@@ -1,8 +1,12 @@
 <link rel="import" href="../../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-courses/prendus-courses.html">
 
 <dom-module id="prendus-app">
     <template>
-        prendus app
+        <redux-store root-reducer="[[rootReducer]]"></redux-store>
+
+        <prendus-courses></prendus-courses>
     </template>
 
     <script src="prendus-app.ts"></script>

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@polymer/polymer": "^2.0.1",
+    "redux-store-element": "^1.1.1",
     "zwitterion-production": "0.0.8"
   }
 }
