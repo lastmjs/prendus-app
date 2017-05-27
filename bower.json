@@ -1,0 +1,22 @@
+{
+  "name": "prendus-graphql-demo",
+  "description": "Testing ground for the future of GraphQL with Prendus",
+  "main": "",
+  "authors": [
+    "Jordan Last <jordan.michael.last@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/lastmjs/prendus-graphql-demo",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^2.0.1",
+    "iron-pages": "PolymerElements/iron-pages#^2.0.0",
+    "app-route": "PolymerElements/app-route#^2.0.0"
+  }
+}
