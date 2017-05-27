@@ -9,6 +9,7 @@ class PrendusCourses extends Polymer.Element {
         GQLRedux(`
             query {
                 allCourses {
+                    id
                     title
                 }
             }

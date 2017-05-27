@@ -1,12 +1,26 @@
-<link rel="import" href="../../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-courses/prendus-courses.html">
+<link rel="import" href="../prendus-course/prendus-course.html">
+<!-- <link rel="import" href="../prendus-lesson/prendus-lesson.html"> -->
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="prendus-app">
     <template>
         <redux-store root-reducer="[[rootReducer]]"></redux-store>
 
-        <prendus-courses></prendus-courses>
+        <app-location route="{{route}}"></app-location>
+        <app-route route="[[route]]" pattern="/:page" data="{{routeData}}" tail="{{routeTail}}" active="{{pageActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/:courseId" data="{{courseRouteData}}" tail="{{courseRouteTail}}" active="{{pageActive}}"></app-route>
+
+        <iron-pages attr-for-selected="show" selected="[[routeData.page]]">
+            <prendus-courses show=""></prendus-courses>
+            <prendus-course show="course" course-id="[[courseRouteData.courseId]]"></prendus-course>
+            <!-- <prendus-lesson show="lesson"></prendus-lesson> -->
+        </iron-pages>
+
     </template>
 
     <script src="prendus-app.ts"></script>
