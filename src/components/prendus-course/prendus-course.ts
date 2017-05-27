@@ -1,6 +1,7 @@
 import {GQLRedux} from '../../services/graphql-service';
+import {PrendusElement} from '../../typings/prendus-element';
 
-class PrendusCourse extends Polymer.Element {
+class PrendusCourse extends Polymer.Element implements PrendusElement {
     static get is() { return 'prendus-course'; }
 
     constructor() {
