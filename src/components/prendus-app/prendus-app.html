@@ -14,16 +14,19 @@
         <!--TODO get rid of the two-way data binding, listen to events and integrate with Redux-->
         <!--TODO update app-location once this PR goes through: https://github.com/PolymerElements/iron-location/pull/83 -->
         <app-location id="appLocation" route="{{route}}" query-params="{{queryParams}}"></app-location>
-        <app-route route="[[route]]" pattern="/:view" data="{{routeData}}"></app-route>
-        <app-route route="[[route]]" pattern="/course/:courseId/:mode" data="{{courseRouteData}}"></app-route>
-        <!-- <app-route route="[[route]]" pattern="/lesson/:lessonId/:mode" data="{{lessonRouteData}}"></app-route> -->
 
-        <iron-pages attr-for-selected="show" selected="[[routeData.view]]">
-            <prendus-courses show=""></prendus-courses>
-            <prendus-course show="course" course-id="[[courseRouteData.courseId]]" mode="[[courseRouteData.mode]]"></prendus-course>
+        <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/create" active="{{createCourseRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
+
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive)]]">
+            <prendus-courses show="rootView"></prendus-courses>
+            <prendus-course show="createCourseView" mode="create"></prendus-course>
+            <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
+            <prendus-course show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
             <!-- <prendus-lesson show="lesson" lesson-id="[[lessonRouteData.lessonId]]" course-id="[[queryParams.courseId]]" mode="[[lessonRouteData.mode]]"></prendus-lesson> -->
         </iron-pages>
-
     </template>
 
     <script src="prendus-app.ts"></script>

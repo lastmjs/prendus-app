@@ -8,6 +8,13 @@ class PrendusApp extends Polymer.Element {
 
         this.rootReducer = RootReducer;
     }
+
+    getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive) {
+        if (rootRouteActive) return 'rootView';
+        if (createCourseRouteActive) return 'createCourseView';
+        if (viewCourseRouteActive) return 'viewCourseView';
+        if (editCourseRouteActive) return 'editCourseView';
+    }
     //
     // subscribedToStore() {
     //     this.subscribedToStore = true;

@@ -15,7 +15,5 @@
     "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
-  "dependencies": {
-    "@polymer/polymer": "^2.0.1"
-  }
+  "dependencies": {}
 }

@@ -20,7 +20,7 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
     }
 
     isEditMode(mode) {
-        return mode === 'edit';
+        return mode === 'edit' || mode === 'create';
     }
 
     loadData() {
@@ -41,9 +41,10 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         `, this);
     }
 
-    saveCourse() {
+    async saveCourse() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
+        //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
         if (this.courseId) {
             GQLRedux(`
                 mutation {
@@ -57,7 +58,16 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
             `, this);
         }
         else {
-
+            const data = await GQLRedux(`
+                mutation {
+                    createCourse(
+                        title: "${title}"
+                    ) {
+                        id
+                    }
+                }
+            `, this);
+            this.courseId = data.createCourse.id; //TODO get rid of this unmanaged mutation once we have a local state solution for integrating with Redux
         }
     }
 

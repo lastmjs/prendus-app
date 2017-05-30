@@ -15,7 +15,7 @@ export const GQLRedux = async (queryString, component) => {
         })
     });
 
-    const data = (await response.json()).data
+    const data = (await response.json()).data;
 
     Object.keys(data).forEach((key) => {
         component.action = {
@@ -24,4 +24,6 @@ export const GQLRedux = async (queryString, component) => {
             value: data[key]
         };
     });
+
+    return data;
 };
