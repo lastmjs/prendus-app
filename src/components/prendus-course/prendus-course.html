@@ -1,22 +1,43 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <dom-module id="prendus-course">
     <template>
-        <redux-store on-statechange="stateChange" on-subscribedtostore="subscribedToStore" action="[[action]]"></redux-store>
+        <redux-store on-statechange="stateChange" action="[[action]]"></redux-store>
 
-        <div>[[course.title]]</div>
+        <dom-if if="[[isViewMode(mode)]]">
+            <template>
+                <div>[[course.title]]</div>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[isEditMode(mode)]]">
+            <template>
+                <input id="titleInput" type="text" value="[[course.title]]">
+
+                <button on-click="saveCourse">Save</button>
+            </template>
+        </dom-if>
+
         <br>
         <div>Lessons:</div>
-
-        <!--TODO this is supposed to be prendus lessons-->
         <dom-repeat items="[[lessons]]">
             <template>
-                <div>[[item.title]]</div>
+                <div>
+                    <a href="lesson/[[item.id]]/view">[[item.title]]</a>
+                </div>
             </template>
         </dom-repeat>
-        <button on-click="addLesson">Add lesson</button>
+
+        <dom-if if="[[isEditMode(mode)]]">
+            <template>
+                <button>
+                    <a href="lesson/create?courseId=[[courseId]]">Add lesson</a>
+                </button>
+            </template>
+        </dom-if>
     </template>
 
     <script src="prendus-course.ts"></script>

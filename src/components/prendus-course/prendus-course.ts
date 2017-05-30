@@ -2,21 +2,25 @@ import {GQLRedux} from '../../services/graphql-service';
 import {PrendusElement} from '../../typings/prendus-element';
 
 class PrendusCourse extends Polymer.Element implements PrendusElement {
+    public courseId: string;
+
     static get is() { return 'prendus-course'; }
-
-    constructor() {
-        super();
-
-        this.courseId = null;
+    static get properties() {
+        return {
+            courseId: {
+                observer: 'loadData'
+            },
+            mode: {
+            }
+        };
     }
 
-    set courseId(val) {
-        this._courseId = val;
-        this.loadData();
+    isViewMode(mode) {
+        return mode === 'view';
     }
 
-    get courseId() {
-        return this._courseId;
+    isEditMode(mode) {
+        return mode === 'edit';
     }
 
     loadData() {
@@ -37,19 +41,24 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         `, this);
     }
 
-    addLesson() {
-        GQLRedux(`
-            mutation {
-                createLesson(
-                    title: "Test Lesson"
-                    courseId: "${this.courseId}"
-                ) {
-                    id
-                    title
+    saveCourse() {
+        const title = this.shadowRoot.querySelector('#titleInput').value;
+
+        if (this.courseId) {
+            GQLRedux(`
+                mutation {
+                    updateCourse(
+                        id: "${this.courseId}"
+                        title: "${title}"
+                    ) {
+                        id
+                    }
                 }
-            }
-        `, this);
-        this.loadData();
+            `, this);
+        }
+        else {
+
+        }
     }
 
     stateChange(e: CustomEvent) {
@@ -57,6 +66,7 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
 
         this.lessons = state[`lessonsFromCourse${this.courseId}`];
         this.course = state[`course${this.courseId}`];
+        // this.loaded = state[]; //TODO set a loaded property for this component when all of the data has been fetched
     }
 }
 

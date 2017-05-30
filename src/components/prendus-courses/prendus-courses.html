@@ -10,10 +10,14 @@
         <dom-repeat items="[[courses]]">
             <template>
                 <div>
-                    <a href="course/[[item.id]]">[[item.title]]</a>
+                    <a href="course/[[item.id]]/view">[[item.title]]</a> <a href="course/[[item.id]]/edit">Edit</a>
                 </div>
             </template>
         </dom-repeat>
+
+        <button>
+            <a href="course/create?courseId=[[courseId]]">Add Course</a>
+        </button>
     </template>
 
     <script src="prendus-courses.ts"></script>

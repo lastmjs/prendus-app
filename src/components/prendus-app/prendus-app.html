@@ -11,14 +11,17 @@
     <template>
         <redux-store root-reducer="[[rootReducer]]"></redux-store>
 
-        <app-location route="{{route}}"></app-location>
-        <app-route route="[[route]]" pattern="/:page" data="{{routeData}}" tail="{{routeTail}}" active="{{pageActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/course/:courseId" data="{{courseRouteData}}" tail="{{courseRouteTail}}" active="{{pageActive}}"></app-route>
+        <!--TODO get rid of the two-way data binding, listen to events and integrate with Redux-->
+        <!--TODO update app-location once this PR goes through: https://github.com/PolymerElements/iron-location/pull/83 -->
+        <app-location id="appLocation" route="{{route}}" query-params="{{queryParams}}"></app-location>
+        <app-route route="[[route]]" pattern="/:view" data="{{routeData}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/:courseId/:mode" data="{{courseRouteData}}"></app-route>
+        <!-- <app-route route="[[route]]" pattern="/lesson/:lessonId/:mode" data="{{lessonRouteData}}"></app-route> -->
 
-        <iron-pages attr-for-selected="show" selected="[[routeData.page]]">
+        <iron-pages attr-for-selected="show" selected="[[routeData.view]]">
             <prendus-courses show=""></prendus-courses>
-            <prendus-course show="course" course-id="[[courseRouteData.courseId]]"></prendus-course>
-            <!-- <prendus-lesson show="lesson"></prendus-lesson> -->
+            <prendus-course show="course" course-id="[[courseRouteData.courseId]]" mode="[[courseRouteData.mode]]"></prendus-course>
+            <!-- <prendus-lesson show="lesson" lesson-id="[[lessonRouteData.lessonId]]" course-id="[[queryParams.courseId]]" mode="[[lessonRouteData.mode]]"></prendus-lesson> -->
         </iron-pages>
 
     </template>
