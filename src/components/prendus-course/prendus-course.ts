@@ -11,8 +11,15 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                 observer: 'loadData'
             },
             mode: {
+
             }
         };
+    }
+
+    constructor() {
+        super();
+
+        this.loaded = true;
     }
 
     isViewMode(mode) {
@@ -23,8 +30,9 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         return mode === 'edit' || mode === 'create';
     }
 
-    loadData() {
-        GQLRedux(`
+    async loadData() {
+        this.loaded = false;
+        await GQLRedux(`
             query {
                 lessonsFromCourse${this.courseId}: allLessons(filter: {
                     course: {
@@ -39,6 +47,7 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                 }
             }
         `, this);
+        this.loaded = true;
     }
 
     async saveCourse() {
@@ -76,7 +85,6 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
 
         this.lessons = state[`lessonsFromCourse${this.courseId}`];
         this.course = state[`course${this.courseId}`];
-        // this.loaded = state[]; //TODO set a loaded property for this component when all of the data has been fetched
     }
 }
 

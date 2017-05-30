@@ -3,70 +3,85 @@ import {NO_COURSE_ID} from '../../services/constants-service';
 
 class PrendusLesson extends Polymer.Element {
     static get is() { return 'prendus-lesson'; }
+    static get properties() {
+        return {
+            lessonId: {
+                observer: 'loadData'
+            },
+            courseId: {
+
+            },
+            mode: {
+
+            }
+        };
+    }
 
     constructor() {
         super();
 
-        this._lessonId = null;
+        this.loaded = true;
     }
 
-    set lessonId(val) {
-        this._lessonId = val;
-        this.loadData();
+    isViewMode(mode) {
+        return mode === 'view';
     }
 
-    get lessonId() {
-        return this._lessonId;
+    isEditMode(mode) {
+        return mode === 'edit' || mode === 'create';
     }
 
-    loadData() {
-        if (this.lessonId === NO_COURSE_ID) {
-            // this.action = {
-            //     type: 'SET_PROPERTY',
-            //     key: `lesson${this.lessonId}`,
-            //     value: {
-            //         title: '',
-            //         course: {
-            //             id:
-            //         }
-            //     }
-            // };
-        }
-        else {
+    async loadData() {
+        this.loaded = false;
+        await GQLRedux(`
+            query {
+                lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
+                    title,
+                    course {
+                        id
+                    }
+                }
+            }
+        `, this);
+        this.loaded = true;
+    }
+
+    async saveLesson() {
+        const title = this.shadowRoot.querySelector('#titleInput').value;
+
+        if (this.lessonId) {
             GQLRedux(`
-                query {
-                    lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
-                        title,
-                        course {
-                            id
-                        }
+                mutation {
+                    updateLesson(
+                        id: "${this.lessonId}"
+                        courseId: "${this.courseId}"
+                        title: "${title}"
+                    ) {
+                        id
                     }
                 }
             `, this);
         }
-    }
-
-    saveLesson() {
-        const title = this.shadowRoot.querySelector('#titleInput').value;
-
-        GQLRedux(`
-            mutation {
-                createLesson(
-                    title: "${title}"
-                    courseId: "${this.lesson.course.id}"
-                ) {
-                    id
-                    title
+        else {
+            const data = await GQLRedux(`
+                mutation {
+                    createLesson(
+                        title: "${title}"
+                        courseId: "${this.courseId}"
+                    ) {
+                        id
+                    }
                 }
-            }
-        `, this);
-        this.loadData();
+            `, this);
+            this.lessonId = data.createLesson.id;
+        }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
         this.lesson = state[`lesson${this.lessonId}`];
+        this.courseId = this.lesson ? this.lesson.course.id : this.courseId;
     }
 }
 

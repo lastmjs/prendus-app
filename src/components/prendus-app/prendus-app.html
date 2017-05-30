@@ -2,7 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
-<!-- <link rel="import" href="../prendus-lesson/prendus-lesson.html"> -->
+<link rel="import" href="../prendus-lesson/prendus-lesson.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -16,16 +16,25 @@
         <app-location id="appLocation" route="{{route}}" query-params="{{queryParams}}"></app-location>
 
         <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
+
         <app-route route="[[route]]" pattern="/course/create" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive)]]">
+        <app-route route="[[route]]" pattern="/lesson/create" active="{{createLessonRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/lesson/:lessonId/view" data="{{viewLessonRouteData}}" active="{{viewLessonRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/lesson/:lessonId/edit" data="{{editLessonRouteData}}" active="{{editLessonRouteActive}}"></app-route>
+
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
+
             <prendus-course show="createCourseView" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
             <prendus-course show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
-            <!-- <prendus-lesson show="lesson" lesson-id="[[lessonRouteData.lessonId]]" course-id="[[queryParams.courseId]]" mode="[[lessonRouteData.mode]]"></prendus-lesson> -->
+
+            <prendus-lesson show="createLessonView" course-id="[[queryParams.courseId]]" mode="create"></prendus-lesson>
+            <prendus-lesson show="viewLessonView" lesson-id="[[viewLessonRouteData.lessonId]]" mode="view"></prendus-lesson>
+            <prendus-lesson show="editLessonView" lesson-id="[[editLessonRouteData.lessonId]]" mode="edit"></prendus-lesson>
         </iron-pages>
     </template>
 

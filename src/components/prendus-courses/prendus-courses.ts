@@ -6,12 +6,19 @@ class PrendusCourses extends Polymer.Element implements PrendusElement {
 
     static get is() { return 'prendus-courses'; }
 
+    constructor() {
+        super();
+
+        this.loaded = true;
+    }
+
     subscribedToStore() {
         this.loadData();
     }
 
-    loadData() {
-        GQLRedux(`
+    async loadData() {
+        this.loaded = false;
+        await GQLRedux(`
             query {
                 allCourses {
                     id
@@ -19,6 +26,7 @@ class PrendusCourses extends Polymer.Element implements PrendusElement {
                 }
             }
         `, this);
+        this.loaded = true;
     }
 
     async stateChange(e: CustomEvent) {

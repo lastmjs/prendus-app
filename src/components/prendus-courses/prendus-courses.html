@@ -1,23 +1,35 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <dom-module id="prendus-courses">
     <template>
         <redux-store on-subscribedtostore="subscribedToStore" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-        <div>Courses:</div>
-        <dom-repeat items="[[courses]]">
+        <dom-if if="[[loaded]]">
             <template>
-                <div>
-                    <a href="course/[[item.id]]/view">[[item.title]]</a> <a href="course/[[item.id]]/edit">Edit</a>
-                </div>
-            </template>
-        </dom-repeat>
+                <div>Courses:</div>
+                <dom-repeat items="[[courses]]">
+                    <template>
+                        <div>
+                            <a href="course/[[item.id]]/view">[[item.title]]</a> <a href="course/[[item.id]]/edit">Edit</a>
+                        </div>
+                    </template>
+                </dom-repeat>
 
-        <button>
-            <a href="course/create">Add Course</a>
-        </button>
+                <button>
+                    <a href="course/create">Add Course</a>
+                </button>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
     </template>
 
     <script src="prendus-courses.ts"></script>
