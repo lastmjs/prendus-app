@@ -1,19 +1,73 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 1
+# version: 10
 
 type File implements Node {
-  contentType: String!
-  createdAt: DateTime!
   id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  contentType: String!
   name: String!
   secret: String! @isUnique
   size: Int!
-  updatedAt: DateTime!
   url: String! @isUnique
 }
 
 type User implements Node {
-  createdAt: DateTime!
   id: ID! @isUnique
+  createdAt: DateTime!
   updatedAt: DateTime!
+  courses: [Course!]! @relation(name: "AuthorOnCourse")
+  lessons: [Lesson!]! @relation(name: "AuthorOnLesson")
+  assignments: [Assignment!]! @relation(name: "AuthorOnAssignment")
+  quizzes: [Quiz!]! @relation(name: "AuthorOnQuiz")
+  questions: [Question!]! @relation(name: "AuthorOnQuestion")
+}
+
+type Course implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  lessons: [Lesson!]! @relation(name: "CourseOnLesson")
+  description: String
+  dueDate: DateTime
+  author: User! @relation(name: "AuthorOnCourse")
+}
+
+type Lesson implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  course: Course! @relation(name: "CourseOnLesson")
+  assignments: [Assignment!]! @relation(name: "LessonOnAssignment")
+  author: User! @relation(name: "AuthorOnLesson")
+}
+
+type Assignment implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  lesson: Lesson! @relation(name: "LessonOnAssignment")
+  author: User! @relation(name: "AuthorOnAssignment")
+}
+
+type Quiz implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  author: User! @relation(name: "AuthorOnQuiz")
+  questions: [Question!]! @relation(name: "QuizOnQuestion")
+}
+
+type Question implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  text: String!
+  code: String!
+  quiz: Quiz @relation(name: "QuizOnQuestion")
+  author: User! @relation(name: "AuthorOnQuestion")
 }

@@ -1,4 +1,4 @@
-import {GQLRedux} from '../../services/graphql-service';
+import {GQLRedux, GQLSubscribe} from '../../services/graphql-service';
 import {PrendusElement} from '../../typings/prendus-element';
 
 class PrendusCourse extends Polymer.Element implements PrendusElement {
@@ -48,6 +48,20 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
             }
         `, this);
         this.loaded = true;
+
+        GQLSubscribe(`
+            subscription changedCourse {
+                Course(
+                    filter: {
+                        mutation_in: [CREATED, UPDATED, DELETED]
+                    }
+                ) {
+                    node {
+                        id
+                    }
+                }
+            }
+        `);
     }
 
     async saveCourse() {
