@@ -11,7 +11,9 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
 
     static get is() { return 'prendus-courses'; }
 
-    async subscribedToStore() {
+    async connectedCallback() {
+        super.connectedCallback();
+
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -68,7 +70,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
         const state = e.detail.state;
 
         this.courses = state.allCourses;
-        this.loaded = state.components[this.componentId].loaded;
+        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
     }
 }
 

@@ -26,7 +26,9 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
         };
     }
 
-    subscribedToStore() {
+    connectedCallback() {
+        super.connectedCallback();
+
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
