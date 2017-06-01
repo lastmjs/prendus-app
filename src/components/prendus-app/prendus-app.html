@@ -17,22 +17,22 @@
 
         <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
 
-        <app-route route="[[route]]" pattern="/course/create" active="{{createCourseRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
 
-        <app-route route="[[route]]" pattern="/lesson/create" active="{{createLessonRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/lesson/create" data="{{createLessonRouteData}}" active="{{createLessonRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/lesson/:lessonId/view" data="{{viewLessonRouteData}}" active="{{viewLessonRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/lesson/:lessonId/edit" data="{{editLessonRouteData}}" active="{{editLessonRouteActive}}"></app-route>
 
         <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
 
-            <prendus-course show="createCourseView" mode="create"></prendus-course>
+            <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
             <prendus-course show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
 
-            <prendus-lesson show="createLessonView" course-id="[[queryParams.courseId]]" mode="create"></prendus-lesson>
+            <prendus-lesson show="createLessonView" lesson-id="[[createLessonRouteData.lessonId]]" course-id="[[queryParams.courseId]]" mode="create"></prendus-lesson>
             <prendus-lesson show="viewLessonView" lesson-id="[[viewLessonRouteData.lessonId]]" mode="view"></prendus-lesson>
             <prendus-lesson show="editLessonView" lesson-id="[[editLessonRouteData.lessonId]]" mode="edit"></prendus-lesson>
         </iron-pages>

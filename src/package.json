@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "redux-store-element": "^1.1.1",
+    "redux-store-element": "^1.2.2",
     "zwitterion-production": "0.0.8"
   }
 }

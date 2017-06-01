@@ -1,12 +1,21 @@
-import {GQLRedux} from '../../services/graphql-service';
-import {NO_COURSE_ID} from '../../services/constants-service';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {ContainerElement} from '../../typings/container-element';
+import {Lesson} from '../../typings/lesson';
 
-class PrendusLesson extends Polymer.Element {
+class PrendusLesson extends Polymer.Element implements ContainerElement {
+    componentId: string;
+    action: SetPropertyAction | SetComponentPropertyAction;
+    courseId: string;
+    lessonId: string;
+    loaded: boolean;
+    lesson: Lesson;
+
     static get is() { return 'prendus-lesson'; }
     static get properties() {
         return {
             lessonId: {
-                observer: 'loadData'
+                observer: 'lessonIdChanged'
             },
             courseId: {
 
@@ -17,10 +26,14 @@ class PrendusLesson extends Polymer.Element {
         };
     }
 
-    constructor() {
-        super();
-
-        this.loaded = true;
+    subscribedToStore() {
+        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     isViewMode(mode) {
@@ -31,9 +44,31 @@ class PrendusLesson extends Polymer.Element {
         return mode === 'edit' || mode === 'create';
     }
 
+    async lessonIdChanged() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'lessonId',
+            value: this.lessonId
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: false
+        };
+        await this.loadData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
+    }
+
     async loadData() {
-        this.loaded = false;
-        await GQLRedux(`
+        await GQLQuery(`
             query {
                 lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
                     title,
@@ -42,15 +77,24 @@ class PrendusLesson extends Polymer.Element {
                     }
                 }
             }
-        `, this);
-        this.loaded = true;
+        `, (key, value) => {
+            this.action = {
+                type: 'SET_PROPERTY',
+                key,
+                value
+            };
+        });
+    }
+
+    subscribeToData() {
+
     }
 
     async saveLesson() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
         if (this.lessonId) {
-            GQLRedux(`
+            GQLMutate(`
                 mutation {
                     updateLesson(
                         id: "${this.lessonId}"
@@ -60,10 +104,10 @@ class PrendusLesson extends Polymer.Element {
                         id
                     }
                 }
-            `, this);
+            `);
         }
         else {
-            const data = await GQLRedux(`
+            const data = await GQLMutate(`
                 mutation {
                     createLesson(
                         title: "${title}"
@@ -72,8 +116,14 @@ class PrendusLesson extends Polymer.Element {
                         id
                     }
                 }
-            `, this);
-            this.lessonId = data.createLesson.id;
+            `);
+
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'lessonId',
+                value: data.createLesson.id
+            };
         }
     }
 
@@ -82,6 +132,8 @@ class PrendusLesson extends Polymer.Element {
 
         this.lesson = state[`lesson${this.lessonId}`];
         this.courseId = this.lesson ? this.lesson.course.id : this.courseId;
+        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        this.lessonId = state.components[this.componentId] ? state.components[this.componentId].lessonId : this.lessonId;
     }
 }
 

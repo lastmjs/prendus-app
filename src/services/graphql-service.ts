@@ -2,11 +2,10 @@ const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r
 
 //TODO the GraphQL web socket protocol used below is deprecated and will be changing soon: https://github.com/apollographql/subscriptions-transport-ws/issues/149
 //TODO We'll need to wait for graph.cool to update their back end before we change our client
-const webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
+let webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
 
 webSocket.onopen = () => {
-    const message: OperationMessage = {
-        id: '1',
+    const message = {
         type: 'init'
     };
 
@@ -14,7 +13,7 @@ webSocket.onopen = () => {
 };
 
 webSocket.onmessage = (event) => {
-    const data: OperationMessage = JSON.parse(event.data);
+    const data = JSON.parse(event.data);
 
     console.log(data);
 
@@ -29,6 +28,10 @@ webSocket.onmessage = (event) => {
                 data
             };
         }
+        case 'subscription_data': {
+            subscriptions[data.id](data);
+            break;
+        }
         case 'subscription_success': {
             console.log('subscription_success');
             break;
@@ -42,7 +45,9 @@ webSocket.onmessage = (event) => {
     }
 };
 
-export const GQLRedux = async (queryString, component) => {
+let subscriptions = {};
+
+export const GQLQuery = async (queryString, callback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
@@ -60,19 +65,45 @@ export const GQLRedux = async (queryString, component) => {
     const data = (await response.json()).data;
 
     Object.keys(data).forEach((key) => {
-        component.action = {
-            type: 'SET_PROPERTY',
-            key,
-            value: data[key]
-        };
+        callback(key, data[key]);
     });
 
     return data;
 };
 
-export const GQLSubscribe = (queryString) => {
+export const GQLMutate = async (queryString) => {
+
+    //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
+
+    const response = await window.fetch(httpEndpoint, {
+        method: 'post',
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: queryString
+        })
+    });
+
+    const data = (await response.json()).data;
+
+    return data;
+};
+
+//TODO potentially gaurd against multiple subscriptions
+export const GQLSubscribe = (queryString, id, callback) => {
+    // we need to wait for the webSocket's connection to be open
+    if (webSocket.readyState !== webSocket.OPEN) {
+        setTimeout(() => {
+            GQLSubscribe(queryString, id, callback); // allow other tasks to run by throwing this function onto the event loop. This creates an infinite non-blocking retry
+        });
+        return;
+    }
+
+    subscriptions[id] = callback;
+
     const message = {
-        id: '2',
+        id,
         type: 'subscription_start',
         query: queryString
     };

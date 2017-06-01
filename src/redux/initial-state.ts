@@ -1,5 +1,5 @@
-export const InitialState = {
-    route: {},
-    routeData: {},
-    queryParams: {}
+import {State} from '../typings/state';
+
+export const InitialState: State = {
+    components: {}
 };

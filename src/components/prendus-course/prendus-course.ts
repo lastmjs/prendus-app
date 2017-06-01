@@ -1,14 +1,24 @@
-import {GQLRedux, GQLSubscribe} from '../../services/graphql-service';
-import {PrendusElement} from '../../typings/prendus-element';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {Mode} from '../../typings/mode';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {Lesson} from '../../typings/lesson';
+import {Course} from '../../typings/course';
 
-class PrendusCourse extends Polymer.Element implements PrendusElement {
-    public courseId: string;
+class PrendusCourse extends Polymer.Element implements ContainerElement {
+    courseId: string;
+    mode: Mode;
+    componentId: string;
+    action: SetPropertyAction | SetComponentPropertyAction;
+    lessons: Lesson[];
+    course: Course;
+    loaded: boolean;
 
     static get is() { return 'prendus-course'; }
     static get properties() {
         return {
             courseId: {
-                observer: 'loadData'
+                observer: 'courseIdChanged'
             },
             mode: {
 
@@ -16,10 +26,15 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         };
     }
 
-    constructor() {
-        super();
-
-        this.loaded = true;
+    subscribedToStore() {
+        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
+        this.subscribeToData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     isViewMode(mode) {
@@ -30,9 +45,31 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         return mode === 'edit' || mode === 'create';
     }
 
+    async courseIdChanged() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'courseId',
+            value: this.courseId
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: false
+        };
+        await this.loadData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
+    }
+
     async loadData() {
-        this.loaded = false;
-        await GQLRedux(`
+        await GQLQuery(`
             query {
                 lessonsFromCourse${this.courseId}: allLessons(filter: {
                     course: {
@@ -46,14 +83,19 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                     title
                 }
             }
-        `, this);
-        this.loaded = true;
+        `, (key, value) => {
+            this.action = {
+                type: 'SET_PROPERTY',
+                key,
+                value
+            };
+        });
+    }
 
-        console.log('after await')
-
+    subscribeToData() {
         GQLSubscribe(`
-            subscription changedCourse {
-                Course(
+            subscription changedLesson {
+                Lesson(
                     filter: {
                         mutation_in: [CREATED, UPDATED, DELETED]
                     }
@@ -63,7 +105,9 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                     }
                 }
             }
-        `);
+        `, this.componentId, (data) => {
+            this.loadData();
+        });
     }
 
     async saveCourse() {
@@ -71,7 +115,7 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
 
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
         if (this.courseId) {
-            GQLRedux(`
+            GQLMutate(`
                 mutation {
                     updateCourse(
                         id: "${this.courseId}"
@@ -80,10 +124,10 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                         id
                     }
                 }
-            `, this);
+            `);
         }
         else {
-            const data = await GQLRedux(`
+            const data = await GQLMutate(`
                 mutation {
                     createCourse(
                         title: "${title}"
@@ -91,16 +135,24 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
                         id
                     }
                 }
-            `, this);
-            this.courseId = data.createCourse.id; //TODO get rid of this unmanaged mutation once we have a local state solution for integrating with Redux
+            `);
+
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'courseId',
+                value: data.createCourse.id
+            };
         }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
+        this.courseId = state.components[this.componentId] ? state.components[this.componentId].courseId : this.courseId;
         this.lessons = state[`lessonsFromCourse${this.courseId}`];
         this.course = state[`course${this.courseId}`];
+        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
     }
 }
 

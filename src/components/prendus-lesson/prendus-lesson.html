@@ -4,7 +4,7 @@
 
 <dom-module id="prendus-lesson">
     <template>
-        <redux-store on-statechange="stateChange" action="[[action]]"></redux-store>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
 
         <dom-if if="[[loaded]]">
             <template>

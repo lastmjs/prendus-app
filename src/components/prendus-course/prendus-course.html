@@ -5,7 +5,7 @@
 
 <dom-module id="prendus-course">
     <template>
-        <redux-store on-statechange="stateChange" action="[[action]]"></redux-store>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" on-subscribedtostore="subscribedToStore" action="[[action]]"></redux-store>
 
         <dom-if if="[[loaded]]">
             <template>
