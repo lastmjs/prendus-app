@@ -1,6 +1,46 @@
 const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
-const wsEndpoint = 'wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r';
-const webSocket = new WebSocket(wsEndpoint);
+
+//TODO the GraphQL web socket protocol used below is deprecated and will be changing soon: https://github.com/apollographql/subscriptions-transport-ws/issues/149
+//TODO We'll need to wait for graph.cool to update their back end before we change our client
+const webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
+
+webSocket.onopen = () => {
+    const message: OperationMessage = {
+        id: '1',
+        type: 'init'
+    };
+
+    webSocket.send(JSON.stringify(message));
+};
+
+webSocket.onmessage = (event) => {
+    const data: OperationMessage = JSON.parse(event.data);
+
+    console.log(data);
+
+    switch (data.type) {
+        case 'init_success': {
+            console.log('init_success');
+            break;
+        }
+        case 'init_fail': {
+            throw {
+                message: 'init_fail returned from WebSocket server',
+                data
+            };
+        }
+        case 'subscription_success': {
+            console.log('subscription_success');
+            break;
+        }
+        case 'subscription_fail': {
+            throw {
+                message: 'subscription_fail returned from WebSocket server',
+                data
+            };
+        }
+    }
+};
 
 export const GQLRedux = async (queryString, component) => {
 
@@ -31,8 +71,11 @@ export const GQLRedux = async (queryString, component) => {
 };
 
 export const GQLSubscribe = (queryString) => {
-    webSocket.send(queryString);
-    webSocket.onmessage = (event) => {
-        console.log('event', event);
+    const message = {
+        id: '2',
+        type: 'subscription_start',
+        query: queryString
     };
+
+    webSocket.send(JSON.stringify(message));
 };

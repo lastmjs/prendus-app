@@ -1,7 +1,28 @@
 import {RootReducer} from '../../redux/reducers';
+import {GQLSubscribe} from '../../services/graphql-service';
 
 class PrendusApp extends Polymer.Element {
     static get is() { return 'prendus-app'; }
+
+    constructor() {
+        super();
+
+        setTimeout(() => {
+            GQLSubscribe(`
+                subscription changedCourse {
+                    Course(
+                        filter: {
+                            mutation_in: [CREATED, UPDATED, DELETED]
+                        }
+                    ) {
+                        node {
+                            id
+                        }
+                    }
+                }
+            `);
+        }, 5000);
+    }
 
     connectedCallback() {
         super.connectedCallback();

@@ -49,6 +49,8 @@ class PrendusCourse extends Polymer.Element implements PrendusElement {
         `, this);
         this.loaded = true;
 
+        console.log('after await')
+
         GQLSubscribe(`
             subscription changedCourse {
                 Course(
