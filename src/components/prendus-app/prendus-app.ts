@@ -1,9 +1,12 @@
 import {RootReducer} from '../../redux/reducers';
 import {GQLSubscribe} from '../../services/graphql-service';
 import {Reducer} from '../../typings/reducer';
+import {State} from '../../typings/state';
+import {User} from '../../typings/user';
 
 class PrendusApp extends Polymer.Element {
     rootReducer: Reducer;
+    user: User;
 
     static get is() { return 'prendus-app'; }
 
@@ -13,10 +16,11 @@ class PrendusApp extends Polymer.Element {
         this.rootReducer = RootReducer;
     }
 
-    getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive) {
+    getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive, loginRouteActive) {
         if (rootRouteActive) return 'rootView';
 
         if (signupRouteActive) return 'signupView';
+        if (loginRouteActive) return 'loginView';
 
         if (createCourseRouteActive) return 'createCourseView';
         if (viewCourseRouteActive) return 'viewCourseView';
@@ -58,15 +62,17 @@ class PrendusApp extends Polymer.Element {
     //     };
     // }
     //
-    // stateChange(e: CustomEvent) {
-    //     const state = e.detail.state;
-    //
-    //     console.log(state);
-    //
-    //     this.route = state.route;
-    //     this.routeData = state.routeData;
-    //     this.queryParams = state.queryParams;
-    // }
+    stateChange(e: CustomEvent) {
+        const state: State = e.detail.state;
+
+        this.user = state.user;
+
+        // console.log(state);
+        //
+        // this.route = state.route;
+        // this.routeData = state.routeData;
+        // this.queryParams = state.queryParams;
+    }
 }
 
 window.customElements.define(PrendusApp.is, PrendusApp);

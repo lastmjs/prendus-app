@@ -1,6 +1,7 @@
 import {State} from '../typings/state';
 
 export const InitialState: State = {
-    userToken: '',
+    userToken: null,
+    user: null,
     components: {}
 };

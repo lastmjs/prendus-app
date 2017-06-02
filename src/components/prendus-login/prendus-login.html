@@ -1,8 +1,20 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
-<dom-module id="prendus-app">
+<dom-module id="prendus-login">
     <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <div>
+            Email: <input id="emailInput" type="text">
+        </div>
+
+        <div>
+            Password: <input id="passwordInput" type="password">
+        </div>
+
+        <button on-click="loginClick">Login</button>
     </template>
 
-    <script src="prendus-app.ts"></script>
+    <script src="prendus-login.ts"></script>
 </dom-module>

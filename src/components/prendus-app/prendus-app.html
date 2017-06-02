@@ -1,16 +1,18 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
 <link rel="import" href="../prendus-lesson/prendus-lesson.html">
 <link rel="import" href="../prendus-signup/prendus-signup.html">
+<link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="prendus-app">
     <template>
-        <redux-store root-reducer="[[rootReducer]]"></redux-store>
+        <redux-store root-reducer="[[rootReducer]]" on-statechange="stateChange"></redux-store>
 
         <!--TODO get rid of the two-way data binding, listen to events and integrate with Redux-->
         <!--TODO update app-location once this PR goes through: https://github.com/PolymerElements/iron-location/pull/83 -->
@@ -19,6 +21,7 @@
         <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/login" active="{{loginRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
@@ -27,6 +30,12 @@
         <app-route route="[[route]]" pattern="/lesson/create" data="{{createLessonRouteData}}" active="{{createLessonRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/lesson/:lessonId/view" data="{{viewLessonRouteData}}" active="{{viewLessonRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/lesson/:lessonId/edit" data="{{editLessonRouteData}}" active="{{editLessonRouteActive}}"></app-route>
+
+        <dom-if if="[[user]]">
+            <template>
+                [[user.email]]
+            </template>
+        </dom-if>
 
         <button>
             <a href="signup">Signup</a>
@@ -39,10 +48,11 @@
         <br>
         <br>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive)]]">
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive, loginRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
 
             <prendus-signup show="signupView"></prendus-signup>
+            <prendus-login show="loginView"></prendus-login>
 
             <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
