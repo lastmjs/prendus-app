@@ -3,13 +3,13 @@ export interface Action {
 }
 
 export interface SetPropertyAction {
-    readonly type: string;
+    readonly type: 'SET_PROPERTY';
     readonly key: string;
     readonly value: any;
 }
 
 export interface SetComponentPropertyAction {
-    readonly type: string;
+    readonly type: 'SET_COMPONENT_PROPERTY';
     readonly componentId: string;
     readonly key: string;
     readonly value: any;

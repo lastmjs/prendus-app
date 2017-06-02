@@ -3,6 +3,7 @@
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
 <link rel="import" href="../prendus-lesson/prendus-lesson.html">
+<link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -17,6 +18,8 @@
 
         <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
+
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
@@ -25,8 +28,21 @@
         <app-route route="[[route]]" pattern="/lesson/:lessonId/view" data="{{viewLessonRouteData}}" active="{{viewLessonRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/lesson/:lessonId/edit" data="{{editLessonRouteData}}" active="{{editLessonRouteActive}}"></app-route>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive)]]">
+        <button>
+            <a href="signup">Signup</a>
+        </button>
+
+        <button>
+            <a href="login">Login</a>
+        </button>
+
+        <br>
+        <br>
+
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
+
+            <prendus-signup show="signupView"></prendus-signup>
 
             <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>

@@ -4,7 +4,7 @@ const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r
 //TODO We'll need to wait for graph.cool to update their back end before we change our client
 let webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
 
-webSocket.onopen = () => {
+webSocket.onopen = (event) => {
     const message = {
         type: 'init'
     };
