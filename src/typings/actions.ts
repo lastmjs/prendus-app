@@ -14,3 +14,7 @@ export interface SetComponentPropertyAction {
     readonly key: string;
     readonly value: any;
 }
+
+export interface DefaultAction {
+    readonly type: 'DEFAULT_ACTION'
+}

@@ -3,17 +3,28 @@ import {GQLSubscribe} from '../../services/graphql-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
 class PrendusApp extends Polymer.Element {
     rootReducer: Reducer;
     user: User;
+    action: SetPropertyAction | DefaultAction;
+    userToken: string;
 
     static get is() { return 'prendus-app'; }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
 
         this.rootReducer = RootReducer;
+
+        //TODO this craziness has to do with setting the actions in the redux store element. Right now I asynchronously recurse so that actions will eventually
+        //TODO fire against the store. That gets rid of gaurantees of synchronous updates to the state. Generators might be able to solve this problem. Look into it
+        const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
+        this.action = checkForUserTokenAction;
+        this.action = await getAndSetUser((<SetPropertyAction> checkForUserTokenAction).value);
+        // this.action = await getAndSetUser(this.userToken);
     }
 
     getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, signupRouteActive, loginRouteActive) {
@@ -66,6 +77,7 @@ class PrendusApp extends Polymer.Element {
         const state: State = e.detail.state;
 
         this.user = state.user;
+        this.userToken = state.userToken;
 
         // console.log(state);
         //

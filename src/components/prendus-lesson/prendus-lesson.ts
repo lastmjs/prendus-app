@@ -2,6 +2,7 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Lesson} from '../../typings/lesson';
+import {User} from '../../typings/user';
 
 class PrendusLesson extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -10,6 +11,8 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
     lessonId: string;
     loaded: boolean;
     lesson: Lesson;
+    userToken: string;
+    user: User;
 
     static get is() { return 'prendus-lesson'; }
     static get properties() {
@@ -79,7 +82,7 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, (key, value) => {
+        `, this.userToken, (key, value) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
@@ -106,7 +109,7 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `);
+            `, this.userToken);
         }
         else {
             const data = await GQLMutate(`
@@ -114,11 +117,12 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                     createLesson(
                         title: "${title}"
                         courseId: "${this.courseId}"
+                        authorId: "${this.user.id}"
                     ) {
                         id
                     }
                 }
-            `);
+            `, this.userToken);
 
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
@@ -136,6 +140,8 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
         this.courseId = this.lesson ? this.lesson.course.id : this.courseId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.lessonId = state.components[this.componentId] ? state.components[this.componentId].lessonId : this.lessonId;
+        this.userToken = state.userToken;
+        this.user = state.user;
     }
 }
 

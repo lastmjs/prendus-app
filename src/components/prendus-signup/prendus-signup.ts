@@ -1,11 +1,13 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
-import {SetPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, DefaultAction} from '../../typings/actions';
+import {persistUserToken, getAndSetUser} from '../../redux/actions';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
-    action: SetPropertyAction;
+    action: SetPropertyAction | DefaultAction;
+    userToken: string;
 
     static get is() { return 'prendus-signup'; }
 
@@ -29,8 +31,9 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         const repeatPassword: string = this.shadowRoot.querySelector('#repeatPasswordInput').value;
         const passwordsMatch = checkPasswords(password, repeatPassword);
         if (!passwordsMatch) alert('passwords must match');
-        const data = await performMutation(email, password);
-        setUserTokenInRedux(this, data.signinUser.token);
+        const data = await performMutation(email, password, this.userToken);
+        this.action = persistUserToken(data.signinUser.token);
+        this.action = await getAndSetUser(this.userToken);
         if (data.createUser.id) alert('user created successfully');
         navigateHome();
 
@@ -43,7 +46,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             }
         }
 
-        async function performMutation(email, password) {
+        async function performMutation(email, password, userToken) {
             // signup the user and login the user
             const data = await GQLMutate(`
                 mutation {
@@ -63,7 +66,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         token
                     }
                 }
-            `);
+            `, userToken);
 
             return data;
         }
@@ -72,18 +75,12 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             window.history.pushState({}, null, '/');
             window.dispatchEvent(new CustomEvent('location-changed'));
         }
-
-        function setUserTokenInRedux(component, token) {
-            component.action = {
-                type: 'SET_PROPERTY',
-                key: 'userToken',
-                value: token
-            };
-        }
     }
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+
+        this.userToken = state.userToken;
     }
 }
 

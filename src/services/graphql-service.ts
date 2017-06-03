@@ -15,11 +15,8 @@ webSocket.onopen = (event) => {
 webSocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    console.log(data);
-
     switch (data.type) {
         case 'init_success': {
-            console.log('init_success');
             break;
         }
         case 'init_fail': {
@@ -33,7 +30,6 @@ webSocket.onmessage = (event) => {
             break;
         }
         case 'subscription_success': {
-            console.log('subscription_success');
             break;
         }
         case 'subscription_fail': {
@@ -47,15 +43,17 @@ webSocket.onmessage = (event) => {
 
 let subscriptions = {};
 
-export const GQLQuery = async (queryString, callback) => {
+export const GQLQuery = async (queryString, userToken, callback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
-
 
     const response = await window.fetch(httpEndpoint, {
         method: 'post',
         headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
+            ...userToken && {
+                'Authorization': `Bearer ${userToken}`
+            }
         },
         body: JSON.stringify({
             query: queryString
@@ -71,14 +69,17 @@ export const GQLQuery = async (queryString, callback) => {
     return data;
 };
 
-export const GQLMutate = async (queryString) => {
+export const GQLMutate = async (queryString, userToken) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
     const response = await window.fetch(httpEndpoint, {
         method: 'post',
         headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
+            ...userToken && {
+                'Authorization': `Bearer ${userToken}`
+            }
         },
         body: JSON.stringify({
             query: queryString

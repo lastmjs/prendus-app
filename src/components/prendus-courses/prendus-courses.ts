@@ -8,6 +8,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
+    userToken: string;
 
     static get is() { return 'prendus-courses'; }
 
@@ -39,7 +40,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                     title
                 }
             }
-        `, (key, value) => {
+        `, this.userToken, (key, value) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
@@ -71,6 +72,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
 
         this.courses = state.allCourses;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        this.userToken = state.userToken;
     }
 }
 
