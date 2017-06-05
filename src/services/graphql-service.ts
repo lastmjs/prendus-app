@@ -1,4 +1,5 @@
-import {GQLQueryCallback} from '../typings/gql-query-callback';
+import {GQLQueryDataCallback} from '../typings/gql-query-data-callback';
+import {GQLQueryErrorCallback} from '../typings/gql-query-error-callback';
 import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback';
 
 const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
@@ -47,7 +48,7 @@ webSocket.onmessage = (event) => {
     }
 };
 
-export const GQLQuery = async (queryString: string, userToken: string, callback: GQLQueryCallback) => {
+export const GQLQuery = async (queryString: string, userToken: string, dataCallback: GQLQueryDataCallback, errorCallback: GQLQueryErrorCallback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
@@ -64,11 +65,15 @@ export const GQLQuery = async (queryString: string, userToken: string, callback:
         })
     });
 
-    const data = (await response.json()).data;
+    const responseJSON = await response.json();
+    const data = responseJSON.data;
+    const error = responseJSON.error;
 
-    Object.keys(data).forEach((key) => {
-        callback(key, data[key]);
+    Object.keys(data || {}).forEach((key) => {
+        dataCallback(key, data[key]);
     });
+
+    if (error) errorCallback(error);
 
     return data;
 };

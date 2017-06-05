@@ -89,6 +89,8 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                 key,
                 value
             };
+        }, (error: any) => {
+            alert(error);
         });
     }
 
