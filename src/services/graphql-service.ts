@@ -1,8 +1,14 @@
+import {GQLQueryCallback} from '../typings/gql-query-callback';
+import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback';
+
 const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
 
 //TODO the GraphQL web socket protocol used below is deprecated and will be changing soon: https://github.com/apollographql/subscriptions-transport-ws/issues/149
 //TODO We'll need to wait for graph.cool to update their back end before we change our client
 let webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
+let subscriptions: {
+    [key: string]: GQLSubscribeCallback
+} = {};
 
 webSocket.onopen = (event) => {
     const message = {
@@ -41,9 +47,7 @@ webSocket.onmessage = (event) => {
     }
 };
 
-let subscriptions = {};
-
-export const GQLQuery = async (queryString, userToken, callback) => {
+export const GQLQuery = async (queryString: string, userToken: string, callback: GQLQueryCallback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
@@ -53,7 +57,7 @@ export const GQLQuery = async (queryString, userToken, callback) => {
             'content-type': 'application/json',
             ...userToken && {
                 'Authorization': `Bearer ${userToken}`
-            }
+            } //TODO As far as I understand the syntax above will be standard and this TypeScript error might go away with the following: https://github.com/Microsoft/TypeScript/issues/10727
         },
         body: JSON.stringify({
             query: queryString
@@ -69,7 +73,7 @@ export const GQLQuery = async (queryString, userToken, callback) => {
     return data;
 };
 
-export const GQLMutate = async (queryString, userToken) => {
+export const GQLMutate = async (queryString: string, userToken: string | null) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
@@ -79,7 +83,7 @@ export const GQLMutate = async (queryString, userToken) => {
             'content-type': 'application/json',
             ...userToken && {
                 'Authorization': `Bearer ${userToken}`
-            }
+            } //TODO As far as I understand the syntax above will be standard and this TypeScript error might go away with the following: https://github.com/Microsoft/TypeScript/issues/10727
         },
         body: JSON.stringify({
             query: queryString
@@ -92,7 +96,7 @@ export const GQLMutate = async (queryString, userToken) => {
 };
 
 //TODO potentially gaurd against multiple subscriptions
-export const GQLSubscribe = (queryString, id, callback) => {
+export const GQLSubscribe = (queryString: string, id: string, callback: GQLSubscribeCallback) => {
     // we need to wait for the webSocket's connection to be open
     if (webSocket.readyState !== webSocket.OPEN) {
         setTimeout(() => {
