@@ -8,8 +8,8 @@ import {persistUserToken} from '../../redux/actions';
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction;
-    userToken: string;
-    user: User;
+    userToken: string | null;
+    user: User | null;
 
     static get is() { return 'prendus-login'; }
 
@@ -33,10 +33,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const data = await performMutation(email, password, this.userToken);
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(data.signinUser.user);
-        if (data.signinUser.token === this.userToken && this.user.id === data.signinUser.user.id) alert('user logged in successfully');
+        if (data.signinUser.token === this.userToken && (this.user && this.user.id === data.signinUser.user.id)) alert('user logged in successfully');
         navigateHome();
 
-        async function performMutation(email, password, userToken) {
+        async function performMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLMutate(`
                 mutation {
@@ -57,11 +57,11 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         }
 
         function navigateHome() {
-            window.history.pushState({}, null, '/');
+            window.history.pushState({}, '', '/');
             window.dispatchEvent(new CustomEvent('location-changed'));
         }
 
-        function setUserInRedux(user): SetPropertyAction {
+        function setUserInRedux(user: User): SetPropertyAction {
             return {
                 type: 'SET_PROPERTY',
                 key: 'user',

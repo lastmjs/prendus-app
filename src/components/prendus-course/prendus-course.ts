@@ -42,11 +42,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isViewMode(mode) {
+    isViewMode(mode: Mode) {
         return mode === 'view';
     }
 
-    isEditMode(mode) {
+    isEditMode(mode: Mode) {
         return mode === 'edit' || mode === 'create';
     }
 
@@ -88,7 +88,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     title
                 }
             }
-        `, this.userToken, (key, value) => {
+        `, this.userToken, (key: string, value: any) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
@@ -110,7 +110,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.componentId, (data) => {
+        `, this.componentId, (data: any) => {
             this.loadData();
         });
     }

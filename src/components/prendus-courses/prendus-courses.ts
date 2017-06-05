@@ -40,7 +40,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                     title
                 }
             }
-        `, this.userToken, (key, value) => {
+        `, this.userToken, (key: string, value: any) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
@@ -62,7 +62,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.componentId, (data) => {
+        `, this.componentId, (data: any) => {
             this.loadData();
         });
     }
