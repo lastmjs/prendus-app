@@ -4,6 +4,7 @@ import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Lesson} from '../../typings/lesson';
 import {Course} from '../../typings/course';
+import {User} from '../../typings/user';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -13,6 +14,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     lessons: Lesson[];
     course: Course;
     loaded: boolean;
+    userToken: string;
+    user: User;
 
     static get is() { return 'prendus-course'; }
     static get properties() {
@@ -85,7 +88,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     title
                 }
             }
-        `, (key, value) => {
+        `, this.userToken, (key, value) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
@@ -126,18 +129,19 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `);
+            `, this.userToken);
         }
         else {
             const data = await GQLMutate(`
                 mutation {
                     createCourse(
                         title: "${title}"
+                        authorId: "${this.user.id}"
                     ) {
                         id
                     }
                 }
-            `);
+            `, this.userToken);
 
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
@@ -155,6 +159,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         this.lessons = state[`lessonsFromCourse${this.courseId}`];
         this.course = state[`course${this.courseId}`];
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        this.userToken = state.userToken;
+        this.user = state.user;
     }
 }
 
