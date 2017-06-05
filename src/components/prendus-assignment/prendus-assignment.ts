@@ -11,8 +11,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     assignmentId: string;
     loaded: boolean;
     assignment: Assignment;
-    userToken: string;
-    user: User;
+    userToken: string | null;
+    user: User | null;
 
     static get is() { return 'prendus-assignment'; }
     static get properties() {
@@ -31,8 +31,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     connectedCallback() {
         super.connectedCallback();
-        console.log('in the assignment')
-
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -112,7 +110,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             `, this.userToken);
         }
         else {
-            console.log(`${this.lessonId}`)
             const data = await GQLMutate(`
                 mutation {
                     createAssignment(

@@ -3,6 +3,5 @@
         "noImplicitAny": true,
         "strictNullChecks": true,
         "target": "es5",
-    },
-    "compileOnSave": false
+    }
 }
