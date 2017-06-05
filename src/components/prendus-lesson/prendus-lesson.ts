@@ -4,6 +4,7 @@ import {ContainerElement} from '../../typings/container-element';
 import {Lesson} from '../../typings/lesson';
 import {Assignment} from '../../typings/assignment';
 import {User} from '../../typings/user';
+import {Mode} from '../../typings/mode';
 
 class PrendusLesson extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -43,11 +44,11 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isViewMode(mode) {
+    isViewMode(mode: Mode) {
         return mode === 'view';
     }
 
-    isEditMode(mode) {
+    isEditMode(mode: Mode) {
         return mode === 'edit' || mode === 'create';
     }
 
@@ -93,7 +94,7 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.userToken, (key, value) => {
+        `, this.userToken, (key: string, value: any) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,

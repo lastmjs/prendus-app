@@ -8,9 +8,9 @@ import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
 class PrendusApp extends Polymer.Element {
     rootReducer: Reducer;
-    user: User;
+    user: User | null;
     action: SetPropertyAction | DefaultAction;
-    userToken: string;
+    userToken: string | null;
 
     static get is() { return 'prendus-app'; }
 
@@ -27,7 +27,7 @@ class PrendusApp extends Polymer.Element {
         // this.action = await getAndSetUser(this.userToken);
     }
 
-    getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, signupRouteActive, loginRouteActive) {
+    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, signupRouteActive: any, loginRouteActive: any) {
         if (rootRouteActive) return 'rootView';
 
         if (signupRouteActive) return 'signupView';
