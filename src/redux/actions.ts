@@ -27,7 +27,9 @@ export async function getAndSetUser(userToken: string | null): Promise<SetProper
                     email
                 }
             }
-        `, userToken, (key: string, value: any) => {});
+        `, userToken, (key: string, value: any) => {}, (error: any) => {
+            throw error;
+        });
 
         return {
             type: 'SET_PROPERTY',

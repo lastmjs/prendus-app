@@ -1,19 +1,29 @@
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Course} from '../../typings/course';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {User} from '../../typings/user';
+import {State} from '../../typings/state';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];
     componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
+    action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
     loaded: boolean;
-    userToken: string;
+    userToken: string | null;
+    user: User | null;
 
     static get is() { return 'prendus-courses'; }
 
     async connectedCallback() {
         super.connectedCallback();
+
+        //TODO this craziness has to do with setting the actions in the redux store element. Right now I asynchronously recurse so that actions will eventually
+        //TODO fire against the store. That gets rid of gaurantees of synchronous updates to the state. Generators might be able to solve this problem. Look into it
+        const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
+        this.action = checkForUserTokenAction;
+        this.action = await getAndSetUser((<SetPropertyAction> checkForUserTokenAction).value);
 
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
@@ -35,7 +45,11 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     async loadData() {
         await GQLQuery(`
             query {
-                allCourses {
+                coursesFromUser${this.user ? this.user.id : null}: allCourses(filter: {
+                    author: {
+                        id: "${this.user ? this.user.id : null}"
+                    }
+                }) {
                     id
                     title
                 }
@@ -47,7 +61,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+            console.log(error);
         });
     }
 
@@ -70,11 +84,12 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
 
     async stateChange(e: CustomEvent) {
-        const state = e.detail.state;
+        const state: State = e.detail.state;
 
-        this.courses = state.allCourses;
+        this.courses = state[`coursesFromUser${this.user ? this.user.id : null}`];
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
+        this.user = state.user;
     }
 }
 
