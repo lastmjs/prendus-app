@@ -66,7 +66,9 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         token
                     }
                 }
-            `, userToken);
+            `, userToken, (error: any) => {
+                alert(error);
+            });
 
             return data;
         }

@@ -1,6 +1,7 @@
 import {GQLQueryDataCallback} from '../typings/gql-query-data-callback';
 import {GQLQueryErrorCallback} from '../typings/gql-query-error-callback';
 import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback';
+import {GQLMutateErrorCallback} from '../typings/gql-mutate-error-callback';
 
 const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
 
@@ -67,18 +68,20 @@ export const GQLQuery = async (queryString: string, userToken: string, dataCallb
 
     const responseJSON = await response.json();
     const data = responseJSON.data;
-    const error = responseJSON.error;
+    const errors = responseJSON.errors;
 
     Object.keys(data || {}).forEach((key) => {
         dataCallback(key, data[key]);
     });
 
-    if (error) errorCallback(error);
+    (errors || []).forEach((error: any) => {
+        errorCallback(error);
+    });
 
     return data;
 };
 
-export const GQLMutate = async (queryString: string, userToken: string | null) => {
+export const GQLMutate = async (queryString: string, userToken: string | null, errorCallback: GQLMutateErrorCallback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 
@@ -95,7 +98,13 @@ export const GQLMutate = async (queryString: string, userToken: string | null) =
         })
     });
 
-    const data = (await response.json()).data;
+    const responseJSON = await response.json();
+    const data = responseJSON.data;
+    const errors = responseJSON.errors;
+
+    (errors || []).forEach((error: any) => {
+        errorCallback(error);
+    });
 
     return data;
 };

@@ -112,7 +112,9 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `, this.userToken);
+            `, this.userToken, (error: any) => {
+                alert(error);
+            });
         }
         else {
             const data = await GQLMutate(`
@@ -125,7 +127,9 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `, this.userToken);
+            `, this.userToken, (error: any) => {
+                alert(error);
+            });
 
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
