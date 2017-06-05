@@ -34,7 +34,6 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
 
     connectedCallback() {
         super.connectedCallback();
-        console.log('in the lesson')
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -116,7 +115,7 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                   }
               }
           }
-      `, this.componentId, (data) => {
+      `, this.componentId, (data: any) => {
           this.loadData();
       });
     }
@@ -138,7 +137,6 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
             `, this.userToken);
         }
         else {
-            console.log(`${this.courseId}`)
             const data = await GQLMutate(`
                 mutation {
                     createLesson(

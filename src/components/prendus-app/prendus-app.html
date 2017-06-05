@@ -69,9 +69,9 @@
             <prendus-lesson show="viewLessonView" lesson-id="[[viewLessonRouteData.lessonId]]" mode="view"></prendus-lesson>
             <prendus-lesson show="editLessonView" lesson-id="[[editLessonRouteData.lessonId]]" mode="edit"></prendus-lesson>
 
-            <prendus-assignment show="createAssignmentView" lesson-id="[[createAssignmentRouteData.lessonId]]" course-id="[[queryParams.courseId]]" mode="create"></prendus-assignment>
-            <prendus-assignment show="viewAssignmentView" lesson-id="[[viewAssignmentRouteData.lessonId]]" mode="view"></prendus-assignment>
-            <prendus-assignment show="editAssignmentView" lesson-id="[[editAssignmentRouteData.lessonId]]" mode="edit"></prendus-assignment>
+            <prendus-assignment show="createAssignmentView" assignment-id="[[createAssignmentRouteData.lessonId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-assignment>
+            <prendus-assignment show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.lessonId]]" mode="view"></prendus-assignment>
+            <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.lessonId]]" mode="edit"></prendus-assignment>
         </iron-pages>
     </template>
 
