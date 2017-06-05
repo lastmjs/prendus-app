@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 15
+# version: 63
 
 type File implements Node {
   id: ID! @isUnique
@@ -23,6 +23,7 @@ type User implements Node {
   questions: [Question!]! @relation(name: "AuthorOnQuestion")
   email: String @isUnique
   password: String
+  role: UserRole! @defaultValue(value: INSTRUCTOR)
 }
 
 type Course implements Node {
@@ -72,4 +73,33 @@ type Question implements Node {
   code: String!
   quiz: Quiz @relation(name: "QuizOnQuestion")
   author: User! @relation(name: "AuthorOnQuestion")
+}
+
+type Discipline implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  subjects: [Subject!]! @relation(name: "DisciplineOnSubject")
+}
+
+type Subject implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  discipline: Discipline! @relation(name: "DisciplineOnSubject")
+  concepts: [Concept!]! @relation(name: "SubjectOnConcept")
+}
+
+type Concept implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  subject: Subject! @relation(name: "SubjectOnConcept")
+}
+
+enum UserRole {
+  INSTRUCTOR
 }
