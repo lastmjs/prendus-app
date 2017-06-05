@@ -18,7 +18,7 @@ export function checkForUserToken(): SetPropertyAction | DefaultAction {
     }
 }
 
-export async function getAndSetUser(userToken): Promise<SetPropertyAction | DefaultAction> {
+export async function getAndSetUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
     if (userToken) {
         const data = await GQLQuery(`
             query {
@@ -27,7 +27,7 @@ export async function getAndSetUser(userToken): Promise<SetPropertyAction | Defa
                     email
                 }
             }
-        `, userToken, (key, value) => {});
+        `, userToken, (key: string, value: any) => {});
 
         return {
             type: 'SET_PROPERTY',
@@ -42,7 +42,7 @@ export async function getAndSetUser(userToken): Promise<SetPropertyAction | Defa
     }
 }
 
-export function persistUserToken(userToken): SetPropertyAction {
+export function persistUserToken(userToken: string): SetPropertyAction {
     window.localStorage.setItem('userToken', userToken);
     return {
         type: 'SET_PROPERTY',

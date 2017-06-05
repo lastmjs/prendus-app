@@ -7,7 +7,7 @@ import {persistUserToken, getAndSetUser} from '../../redux/actions';
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | DefaultAction;
-    userToken: string;
+    userToken: string | null;
 
     static get is() { return 'prendus-signup'; }
 
@@ -37,7 +37,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (data.createUser.id) alert('user created successfully');
         navigateHome();
 
-        function checkPasswords(password1, password2) {
+        function checkPasswords(password1: string, password2: string) {
             if (password === repeatPassword) {
                 return true;
             }
@@ -46,7 +46,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             }
         }
 
-        async function performMutation(email, password, userToken) {
+        async function performMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLMutate(`
                 mutation {
@@ -72,7 +72,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         }
 
         function navigateHome() {
-            window.history.pushState({}, null, '/');
+            window.history.pushState({}, '', '/');
             window.dispatchEvent(new CustomEvent('location-changed'));
         }
     }
