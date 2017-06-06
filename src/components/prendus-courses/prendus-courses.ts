@@ -47,7 +47,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+            console.log('courses load data', error);
         });
     }
 
