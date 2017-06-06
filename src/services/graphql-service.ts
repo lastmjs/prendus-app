@@ -49,7 +49,7 @@ webSocket.onmessage = (event) => {
     }
 };
 
-export const GQLQuery = async (queryString: string, userToken: string, dataCallback: GQLQueryDataCallback, errorCallback: GQLQueryErrorCallback) => {
+export const GQLQuery = async (queryString: string, userToken: string | null, dataCallback: GQLQueryDataCallback, errorCallback: GQLQueryErrorCallback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
 

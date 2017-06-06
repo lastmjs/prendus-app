@@ -31,10 +31,11 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         const repeatPassword: string = this.shadowRoot.querySelector('#repeatPasswordInput').value;
         const passwordsMatch = checkPasswords(password, repeatPassword);
         if (!passwordsMatch) alert('passwords must match');
-        const data = await performMutation(email, password, this.userToken);
-        this.action = persistUserToken(data.signinUser.token);
+        const signupData = await performSignupMutation(email, password, this.userToken);
+        const loginData = await performLoginMutation(email, password, this.userToken);
+        this.action = persistUserToken(loginData.signinUser.token);
         this.action = await getAndSetUser(this.userToken);
-        if (data.createUser.id) alert('user created successfully');
+        if (signupData.createUser.id) alert('user created successfully');
         navigateHome();
 
         function checkPasswords(password1: string, password2: string) {
@@ -46,7 +47,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             }
         }
 
-        async function performMutation(email: string, password: string, userToken: string | null) {
+        async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLMutate(`
                 mutation {
@@ -58,7 +59,17 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }) {
                         id
                     }
+                }
+            `, userToken, (error: any) => {
+                console.log(error);
+            });
 
+            return data;
+        }
+
+        async function performLoginMutation(email: string, password: string, userToken: string | null) {
+            const data = await GQLMutate(`
+                mutation {
                     signinUser(email: {
                         email: "${email}"
                         password: "${password}"
@@ -67,7 +78,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                alert(error);
+                console.log(error);
             });
 
             return data;
