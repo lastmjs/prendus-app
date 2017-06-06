@@ -49,18 +49,24 @@
         <dom-if if="[[user]]">
             <template>
                 [[user.email]]
+                <button on-click="logout">
+                    Logout
+                </button>
             </template>
         </dom-if>
 
-        <button>
-            <a href="signup">Signup</a>
-        </button>
+        <dom-if if="[[!user]]">
+          <template>
+            <button>
+                <a href="signup">Signup</a>
+            </button>
 
-        <button>
-            <a href="login">Login</a>
-        </button>
+            <button>
+                <a href="login">Login</a>
+            </button>
+          </template>
+        </dom-if>
 
-        <br>
         <br>
 
         <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, viewLearningStructureRouteActive, signupRouteActive, loginRouteActive)]]">
