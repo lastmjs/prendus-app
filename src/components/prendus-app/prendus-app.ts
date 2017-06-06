@@ -27,7 +27,7 @@ class PrendusApp extends Polymer.Element {
         // this.action = await getAndSetUser(this.userToken);
     }
 
-    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, signupRouteActive: any, loginRouteActive: any) {
+    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, viewLearningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any) {
         if (rootRouteActive) return 'rootView';
 
         if (signupRouteActive) return 'signupView';
@@ -44,6 +44,8 @@ class PrendusApp extends Polymer.Element {
         if (createAssignmentRouteActive) return 'createAssignmentView';
         if (viewAssignmentRouteActive) return 'viewAssignmentView';
         if (editAssignmentRouteActive) return 'editAssignmentView';
+
+        if (viewLearningStructureRouteActive) return 'viewLearningStructureView';
     }
     //
     // subscribedToStore() {

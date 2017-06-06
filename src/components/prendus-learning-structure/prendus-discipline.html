@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-discipline">
+    <template>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <dom-if if="[[isViewMode(mode)]]">
+                    <template>
+                        <div>[[course.title]]</div>
+                    </template>
+                </dom-if>
+
+                <dom-if if="[[isEditMode(mode)]]">
+                    <template>
+                        <input id="titleInput" type="text" value="[[course.title]]">
+
+                        <button on-click="saveCourse">Save</button>
+                    </template>
+                </dom-if>
+
+                <br>
+                <div>Lessons:</div>
+
+                <dom-repeat items="[[disciplines]]">
+                    <template>
+                        <div>
+                            <a href="discipline/[[item.id]]/view">[[item.title]]</a>
+
+                            <dom-if if="[[isEditMode(mode)]]">
+                                <template>
+                                    <a href="lesson/[[item.id]]/edit">Edit</a>
+                                </template>
+                            </dom-if>
+                        </div>
+                    </template>
+                </dom-repeat>
+
+                <dom-if if="[[isEditMode(mode)]]">
+                    <template>
+                        <button>
+                            <a href="lesson/create?courseId=[[courseId]]">Add lesson</a>
+                        </button>
+                    </template>
+                </dom-if>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
+    </template>
+
+    <script src="prendus-discipline.ts"></script>
+</dom-module>
