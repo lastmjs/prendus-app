@@ -120,6 +120,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     async saveCourse() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
+        //TODO working on updateOrCreate
+
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
         if (this.courseId) {
             GQLMutate(`
