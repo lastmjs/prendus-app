@@ -17,7 +17,7 @@ export function checkForUserToken(): SetPropertyAction | DefaultAction {
         };
     }
 }
-export async function getAndRemoveUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
+export async function removeUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
 
     if (userToken) {
       return {

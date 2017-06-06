@@ -3,7 +3,7 @@ import {GQLSubscribe} from '../../services/graphql-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser, getAndRemoveUser, removeUserToken} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
 import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
 class PrendusApp extends Polymer.Element {
@@ -85,7 +85,7 @@ class PrendusApp extends Polymer.Element {
     //
     async logout() {
       const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
-      this.action = await getAndRemoveUser((<SetPropertyAction> checkForUserTokenAction).value);
+      this.action = await removeUser((<SetPropertyAction> checkForUserTokenAction).value);
       this.action = removeUserToken((<SetPropertyAction> checkForUserTokenAction).value);
     }
     stateChange(e: CustomEvent) {
@@ -93,7 +93,7 @@ class PrendusApp extends Polymer.Element {
 
         this.user = state.user;
         this.userToken = state.userToken;
-
+        console.log('state', state)
         // console.log(state);
         //
         // this.route = state.route;
