@@ -1,29 +1,26 @@
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
-import {Lesson} from '../../typings/lesson';
 import {Assignment} from '../../typings/assignment';
 import {User} from '../../typings/user';
-import {Mode} from '../../typings/mode';
 
-class PrendusLesson extends Polymer.Element implements ContainerElement {
+class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
-    courseId: string;
     lessonId: string;
-    assignments: Assignment[];
+    assignmentId: string;
     loaded: boolean;
-    lesson: Lesson;
-    userToken: string;
-    user: User;
+    assignment: Assignment;
+    userToken: string | null;
+    user: User | null;
 
-    static get is() { return 'prendus-lesson'; }
+    static get is() { return 'prendus-assignment'; }
     static get properties() {
         return {
-            lessonId: {
-                observer: 'lessonIdChanged'
+            assignmentId: {
+                observer: 'assignmentIdChanged'
             },
-            courseId: {
+            lessonId: {
 
             },
             mode: {
@@ -43,20 +40,20 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isViewMode(mode: Mode) {
+    isViewMode(mode) {
         return mode === 'view';
     }
 
-    isEditMode(mode: Mode) {
+    isEditMode(mode) {
         return mode === 'edit' || mode === 'create';
     }
 
-    async lessonIdChanged() {
+    async assignmentIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
-            key: 'lessonId',
-            value: this.lessonId
+            key: 'assignmentId',
+            value: this.assignmentId
         };
 
         this.action = {
@@ -77,89 +74,59 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
     async loadData() {
         await GQLQuery(`
             query {
-                assignmentsFromLesson${this.lessonId}: allAssignments(filter: {
-                    lesson: {
-                        id: "${this.lessonId}"
-                    }
-                }) {
-                    id
-                    title
-                }
-
-                lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
+                assignment${this.assignmentId}: Assignment(id: "${this.assignmentId}") {
                     title,
-                    course {
+                    lesson {
                         id
                     }
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
+        `, this.userToken, (key, value) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
                 value
             };
-        }, (error: any) => {
-            console.log(error);
         });
     }
 
     subscribeToData() {
-      GQLSubscribe(`
-          subscription changedAssignment {
-              Assignment(
-                  filter: {
-                      mutation_in: [CREATED, UPDATED, DELETED]
-                  }
-              ) {
-                  node {
-                      id
-                  }
-              }
-          }
-      `, this.componentId, (data: any) => {
-          this.loadData();
-      });
+
     }
 
-    async saveLesson() {
+    async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-
-        if (this.lessonId) {
+        if (this.assignmentId) {
             GQLMutate(`
                 mutation {
-                    updateLesson(
-                        id: "${this.lessonId}"
-                        courseId: "${this.courseId}"
+                    updateAssignment(
+                        id: "${this.assignmentId}"
+                        lessonId: "${this.lessonId}"
                         title: "${title}"
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
+            `, this.userToken);
         }
         else {
             const data = await GQLMutate(`
                 mutation {
-                    createLesson(
+                    createAssignment(
                         title: "${title}"
-                        courseId: "${this.courseId}"
+                        lessonId: "${this.lessonId}"
                         authorId: "${this.user.id}"
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
+            `, this.userToken);
 
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
-                key: 'lessonId',
-                value: data.createLesson.id
+                key: 'assignmentId',
+                value: data.createAssignment.id
             };
         }
     }
@@ -167,14 +134,13 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
-        this.lesson = state[`lesson${this.lessonId}`];
-        this.lessonId = state.components[this.componentId] ? state.components[this.componentId].lessonId : this.lessonId;
-        this.assignments = state[`assignmentsFromLesson${this.lessonId}`];
-        this.courseId = this.lesson ? this.lesson.course.id : this.courseId;
+        this.assignment = state[`assignment${this.assignmentId}`];
+        this.assignmentId = state.components[this.componentId] ? state.components[this.componentId].assignmentId : this.assignmentId;
+        this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
 }
 
-window.customElements.define(PrendusLesson.is, PrendusLesson);
+window.customElements.define(PrendusAssignment.is, PrendusAssignment);

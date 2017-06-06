@@ -1,0 +1,36 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+
+<dom-module id="prendus-assignment">
+    <template>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <dom-if if="[[isViewMode(mode)]]">
+                    <template>
+                        <div>[[assignment.title]]</div>
+                    </template>
+                </dom-if>
+
+                <dom-if if="[[isEditMode(mode)]]">
+                    <template>
+                        <input id="titleInput" type="text" value="[[assignment.title]]">
+
+                        <button on-click="saveAssignment">Save</button>
+                    </template>
+                </dom-if>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
+    </template>
+
+    <script src="prendus-assignment.ts"></script>
+</dom-module>
