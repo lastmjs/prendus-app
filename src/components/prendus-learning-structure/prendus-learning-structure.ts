@@ -59,9 +59,9 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
     async loadData() {
         await GQLQuery(`
             query {
-              User(email:"cj3lyatut1ztg0127uizmnb3e") {
+              allDisciplines {
                   id
-                  email
+                  title
               }
             }
         `, this.userToken, (key: string, value: any) => {

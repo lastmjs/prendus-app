@@ -85,7 +85,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
         this.userToken = state.userToken;
         this.user = state.user;
     }
