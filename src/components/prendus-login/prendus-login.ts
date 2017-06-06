@@ -52,7 +52,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                alert(error);
+                console.log(error);
             });
 
             return data;

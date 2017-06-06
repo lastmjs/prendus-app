@@ -95,7 +95,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+            console.log(error);
         });
     }
 
@@ -132,7 +132,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                alert(error);
+                console.log(error);
             });
         }
         else {
@@ -146,7 +146,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                alert(error);
+                console.log(error);
             });
 
             this.action = {
