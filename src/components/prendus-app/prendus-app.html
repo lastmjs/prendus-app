@@ -6,6 +6,7 @@
 <link rel="import" href="../prendus-lesson/prendus-lesson.html">
 <link rel="import" href="../prendus-assignment/prendus-assignment.html">
 <link rel="import" href="../prendus-learning-structure/prendus-learning-structure.html">
+<link rel="import" href="../prendus-learning-structure/prendus-discipline.html">
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
@@ -37,7 +38,11 @@
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/view" data="{{viewAssignmentRouteData}}" active="{{viewAssignmentRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/edit" data="{{editAssignmentRouteData}}" active="{{editAssignmentRouteActive}}"></app-route>
 
-        <app-route route="[[route]]" pattern="/learning-structure/" data="{{viewLearningStructureRouteData}}" active="{{viewLearningStructureRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/learning-structure" data="{{viewLearningStructureRouteData}}" active="{{viewLearningStructureRouteActive}}"></app-route>
+
+        <app-route route="[[route]]" pattern="/discipline/create" data="{{createDisciplineRouteData}}" active="{{createAssignmentRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/discipline/:disciplineId/view" data="{{viewDisciplineRouteData}}" active="{{viewDisciplineRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/discipline/:disciplineId/edit" data="{{editDisciplineRouteData}}" active="{{editDisciplineRouteActive}}"></app-route>
 
         <a href="/">Prendus</a>
 
@@ -58,7 +63,7 @@
         <br>
         <br>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, viewLearningStructureRouteActive, signupRouteActive, loginRouteActive)]]">
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, viewLearningStructureRouteActive, signupRouteActive, loginRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
 
             <prendus-signup show="signupView"></prendus-signup>
@@ -77,6 +82,11 @@
             <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.lessonId]]" mode="edit"></prendus-assignment>
 
             <prendus-learning-structure show="viewLearningStructureView" mode="view"></prendus-learning-structure>
+
+            <prendus-discipline show="createDisciplineView" assignment-id="[[createDisciplineRouteData.lessonId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-discipline>
+            <prendus-discipline show="viewDisciplineView" assignment-id="[[viewDisciplineRouteData.lessonId]]" mode="view"></prendus-discipline>
+            <prendus-discipline show="editDisciplineView" assignment-id="[[editDisciplineRouteData.lessonId]]" mode="edit"></prendus-discipline>
+
         </iron-pages>
     </template>
 

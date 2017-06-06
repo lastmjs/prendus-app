@@ -15,16 +15,14 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
     userToken: string;
     user: User;
 
-    static get is() { return 'prendus-discipline'; }
-    static get properties() {
+    static get is() { return 'prendus-learning-structure'; }
 
-    }
-
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
 
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
+        await this.loadData();
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -61,10 +59,10 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
     async loadData() {
         await GQLQuery(`
             query {
-                disciplines: {
-                  id,
+              allDisciplines {
+                  id
                   title
-                };
+              }
             }
         `, this.userToken, (key: string, value: any) => {
             this.action = {
@@ -79,8 +77,7 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.disciplines = state[`disciplines`];
-        console.log('this disciplines', this.disciplines)
+        this.disciplines = state[`allDisciplines`];
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
