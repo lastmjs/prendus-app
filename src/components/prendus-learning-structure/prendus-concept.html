@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
-<dom-module id="prendus-discipline">
+<dom-module id="prendus-concept">
     <template>
         <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
 
@@ -11,23 +11,11 @@
             <template>
               <dom-if if="[[!isViewMode(mode)]]">
                   <template>
-                      <input id="titleInput" type="text" value="[[discipline.title]]">
+                      <input id="titleInput" type="text">
 
-                      <button on-click="saveDiscipline">Save</button>
-                      <button>
-                          <a href="subject/create?disciplineId=[[disciplineId]]">Add Subject</a>
-                      </button>
+                      <button on-click="saveConcept">Save</button>
                   </template>
               </dom-if>
-                <br>
-                <div>[[discipline.title]] Subjects</div>
-                <dom-repeat items="[[subjects]]">
-                    <template>
-                        <div>
-                            <a href="subject/[[item.id]]/view">[[item.title]]</a> <a href="subject/[[item.id]]/edit">Edit</a>
-                        </div>
-                    </template>
-                </dom-repeat>
             </template>
         </dom-if>
 
@@ -39,5 +27,5 @@
 
     </template>
 
-    <script src="prendus-discipline.ts"></script>
+    <script src="prendus-concept.ts"></script>
 </dom-module>

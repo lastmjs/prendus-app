@@ -3,13 +3,14 @@ import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Subject} from '../../typings/subject';
-import {Discipline} from '../../typings/discipline';
+import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 
-class PrendusDiscipline extends Polymer.Element implements ContainerElement {
+class PrendusSubject extends Polymer.Element implements ContainerElement {
+    subjectId: string;
+    subject: Subject;
     disciplineId: string;
-    discipline: Discipline;
-    subjects: Subject[];
+    concepts: Concept[];
     mode: Mode;
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
@@ -17,11 +18,14 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     userToken: string;
     user: User;
 
-    static get is() { return 'prendus-discipline'; }
+    static get is() { return 'prendus-subject'; }
     static get properties() {
         return {
+            subjectId: {
+                observer: 'subjectIdChanged'
+            },
             disciplineId: {
-                observer: 'disciplineIdChanged'
+
             },
             mode: {
 
@@ -54,12 +58,12 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         return mode === 'create';
     }
 
-    async disciplineIdChanged() {
+    async subjectIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
-            key: 'disciplineId',
-            value: this.disciplineId
+            key: 'subjectId',
+            value: this.subjectId
         };
 
         this.action = {
@@ -82,16 +86,19 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     async loadData() {
         await GQLQuery(`
             query {
-                subjectsFromDiscipline${this.disciplineId}: allSubjects(filter: {
-                    discipline: {
-                        id: "${this.disciplineId}"
+                conceptsFromSubject${this.subjectId}: allConcepts(filter: {
+                    subject: {
+                        id: "${this.subjectId}"
                     }
                 }) {
                     id
                     title
                 }
-                discipline${this.disciplineId}: Discipline(id: "${this.disciplineId}") {
+                subject${this.subjectId}: Subject(id: "${this.subjectId}") {
                     title
+                    discipline {
+                        id
+                    }
                 }
             }
         `, this.userToken, (key: string, value: any) => {
@@ -105,17 +112,16 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         });
     }
 
-    async saveDiscipline() {
+    async saveSubject() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-        console.log('title', title)
-        console.log('this discipline')
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
-        if (this.disciplineId) {
+        if (this.subjectId) {
             GQLMutate(`
                 mutation {
-                    updateDiscipline(
-                        id: "${this.disciplineId}"
+                    updateSubject(
+                        id: "${this.subjectId}"
                         title: "${title}"
+                        disciplineId: "${this.disciplineId}"
                     ) {
                         id
                     }
@@ -125,10 +131,12 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
             });
         }
         else {
+          console.log(`${this.disciplineId}`)
             const data = await GQLMutate(`
                 mutation {
-                    createDiscipline(
+                    createSubject(
                         title: "${title}"
+                        disciplineId: "${this.disciplineId}"
                     ) {
                         id
                     }
@@ -137,25 +145,26 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
               console.log('error', error)
                 alert(error);
             });
-
+            console.log('data', data)
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
-                key: 'disciplineId',
-                value: data.createDiscipline.id
+                key: 'subjectId',
+                value: data.createSubject.id
             };
         }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.disciplineId = state.components[this.componentId] ? state.components[this.componentId].disciplineId : this.disciplineId;
-        this.subjects = state[`subjectsFromDiscipline${this.disciplineId}`];
-        this.discipline = state[`discipline${this.disciplineId}`];
+        this.subjectId = state.components[this.componentId] ? state.components[this.componentId].subjectId : this.subjectId;
+        this.concepts = state[`conceptsFromSubject${this.subjectId}`];
+        this.subject = state[`subject${this.subjectId}`];
+        this.disciplineId = this.subject ? this.subject.discipline.id : this.disciplineId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
 }
 
-window.customElements.define(PrendusDiscipline.is, PrendusDiscipline);
+window.customElements.define(PrendusSubject.is, PrendusSubject);

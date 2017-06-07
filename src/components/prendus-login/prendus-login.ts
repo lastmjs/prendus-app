@@ -31,7 +31,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const email: string = this.shadowRoot.querySelector('#emailInput').value;
         const password: string = this.shadowRoot.querySelector('#passwordInput').value;
         const data = await performMutation(email, password, this.userToken);
-        const GQLEmail = await readEmail(email, password, data.signinUser.token)
+        const GQLEmail = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(GQLEmail.User);
         if (data.signinUser.token === this.userToken && (this.user && this.user.id === GQLEmail)) alert('user logged in successfully');
@@ -53,9 +53,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             });
             return data;
         }
-        async function readEmail(email: string, password: string, userToken: string | null) {
+        async function getUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
-            console.log('token', userToken)
             const data = await GQLQuery(`
               query {
                 User(email:"${email}") {

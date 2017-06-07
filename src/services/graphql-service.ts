@@ -75,7 +75,8 @@ export const GQLQuery = async (queryString: string, userToken: string | null, da
     });
 
     (errors || []).forEach((error: any) => {
-        errorCallback(error);
+      console.log('error', error)
+        // errorCallback(error); Error Callback doesn't work at the moment
     });
 
     return data;
@@ -103,7 +104,8 @@ export const GQLMutate = async (queryString: string, userToken: string | null, e
     const errors = responseJSON.errors;
 
     (errors || []).forEach((error: any) => {
-        errorCallback(error);
+      console.log('error', error)
+        // errorCallback(error);
     });
 
     return data;
