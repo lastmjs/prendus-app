@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Lesson} from '../../typings/lesson';
@@ -89,7 +89,6 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                     id
                     title
                 }
-
                 lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
                     title,
                     course {

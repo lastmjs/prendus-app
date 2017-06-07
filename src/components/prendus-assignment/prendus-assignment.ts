@@ -81,12 +81,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.userToken, (key, value) => {
+        `, this.userToken, (key: string, value: any) => {
             this.action = {
                 type: 'SET_PROPERTY',
                 key,
                 value
             };
+        }, (error: any) => {
+            console.log(error);
         });
     }
 
@@ -107,7 +109,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `, this.userToken);
+            `, this.userToken, (error: any) => {
+                console.log(error);
+            });
         }
         else {
             const data = await GQLMutate(`
@@ -120,7 +124,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                         id
                     }
                 }
-            `, this.userToken);
+            `, this.userToken, (error: any) => {
+                console.log(error);
+            });
 
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
