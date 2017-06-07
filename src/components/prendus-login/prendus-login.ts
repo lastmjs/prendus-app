@@ -31,9 +31,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const email: string = this.shadowRoot.querySelector('#emailInput').value;
         const password: string = this.shadowRoot.querySelector('#passwordInput').value;
         const data = await performMutation(email, password, this.userToken);
+        const GQLEmail = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
-        this.action = setUserInRedux(data.signinUser.user);
-        if (data.signinUser.token === this.userToken && (this.user && this.user.id === data.signinUser.user.id)) alert('user logged in successfully');
+        this.action = setUserInRedux(GQLEmail.User);
+        if (data.signinUser.token === this.userToken && (this.user && this.user.id === GQLEmail)) alert('user logged in successfully');
         navigateHome();
 
         async function performMutation(email: string, password: string, userToken: string | null) {
@@ -44,20 +45,29 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                         email: "${email}"
                         password: "${password}"
                     }) {
-                        user {
-                            id
-                            email
-                        }
                         token
                     }
                 }
             `, userToken, (error: any) => {
                 console.log(error);
             });
-
             return data;
         }
-
+        async function getUser(email: string, password: string, userToken: string | null) {
+            // signup the user and login the user
+            const data = await GQLQuery(`
+              query {
+                User(email:"${email}") {
+                    id
+                    email
+                }
+              }
+            `, userToken, (key: string, value: any) => {
+            }, (error: any) => {
+                alert(error);
+            });
+            return data;
+        }
         function navigateHome() {
             window.history.pushState({}, '', '/');
             window.dispatchEvent(new CustomEvent('location-changed'));
@@ -74,7 +84,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
         this.userToken = state.userToken;
         this.user = state.user;
     }

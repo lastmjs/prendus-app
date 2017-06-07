@@ -17,7 +17,21 @@ export function checkForUserToken(): SetPropertyAction | DefaultAction {
         };
     }
 }
-
+export async function removeUser(): Promise<SetPropertyAction | DefaultAction> {
+    return {
+        type: 'SET_PROPERTY',
+        key: 'user',
+        value: null
+    };
+}
+export function removeUserToken(): SetPropertyAction {
+    window.localStorage.setItem('userToken', '');
+    return {
+        type: 'SET_PROPERTY',
+        key: 'userToken',
+        value: null
+    };
+}
 export async function getAndSetUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
     if (userToken) {
         const data = await GQLQuery(`

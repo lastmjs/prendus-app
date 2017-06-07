@@ -9,22 +9,20 @@
 
         <dom-if if="[[loaded]]">
             <template>
-                <div>Disciplines:</div>
+                <div>Disciplines</div>
 
                 <dom-repeat items="[[disciplines]]">
                     <template>
                         <div>
                             <a href="discipline/[[item.id]]/view">[[item.title]]</a>
-
-                            <dom-if if="[[isEditMode(mode)]]">
-                                <template>
-                                    <a href="discipline/[[item.id]]/edit">Edit</a>
-                                </template>
-                            </dom-if>
+                            <a href="discipline/[[item.id]]/edit">Edit</a>
                         </div>
                     </template>
                 </dom-repeat>
 
+                <button>
+                    <a href="discipline/create">Add Discipline</a>
+                </button>
             </template>
         </dom-if>
 
