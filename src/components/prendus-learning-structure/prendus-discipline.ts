@@ -107,8 +107,6 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
 
     async saveDiscipline() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-        console.log('title', title)
-        console.log('this discipline')
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
         if (this.disciplineId) {
             GQLMutate(`

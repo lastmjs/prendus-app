@@ -131,7 +131,6 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
             });
         }
         else {
-          console.log(`${this.disciplineId}`)
             const data = await GQLMutate(`
                 mutation {
                     createSubject(
@@ -145,7 +144,6 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
               console.log('error', error)
                 alert(error);
             });
-            console.log('data', data)
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
