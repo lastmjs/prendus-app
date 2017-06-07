@@ -3,7 +3,7 @@ import {GQLSubscribe} from '../../services/graphql-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
 import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
 class PrendusApp extends Polymer.Element {
@@ -27,7 +27,7 @@ class PrendusApp extends Polymer.Element {
         // this.action = await getAndSetUser(this.userToken);
     }
 
-    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, viewLearningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any) {
+    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, viewLearningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any) {
         if (rootRouteActive) return 'rootView';
 
         if (signupRouteActive) return 'signupView';
@@ -46,6 +46,10 @@ class PrendusApp extends Polymer.Element {
         if (editAssignmentRouteActive) return 'editAssignmentView';
 
         if (viewLearningStructureRouteActive) return 'viewLearningStructureView';
+
+        if (createDisciplineRouteActive) return 'createDisciplineView';
+        if (viewDisciplineRouteActive) return 'viewDisciplineView';
+        if (editDisciplineRouteActive) return 'editDisciplineView';
     }
     //
     // subscribedToStore() {
@@ -79,12 +83,16 @@ class PrendusApp extends Polymer.Element {
     //     };
     // }
     //
+    async logout() {
+      const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
+      this.action = await removeUser((<SetPropertyAction> checkForUserTokenAction).value);
+      this.action = removeUserToken((<SetPropertyAction> checkForUserTokenAction).value);
+    }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
 
         this.user = state.user;
         this.userToken = state.userToken;
-
         // console.log(state);
         //
         // this.route = state.route;

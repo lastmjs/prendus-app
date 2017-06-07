@@ -17,7 +17,29 @@ export function checkForUserToken(): SetPropertyAction | DefaultAction {
         };
     }
 }
+export async function removeUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
 
+    if (userToken) {
+      return {
+          type: 'SET_PROPERTY',
+          key: 'user',
+          value: null
+      };
+    }
+    else {
+        return {
+            type: 'DEFAULT_ACTION'
+        };
+    }
+}
+export function removeUserToken(userToken: string): SetPropertyAction {
+    window.localStorage.setItem('userToken', '');
+    return {
+        type: 'SET_PROPERTY',
+        key: 'userToken',
+        value: null
+    };
+}
 export async function getAndSetUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
     if (userToken) {
         const data = await GQLQuery(`
