@@ -18,10 +18,10 @@ module.exports = function(event) {
               return authorizeUserOnAssignment(graphCoolEndpoint, prendusCloudFunctionJWT, userId, assignmentId);
           }).
           then((data) => {
-             resolve();
+             resolve(data);
           })
           .catch((error) => {
-              console.log(error);
+              reject(error);
           });
       });
   }
