@@ -122,8 +122,8 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
 
     subscribeToData() {
       GQLSubscribe(`
-          subscription changedLesson {
-              Lesson(
+          subscription changedAssignment {
+              Assignment(
                   filter: {
                       mutation_in: [CREATED, UPDATED, DELETED]
                   }
