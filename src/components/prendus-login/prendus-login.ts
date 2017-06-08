@@ -1,16 +1,17 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
-import {SetPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
-    action: SetPropertyAction;
+    action: SetPropertyAction | SetComponentPropertyAction;
     userToken: string | null;
     user: User | null;
     linkLtiAccount: boolean;
+    loaded: boolean;
 
     static get is() { return 'prendus-login'; }
     static get properties() {
@@ -28,6 +29,12 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         super.connectedCallback();
 
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     loadData() {
@@ -39,6 +46,13 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
 
     async loginClick() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: false
+        };
+
         const email: string = this.shadowRoot.querySelector('#emailInput').value;
         const password: string = this.shadowRoot.querySelector('#passwordInput').value;
         const data = await signinUser(email, password, this.userToken);
@@ -46,8 +60,14 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(GQLEmail.User);
         if (this.linkLtiAccount) await addLtiJwtToUser(this.user, this.userToken);
-        if (data.signinUser.token === this.userToken && (this.user && this.user.id === GQLEmail)) alert('user logged in successfully');
         navigateHome();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
 
         async function signinUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
@@ -113,8 +133,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+
         this.userToken = state.userToken;
         this.user = state.user;
+        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
     }
 }
 
