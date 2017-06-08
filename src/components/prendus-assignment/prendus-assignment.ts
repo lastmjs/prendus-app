@@ -105,24 +105,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
     }
 
-    subscribeToData() {
-      GQLSubscribe(`
-          subscription changedAssignment {
-              Assignment(
-                  filter: {
-                      mutation_in: [CREATED, UPDATED, DELETED]
-                  }
-              ) {
-                  node {
-                      id
-                  }
-              }
-          }
-      `, this.componentId, (data: any) => {
-          this.loadData();
-      });
-    }
-
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         if (this.assignmentId) {

@@ -9,10 +9,11 @@
 
         <dom-if if="[[loaded]]">
             <template>
-              <prendus-scaffold></prendus-scaffold>
+
                 <dom-if if="[[isViewMode(mode)]]">
                     <template>
-                        <div>[[assignment.title]]</div>
+                      <!-- <prendus-scaffold></prendus-scaffold> -->
+                        <div>[[assignment]]</div>
                     </template>
                 </dom-if>
 
