@@ -47,7 +47,11 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     }
 
     isEditMode(mode: Mode) {
-        return mode === 'edit' || mode === 'create';
+        return mode === 'edit';
+    }
+
+    isCreateMode(mode: Mode) {
+        return mode === 'create';
     }
 
     async disciplineIdChanged() {
@@ -73,7 +77,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         };
     }
     subscribeToData() {
-      
+
     }
     async loadData() {
         await GQLQuery(`
@@ -101,46 +105,45 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         });
     }
 
-    // async saveCourse() {
-    //     const title = this.shadowRoot.querySelector('#titleInput').value;
-    //
-    //     //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
-    //     if (this.courseId) {
-    //         GQLMutate(`
-    //             mutation {
-    //                 updateCourse(
-    //                     id: "${this.courseId}"
-    //                     title: "${title}"
-    //                 ) {
-    //                     id
-    //                 }
-    //             }
-    //         `, this.userToken, (error: any) => {
-    //             alert(error);
-    //         });
-    //     }
-    //     else {
-    //         const data = await GQLMutate(`
-    //             mutation {
-    //                 createCourse(
-    //                     title: "${title}"
-    //                     authorId: "${this.user.id}"
-    //                 ) {
-    //                     id
-    //                 }
-    //             }
-    //         `, this.userToken, (error: any) => {
-    //             alert(error);
-    //         });
-    //
-    //         this.action = {
-    //             type: 'SET_COMPONENT_PROPERTY',
-    //             componentId: this.componentId,
-    //             key: 'courseId',
-    //             value: data.createCourse.id
-    //         };
-    //     }
-    // }
+    async saveDiscipline() {
+        const title = this.shadowRoot.querySelector('#titleInput').value;
+        //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
+        if (this.disciplineId) {
+            GQLMutate(`
+                mutation {
+                    updateDiscipline(
+                        id: "${this.disciplineId}"
+                        title: "${title}"
+                    ) {
+                        id
+                    }
+                }
+            `, this.userToken, (error: any) => {
+                alert(error);
+            });
+        }
+        else {
+            const data = await GQLMutate(`
+                mutation {
+                    createDiscipline(
+                        title: "${title}"
+                    ) {
+                        id
+                    }
+                }
+            `, this.userToken, (error: any) => {
+              console.log('error', error)
+                alert(error);
+            });
+
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'disciplineId',
+                value: data.createDiscipline.id
+            };
+        }
+    }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;

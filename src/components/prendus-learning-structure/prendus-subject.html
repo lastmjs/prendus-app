@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
-<dom-module id="prendus-discipline">
+<dom-module id="prendus-subject">
     <template>
         <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
 
@@ -11,20 +11,20 @@
             <template>
               <dom-if if="[[!isViewMode(mode)]]">
                   <template>
-                      <input id="titleInput" type="text" value="[[discipline.title]]">
+                      <input id="titleInput" type="text" value="[[subject.title]]">
 
-                      <button on-click="saveDiscipline">Save</button>
+                      <button on-click="saveSubject">Save</button>
                       <button>
-                          <a href="subject/create?disciplineId=[[disciplineId]]">Add Subject</a>
+                          <a href="concept/create?subjectId=[[subjectId]]">Add Concept</a>
                       </button>
                   </template>
               </dom-if>
                 <br>
-                <div>[[discipline.title]] Subjects</div>
-                <dom-repeat items="[[subjects]]">
+                <div>[[Subject]] Concepts</div>
+                <dom-repeat items="[[concepts]]">
                     <template>
                         <div>
-                            <a href="subject/[[item.id]]/view">[[item.title]]</a> <a href="subject/[[item.id]]/edit">Edit</a>
+                            <a href="concept/[[item.id]]/view">[[item.title]]</a> <a href="concept/[[item.id]]/edit">Edit</a>
                         </div>
                     </template>
                 </dom-repeat>
@@ -39,5 +39,5 @@
 
     </template>
 
-    <script src="prendus-discipline.ts"></script>
+    <script src="prendus-subject.ts"></script>
 </dom-module>

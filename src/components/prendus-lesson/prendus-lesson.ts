@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Lesson} from '../../typings/lesson';
@@ -48,7 +48,11 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
     }
 
     isEditMode(mode: Mode) {
-        return mode === 'edit' || mode === 'create';
+        return mode === 'edit';
+    }
+
+    isCreateMode(mode: Mode) {
+        return mode === 'create';
     }
 
     async lessonIdChanged() {
@@ -85,7 +89,6 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
                     id
                     title
                 }
-
                 lesson${this.lessonId}: Lesson(id: "${this.lessonId}") {
                     title,
                     course {

@@ -2,26 +2,30 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {Lesson} from '../../typings/lesson';
-import {Course} from '../../typings/course';
+import {Subject} from '../../typings/subject';
+import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 
-class PrendusCourse extends Polymer.Element implements ContainerElement {
-    courseId: string;
+class PrendusSubject extends Polymer.Element implements ContainerElement {
+    subjectId: string;
+    subject: Subject;
+    disciplineId: string;
+    concepts: Concept[];
     mode: Mode;
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
-    lessons: Lesson[];
-    course: Course;
     loaded: boolean;
     userToken: string;
     user: User;
 
-    static get is() { return 'prendus-course'; }
+    static get is() { return 'prendus-subject'; }
     static get properties() {
         return {
-            courseId: {
-                observer: 'courseIdChanged'
+            subjectId: {
+                observer: 'subjectIdChanged'
+            },
+            disciplineId: {
+
             },
             mode: {
 
@@ -49,16 +53,17 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     isEditMode(mode: Mode) {
         return mode === 'edit';
     }
+
     isCreateMode(mode: Mode) {
         return mode === 'create';
     }
 
-    async courseIdChanged() {
+    async subjectIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
-            key: 'courseId',
-            value: this.courseId
+            key: 'subjectId',
+            value: this.subjectId
         };
 
         this.action = {
@@ -75,20 +80,25 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: true
         };
     }
+    subscribeToData() {
 
+    }
     async loadData() {
         await GQLQuery(`
             query {
-                lessonsFromCourse${this.courseId}: allLessons(filter: {
-                    course: {
-                        id: "${this.courseId}"
+                conceptsFromSubject${this.subjectId}: allConcepts(filter: {
+                    subject: {
+                        id: "${this.subjectId}"
                     }
                 }) {
                     id
                     title
                 }
-                course${this.courseId}: Course(id: "${this.courseId}") {
+                subject${this.subjectId}: Subject(id: "${this.subjectId}") {
                     title
+                    discipline {
+                        id
+                    }
                 }
             }
         `, this.userToken, (key: string, value: any) => {
@@ -98,81 +108,61 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            console.log(error);
+            alert(error);
         });
     }
 
-    subscribeToData() {
-        GQLSubscribe(`
-            subscription changedLesson {
-                Lesson(
-                    filter: {
-                        mutation_in: [CREATED, UPDATED, DELETED]
-                    }
-                ) {
-                    node {
-                        id
-                    }
-                }
-            }
-        `, this.componentId, (data: any) => {
-            this.loadData();
-        });
-    }
-
-    async saveCourse() {
+    async saveSubject() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-
-        //TODO working on updateOrCreate
-
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
-        if (this.courseId) {
+        if (this.subjectId) {
             GQLMutate(`
                 mutation {
-                    updateCourse(
-                        id: "${this.courseId}"
+                    updateSubject(
+                        id: "${this.subjectId}"
                         title: "${title}"
+                        disciplineId: "${this.disciplineId}"
                     ) {
                         id
                     }
                 }
             `, this.userToken, (error: any) => {
-                console.log(error);
+                alert(error);
             });
         }
         else {
             const data = await GQLMutate(`
                 mutation {
-                    createCourse(
+                    createSubject(
                         title: "${title}"
-                        authorId: "${this.user.id}"
+                        disciplineId: "${this.disciplineId}"
                     ) {
                         id
                     }
                 }
             `, this.userToken, (error: any) => {
-                console.log(error);
+              console.log('error', error)
+                alert(error);
             });
-
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
-                key: 'courseId',
-                value: data.createCourse.id
+                key: 'subjectId',
+                value: data.createSubject.id
             };
         }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-
-        this.courseId = state.components[this.componentId] ? state.components[this.componentId].courseId : this.courseId;
-        this.lessons = state[`lessonsFromCourse${this.courseId}`];
-        this.course = state[`course${this.courseId}`];
+        this.subjectId = state.components[this.componentId] ? state.components[this.componentId].subjectId : this.subjectId;
+        this.concepts = state[`conceptsFromSubject${this.subjectId}`];
+        this.subject = state[`subject${this.subjectId}`];
+        this.disciplineId = this.subject ? this.subject.discipline.id : this.disciplineId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
 }
 
-window.customElements.define(PrendusCourse.is, PrendusCourse);
+window.customElements.define(PrendusSubject.is, PrendusSubject);

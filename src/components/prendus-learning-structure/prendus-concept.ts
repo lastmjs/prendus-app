@@ -2,26 +2,28 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {Lesson} from '../../typings/lesson';
-import {Course} from '../../typings/course';
+import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 
-class PrendusCourse extends Polymer.Element implements ContainerElement {
-    courseId: string;
+class PrendusConcept extends Polymer.Element implements ContainerElement {
+    conceptId: string;
+    concept: Concept;
+    subjectId: string;
     mode: Mode;
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
-    lessons: Lesson[];
-    course: Course;
     loaded: boolean;
     userToken: string;
     user: User;
 
-    static get is() { return 'prendus-course'; }
+    static get is() { return 'prendus-concept'; }
     static get properties() {
         return {
-            courseId: {
-                observer: 'courseIdChanged'
+            conceptId: {
+                observer: 'conceptIdChanged'
+            },
+            subjectId: {
+
             },
             mode: {
 
@@ -49,16 +51,17 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     isEditMode(mode: Mode) {
         return mode === 'edit';
     }
+
     isCreateMode(mode: Mode) {
         return mode === 'create';
     }
 
-    async courseIdChanged() {
+    async conceptIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
-            key: 'courseId',
-            value: this.courseId
+            key: 'conceptId',
+            value: this.conceptId
         };
 
         this.action = {
@@ -75,20 +78,17 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: true
         };
     }
+    subscribeToData() {
 
+    }
     async loadData() {
         await GQLQuery(`
             query {
-                lessonsFromCourse${this.courseId}: allLessons(filter: {
-                    course: {
-                        id: "${this.courseId}"
+                concept${this.conceptId}: Concept(id: "${this.conceptId}") {
+                    title
+                    subject {
+                        id
                     }
-                }) {
-                    id
-                    title
-                }
-                course${this.courseId}: Course(id: "${this.courseId}") {
-                    title
                 }
             }
         `, this.userToken, (key: string, value: any) => {
@@ -98,81 +98,60 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            console.log(error);
+            alert(error);
         });
     }
 
-    subscribeToData() {
-        GQLSubscribe(`
-            subscription changedLesson {
-                Lesson(
-                    filter: {
-                        mutation_in: [CREATED, UPDATED, DELETED]
-                    }
-                ) {
-                    node {
-                        id
-                    }
-                }
-            }
-        `, this.componentId, (data: any) => {
-            this.loadData();
-        });
-    }
-
-    async saveCourse() {
+    async saveConcept() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-
-        //TODO working on updateOrCreate
-
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
-        if (this.courseId) {
+        if (this.conceptId) {
             GQLMutate(`
                 mutation {
-                    updateCourse(
-                        id: "${this.courseId}"
+                    updateConcept(
+                        id: "${this.conceptId}"
                         title: "${title}"
+                        subjectId: "${this.subjectId}"
                     ) {
                         id
                     }
                 }
             `, this.userToken, (error: any) => {
-                console.log(error);
+                alert(error);
             });
         }
         else {
             const data = await GQLMutate(`
                 mutation {
-                    createCourse(
+                    createConcept(
                         title: "${title}"
-                        authorId: "${this.user.id}"
+                        subjectId: "${this.subjectId}"
                     ) {
                         id
                     }
                 }
             `, this.userToken, (error: any) => {
-                console.log(error);
+              console.log('error', error)
+                alert(error);
             });
-
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
-                key: 'courseId',
-                value: data.createCourse.id
+                key: 'conceptId',
+                value: data.createConcept.id
             };
         }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-
-        this.courseId = state.components[this.componentId] ? state.components[this.componentId].courseId : this.courseId;
-        this.lessons = state[`lessonsFromCourse${this.courseId}`];
-        this.course = state[`course${this.courseId}`];
+        this.conceptId = state.components[this.componentId] ? state.components[this.componentId].conceptId : this.conceptId;
+        this.concept = state[`concept${this.conceptId}`];
+        this.subjectId = this.concept ? this.concept.subject.id : this.subjectId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
 }
 
-window.customElements.define(PrendusCourse.is, PrendusCourse);
+window.customElements.define(PrendusConcept.is, PrendusConcept);

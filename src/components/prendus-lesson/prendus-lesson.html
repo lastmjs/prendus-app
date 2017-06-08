@@ -14,23 +14,16 @@
                     </template>
                 </dom-if>
 
-                <dom-if if="[[isEditMode(mode)]]">
+                <dom-if if="[[!isViewMode(mode)]]">
                     <template>
                         <input id="titleInput" type="text" value="[[lesson.title]]">
 
                         <button on-click="saveLesson">Save</button>
                     </template>
                 </dom-if>
-                <dom-if if="[[isEditMode(mode)]]">
-                    <template>
-                        <button>
-                            <a href="assignment/create?lessonId=[[lessonId]]">Add assignment</a>
-                        </button>
-                    </template>
-                </dom-if>
 
                 <br>
-                <div>Assignments:</div>
+                <div>Assignments</div>
 
                 <dom-repeat items="[[assignments]]">
                     <template>
@@ -45,6 +38,14 @@
                         </div>
                     </template>
                 </dom-repeat>
+
+                <dom-if if="[[!isCreateMode(mode)]]">
+                    <template>
+                        <button>
+                            <a href="assignment/create?lessonId=[[lessonId]]">Add assignment</a>
+                        </button>
+                    </template>
+                </dom-if>
             </template>
         </dom-if>
 
