@@ -1,16 +1,17 @@
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {Lesson} from '../../typings/lesson';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
     mode: Mode;
     componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
+    action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
     lessons: Lesson[];
     course: Course;
     loaded: boolean;
@@ -29,7 +30,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         };
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
 
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
@@ -67,13 +68,25 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: false
         };
-        await this.loadData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+
+        //TODO this is slightly complicated, wait for the Redux store to support generators
+        if (this.userToken && this.user) {
+            await this.loadData();
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'loaded',
+                value: true
+            };
+        }
+        else {
+            this.action = checkForUserToken();
+            this.action = await getAndSetUser(this.userToken);
+
+            setTimeout(() => {
+                this.courseIdChanged();
+            });
+        }
     }
 
     async loadData() {
