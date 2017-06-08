@@ -19,12 +19,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     async connectedCallback() {
         super.connectedCallback();
 
-        //TODO this craziness has to do with setting the actions in the redux store element. Right now I asynchronously recurse so that actions will eventually
-        //TODO fire against the store. That gets rid of gaurantees of synchronous updates to the state. Generators might be able to solve this problem. Look into it
-        const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
-        this.action = checkForUserTokenAction;
-        this.action = await getAndSetUser((<SetPropertyAction> checkForUserTokenAction).value);
-
+        //always set the componentId before firing other actions within a component
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -32,13 +27,19 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: false
         };
+
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
         await this.loadData();
+
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
+
         this.subscribeToData();
     }
 

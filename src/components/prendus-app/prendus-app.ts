@@ -14,17 +14,16 @@ class PrendusApp extends Polymer.Element {
 
     static get is() { return 'prendus-app'; }
 
+    constructor() {
+        super();
+        this.rootReducer = RootReducer;
+    }
+
     async connectedCallback() {
         super.connectedCallback();
 
-        this.rootReducer = RootReducer;
-
-        //TODO this craziness has to do with setting the actions in the redux store element. Right now I asynchronously recurse so that actions will eventually
-        //TODO fire against the store. That gets rid of gaurantees of synchronous updates to the state. Generators might be able to solve this problem. Look into it
-        const checkForUserTokenAction: SetPropertyAction | DefaultAction = checkForUserToken();
-        this.action = checkForUserTokenAction;
-        this.action = await getAndSetUser((<SetPropertyAction> checkForUserTokenAction).value);
-        // this.action = await getAndSetUser(this.userToken);
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
     }
     getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any) {
         if (rootRouteActive) return 'rootView';
@@ -91,9 +90,9 @@ class PrendusApp extends Polymer.Element {
     //     };
     // }
     //
-    async logout() {
-      if(this.userToken){
-        this.action = await removeUser();
+    logout() {
+      if (this.userToken){
+        this.action = removeUser();
         this.action = removeUserToken();
       }
 
@@ -103,6 +102,8 @@ class PrendusApp extends Polymer.Element {
 
         this.user = state.user;
         this.userToken = state.userToken;
+
+        // console.log(state);
         // console.log(state);
         //
         // this.route = state.route;
