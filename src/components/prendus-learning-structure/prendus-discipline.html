@@ -9,44 +9,16 @@
 
         <dom-if if="[[loaded]]">
             <template>
-                <dom-if if="[[isViewMode(mode)]]">
-                    <template>
-                        <div>[[course.title]]</div>
-                    </template>
-                </dom-if>
-
-                <dom-if if="[[isEditMode(mode)]]">
-                    <template>
-                        <input id="titleInput" type="text" value="[[course.title]]">
-
-                        <button on-click="saveCourse">Save</button>
-                    </template>
-                </dom-if>
 
                 <br>
-                <div>Lessons:</div>
-
-                <dom-repeat items="[[disciplines]]">
+                <div>[[Discipline]] Subjects:</div>
+                <dom-repeat items="[[subjects]]">
                     <template>
                         <div>
-                            <a href="discipline/[[item.id]]/view">[[item.title]]</a>
-
-                            <dom-if if="[[isEditMode(mode)]]">
-                                <template>
-                                    <a href="lesson/[[item.id]]/edit">Edit</a>
-                                </template>
-                            </dom-if>
+                            <a href="subject/[[item.id]]/view">[[item.title]]</a> <a href="subject/[[item.id]]/edit">Edit</a>
                         </div>
                     </template>
                 </dom-repeat>
-
-                <dom-if if="[[isEditMode(mode)]]">
-                    <template>
-                        <button>
-                            <a href="lesson/create?courseId=[[courseId]]">Add lesson</a>
-                        </button>
-                    </template>
-                </dom-if>
             </template>
         </dom-if>
 

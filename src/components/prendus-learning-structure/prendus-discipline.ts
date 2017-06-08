@@ -72,11 +72,13 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
             value: true
         };
     }
-
+    subscribeToData() {
+      
+    }
     async loadData() {
         await GQLQuery(`
             query {
-                subjectsFromDiscipline${this.disciplineId}: allLessons(filter: {
+                subjectsFromDiscipline${this.disciplineId}: allSubjects(filter: {
                     discipline: {
                         id: "${this.disciplineId}"
                     }
@@ -142,7 +144,6 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-
         this.disciplineId = state.components[this.componentId] ? state.components[this.componentId].disciplineId : this.disciplineId;
         this.subjects = state[`subjectsFromDiscipline${this.disciplineId}`];
         this.discipline = state[`discipline${this.disciplineId}`];
