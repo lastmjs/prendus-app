@@ -1,12 +1,13 @@
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
 import {User} from '../../typings/user';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
+    action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
     lessonId: string;
     assignmentId: string;
     loaded: boolean;
@@ -62,13 +63,25 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: false
         };
-        await this.loadData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+
+        //TODO this is slightly complicated, wait for the Redux store to support generators
+        if (this.userToken && this.user) {
+            await this.loadData();
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'loaded',
+                value: true
+            };
+        }
+        else {
+            this.action = checkForUserToken();
+            this.action = await getAndSetUser(this.userToken);
+
+            setTimeout(() => {
+                this.assignmentIdChanged();
+            });
+        }
     }
 
     async loadData() {
