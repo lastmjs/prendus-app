@@ -5,19 +5,29 @@
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-        <div>
-            Email: <input id="emailInput" type="text">
-        </div>
+        <dom-if if="[[loaded]]">
+            <template>
+                <div>
+                    Email: <input id="emailInput" type="text">
+                </div>
 
-        <div>
-            Password: <input id="passwordInput" type="password">
-        </div>
+                <div>
+                    Password: <input id="passwordInput" type="password">
+                </div>
 
-        <div>
-            Repeat Password: <input id="repeatPasswordInput" type="password">
-        </div>
+                <div>
+                    Repeat Password: <input id="repeatPasswordInput" type="password">
+                </div>
 
-        <button on-click="signupClick">Signup</button>
+                <button on-click="signupClick">Signup</button>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
     </template>
 
     <script src="prendus-signup.ts"></script>
