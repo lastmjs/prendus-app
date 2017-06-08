@@ -61,7 +61,7 @@
         <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, viewLearningStructureRouteActive, signupRouteActive, loginRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
 
-            <prendus-signup show="signupView"></prendus-signup>
+            <prendus-signup show="signupView" redirect-url="[[queryParams.redirectUrl]]"></prendus-signup>
             <prendus-login show="loginView"></prendus-login>
 
             <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
