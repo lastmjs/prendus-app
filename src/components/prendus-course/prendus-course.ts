@@ -47,7 +47,10 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     isEditMode(mode: Mode) {
-        return mode === 'edit' || mode === 'create';
+        return mode === 'edit';
+    }
+    isCreateMode(mode: Mode) {
+        return mode === 'create';
     }
 
     async courseIdChanged() {

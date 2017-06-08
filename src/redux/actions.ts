@@ -17,22 +17,14 @@ export function checkForUserToken(): SetPropertyAction | DefaultAction {
         };
     }
 }
-export async function removeUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
-
-    if (userToken) {
-      return {
-          type: 'SET_PROPERTY',
-          key: 'user',
-          value: null
-      };
-    }
-    else {
-        return {
-            type: 'DEFAULT_ACTION'
-        };
-    }
+export async function removeUser(): Promise<SetPropertyAction | DefaultAction> {
+    return {
+        type: 'SET_PROPERTY',
+        key: 'user',
+        value: null
+    };
 }
-export function removeUserToken(userToken: string): SetPropertyAction {
+export function removeUserToken(): SetPropertyAction {
     window.localStorage.setItem('userToken', '');
     return {
         type: 'SET_PROPERTY',
