@@ -11,6 +11,7 @@
 <link rel="import" href="../prendus-learning-structure/prendus-concept.html">
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
+<link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -27,6 +28,7 @@
 
         <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/login" active="{{loginRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/authenticate" active="{{authenticateRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
@@ -79,11 +81,12 @@
 
         <br>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive)]]">
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, LearningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
 
-            <prendus-signup show="signupView"></prendus-signup>
-            <prendus-login show="loginView"></prendus-login>
+            <prendus-signup show="signupView" redirect-url="[[queryParams.redirectUrl]]"></prendus-signup>
+            <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]"></prendus-login>
+            <prendus-authenticate show="authenticateView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]" active="[[authenticateRouteActive]]"></prendus-authenticate>
 
             <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>

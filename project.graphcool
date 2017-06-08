@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 63
+# version: 182
 
 type File implements Node {
   id: ID! @isUnique
@@ -16,14 +16,17 @@ type User implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  courses: [Course!]! @relation(name: "AuthorOnCourse")
-  lessons: [Lesson!]! @relation(name: "AuthorOnLesson")
-  assignments: [Assignment!]! @relation(name: "AuthorOnAssignment")
-  quizzes: [Quiz!]! @relation(name: "AuthorOnQuiz")
-  questions: [Question!]! @relation(name: "AuthorOnQuestion")
+  ownedCourses: [Course!]! @relation(name: "AuthorOnCourse")
+  ownedLessons: [Lesson!]! @relation(name: "AuthorOnLesson")
+  ownedAssignments: [Assignment!]! @relation(name: "AuthorOnAssignment")
+  ownedQuizzes: [Quiz!]! @relation(name: "AuthorOnQuiz")
+  ownedQuestions: [Question!]! @relation(name: "AuthorOnQuestion")
   email: String @isUnique
   password: String
-  role: UserRole! @defaultValue(value: INSTRUCTOR)
+  role: UserRole! @defaultValue(value: STUDENT)
+  ltiJWT: String
+  enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
+  ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
 }
 
 type Course implements Node {
@@ -54,6 +57,7 @@ type Assignment implements Node {
   title: String!
   lesson: Lesson! @relation(name: "LessonOnAssignment")
   author: User! @relation(name: "AuthorOnAssignment")
+  students: [User!]! @relation(name: "StudentsAndAssignments")
 }
 
 type Quiz implements Node {
@@ -100,6 +104,23 @@ type Concept implements Node {
   subject: Subject! @relation(name: "SubjectOnConcept")
 }
 
+type LTIUser implements Node {
+  id: ID! @isUnique
+  ltiUserId: String! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User! @relation(name: "UserOnLTIUser")
+}
+
+type LTISecret implements Node {
+  id: ID! @isUnique
+  key: String! @isUnique
+  secret: String! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 enum UserRole {
   INSTRUCTOR
+  STUDENT
 }
