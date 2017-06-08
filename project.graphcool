@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 167
+# version: 182
 
 type File implements Node {
   id: ID! @isUnique
@@ -24,9 +24,9 @@ type User implements Node {
   email: String @isUnique
   password: String
   role: UserRole! @defaultValue(value: STUDENT)
-  ltiUser: LTIUser @relation(name: "UserOnLTIUser")
   ltiJWT: String
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
+  ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
 }
 
 type Course implements Node {
@@ -107,7 +107,15 @@ type Concept implements Node {
 type LTIUser implements Node {
   id: ID! @isUnique
   ltiUserId: String! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
   user: User! @relation(name: "UserOnLTIUser")
+}
+
+type LTISecret implements Node {
+  id: ID! @isUnique
+  key: String! @isUnique
+  secret: String! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
 }
