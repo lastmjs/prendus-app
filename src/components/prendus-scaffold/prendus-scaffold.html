@@ -1,0 +1,234 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="prendus-scaffold-new-question.html">
+<link rel="import" href="prendus-scaffold-distractors.html">
+<!-- <link rel="import" href="prendus-scaffold-comments.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-explanation.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-rate-question.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-take-quiz.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-final-question.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-resource.html"> -->
+<!-- <link rel="import" href="prendus-scaffold-concept.html"> -->
+
+<dom-module id="prendus-scaffold">
+    <template>
+        <style>
+        .content {
+          display: grid;
+          grid-template-columns: 50% 50%;
+          grid-template-rows: 50% 50%;
+        }
+
+        .page {
+          grid-row: 1;
+          grid-column: 1/3;
+        }
+
+        .back, .next {
+          margin-top: 10px;
+        }
+
+        .back {
+          grid-row: 2;
+          grid-column: 1;
+        }
+
+        .next {
+          grid-row: 2;
+          grid-column: 2;
+          justify-self: end;
+        }
+        .centered {
+          text-align: center;
+        }
+
+        .big {
+          font-size: 22px;
+        }
+        #process {
+          display: grid;
+          grid-template-columns: 33% 33% 33%;
+          margin-top: 20px;
+        }
+        .bigIcon{
+          --iron-icon-height: 50%;
+          --iron-icon-width: 50%;
+        }
+        </style>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <div class="content">
+          <div class="page">
+            <iron-pages id="iron-pages" selected="[[selectedIndex]]">
+              <div>
+                <div class="prendus-card big">
+                  For this assignment you will create an exam level
+                  question for you and your class to practice for the
+                  upcoming exam. We will guide you through the question creation process.
+                  <!-- For this assignment you will create an exam level
+                  question for you and your class to practice for the
+                  upcoming exam. Here is an exam question
+                  to guide your thinking. -->
+                </div>
+                <div class="prendus-card" id="process">
+                  <div>
+                    <center>
+                        <h2>Step 1</h2>
+                        <iron-icon class="bigIcon" icon="dns"></iron-icon>
+                        <h3>Tag Concept</h3>
+                        <p>Select learning outcome</p>
+                    </center>
+                  </div>
+                  <div>
+                    <center>
+                        <h2>Step 2</h2>
+                        <iron-icon class="bigIcon" icon="chrome-reader-mode"></iron-icon>
+                        <h3>Prepare Materials</h3>
+                        <p>Add links to materials</p>
+                    </center>
+                  </div>
+                  <div>
+                    <center>
+                        <h2>Step 3</h2>
+                        <iron-icon class="bigIcon" icon="create"></iron-icon>
+                        <h3>Create Question</h3>
+                        <p>Write the question stem</p>
+                    </center>
+                  </div>
+                  <div>
+                    <center>
+                      <h2>Step 4</h2>
+                      <iron-icon class="bigIcon" icon="question-answer"></iron-icon>
+                      <h3>Add Answers</h3>
+                      <p>Add answer and distractors</p>
+                    </center>
+                  </div>
+                  <div>
+                    <center>
+                      <h2>Step 5</h2>
+                      <iron-icon class="bigIcon" icon="description"></iron-icon>
+                      <h3>Give Explanations</h3>
+                      <p>Explain solution and hints</p>
+                    </center>
+                  </div>
+                  <div>
+                    <center>
+                      <h2>Step 6</h2>
+                      <iron-icon class="bigIcon" icon="feedback"></iron-icon>
+                      <h3>Review Questions</h3>
+                      <p>Review other questions</p>
+                    </center>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  <h3>Guidelines for Adding a Concept</h3>
+                  <ol>
+                    <li>
+                      Select the concept that best aligns with the course.
+                    </li>
+                  </ol>
+                </div>
+                <prendus-scaffold-concept my-index="1" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-concept>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  <h3>Guidelines for Adding a Resource</h3>
+                  <ol>
+                    <li>
+                      Make sure the resource aligns with a concept
+                    </li>
+                    <li>
+                      Create a question in a <span class="bold">topic area that you are struggling with.</span>
+                    </li>
+                  </ol>
+                </div>
+                <prendus-scaffold-resource my-index="2" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  <h3>Guidelines for Creating a Question</h3>
+                  <ol>
+                    <li>
+                      Remember these will be used as <span class="bold">exam practice questions</span> for the class,
+                      so try to create a question that could be on the exam.
+                    </li>
+                    <li>
+                      Create a question in a <span class="bold">topic area that you are struggling with.</span>
+                    </li>
+                  </ol>
+                </div>
+                <prendus-scaffold-new-question my-index="3" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  Now, create distractors for your multiple-choice-question by
+                  thinking about common misconceptions students may have
+                  about the content area of your question
+                </div>
+                <prendus-scaffold-distractors my-index="4" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-distractors>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  Now, add in correct and incorrect answer comments based on the <b>misconceptions you identified</b>
+                  in the previous problem.
+                </div>
+                <prendus-scaffold-comments my-index="5" selected-index="[[selectedIndex]]"></prendus-scaffold-comments>
+              </div>
+              <div>
+                <div class="prendus-card big">
+                  Finally, add an explanation <b>that explains how to solve </b>the problem.  Remember to
+                  <b> highlight common misconceptions</b> with the problem in your explanation.
+                </div>
+                <prendus-scaffold-explanation my-index="6" selected-index="[[selectedIndex]]"></prendus-scaffold-explanation>
+              </div>
+              <div>
+                <div class="prendus-card centered">
+                  <h3>Final Question</h3>
+                </div>
+                <prendus-scaffold-final-question quiz-id="[[quizId]]" my-index="7" selected-index="[[selectedIndex]]"></prendus-scaffold-final-question>
+              </div>
+              <div>
+                <div class="prendus-card centered">
+                  <h3>Question Submitted</h3>
+                  You have now submitted the first part of the assignment. For the next part, you will rate other questions for difficulty, quality, and accuracy.
+                </div>
+              </div>
+              <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
+                <div>
+                  <div class="prendus-card centered">
+                    <h3> Rate question [[plusOne(index)]]</h3>
+                    <!--TODO fix this description -->
+                  </div>
+                  <prendus-scaffold-rate-question my-index="[[calculateRateIndex(index)]]" selected-index="[[selectedIndex]]" scaffold="[[item]]"></prendus-scaffold-rate-question>
+                </div>
+              </template>
+
+              <div>
+                <div class="prendus-card centered">
+                  <h3>Take quiz</h3>
+                  <!--TODO fix this description -->
+                </div>
+                <prendus-scaffold-take-quiz course-id="[[courseId]]" quiz-id="[[questionScaffoldQuizId]]" my-index="[[calculateTakeIndex(index)]]" selected-index="[[selectedIndex]]"></prendus-scaffold-take-quiz>
+              </div>
+
+            </iron-pages>
+          </div>
+
+          <template is="dom-if" if="[[selectedIndex]]">
+            <div class="back">
+              <button class="prendus-button prendus-button--recommended" on-click="back">Back</button>
+            </div>
+          </template>
+          <div class="next">
+            <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next" disabled="[[disableNext]]">Next</button>
+          </div>
+        </div>
+    </template>
+
+    <script src="prendus-scaffold.ts"></script>
+</dom-module>

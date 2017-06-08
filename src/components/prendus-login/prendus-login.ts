@@ -31,10 +31,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const email: string = this.shadowRoot.querySelector('#emailInput').value;
         const password: string = this.shadowRoot.querySelector('#passwordInput').value;
         const data = await performMutation(email, password, this.userToken);
-        const GQLEmail = await getUser(email, password, data.signinUser.token)
+        const GQLUser = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
-        this.action = setUserInRedux(GQLEmail.User);
-        if (data.signinUser.token === this.userToken && (this.user && this.user.id === GQLEmail)) alert('user logged in successfully');
+        this.action = setUserInRedux(GQLUser.User);
+        if (data.signinUser.token === this.userToken && (this.user && this.user.id === GQLUser)) alert('user logged in successfully');
         navigateHome();
 
         async function performMutation(email: string, password: string, userToken: string | null) {

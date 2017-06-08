@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-scaffold-new-question">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style>
+        .bold {
+          font-weight: bold;
+        }
+
+        .wrapper {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .question {
+          margin-top: 20px;
+        }
+
+        .answer {
+          margin-top: 20px;
+        }
+        </style>
+
+        <div class="wrapper">
+          <div>
+            <h3>Question</h3>
+            <paper-textarea id="question" value="[[question]]" on-value-changed="disableNext"></paper-textarea>
+          </div>
+          <div>
+            <h3>Correct Answer</h3>
+            <paper-textarea id="answer" value="[[answer]]" on-value-changed="disableNext"></paper-textarea>
+          </div>
+        </div>
+    </template>
+
+    <script src="prendus-scaffold-new-question.ts"></script>
+</dom-module>
