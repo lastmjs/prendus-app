@@ -18,7 +18,6 @@ class PrendusScaffold extends Polymer.Element {
     questionScaffoldAnswers: QuestionScaffoldAnswer[];
     questionScaffoldsToRate: QuestionScaffold[];
     questionScaffoldQuizId: string;
-    properties: any;
     assignmentId: string;
 
 

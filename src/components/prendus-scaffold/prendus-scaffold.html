@@ -6,11 +6,11 @@
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="prendus-scaffold-new-question.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
-<!-- <link rel="import" href="prendus-scaffold-comments.html"> -->
-<!-- <link rel="import" href="prendus-scaffold-explanation.html"> -->
+<link rel="import" href="prendus-scaffold-comments.html">
+<link rel="import" href="prendus-scaffold-explanation.html">
 <!-- <link rel="import" href="prendus-scaffold-rate-question.html"> -->
 <!-- <link rel="import" href="prendus-scaffold-take-quiz.html"> -->
-<!-- <link rel="import" href="prendus-scaffold-final-question.html"> -->
+<link rel="import" href="prendus-scaffold-final-question.html">
 <!-- <link rel="import" href="prendus-scaffold-resource.html"> -->
 <!-- <link rel="import" href="prendus-scaffold-concept.html"> -->
 
@@ -198,23 +198,22 @@
                   You have now submitted the first part of the assignment. For the next part, you will rate other questions for difficulty, quality, and accuracy.
                 </div>
               </div>
-              <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
+              <!-- Move the rate question to a seperate component -->
+              <!-- <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
                 <div>
                   <div class="prendus-card centered">
                     <h3> Rate question [[plusOne(index)]]</h3>
-                    <!--TODO fix this description -->
                   </div>
                   <prendus-scaffold-rate-question my-index="[[calculateRateIndex(index)]]" selected-index="[[selectedIndex]]" scaffold="[[item]]"></prendus-scaffold-rate-question>
                 </div>
-              </template>
-
-              <div>
+              </template> -->
+              <!-- Move the Take Quiz to another component -->
+              <!-- <div>
                 <div class="prendus-card centered">
                   <h3>Take quiz</h3>
-                  <!--TODO fix this description -->
                 </div>
                 <prendus-scaffold-take-quiz course-id="[[courseId]]" quiz-id="[[questionScaffoldQuizId]]" my-index="[[calculateTakeIndex(index)]]" selected-index="[[selectedIndex]]"></prendus-scaffold-take-quiz>
-              </div>
+              </div> -->
 
             </iron-pages>
           </div>
