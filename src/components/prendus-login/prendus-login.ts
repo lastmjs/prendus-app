@@ -56,9 +56,9 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const email: string = this.shadowRoot.querySelector('#emailInput').value;
         const password: string = this.shadowRoot.querySelector('#passwordInput').value;
         const data = await signinUser(email, password, this.userToken);
-        const GQLEmail = await getUser(email, password, data.signinUser.token)
+        const gqlUser = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
-        this.action = setUserInRedux(GQLEmail.User);
+        this.action = setUserInRedux(gqlUser.User);
         if (this.linkLtiAccount) await addLtiJwtToUser(this.user, this.userToken);
         navigateHome();
 

@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="../prendus-question-creator/prendus-question-creator.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
 
 <dom-module id="prendus-assignment">
     <template>
@@ -9,10 +9,11 @@
 
         <dom-if if="[[loaded]]">
             <template>
-              <!-- <prendus-question-creator></prendus-question-creator> -->
+
                 <dom-if if="[[isViewMode(mode)]]">
                     <template>
-                        <div>[[assignment.title]]</div>
+                      <!-- <prendus-scaffold></prendus-scaffold> -->
+                        <div>[[assignment]]</div>
                     </template>
                 </dom-if>
 

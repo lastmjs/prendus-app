@@ -105,10 +105,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
     }
 
-    subscribeToData() {
-
-    }
-
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         if (this.assignmentId) {
