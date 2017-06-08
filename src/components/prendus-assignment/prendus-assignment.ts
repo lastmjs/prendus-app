@@ -30,8 +30,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         };
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
+
+        //always set the componentId before firing other actions within a component
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -39,6 +41,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
+
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
     }
 
     isViewMode(mode) {
@@ -64,24 +69,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             value: false
         };
 
-        //TODO this is slightly complicated, wait for the Redux store to support generators
-        if (this.userToken && this.user) {
-            await this.loadData();
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'loaded',
-                value: true
-            };
-        }
-        else {
-            this.action = checkForUserToken();
-            this.action = await getAndSetUser(this.userToken);
+        await this.loadData();
 
-            setTimeout(() => {
-                this.assignmentIdChanged();
-            });
-        }
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     async loadData() {

@@ -3,7 +3,7 @@
 
 <dom-module id="prendus-authenticate">
     <template>
-        <redux-store action="[[action]]"></redux-store>
+        <redux-store id="reduxStoreElement" action="[[action]]"></redux-store>
 
         <br>
         You must <a href="signup[[getTail(redirectUrl, linkLtiAccount)]]">sign up</a> or <a href="login[[getTail(redirectUrl, linkLtiAccount)]]">log in</a> to continue.

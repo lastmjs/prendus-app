@@ -18,7 +18,7 @@
 
 <dom-module id="prendus-app">
     <template>
-        <redux-store root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
 
         <!--TODO get rid of the two-way data binding, listen to events and integrate with Redux-->
         <!--TODO update app-location once this PR goes through: https://github.com/PolymerElements/iron-location/pull/83 -->

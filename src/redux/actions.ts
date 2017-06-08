@@ -1,5 +1,6 @@
 import {GQLQuery} from '../services/graphql-service';
 import {SetPropertyAction, DefaultAction} from '../typings/actions';
+import {State} from '../typings/state';
 
 export function checkForUserToken(): SetPropertyAction | DefaultAction {
     const userToken = window.localStorage.getItem('userToken');
@@ -35,8 +36,10 @@ export function removeUserToken(): SetPropertyAction {
     };
 }
 
-export async function getAndSetUser(userToken: string | null): Promise<SetPropertyAction | DefaultAction> {
-    if (userToken) {
+export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction> {
+    const originalUserToken = window.localStorage.getItem('userToken');
+
+    if (originalUserToken) {
         const data = await GQLQuery(`
             query {
                 user {
@@ -44,21 +47,24 @@ export async function getAndSetUser(userToken: string | null): Promise<SetProper
                     email
                 }
             }
-        `, userToken, (key: string, value: any) => {}, (error: any) => {
+        `, originalUserToken, (key: string, value: any) => {}, (error: any) => {
             throw error;
         });
 
-        return {
-            type: 'SET_PROPERTY',
-            key: 'user',
-            value: data.user
-        };
+        // The user token might be set to null while the request is off...if it is, we do not want to set the user because we are expecting the user to stay null
+        const currentUserToken = window.localStorage.getItem('userToken');
+        if (currentUserToken) {
+            return {
+                type: 'SET_PROPERTY',
+                key: 'user',
+                value: data.user
+            };
+        }
     }
-    else {
-        return {
-            type: 'DEFAULT_ACTION'
-        };
-    }
+
+    return {
+        type: 'DEFAULT_ACTION'
+    };
 }
 
 export function persistUserToken(userToken: string): SetPropertyAction {
