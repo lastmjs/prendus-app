@@ -102,43 +102,34 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-        if (this.assignmentId) {
-            GQLMutate(`
-                mutation {
-                    updateAssignment(
+
+        const data = await GQLMutate(`
+            mutation {
+                updateOrCreateAssignment(
+                    update: {
                         id: "${this.assignmentId}"
                         lessonId: "${this.lessonId}"
                         title: "${title}"
-                    ) {
-                        id
                     }
-                }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
-        }
-        else {
-            const data = await GQLMutate(`
-                mutation {
-                    createAssignment(
+                    create: {
                         title: "${title}"
                         lessonId: "${this.lessonId}"
-                        authorId: "${this.user.id}"
-                    ) {
-                        id
+                        authorId: "${this.user ? this.user.id : null}"
                     }
+                ) {
+                    id
                 }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
+            }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
 
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'assignmentId',
-                value: data.createAssignment.id
-            };
-        }
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'assignmentId',
+            value: data.updateOrCreateAssignment.id
+        };
     }
 
     stateChange(e: CustomEvent) {
