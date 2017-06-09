@@ -136,43 +136,33 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
     async saveLesson() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
-        if (this.lessonId) {
-            GQLMutate(`
-                mutation {
-                    updateLesson(
+        const data = await GQLMutate(`
+            mutation {
+                updateOrCreateLesson(
+                    update: {
                         id: "${this.lessonId}"
                         courseId: "${this.courseId}"
                         title: "${title}"
-                    ) {
-                        id
                     }
-                }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
-        }
-        else {
-            const data = await GQLMutate(`
-                mutation {
-                    createLesson(
+                    create: {
                         title: "${title}"
                         courseId: "${this.courseId}"
                         authorId: "${this.user.id}"
-                    ) {
-                        id
                     }
+                ) {
+                    id
                 }
-            `, this.userToken, (error: any) => {
-                console.log(error);
-            });
+            }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
 
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'lessonId',
-                value: data.createLesson.id
-            };
-        }
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'lessonId',
+            value: data.updateOrCreateLesson.id
+        };
     }
 
     stateChange(e: CustomEvent) {
