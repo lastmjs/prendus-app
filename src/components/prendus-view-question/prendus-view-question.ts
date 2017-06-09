@@ -90,8 +90,12 @@ class PrendusViewQuestion extends Polymer.Element {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'builtQuestion',
-            value: await buildQuestion(this.question)
+            value: await buildQuestion(this.question, this.shadowRoot.querySelector('#secureIframe'))
         };
+    }
+
+    getSanitizedText(transformedText: string) {
+        return DOMPurify.sanitize(transformedText);
     }
 
     checkAnswer() {

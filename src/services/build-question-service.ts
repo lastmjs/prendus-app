@@ -2,22 +2,21 @@ import {Question} from '../typings/question';
 import {BuiltQuestion} from '../typings/built-question';
 
 //TODO add a return type to this function...the typescript errors are a little weird for the return type
-export async function buildQuestion(rawQuestion: Question) {
+export async function buildQuestion(rawQuestion: Question, secureIframe: HTMLIFrameElement) {
     return new Promise((resolve, reject) => {
         const uuid = createUUID();
         const userVariables: string[] = retrieveUserVariables([], rawQuestion);
         const userInputs: string[] = retrieveUserInputs([], rawQuestion);
         const userCheckboxes: string[] = retrieveUserCheckboxes([], rawQuestion);
         const userRadios: string[] = retrieveUserRadios([], rawQuestion);
-        const questionWorker = new Worker('services/question-worker-service.js');
 
-        questionWorker.postMessage({
+        secureIframe.contentWindow.postMessage({
             userVariables,
             userInputs,
             userCode: rawQuestion.code
-        });
+        }, '*');
 
-        questionWorker.onmessage = (e) => {
+        window.addEventListener('message', (event) => {
             const result: {
                 answer: string | number,
                 // hint: string,
@@ -26,7 +25,7 @@ export async function buildQuestion(rawQuestion: Question) {
                     value: number | string
                 }[],
                 errorMessage: string
-            } = e.data;
+            } = event.data;
 
             if (result.errorMessage) {
                 resolve({
@@ -79,7 +78,7 @@ export async function buildQuestion(rawQuestion: Question) {
                 userCheckboxes,
                 userRadios
             });
-        };
+        });
     });
 }
 
