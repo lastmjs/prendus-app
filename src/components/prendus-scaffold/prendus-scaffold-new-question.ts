@@ -53,13 +53,17 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
      */
     disableNext(e: any): void {
       try {
+        console.log('hello')
+        console.log(this.myIndex)
+        console.log(this.selectedIndex)
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const question: string = this.querySelector('#question') ? this.querySelector('#question').value : null;
           const answer: string = this.querySelector('#answer') ? this.querySelector('#answer').value : null;
           const answers: string[] = getAnswers(this, answer);
-
-          // this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty([question, answer]));
-          // this.action = Actions.updateCurrentQuestionScaffold(question, null, answers, null);
+          console.log('question', question)
+          console.log('answer', answer)
+          this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty([question, answer]));
+          this.action = Actions.updateCurrentQuestionScaffold(question, null, answers, null);
         }
       } catch(error) {
         console.error(error);
