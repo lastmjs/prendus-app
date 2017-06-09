@@ -1,0 +1,24 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+
+<dom-module id="prendus-view-question">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <div inner-h-t-m-l="[[builtQuestion.transformedText]]"></div>
+                <button on-click="checkAnswer">Check</button>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script src="prendus-view-question.ts"></script>
+</dom-module>
