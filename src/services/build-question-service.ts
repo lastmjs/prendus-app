@@ -163,23 +163,8 @@ function replaceUserCheckboxText(previousText: string, userCheckboxes: string[],
 
 function replaceUserRadioText(previousText: string, userRadios: string[], uuid: string): string {
     return userRadios.reduce((prev: string, curr: string, index: number) => {
-        const constructString = (index: number, label: string) => {
-            const radioButton = `<paper-radio-button id="${curr}${uuid}" name="${curr}">${label}</paper-radio-button><br>`;
-
-            if (index === 0) {
-                return `<paper-radio-group allow-empty-selection>${radioButton}`;
-            }
-
-            if (index === userRadios.length - 1) {
-                return `${radioButton}</paper-radio-group>`;
-            }
-
-            return radioButton;
-        };
-
-        const re = new RegExp(`<p>\\[\\*\\]${curr}\\[\\*\\](.*?)</p>`);
-        const label: string = re.exec(prev)[1];
-        return prev.replace(re, constructString(index, label));
+        const re = new RegExp(`\\[\\*\\]${curr}\\[\\*\\]`);
+        return prev.replace(re, `<input type="radio" id="${curr}${uuid}" name="${uuid}">`);
     }, previousText);
 }
 
