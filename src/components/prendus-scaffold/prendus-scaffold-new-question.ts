@@ -1,12 +1,13 @@
 import {ContainerElement} from '../../typings/container-element';
 import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 import {State} from '../../typings/state';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-
+import {isDefinedAndNotEmpty} from '../../services/utilities-service';
 
 class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -38,14 +39,20 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
 
     async connectedCallback() {
         super.connectedCallback();
-
+        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     /**
      * Called when numberOfAnswers is set
      */
     initCurrentQuestionScaffold(): void {
-      // this.action = Actions.initCurrentQuestionScaffold(this.numberOfAnswers);
+      this.action = initCurrentQuestionScaffold(this.numberOfAnswers);
     }
     /**
      * Checks if the question and answer have been entered and aren't empty and if
@@ -53,23 +60,18 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
      */
     disableNext(e: any): void {
       try {
-        console.log('hello')
-        console.log(this.myIndex)
-        console.log(this.selectedIndex)
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          const question: string = this.querySelector('#question') ? this.querySelector('#question').value : null;
-          const answer: string = this.querySelector('#answer') ? this.querySelector('#answer').value : null;
+          const question: string = this.shadowRoot.querySelector('#question') ? this.shadowRoot.querySelector('#question').value : null;
+          const answer: string = this.shadowRoot.querySelector('#answer') ? this.shadowRoot.querySelector('#answer').value : null;
           const answers: string[] = getAnswers(this, answer);
-          console.log('question', question)
-          console.log('answer', answer)
-          this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty([question, answer]));
-          this.action = Actions.updateCurrentQuestionScaffold(question, null, answers, null);
+          this.action = setDisabledNext(!isDefinedAndNotEmpty([question, answer]))
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, question, null, answers, null)
         }
       } catch(error) {
         console.error(error);
       }
 
-      function getAnswers(context: PrendusQuestionScaffoldNewQuestion, text: string): string[] {
+      function getAnswers(context: PrendusScaffoldNewQuestion, text: string): string[] {
         const newAnswers: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = {
           ...(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}),
           'question0': {
@@ -88,7 +90,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
 
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
+        this.currentQuestionScaffold = state.currentQuestionScaffold;
     }
 }
 
