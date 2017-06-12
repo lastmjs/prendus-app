@@ -2,22 +2,21 @@ import {Question} from '../typings/question';
 import {BuiltQuestion} from '../typings/built-question';
 
 //TODO add a return type to this function...the typescript errors are a little weird for the return type
-export async function buildQuestion(rawQuestion: Question) {
+export async function buildQuestion(rawQuestion: Question, secureIframe: HTMLIFrameElement) {
     return new Promise((resolve, reject) => {
         const uuid = createUUID();
         const userVariables: string[] = retrieveUserVariables([], rawQuestion);
         const userInputs: string[] = retrieveUserInputs([], rawQuestion);
         const userCheckboxes: string[] = retrieveUserCheckboxes([], rawQuestion);
         const userRadios: string[] = retrieveUserRadios([], rawQuestion);
-        const questionWorker = new Worker('services/question-worker-service.js');
 
-        questionWorker.postMessage({
+        secureIframe.contentWindow.postMessage({
             userVariables,
             userInputs,
             userCode: rawQuestion.code
-        });
+        }, '*');
 
-        questionWorker.onmessage = (e) => {
+        window.addEventListener('message', (event) => {
             const result: {
                 answer: string | number,
                 // hint: string,
@@ -26,7 +25,7 @@ export async function buildQuestion(rawQuestion: Question) {
                     value: number | string
                 }[],
                 errorMessage: string
-            } = e.data;
+            } = event.data;
 
             if (result.errorMessage) {
                 resolve({
@@ -79,7 +78,7 @@ export async function buildQuestion(rawQuestion: Question) {
                 userCheckboxes,
                 userRadios
             });
-        };
+        });
     });
 }
 
@@ -163,23 +162,8 @@ function replaceUserCheckboxText(previousText: string, userCheckboxes: string[],
 
 function replaceUserRadioText(previousText: string, userRadios: string[], uuid: string): string {
     return userRadios.reduce((prev: string, curr: string, index: number) => {
-        const constructString = (index: number, label: string) => {
-            const radioButton = `<paper-radio-button id="${curr}${uuid}" name="${curr}">${label}</paper-radio-button><br>`;
-
-            if (index === 0) {
-                return `<paper-radio-group allow-empty-selection>${radioButton}`;
-            }
-
-            if (index === userRadios.length - 1) {
-                return `${radioButton}</paper-radio-group>`;
-            }
-
-            return radioButton;
-        };
-
-        const re = new RegExp(`<p>\\[\\*\\]${curr}\\[\\*\\](.*?)</p>`);
-        const label: string = re.exec(prev)[1];
-        return prev.replace(re, constructString(index, label));
+        const re = new RegExp(`\\[\\*\\]${curr}\\[\\*\\]`);
+        return prev.replace(re, `<input type="radio" id="${curr}${uuid}" name="${uuid}">`);
     }, previousText);
 }
 

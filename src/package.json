@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dompurify": "^0.9.0",
     "redux-store-element": "^1.2.6",
     "zwitterion-production": "0.0.8"
   }
