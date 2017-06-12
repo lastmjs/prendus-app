@@ -7,6 +7,6 @@ export interface Question {
     readonly updatedAt: Date;
     readonly text: string;
     readonly code: string;
-    readonly quiz: Quiz;
+    readonly quiz: Quiz | null;
     readonly author: User;
 }

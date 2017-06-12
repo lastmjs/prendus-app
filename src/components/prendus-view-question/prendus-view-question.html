@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+
+<!--TODO ensure that this script does not do a network request for each instance of a question-->
+<script src="../../node_modules/dompurify/dist/purify.min.js"></script>
+
+<dom-module id="prendus-view-question">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <iframe id="secureIframe" sandbox="allow-scripts" style="display: none;" src="services/secure-question-iframe.html"></iframe>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <div inner-h-t-m-l="[[getSanitizedText(builtQuestion.transformedText)]]"></div>
+                <button on-click="checkAnswer">Check</button>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script src="prendus-view-question.ts"></script>
+</dom-module>
