@@ -28,3 +28,10 @@ export const getQuestionScaffoldAnswers = (questionScaffold: QuestionScaffold): 
       };
   });
 };
+
+export function shuffleArray(array: any[]): any[] {
+    const newArray = [...array];
+    return newArray.sort((element) => {
+        return .5 - Math.random();
+    });
+}

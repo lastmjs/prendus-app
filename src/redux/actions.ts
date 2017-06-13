@@ -1,6 +1,7 @@
 import {GQLQuery} from '../services/graphql-service';
 import {SetPropertyAction, DefaultAction} from '../typings/actions';
 import {State} from '../typings/state';
+import {Question} from '../typings/question';
 import {QuestionScaffold} from '../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 

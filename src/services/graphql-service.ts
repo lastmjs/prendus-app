@@ -85,7 +85,6 @@ export const GQLQuery = async (queryString: string, userToken: string | null, da
 export const GQLMutate = async (queryString: string, userToken: string | null, errorCallback: GQLMutateErrorCallback) => {
 
     //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
-
     const response = await window.fetch(httpEndpoint, {
         method: 'post',
         headers: {
