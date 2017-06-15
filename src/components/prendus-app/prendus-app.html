@@ -98,9 +98,9 @@
             <prendus-lesson show="viewLessonView" lesson-id="[[viewLessonRouteData.lessonId]]" mode="view"></prendus-lesson>
             <prendus-lesson show="editLessonView" lesson-id="[[editLessonRouteData.lessonId]]" mode="edit"></prendus-lesson>
 
-            <prendus-assignment show="createAssignmentView" assignment-id="[[createAssignmentRouteData.lessonId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-assignment>
-            <prendus-assignment show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.lessonId]]" mode="view"></prendus-assignment>
-            <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.lessonId]]" mode="edit"></prendus-assignment>
+            <prendus-assignment show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-assignment>
+            <prendus-assignment show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.assignmentId]]" mode="view"></prendus-assignment>
+            <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit"></prendus-assignment>
 
             <prendus-learning-structure show="learningStructureView" mode="view"></prendus-learning-structure>
 
@@ -112,7 +112,7 @@
             <prendus-subject show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view"></prendus-subject>
             <prendus-subject show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit"></prendus-subject>
 
-            <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.disciplineId]]" mode="create"></prendus-subject>
+            <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.subjectId]]" mode="create"></prendus-subject>
             <prendus-concept show="viewConceptView" concept-id="[[viewConceptRouteData.subjectId]]" mode="view"></prendus-subject>
             <prendus-concept show="editConceptView" concept-id="[[editConceptRouteData.subjectId]]" mode="edit"></prendus-subject>
 

@@ -101,7 +101,6 @@ export const GQLMutate = async (queryString: string, userToken: string | null, e
     const responseJSON = await response.json();
     const data = responseJSON.data;
     const errors = responseJSON.errors;
-
     (errors || []).forEach((error: any) => {
       console.log('error', error)
         // errorCallback(error);

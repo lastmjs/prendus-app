@@ -169,7 +169,7 @@ class PrendusLesson extends Polymer.Element implements ContainerElement {
         const state = e.detail.state;
 
         this.lesson = state[`lesson${this.lessonId}`];
-        this.lessonId = state.components[this.componentId] ? state.components[this.componentId].lessonId : this.lessonId;
+        // this.lessonId = state.components[this.componentId] ? state.components[this.componentId].lessonId : this.lessonId;
         this.assignments = state[`assignmentsFromLesson${this.lessonId}`];
         this.courseId = this.lesson ? this.lesson.course.id : this.courseId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;

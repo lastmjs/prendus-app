@@ -26,11 +26,13 @@ class PrendusScaffoldExample extends Polymer.Element {
             type: Number
           },
           questionScaffold: {
-            type: Object
+            type: Object,
+            observer: 'scaffoldLoaded'
           }
         };
     }
     connectedCallback() {
+      console.log('connected callback in the scaffold example')
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
@@ -40,7 +42,9 @@ class PrendusScaffoldExample extends Polymer.Element {
             value: true
         };
     }
-
+    scaffoldLoaded(){
+      console.log('scaffold has loaded')
+    }
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
         this.action = Actions.setDisabledNext(false);

@@ -19,15 +19,19 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
     answers: QuestionScaffoldAnswer[];
-    quizId: string;
+    assignmentId: string;
     question: Question;
     questionScaffold: QuestionScaffold;
+    questionId: string;
     userToken: string;
     user: User;
 
     static get is() { return 'prendus-scaffold-final-question'; }
     static get properties() {
         return {
+          assignmentId: {
+            type: String
+          },
           myIndex: {
             type: Number
           },
@@ -54,6 +58,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
         // checkForUserToken();
         const convertedQuestion = this.convertScaffoldToQuestion()
         const questionId = this.saveQuestion(convertedQuestion)
+        // this.saveQuestionToAssignment(this.questionId)
         // this.action = {
         //     type: 'CONVERT_QUESTION_SCAFFOLD_TO_QUESTION',
         //     userToken: this.userToken,
@@ -114,27 +119,44 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     async saveQuestion(question: Question) {
       //have to do this because the code is a multi-line string. We need to parse it down to a single line so that Graph.cool will accept it.
       const code: string = question.code.replace(/\n/g, "");
-        const data = await GQLMutate(`
-          mutation {
-            createQuestion(
-              authorId: "${this.user.id}"
-              text: "${question.text}"
-              code: "${code}"
-            ) {
-              id
-            }
+      const data = await GQLMutate(`
+        mutation {
+          createQuestion(
+            authorId: "${this.user.id}"
+            assignmentId: "${this.assignmentId}"
+            text: "${question.text}"
+            code: "${code}"
+          ) {
+            id
           }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'questionId',
-            value: data.createQuestion.id
-        };
+        }
+      `, this.userToken, (error: any) => {
+          console.log(error);
+      });
+      const userT = this.userToken;
+      Object.keys(question.answerComments).forEach(async function(key) {
+          await GQLMutate(`
+            mutation {
+              createAnswerComment(
+                text: "${question.answerComments[key]}"
+                questionId: "${data.createQuestion.id}"
+              ) {
+                id
+              }
+            }
+          `, userT, (error: any) => {
+              console.log(error);
+          });
+      });
+      console.log('data', data)
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'questionId',
+          value: data.createQuestion.id
+      };
+      return data.createQuestion.id
     }
-
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;

@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
+import {QuestionScaffold} from '../../typings/question-scaffold';
 import {User} from '../../typings/user';
 
 class PrendusScaffoldComments extends Polymer.Element {
@@ -10,14 +11,11 @@ class PrendusScaffoldComments extends Polymer.Element {
     userToken: string | null;
     user: User | null;
     selectedIndex: number;
-    disableNext: boolean;
     numberOfAnswers: number;
     properties: any;
     assignmentId: string;
-
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
-    answers: QuestionScaffoldAnswer[];
 
     static get is() { return 'prendus-scaffold-comments'; }
     static get properties() {
@@ -40,27 +38,23 @@ class PrendusScaffoldComments extends Polymer.Element {
             key: 'loaded',
             value: true
         };
+        this.loadConcepts();
     }
 
     disableNext(): void {
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          const comments: string[] = getComments(this);
-
-          this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(comments));
-          this.action = Actions.updateCurrentQuestionScaffold(null, comments, null, null);
+          const concepts: string[] = getConcepts(this);
+          // this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(comments));
+          // this.action = Actions.updateCurrentQuestionScaffold(null, comments, null, null);
         }
       } catch(error) {
         console.error(error);
       }
-
-      function getComments(context: PrendusQuestionScaffoldComments): string[] {
-        return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-          return context.querySelector(`#comment${index}`) ? context.querySelector(`#comment${index}`).value : null;
-        });
-      }
     }
-
+    loadConcepts(){
+      console.log('load concepts')
+    }
     plusOne(index: number): number {
       return index + 1;
     }

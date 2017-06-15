@@ -2,8 +2,9 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
+import {Subject} from '../../typings/subject';
+import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -14,6 +15,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     assignment: Assignment;
     userToken: string | null;
     user: User | null;
+    learningStructure: any;
+    subjects: Subject[];
+    concepts: Concept[];
+    selectedConcept: Concept;
 
     static get is() { return 'prendus-assignment'; }
     static get properties() {
@@ -41,9 +46,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-
-        this.action = checkForUserToken();
-        this.action = await getAndSetUser();
+        await this.loadData();
     }
 
     isViewMode(mode) {
@@ -68,17 +71,43 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: false
         };
-
-        await this.loadData();
-
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
+        await this.loadLearningStructure();
     }
-
+    getSubject(e){
+      this.subjects = this.learningStructure[e.target.id].subjects
+      //This is Polymer. I'm doing it to update subjects on the DOM when a discipline is seletcted
+      this.notifySplices('subjects', [
+        { index: 1, added: [this.learningStructure[e.target.id].subjects[0]], addedCount: this.subjects.length, obect: this.subjects, type: 'splice' },
+      ]);
+    }
+    getConcept(e){
+      this.concepts = this.subjects[e.target.id].concepts
+      this.notifySplices('concepts', [
+        { index: 1, added: [this.subjects[e.target.id].concepts[0]], addedCount: this.concepts.length, obect: this.concepts, type: 'splice' },
+      ]);
+    }
+    async saveConcept(e: any){
+      this.selectedConcept = this.concepts[e.target.id]
+      this.saveConceptToAssignment();
+      const data = await GQLMutate(`
+        mutation {
+          updateAssignment(
+            id: "${this.assignmentId}"
+            conceptsIds: "${this.selectedConcept.id}"
+          ) {
+            id
+          }
+      }
+      `, this.userToken, (error: any) => {
+          console.log(error);
+      });
+    }
     async loadData() {
         await GQLQuery(`
             query {
@@ -99,23 +128,40 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             console.log(error);
         });
     }
+    async loadLearningStructure(){
+      await GQLQuery(`
+          query {
+              learningStructure: allDisciplines(first: 30) {
+                title
+                subjects{
+                  title
+                  concepts{
+                    id
+                    title
+                  }
+                }
+              }
+          }
+      `, this.userToken, (key: string, value: any) => {
+          this.action = {
+              type: 'SET_PROPERTY',
+              key,
+              value
+          };
+      }, (error: any) => {
+          console.log(error);
+      });
+    }
 
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
         const data = await GQLMutate(`
             mutation {
-                updateOrCreateAssignment(
-                    update: {
-                        id: "${this.assignmentId}"
-                        lessonId: "${this.lessonId}"
-                        title: "${title}"
-                    }
-                    create: {
-                        title: "${title}"
-                        lessonId: "${this.lessonId}"
-                        authorId: "${this.user ? this.user.id : null}"
-                    }
+                createAssignment(
+                  title: "${title}"
+                  lessonId: "${this.lessonId}"
+                  authorId: "${this.user ? this.user.id : null}"
                 ) {
                     id
                 }
@@ -123,21 +169,19 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         `, this.userToken, (error: any) => {
             console.log(error);
         });
-
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'assignmentId',
-            value: data.updateOrCreateAssignment.id
+            value: data.createAssignment.id
         };
     }
-
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-
         this.assignment = state[`assignment${this.assignmentId}`];
+        this.learningStructure = state[`learningStructure`];
         this.assignmentId = state.components[this.componentId] ? state.components[this.componentId].assignmentId : this.assignmentId;
-        this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
+        // this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;

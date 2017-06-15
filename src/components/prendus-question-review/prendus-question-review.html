@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
+
+<dom-module id="prendus-question-review">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style include="prendus-styles">
+          .wrapper {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(1, 0fr);
+          }
+
+          .quality {
+            grid-column: 1;
+            grid-row: 1;
+          }
+
+          .difficulty {
+            grid-column: 2;
+            grid-row: 1;
+          }
+
+          .accuracy {
+            grid-column: 3;
+            grid-row: 1;
+          }
+
+          .submit-button {
+            justify-self: right;
+            grid-column: 4;
+            grid-row: 1;
+          }
+        </style>
+        <div>
+
+          <prendus-question-scaffold-example question-scaffold="[[questionScaffoldsToRate]]"></prendus-question-scaffold-example>
+          <div class="wrapper">
+            [[questionScaffoldsToRate.answers]]
+            <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
+              [[item.question]]
+              <template is="dom-repeat" answers= [[item.answers]]>
+                [[answer]]
+              </template>
+              <!-- [[item.0.answers]] -->
+            </template>
+            <div class="quality">
+              Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+            </div>
+            <div class="difficulty">
+              Difficulty<paper-slider id="difficulty" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+            </div>
+            <div class="accuracy">
+              Accuracy<paper-slider id="accuracy" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+            </div>
+            <div class="submit-button">
+              <button class="prendus-button prendus-button--recommended" on-tap="submit">Submit</button>
+            </div>
+          </div>
+        </div>
+    </template>
+
+    <script src="prendus-question-review.ts"></script>
+</dom-module>
