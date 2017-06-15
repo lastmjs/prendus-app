@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
+import {Concept} from '../../typings/concept';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 
@@ -21,19 +21,28 @@ class PrendusScaffold extends Polymer.Element {
     questionScaffoldsToRate: QuestionScaffold[];
     questionScaffoldQuizId: string;
     assignmentId: string;
+    concepts: Concept[];
 
 
     static get is() { return 'prendus-scaffold'; }
+    static get properties() {
+      return {
+        concepts: {
+        },
+        assignmentId: {
+        }
+      };
+    }
 
     connectedCallback() {
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
         this.selectedIndex = 0;
         this.numberOfAnswers = 4;
     }

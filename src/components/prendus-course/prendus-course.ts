@@ -35,12 +35,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         //always set the componentId before firing other actions within a component
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
 
         this.action = checkForUserToken();
         this.action = await getAndSetUser();

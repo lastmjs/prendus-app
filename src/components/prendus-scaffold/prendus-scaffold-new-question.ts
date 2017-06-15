@@ -40,12 +40,12 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
     async connectedCallback() {
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
     }
 
     /**

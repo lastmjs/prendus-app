@@ -32,18 +32,17 @@ class PrendusScaffoldExample extends Polymer.Element {
         };
     }
     connectedCallback() {
-      console.log('connected callback in the scaffold example')
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
     }
     scaffoldLoaded(){
-      console.log('scaffold has loaded')
+      
     }
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {

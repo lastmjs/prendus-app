@@ -40,13 +40,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
         //always set the componentId before firing other actions within a component
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-        await this.loadData();
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
     }
 
     isViewMode(mode) {
@@ -77,6 +76,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
+        await this.loadData();
         await this.loadLearningStructure();
     }
     getSubject(e){
@@ -94,15 +94,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async saveConcept(e: any){
       this.selectedConcept = this.concepts[e.target.id]
-      this.saveConceptToAssignment();
       const data = await GQLMutate(`
-        mutation {
-          updateAssignment(
-            id: "${this.assignmentId}"
-            conceptsIds: "${this.selectedConcept.id}"
-          ) {
-            id
-          }
+      mutation {
+        updateAssignment(
+          id: "${this.assignmentId}"
+          conceptsIds: "${this.selectedConcept.id}"
+        ) {
+          id
+        }
       }
       `, this.userToken, (error: any) => {
           console.log(error);
@@ -115,6 +114,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                     title,
                     lesson {
                         id
+                    }
+                    concepts{
+                      id
+                      title
                     }
                 }
             }

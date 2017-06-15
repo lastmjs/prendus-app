@@ -16,6 +16,7 @@ class PrendusScaffoldComments extends Polymer.Element {
     assignmentId: string;
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
+    concepts: Concept[]
 
     static get is() { return 'prendus-scaffold-comments'; }
     static get properties() {
@@ -26,18 +27,21 @@ class PrendusScaffoldComments extends Polymer.Element {
           selectedIndex: {
             type: Number,
             observer: 'disableNext'
+          },
+          concepts: {
+
           }
         };
     }
     connectedCallback() {
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
         this.loadConcepts();
     }
 
