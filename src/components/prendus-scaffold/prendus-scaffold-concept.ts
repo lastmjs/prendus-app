@@ -1,21 +1,24 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
+import {ContainerElement} from '../../typings/container-element';
 import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
+import {User} from '../../typings/user';
 
-class PrendusScaffoldExplanation extends Polymer.Element {
+class PrendusScaffoldComments extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
+    userToken: string | null;
+    user: User | null;
     selectedIndex: number;
     numberOfAnswers: number;
+    properties: any;
+    assignmentId: string;
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
-    answers: QuestionScaffoldAnswer[];
+    concepts: Concept[]
 
-    static get is() { return 'prendus-scaffold-explanation'; }
+    static get is() { return 'prendus-scaffold-comments'; }
     static get properties() {
         return {
           myIndex: {
@@ -24,6 +27,9 @@ class PrendusScaffoldExplanation extends Polymer.Element {
           selectedIndex: {
             type: Number,
             observer: 'disableNext'
+          },
+          concepts: {
+
           }
         };
     }
@@ -36,25 +42,32 @@ class PrendusScaffoldExplanation extends Polymer.Element {
         //     key: 'loaded',
         //     value: true
         // };
+        this.loadConcepts();
     }
 
     disableNext(): void {
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          this.action = setDisabledNext(isDefinedAndNotEmpty(this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, null, null, this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null);
+          const concepts: string[] = getConcepts(this);
+          // this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(comments));
+          // this.action = Actions.updateCurrentQuestionScaffold(null, comments, null, null);
         }
       } catch(error) {
         console.error(error);
       }
     }
+    loadConcepts(){
+      console.log('load concepts')
+    }
+    plusOne(index: number): number {
+      return index + 1;
+    }
+
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
-        this.currentQuestionScaffold = state.currentQuestionScaffold;
-        this.answers = state.currentQuestionScaffold ? getQuestionScaffoldAnswers(state.currentQuestionScaffold) : this.answers;
     }
 }
 
-window.customElements.define(PrendusScaffoldExplanation.is, PrendusScaffoldExplanation);
+window.customElements.define(PrendusScaffoldComments.is, PrendusScaffoldComments);

@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<!-- <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
 <link rel="import" href="../prendus-lesson/prendus-lesson.html">
@@ -14,7 +14,7 @@
 <link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../bower_components/iron-pages/iron-pages.html"> -->
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../prendus-view-question/prendus-view-question.html">
 
@@ -98,9 +98,9 @@
             <prendus-lesson show="viewLessonView" lesson-id="[[viewLessonRouteData.lessonId]]" mode="view"></prendus-lesson>
             <prendus-lesson show="editLessonView" lesson-id="[[editLessonRouteData.lessonId]]" mode="edit"></prendus-lesson>
 
-            <prendus-assignment show="createAssignmentView" assignment-id="[[createAssignmentRouteData.lessonId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-assignment>
-            <prendus-assignment show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.lessonId]]" mode="view"></prendus-assignment>
-            <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.lessonId]]" mode="edit"></prendus-assignment>
+            <prendus-assignment show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" lesson-id="[[queryParams.lessonId]]" mode="create"></prendus-assignment>
+            <prendus-assignment show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.assignmentId]]" mode="view"></prendus-assignment>
+            <prendus-assignment show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit"></prendus-assignment>
 
             <prendus-learning-structure show="learningStructureView" mode="view"></prendus-learning-structure>
 
@@ -112,13 +112,13 @@
             <prendus-subject show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view"></prendus-subject>
             <prendus-subject show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit"></prendus-subject>
 
-            <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.disciplineId]]" mode="create"></prendus-subject>
+            <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.subjectId]]" mode="create"></prendus-subject>
             <prendus-concept show="viewConceptView" concept-id="[[viewConceptRouteData.subjectId]]" mode="view"></prendus-subject>
             <prendus-concept show="editConceptView" concept-id="[[editConceptRouteData.subjectId]]" mode="edit"></prendus-subject>
 
         </iron-pages>
 
-        <prendus-view-question id="questionElement" question-id="cj3q4zu4cckzg0178ax43cp6r"></prendus-view-question>
+        <!-- <prendus-view-question id="questionElement" question-id="cj3q4zu4cckzg0178ax43cp6r"></prendus-view-question> -->
         <!-- <prendus-view-question question-id="cj3q7x9pmp5qp01807md3ajn5"></prendus-view-question> -->
     </template>
 

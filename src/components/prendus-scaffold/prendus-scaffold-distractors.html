@@ -70,7 +70,7 @@
               </div>
               <template is="dom-repeat" items="[[distractors]]">
                 <div class="prendus-card distractor-card">
-                  <paper-textarea id="distractor[[plusOne(index)]]" label="Distractor [[plusOne(index)]]" on-value-changed="disableNext"></paper-textarea>
+                  <textarea id="distractor[[plusOne(index)]]" label="Distractor [[plusOne(index)]]" on-value-changed="disableNext"></textarea>
                 </div>
               </template>
             </div>

@@ -23,12 +23,12 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
         await this.loadData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
     }
 
     isViewMode(mode: Mode) {

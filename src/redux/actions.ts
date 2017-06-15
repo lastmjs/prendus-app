@@ -1,6 +1,10 @@
 import {GQLQuery} from '../services/graphql-service';
 import {SetPropertyAction, DefaultAction} from '../typings/actions';
 import {State} from '../typings/state';
+import {Question} from '../typings/question';
+import {QuestionScaffold} from '../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
+
 
 export function checkForUserToken(): SetPropertyAction | DefaultAction {
     const userToken = window.localStorage.getItem('userToken');
@@ -74,4 +78,84 @@ export function persistUserToken(userToken: string): SetPropertyAction {
         key: 'userToken',
         value: userToken
     };
+}
+
+// Question Creation Actions
+export function setDisabledNext(disableNext: boolean): SetPropertyAction {
+  return {
+      type: 'SET_PROPERTY',
+      key: 'setDisabledNext',
+      value: disableNext
+  };
+};
+
+export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
+  const answersObj: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = getAnswers(currentQuestionScaffold, answers, comments);
+  return {
+      type: 'SET_PROPERTY',
+      key: 'currentQuestionScaffold',
+      value: {
+        ...currentQuestionScaffold,
+        answers: answersObj,
+        // only take new explanation if given
+        explanation: explanation || currentQuestionScaffold.explanation,
+        // only take new question if given
+        question: questionStem || currentQuestionScaffold.question
+      }
+  };
+
+  function getAnswers(questionScaffold: QuestionScaffold, answers: string[], comments: string[]): { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } {
+    return Object.keys(questionScaffold.answers || {})
+    .map((key: string, index: number) => {
+      return {
+        ...questionScaffold.answers[key],
+        // only take new answers or comments if passed in
+        text: answers ? answers[index] : questionScaffold.answers[key].text,
+        comment: comments ? comments[index] : questionScaffold.answers[key].comment
+      };
+    })
+    // convert back to object
+    .reduce((result: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer }, current: QuestionScaffoldAnswer, index: number) => {
+      result[`question${index}`] = current;
+      return result;
+    }, {});
+  };
+}
+
+export const initCurrentQuestionScaffold = (numberOfAnswers: number): SetPropertyAction => {
+  // Define answersArr with empty strings because Array.map won't work
+  // on an array with only undefineds
+  const answersArr: string[] = initArray([], Array(numberOfAnswers));
+  const answers: { [currentQuestionScaffoldId: string]: QuestionScaffoldAnswer} = answersArr
+  .map( (currentValue: string, index: number): QuestionScaffoldAnswer => {
+    return {
+      text: '',
+      comment: '',
+      correct: index === 0,
+      id: `question${index}`
+    };
+  })
+  .reduce((result: { [currentQuestionScaffoldId: string]: QuestionScaffoldAnswer}, current: QuestionScaffoldAnswer, index: number) => {
+    result[`question${index}`] = current;
+    return result;
+  }, {});
+
+  const currentQuestionScaffold: QuestionScaffold = {
+    answers,
+    explanation: '',
+    question: ''
+  };
+  return {
+      type: 'SET_PROPERTY',
+      key: 'currentQuestionScaffold',
+      value: currentQuestionScaffold
+  };
+
+  function initArray(arr: string[], arr2: string[]): string[] {
+    if (arr2.length === 0) {
+        return arr;
+    }
+    return initArray([...arr, ''], arr2.slice(1));
+  }
+
 }

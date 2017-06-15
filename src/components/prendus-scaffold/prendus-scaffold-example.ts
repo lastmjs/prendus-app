@@ -2,11 +2,18 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
+    answers: QuestionScaffoldAnswer[];
     loaded: boolean;
+    myIndex: number;
+    selectedIndex: number;
+    questionScaffold: QuestionScaffold;
 
     static get is() { return 'prendus-scaffold-example'; }
     static get properties() {
@@ -19,21 +26,24 @@ class PrendusScaffoldExample extends Polymer.Element {
             type: Number
           },
           questionScaffold: {
-            type: Object
+            type: Object,
+            observer: 'scaffoldLoaded'
           }
         };
     }
     connectedCallback() {
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        // this.action = {
+        //     type: 'SET_COMPONENT_PROPERTY',
+        //     componentId: this.componentId,
+        //     key: 'loaded',
+        //     value: true
+        // };
     }
-
+    scaffoldLoaded(){
+      
+    }
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
         this.action = Actions.setDisabledNext(false);
@@ -43,7 +53,7 @@ class PrendusScaffoldExample extends Polymer.Element {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
-        this.answers = this.questionScaffold ? UtilitiesService.getQuestionScaffoldAnswers(this.questionScaffold) : this.answers;
+        this.answers = this.questionScaffold ? getQuestionScaffoldAnswers(this.questionScaffold) : this.answers;
     }
 }
 
