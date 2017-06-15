@@ -1,7 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <dom-module id="prendus-scaffold-resource">
     <template>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     </template>
 
     <script src="prendus-scaffold-resource.ts"></script>

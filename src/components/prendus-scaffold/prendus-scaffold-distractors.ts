@@ -1,23 +1,39 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {isDefinedAndNotEmpty} from '../../services/utilities-service';
 import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
 
 class PrendusScaffoldDistractors extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
-    userToken: string | null;
-    user: User | null;
     selectedIndex: number;
-    disableNext: boolean;
     numberOfAnswers: number;
-    properties: any;
-    assignmentId: string;
-
+    currentQuestionScaffold: QuestionScaffold;
+    distractors: any[];
+    answer: string;
+    myIndex: number;
 
     static get is() { return 'prendus-scaffold-distractors'; }
 
+    static get properties() {
+        return {
+          selectedIndex: {
+            type: Number,
+            observer: 'disableNext'
+          },
+          myIndex: {
+            type: Number
+          },
+          numberOfAnswers: {
+            type: Number,
+            observer: 'numberOfAnswersSet'
+          },
+        };
+    }
     connectedCallback() {
         super.connectedCallback();
         this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
@@ -41,27 +57,29 @@ class PrendusScaffoldDistractors extends Polymer.Element {
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const distractors: string[] = getDistractors(this);
-          this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(distractors));
-          this.action = Actions.updateCurrentQuestionScaffold(null, null, distractors, null);
+          this.action = setDisabledNext(!isDefinedAndNotEmpty(distractors));
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, null, distractors, null);
         }
 
       } catch(error) {
         console.error(error);
       }
 
-      function getDistractors(context: PrendusQuestionScaffoldDistractors): string[] {
+      function getDistractors(context: PrendusScaffoldDistractors): string[] {
         return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
           const id: string = `#distractor${index}`;
-          return context.querySelector(id) ? context.querySelector(id).value : null;
+          return context.shadowRoot.querySelector(id) ? context.shadowRoot.querySelector(id).value : null;
         });
       }
     }
-    
+    plusOne(index: number): number {
+      return index + 1;
+    }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
-        this.userToken = state.userToken;
-        this.user = state.user;
+        this.currentQuestionScaffold = state.currentQuestionScaffold;
+        this.answer = state.currentQuestionScaffold && state.currentQuestionScaffold.answers && state.currentQuestionScaffold.answers['question0'] ? state.currentQuestionScaffold.answers['question0'].text : this.answer;
     }
 }
 

@@ -1,5 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<!-- <link rel="import" href="../../bower_components/paper-input/paper-textarea.html"> -->
 
 <dom-module id="prendus-scaffold-comments">
     <template>
@@ -36,7 +39,6 @@
           margin-top: 20px;
         }
         </style>
-        <redux-store on-statechange="mapStateToThis" action="[[action]]"></redux-store>
         <div class="wrapper">
           <div class="prendus-card question">
             <h3>Question</h3>
@@ -58,7 +60,7 @@
                 [[item.text]]
               </div>
               <div class="prendus-card right-column">
-                <paper-textarea id="comment[[index]]" label="Comment [[plusOne(index)]]" on-value-changed="disableNext"></paper-textarea>
+                <textarea id="comment[[index]]" label="Comment [[plusOne(index)]]" on-value-changed="disableNext"></textarea>
               </div>
             </div>
           </template>

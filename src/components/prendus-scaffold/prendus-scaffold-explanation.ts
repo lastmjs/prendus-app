@@ -1,7 +1,9 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
+import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
 
 class PrendusScaffoldExplanation extends Polymer.Element {
     componentId: string;
@@ -39,8 +41,8 @@ class PrendusScaffoldExplanation extends Polymer.Element {
     disableNext(): void {
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(this.querySelector('#explanation') ? this.querySelector('#explanation').value : null));
-          this.action = Actions.updateCurrentQuestionScaffold(null, null, null, this.querySelector('#explanation') ? this.querySelector('#explanation').value : null);
+          this.action = setDisabledNext(isDefinedAndNotEmpty(this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null));
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, null, null, this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null);
         }
       } catch(error) {
         console.error(error);
@@ -50,6 +52,8 @@ class PrendusScaffoldExplanation extends Polymer.Element {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        this.currentQuestionScaffold = state.currentQuestionScaffold;
+        this.answers = state.currentQuestionScaffold ? getQuestionScaffoldAnswers(state.currentQuestionScaffold) : this.answers;
     }
 }
 
