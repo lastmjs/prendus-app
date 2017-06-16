@@ -5,6 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {User} from '../../typings/user';
 import {State} from '../../typings/state';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];
@@ -16,11 +17,15 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
 
     static get is() { return 'prendus-courses'; }
 
+    constructor() {
+        super();
+
+        this.componentId = createUUID();
+    }
+
     async connectedCallback() {
         super.connectedCallback();
 
-        //always set the componentId before firing other actions within a component
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -87,8 +92,8 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
 
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.courses = state[`coursesFromUser${this.user ? this.user.id : null}`];
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
