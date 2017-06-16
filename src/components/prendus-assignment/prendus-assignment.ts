@@ -4,6 +4,7 @@ import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -30,11 +31,15 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         };
     }
 
+    constructor() {
+        super();
+
+        this.componentId = createUUID();
+    }
+
     async connectedCallback() {
         super.connectedCallback();
 
-        //always set the componentId before firing other actions within a component
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -135,10 +140,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('assignmentId')) this.assignmentId = state.components[this.componentId].assignmentId;
         this.assignment = state[`assignment${this.assignmentId}`];
-        this.assignmentId = state.components[this.componentId] ? state.components[this.componentId].assignmentId : this.assignmentId;
         this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }

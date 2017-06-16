@@ -16,5 +16,5 @@ export interface SetComponentPropertyAction {
 }
 
 export interface DefaultAction {
-    readonly type: 'DEFAULT_ACTION'
+    readonly type: 'DEFAULT_ACTION';
 }
