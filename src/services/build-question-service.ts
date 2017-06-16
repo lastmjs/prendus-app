@@ -10,11 +10,22 @@ export async function buildQuestion(rawQuestion: Question, secureIframe: HTMLIFr
         const userCheckboxes: string[] = retrieveUserCheckboxes([], rawQuestion);
         const userRadios: string[] = retrieveUserRadios([], rawQuestion);
 
-        secureIframe.contentWindow.postMessage({
-            userVariables,
-            userInputs,
-            userCode: rawQuestion.code
-        }, '*');
+        if (secureIframe.contentWindow) {
+            secureIframe.contentWindow.postMessage({
+                userVariables,
+                userInputs,
+                userCode: rawQuestion.code
+            }, '*');
+        }
+        else {
+            secureIframe.addEventListener('load', () => {
+                secureIframe.contentWindow.postMessage({
+                    userVariables,
+                    userInputs,
+                    userCode: rawQuestion.code
+                }, '*');
+            });
+        }
 
         window.addEventListener('message', (event) => {
             const result: {
