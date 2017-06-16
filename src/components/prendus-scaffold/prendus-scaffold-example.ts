@@ -27,7 +27,6 @@ class PrendusScaffoldExample extends Polymer.Element {
           },
           questionScaffold: {
             type: Object,
-            observer: 'scaffoldLoaded'
           }
         };
     }
@@ -41,12 +40,10 @@ class PrendusScaffoldExample extends Polymer.Element {
         //     value: true
         // };
     }
-    scaffoldLoaded(){
-      
-    }
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        this.action = Actions.setDisabledNext(false);
+        console.log('disable next')
+        // this.action = Actions.setDisabledNext(false);
       }
     }
 

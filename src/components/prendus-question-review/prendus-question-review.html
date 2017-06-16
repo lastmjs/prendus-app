@@ -37,17 +37,21 @@
           }
         </style>
         <div>
+          <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
+            <div>
+              <div class="prendus-card centered">
+                <h3> Rate question [[plusOne(index)]]</h3>
+                <!--TODO fix this description -->
+              </div>
+              <prendus-scaffold-example my-index="1" selected-index="1" question-scaffold="[[item]]"></prendus-scaffold-example>
+              <!-- <prendus-question-scaffold-rate-question my-index="[[calculateRateIndex(index)]]" selected-index="[[selectedIndex]]" question-scaffold="[[item]]"></prendus-question-scaffold-rate-question> -->
+            </div>
+          </template>
 
-          <prendus-question-scaffold-example question-scaffold="[[questionScaffoldsToRate]]"></prendus-question-scaffold-example>
+
           <div class="wrapper">
             [[questionScaffoldsToRate.answers]]
-            <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
-              [[item.question]]
-              <template is="dom-repeat" answers= [[item.answers]]>
-                [[answer]]
-              </template>
-              <!-- [[item.0.answers]] -->
-            </template>
+
             <div class="quality">
               Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
             </div>

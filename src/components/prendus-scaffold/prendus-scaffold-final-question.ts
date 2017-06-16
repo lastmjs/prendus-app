@@ -83,18 +83,21 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     }
 
     convertScaffoldToQuestion(): Question {
+      //Need to pull this out because the answer comments go to a different place than the rest of the answers
+        const shuffledAnswers = shuffleArray(Object.values(this.questionScaffold.answers).map((answer: QuestionScaffoldAnswer) => {
+            return {
+                text: answer.text,
+                correct: answer.correct,
+                comment: answer.comment,
+                type: AnswerTypes.MultipleChoice
+            };
+        }))
         const convertedTextAndCode: {
             text: string,
             code: string
         } = generateMultipleChoice({
             stem: this.questionScaffold.question,
-            answers: shuffleArray(Object.values(this.questionScaffold.answers).map((answer: QuestionScaffoldAnswer) => {
-                return {
-                    text: answer.text,
-                    correct: answer.correct,
-                    type: AnswerTypes.MultipleChoice
-                };
-            }))
+            answers: shuffledAnswers
         });
         const convertedQuestion: Question = {
             ...this.questionScaffold.convertedQuestion,
@@ -102,15 +105,14 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             text: convertedTextAndCode.text,
             code: convertedTextAndCode.code,
             license: 'attribution',
-            // discipline: 'NOT_IMPLEMENTED',
-            // subject: 'NOT_IMPLEMENTED',
+            // This will be implemented soon
             // concept: 'NOT_IMPLEMENTED',
             explanation: this.questionScaffold.explanation,
             answerComments: {
-                question0: this.questionScaffold.answers.question0.comment,
-                question1: this.questionScaffold.answers.question1.comment,
-                question2: this.questionScaffold.answers.question2.comment,
-                question3: this.questionScaffold.answers.question3.comment
+                question0: shuffledAnswers[0].comment,
+                question1: shuffledAnswers[0].comment,
+                question2: shuffledAnswers[0].comment,
+                question3: shuffledAnswers[0].comment
             }
         };
         return convertedQuestion;
@@ -125,6 +127,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             authorId: "${this.user.id}"
             assignmentId: "${this.assignmentId}"
             text: "${question.text}"
+            explanation: "${question.explanation}"
             code: "${code}"
           ) {
             id
@@ -148,7 +151,6 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
               console.log(error);
           });
       });
-      console.log('data', data)
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,

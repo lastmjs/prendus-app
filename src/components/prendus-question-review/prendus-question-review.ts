@@ -1,4 +1,4 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
@@ -58,6 +58,8 @@ class PrendusQuestionReview extends Polymer.Element {
         this.difficulty = 0;
         this.accuracy = 0;
 
+        // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
+        // this.action = await Actions.initializeQuestionScaffoldsToRate(this.quizId, 3);
         await this.loadAssignmentQuestions();
         this.generateQuestionScaffolds()
     }
@@ -73,6 +75,7 @@ class PrendusQuestionReview extends Polymer.Element {
     }
 
     async loadAssignmentQuestions() {
+      console.log('this.assignmentId', this.assignmentId)
         await GQLQuery(`
             query {
                 questionsInAssignment: Assignment(id: "${this.assignmentId}") {
@@ -80,6 +83,7 @@ class PrendusQuestionReview extends Polymer.Element {
                       id
                       code
                       text
+                      explanation
                       answerComments{
                         text
                       }
@@ -98,6 +102,7 @@ class PrendusQuestionReview extends Polymer.Element {
         });
     }
     generateQuestionScaffolds(){
+      const questionComments = this.questions.questions;
       this.questionScaffoldsToRate = this.questions.questions.map(function(question: Question){
         const guiQuestion: GuiQuestion = generateGuiData({
             text: question.text,
@@ -109,16 +114,15 @@ class PrendusQuestionReview extends Polymer.Element {
                 [`question${index}`]: {
                     text: guiAnswer.text,
                     correct: guiAnswer.correct,
-                    // comment: question.answerComments[`question${index}`],
+                    comment: question.answerComments[`${index}`].text,
                     id: `question${index}`
                 }
             };
         }, {});
-        console.log('quesitonScaffoldAnswers', questionScaffoldAnswers)
         return {
             answers: questionScaffoldAnswers,
             question: guiQuestion.stem,
-            // explanation: question.explanation,
+            explanation: question.explanation,
             convertedQuestion: question
         };
       })
