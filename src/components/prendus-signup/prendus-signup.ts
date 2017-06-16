@@ -3,6 +3,7 @@ import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser} from '../../redux/actions';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -20,10 +21,15 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         };
     }
 
+    constructor() {
+        super();
+
+        this.componentId = createUUID();
+    }
+
     async connectedCallback() {
         super.connectedCallback();
 
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -155,8 +161,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
 
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.userToken = state.userToken;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
     }
 }
 

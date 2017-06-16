@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-view-question/prendus-view-question.html">
+
+<dom-module id="prendus-quiz">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <div>[[quiz.title]]</div>
+                <div>Question [[getCurrentQuestionNumber(currentQuestionIndex)]] of [[numberOfQuestions]]</div>
+
+                <div>
+                    <prendus-view-question question-id="[[currentQuestionId]]"></prendus-view-question>
+                </div>
+
+                <dom-if if="[[showNewQuestionButton(currentQuestionIndex, numberOfQuestions)]]">
+                    <template>
+                        <button on-click="loadNewQuestion">New Question</button>
+                    </template>
+                </dom-if>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script src="prendus-quiz.ts"></script>
+</dom-module>
