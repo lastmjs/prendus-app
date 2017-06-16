@@ -9,16 +9,13 @@
 <link rel="import" href="../prendus-learning-structure/prendus-discipline.html">
 <link rel="import" href="../prendus-learning-structure/prendus-subject.html">
 <link rel="import" href="../prendus-learning-structure/prendus-concept.html">
+<link rel="import" href="../prendus-view-question/prendus-view-question.html">
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
 <link rel="import" href="../../node_modules/@npm-polymer/app-route/app-location.html">
 <link rel="import" href="../../node_modules/@npm-polymer/app-route/app-route.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
-
-<!--TODO testing-->
-<!-- <link rel="import" href="../prendus-quiz/prendus-quiz.html"> -->
-<!--TODO testing-->
 
 <dom-module id="prendus-app">
     <template>
@@ -60,6 +57,8 @@
         <app-route route="[[route]]" pattern="/concept/:conceptId/view" data="{{viewConceptRouteData}}" active="{{viewConceptRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/concept/:conceptId/edit" data="{{editConceptRouteData}}" active="{{editConceptRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/question/:questionId/view" data="{{viewQuestionRouteData}}" active="{{viewQuestionRouteActive}}"></app-route>
+
         <a href="/">Prendus</a>
 
         <dom-if if="[[user]]">
@@ -85,12 +84,15 @@
 
         <br>
 
-        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive)]]">
+        <iron-pages attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createLessonRouteActive, viewLessonRouteActive, editLessonRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive)]]">
             <prendus-courses show="rootView"></prendus-courses>
+
 
             <prendus-signup show="signupView" redirect-url="[[queryParams.redirectUrl]]"></prendus-signup>
             <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]"></prendus-login>
             <prendus-authenticate show="authenticateView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]" active="[[authenticateRouteActive]]"></prendus-authenticate>
+
+            <prendus-view-question show="viewQuestionView" question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
 
             <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
@@ -115,14 +117,10 @@
             <prendus-subject show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit"></prendus-subject>
 
             <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.disciplineId]]" mode="create"></prendus-subject>
-            <prendus-concept show="viewConceptView" concept-id="[[viewConceptRouteData.subjectId]]" mode="view"></prendus-subject>
-            <prendus-concept show="editConceptView" concept-id="[[editConceptRouteData.subjectId]]" mode="edit"></prendus-subject>
+            <prendus-concept show="viewConceptView" concept-id="[[viewConceptRouteData.subjectId]]" mode="view"></prendus-concept>
+            <prendus-concept show="editConceptView" concept-id="[[editConceptRouteData.subjectId]]" mode="edit"></prendus-concept>
 
         </iron-pages>
-
-        <!--TODO testing-->
-        <!-- <prendus-quiz quiz-id="cj3yv085ellgq0105q6zp4qnz"></prendus-quiz> -->
-        <!--TODO testing-->
     </template>
 
     <script src="prendus-app.ts"></script>

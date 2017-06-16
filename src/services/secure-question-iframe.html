@@ -118,7 +118,7 @@
         });
 
         questionWorker.onmessage = (event) => {
-            window.top.postMessage(event.data, '*');
+            window.parent.postMessage(event.data, '*');
         };
     });
 </script>

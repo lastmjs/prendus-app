@@ -13,7 +13,15 @@
         <dom-if if="[[loaded]]">
             <template>
                 <div inner-h-t-m-l="[[getSanitizedText(builtQuestion.transformedText)]]"></div>
+
+                <dom-if if="[[showEmbedCode]]">
+                    <template>
+                        <input type="text" value='<iframe src="http://localhost:8000/question/[[questionId]]/view" frameborder="0"></iframe>'>
+                    </template>
+                </dom-if>
+
                 <button on-click="checkAnswer">Check</button>
+                <button on-click="showEmbedCodeClick">Embed</button>
             </template>
         </dom-if>
 

@@ -16,6 +16,7 @@ class PrendusViewQuestion extends Polymer.Element {
     builtQuestion: BuiltQuestion;
     userToken: string | null;
     loaded: boolean;
+    showEmbedCode: boolean;
 
     static get is() { return 'prendus-view-question'; }
     static get properties() {
@@ -43,6 +44,15 @@ class PrendusViewQuestion extends Polymer.Element {
 
         // this.action = checkForUserToken();
         // this.action = await getAndSetUser();
+    }
+
+    showEmbedCodeClick() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'showEmbedCode',
+            value: !this.showEmbedCode
+        };
     }
 
     async questionChanged() {
@@ -185,6 +195,7 @@ class PrendusViewQuestion extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('question')) this.question = state.components[this.componentId].question;
         if (Object.keys(state.components[this.componentId] || {}).includes('builtQuestion')) this.builtQuestion = state.components[this.componentId].builtQuestion;
+        if (Object.keys(state.components[this.componentId] || {}).includes('showEmbedCode')) this.showEmbedCode = state.components[this.componentId].showEmbedCode;
         this.userToken = state.userToken;
     }
 }
