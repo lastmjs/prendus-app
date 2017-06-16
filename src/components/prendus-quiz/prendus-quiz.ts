@@ -4,6 +4,7 @@ import {GQLQuery} from '../../services/graphql-service';
 import {Quiz} from '../../typings/quiz';
 import {checkForUserToken} from '../../redux/actions';
 import {createUUID} from '../../services/utilities-service';
+import {Question} from '../../typings/question';
 
 class PrendusQuiz extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -13,6 +14,7 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
     quiz: Quiz;
     loaded: boolean;
     currentQuestionId: string;
+    currentQuestion: Question;
     currentQuestionIndex: number;
     random: boolean;
     numberOfQuestions: number;
@@ -136,7 +138,6 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
                 Quiz(id: "${this.quizId}") {
                     title
                     questions {
-                        id
                         text
                         code
                     }
@@ -154,26 +155,41 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
         });
     }
 
-    getCurrentQuestionId(currentQuestionId: string, currentQuestionIndex: number, previousCurrentQuestionIndex: number, quiz: Quiz, random: boolean) {
+    getCurrentQuestionInfo(currentQuestionId: string, currentQuestion: Question, currentQuestionIndex: number, previousCurrentQuestionIndex: number, quiz: Quiz, random: boolean) {
         if (!quiz) {
-            return currentQuestionId;
+            return {
+                currentQuestionId,
+                currentQuestion
+            };
         }
 
         if (currentQuestionIndex === previousCurrentQuestionIndex) {
-            return currentQuestionId;
+            return {
+                currentQuestionId,
+                currentQuestion
+            };
         }
 
         if (currentQuestionIndex === undefined) {
-            return currentQuestionId;
+            return {
+                currentQuestionId,
+                currentQuestion
+            };
         }
 
         if (currentQuestionIndex === -1) {
-            return currentQuestionId;
+            return {
+                currentQuestionId,
+                currentQuestion
+            };
         }
 
         const index = random ? Math.floor(Math.random() * quiz.questions.length) : currentQuestionIndex;
 
-        return quiz.questions[index] ? quiz.questions[index].id : currentQuestionId;
+        return {
+            currentQuestionId: quiz.questions[index] ? quiz.questions[index].id : currentQuestionId,
+            currentQuestion: quiz.questions[index] ? quiz.questions[index] : currentQuestion
+        };
     }
 
     stateChange(e: CustomEvent) {
@@ -187,7 +203,9 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         const previousCurrentQuestionIndex = this.currentQuestionIndex;
         this.currentQuestionIndex = state.components[this.componentId] ? state.components[this.componentId].currentQuestionIndex : this.currentQuestionIndex;
-        this.currentQuestionId = this.getCurrentQuestionId(this.currentQuestionId, this.currentQuestionIndex, previousCurrentQuestionIndex, this.quiz, this.random);
+        const {currentQuestionId, currentQuestion} = this.getCurrentQuestionInfo(this.currentQuestionId, this.currentQuestion, this.currentQuestionIndex, previousCurrentQuestionIndex, this.quiz, this.random);
+        this.currentQuestionId = currentQuestionId;
+        this.currentQuestion = currentQuestion;
     }
 }
 

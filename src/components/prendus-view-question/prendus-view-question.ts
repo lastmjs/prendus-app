@@ -6,6 +6,7 @@ import {buildQuestion} from '../../services/build-question-service';
 import {UserAnswerInfo} from '../../typings/user-answer-info';
 import {checkAnswer} from '../../services/check-answer-service';
 import {ReturnAnswerInfo} from '../../typings/return-answer-info';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusViewQuestion extends Polymer.Element {
     componentId: string;
@@ -20,7 +21,8 @@ class PrendusViewQuestion extends Polymer.Element {
     static get properties() {
         return {
             question: {
-                type: Object
+                type: Object,
+                observer: 'questionChanged'
             },
             questionId: {
                 type: String,
@@ -30,14 +32,42 @@ class PrendusViewQuestion extends Polymer.Element {
         };
     }
 
+    constructor() {
+        super();
+
+        this.componentId = createUUID();
+    }
+
     async connectedCallback() {
         super.connectedCallback();
 
-        //always set the componentId before firing other actions within a component
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-
         // this.action = checkForUserToken();
         // this.action = await getAndSetUser();
+    }
+
+    async questionChanged() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'question',
+            value: this.question
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: false
+        };
+
+        await this.loadData();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     async questionIdChanged() {
@@ -68,23 +98,25 @@ class PrendusViewQuestion extends Polymer.Element {
     }
 
     async loadData() {
-        await GQLQuery(`
-            query {
-                question: Question(id: "${this.questionId}") {
-                    text
-                    code
+        if (!this.question) {
+            await GQLQuery(`
+                query {
+                    question: Question(id: "${this.questionId}") {
+                        text
+                        code
+                    }
                 }
-            }
-        `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key,
-                value
-            };
-        }, (error: any) => {
-            console.log(error);
-        });
+            `, this.userToken, (key: string, value: any) => {
+                this.action = {
+                    type: 'SET_COMPONENT_PROPERTY',
+                    componentId: this.componentId,
+                    key,
+                    value
+                };
+            }, (error: any) => {
+                console.log(error);
+            });
+        }
 
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -149,12 +181,11 @@ class PrendusViewQuestion extends Polymer.Element {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        const componentState = state.components[this.componentId];
 
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('question')) this.question = state.components[this.componentId].question;
+        if (Object.keys(state.components[this.componentId] || {}).includes('builtQuestion')) this.builtQuestion = state.components[this.componentId].builtQuestion;
         this.userToken = state.userToken;
-        this.question = componentState ? componentState.question : this.question;
-        this.builtQuestion = componentState ? componentState.builtQuestion : this.builtQuestion;
-        this.loaded = componentState ? componentState.loaded : this.loaded;
     }
 }
 
