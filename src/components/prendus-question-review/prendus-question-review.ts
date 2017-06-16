@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
+import {setDisabledNext} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
@@ -16,6 +17,7 @@ class PrendusQuestionReview extends Polymer.Element {
     userToken: string | null;
     user: User | null;
     selectedIndex: number;
+    myIndex: number;
     disableNext: boolean;
     numberOfAnswers: number;
     exampleQuestionScaffold: QuestionScaffold;
@@ -57,7 +59,8 @@ class PrendusQuestionReview extends Polymer.Element {
         this.quality = 0;
         this.difficulty = 0;
         this.accuracy = 0;
-
+        this.numberOfAnswers = 4;
+        this.selectedIndex = 0;
         // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
         // this.action = await Actions.initializeQuestionScaffoldsToRate(this.quizId, 3);
         await this.loadAssignmentQuestions();
@@ -66,12 +69,14 @@ class PrendusQuestionReview extends Polymer.Element {
     back(): void {
       --this.selectedIndex;
       // this.action = Actions.setDisabledNext(false);
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'setDisabledNext',
-          value: false
-      };
+      this.action = setDisabledNext(false);
+    }
+    next(): void {
+      ++this.selectedIndex;
+      if(this.selectedIndex === this.querySelector('#iron-pages').items.length - 1) {
+        // Reached the limit.
+        this.action = setDisabledNext(true);
+      }
     }
 
     async loadAssignmentQuestions() {
@@ -127,22 +132,7 @@ class PrendusQuestionReview extends Polymer.Element {
         };
       })
       console.log('questionScaffolds', this.questionScaffoldsToRate)
-
-
-      // const questionScaffoldAnswers = guiQuestion.answers.reduce((result, guiAnswer: GuiAnswer, index: number) => {
-      //     return {
-      //         ...result,
-      //         [`question${index}`]: {
-      //             text: guiAnswer.text,
-      //             correct: guiAnswer.correct,
-      //             comment: question.answerComments[`question${index}`],
-      //             id: `question${index}`
-      //         }
-      //     };
-      // }
     }
-
-
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
@@ -150,7 +140,6 @@ class PrendusQuestionReview extends Polymer.Element {
         this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
-        this.disableNext = state.disableNext;
     }
 }
 
