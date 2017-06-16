@@ -9,6 +9,7 @@ import {GuiAnswer} from '../../typings/gui-answer';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {generateGuiData} from '../../services/code-to-question-service'
+import {QuestionRating} from '../../typings/question-rating';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
@@ -107,7 +108,7 @@ class PrendusQuestionReview extends Polymer.Element {
         });
     }
     generateQuestionScaffolds(){
-      const questionComments = this.questions.questions;
+      // const questionComments = this.questions.questions;
       this.questionScaffoldsToRate = this.questions.questions.map(function(question: Question){
         const guiQuestion: GuiQuestion = generateGuiData({
             text: question.text,
@@ -125,13 +126,42 @@ class PrendusQuestionReview extends Polymer.Element {
             };
         }, {});
         return {
+            id: question.id,
             answers: questionScaffoldAnswers,
             question: guiQuestion.stem,
             explanation: question.explanation,
             convertedQuestion: question
         };
       })
-      console.log('questionScaffolds', this.questionScaffoldsToRate)
+    }
+
+    async submit(e): Promise<void> {
+      try {
+        const questionId: string = e.target.id;
+        const quality: number = this.shadowRoot.querySelector('#quality').value;
+        const difficulty: number = this.shadowRoot.querySelector('#difficulty').value;
+        const accuracy: number = this.shadowRoot.querySelector('#accuracy').value;
+        const data = await GQLMutate(`
+          mutation {
+            createQuestionRating(
+              quality: ${quality}
+              difficulty: ${difficulty}
+              alignment: ${accuracy}
+              raterId: "${this.user.id}"
+              questionId: "${questionId}"
+            ) {
+              id
+            }
+          }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
+        this.action = setDisabledNext(false);
+        // Actions.showNotification(this, 'success', 'Ratings submitted');
+      } catch(error) {
+        console.error(error);
+      }
+      ++this.selectedIndex;
     }
 
     stateChange(e: CustomEvent) {
