@@ -5,6 +5,7 @@ import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaff
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
+import {createUUID} from '../../services/utilities-service';
 
 
 class PrendusScaffoldComments extends Polymer.Element {
@@ -32,15 +33,18 @@ class PrendusScaffoldComments extends Polymer.Element {
           }
         };
     }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     disableNext(): void {

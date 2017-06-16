@@ -63,13 +63,11 @@ class PrendusQuestionReview extends Polymer.Element {
         this.numberOfAnswers = 4;
         this.selectedIndex = 0;
         // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
-        // this.action = await Actions.initializeQuestionScaffoldsToRate(this.quizId, 3);
         await this.loadAssignmentQuestions();
         this.generateQuestionScaffolds()
     }
     back(): void {
       --this.selectedIndex;
-      // this.action = Actions.setDisabledNext(false);
       this.action = setDisabledNext(false);
     }
     next(): void {
@@ -81,11 +79,10 @@ class PrendusQuestionReview extends Polymer.Element {
     }
 
     async loadAssignmentQuestions() {
-      console.log('this.assignmentId', this.assignmentId)
         await GQLQuery(`
             query {
                 questionsInAssignment: Assignment(id: "${this.assignmentId}") {
-                    questions{
+                    questions(first: 3){
                       id
                       code
                       text
@@ -135,7 +132,7 @@ class PrendusQuestionReview extends Polymer.Element {
       })
     }
 
-    async submit(e): Promise<void> {
+    async submit(e: any): Promise<void> {
       try {
         const questionId: string = e.target.id;
         const quality: number = this.shadowRoot.querySelector('#quality').value;
@@ -162,6 +159,9 @@ class PrendusQuestionReview extends Polymer.Element {
         console.error(error);
       }
       ++this.selectedIndex;
+      if(this.selectedIndex == this.questionScaffoldsToRate.length){
+        alert('Congratulations, you are done rating questions')
+      }
     }
 
     stateChange(e: CustomEvent) {

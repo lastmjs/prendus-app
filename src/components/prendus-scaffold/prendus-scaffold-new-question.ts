@@ -8,6 +8,7 @@ import {State} from '../../typings/state';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty} from '../../services/utilities-service';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -36,16 +37,12 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
           }
         };
     }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     async connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
     }
 
     /**

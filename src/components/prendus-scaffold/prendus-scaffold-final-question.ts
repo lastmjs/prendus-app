@@ -9,6 +9,7 @@ import {generateMultipleChoice} from '../../services/question-to-code-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Question} from '../../typings/question';
 import {AnswerTypes} from '../../typings/answer-types';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;
@@ -41,15 +42,12 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           }
         };
     }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
     }
 
     disableNext(e: any): Promise<void> {

@@ -3,6 +3,7 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldComments extends Polymer.Element {
     componentId: string;
@@ -33,15 +34,12 @@ class PrendusScaffoldComments extends Polymer.Element {
           }
         };
     }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
         this.loadConcepts();
     }
 
