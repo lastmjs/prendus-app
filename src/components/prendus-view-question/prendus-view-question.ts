@@ -78,6 +78,13 @@ class PrendusViewQuestion extends Polymer.Element {
             key: 'loaded',
             value: true
         };
+
+        //this is so that if the question is being viewed from within an iframe, the iframe can resize itself
+        window.parent.postMessage({
+            type: 'prendus-view-question-resize',
+            height: document.body.scrollHeight,
+            width: document.body.scrollWidth
+        }, '*');
     }
 
     async questionIdChanged() {
