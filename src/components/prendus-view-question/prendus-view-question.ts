@@ -53,6 +53,11 @@ class PrendusViewQuestion extends Polymer.Element {
             key: 'showEmbedCode',
             value: !this.showEmbedCode
         };
+
+        //allow the template with the input to be stamped
+        setTimeout(() => {
+            this.shadowRoot.querySelector('#embedInput').select();
+        });
     }
 
     async questionChanged() {
