@@ -98,11 +98,21 @@ class PrendusQuestionReview extends Polymer.Element {
         this.generateQuestionScaffolds()
     }
     back(): void {
-      --this.selectedIndex;
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedIndex',
+          value: --this.selectedIndex
+      };
       this.action = setDisabledNext(false);
     }
     next(): void {
-      ++this.selectedIndex;
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedIndex',
+          value: ++this.selectedIndex
+      };
       if(this.selectedIndex === this.querySelector('#iron-pages').items.length - 1) {
         // Reached the limit.
         this.action = setDisabledNext(true);
