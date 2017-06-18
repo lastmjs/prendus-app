@@ -39,19 +39,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     constructor() {
         super();
-
         this.componentId = createUUID();
     }
 
     async connectedCallback() {
-        super.connectedCallback();
-
+      console.log('connec')
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
+        super.connectedCallback();
     }
 
     isViewMode(mode) {
@@ -73,18 +72,30 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         await this.loadData();
         await this.loadLearningStructure();
     }
-    getSubject(e){
-      this.subjects = this.learningStructure[e.target.id].subjects
-      //This is Polymer. I'm doing it to update subjects on the DOM when a discipline is seletcted
-      this.notifySplices('subjects', [
-        { index: 1, added: [this.learningStructure[e.target.id].subjects[0]], addedCount: this.subjects.length, obect: this.subjects, type: 'splice' },
-      ]);
+    showSubjects(e){
+      //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
+      if(this.concepts){
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'concepts',
+            value: ''
+        };
+      }
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'subjects',
+          value: this.learningStructure[e.target.id].subjects
+      };
     }
-    getConcept(e){
-      this.concepts = this.subjects[e.target.id].concepts
-      this.notifySplices('concepts', [
-        { index: 1, added: [this.subjects[e.target.id].concepts[0]], addedCount: this.concepts.length, obect: this.concepts, type: 'splice' },
-      ]);
+    showConcepts(e){
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'concepts',
+          value: this.subjects[e.target.id].concepts
+      };
     }
     async saveConcept(e: any){
       this.selectedConcept = this.concepts[e.target.id]
@@ -175,9 +186,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.learningStructure = state[`learningStructure`];
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentId')) this.assignmentId = state.components[this.componentId].assignmentId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('subjects')) this.subjects = state.components[this.componentId].subjects;
+        if (Object.keys(state.components[this.componentId] || {}).includes('concepts')) this.concepts = state.components[this.componentId].concepts;
+        if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         this.assignment = state[`assignment${this.assignmentId}`];
         this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
         this.userToken = state.userToken;

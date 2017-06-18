@@ -1,8 +1,8 @@
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
-<!-- <link rel="import" href="../prendus-scaffold/prendus-scaffold.html"> -->
-<link rel="import" href="../prendus-question-review/prendus-question-review.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
+<!-- <link rel="import" href="../prendus-question-review/prendus-question-review.html"> -->
 
 <dom-module id="prendus-assignment">
     <template>
@@ -10,13 +10,12 @@
 
         <dom-if if="[[loaded]]">
             <template>
-
                 <dom-if if="[[isViewMode(mode)]]">
                     <template>
                       <!-- Not sure if its better to pass it in here or to have it in redux. Jordan?  -->
-                      <!-- <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[concepts]]"></prendus-scaffold> -->
+                      <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[concepts]]"></prendus-scaffold>
                       <!-- The scaffold is commented out while I test the question review -->
-                      <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review>
+                      <!-- <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review> -->
                     </template>
                 </dom-if>
                 <dom-if if="[[!isViewMode(mode)]]">
@@ -32,20 +31,20 @@
                     <h2>Disciplines</h2>
                     <dom-repeat items="[[learningStructure]]">
                       <template>
-                          <h4 id="[[index]]" data-number="[[index]]" on-click="getSubject">[[item.title]]</h4>
+                          <h4 id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</h4>
                       </template>
                     </dom-repeat>
                     <h2>Subjects</h2>
                     <div id ="subjects">
-                      <dom-repeat items="[[subjects]]" mutable-data>
+                      <dom-repeat items="[[subjects]]">
                         <template>
-                            <h4 id="[[index]]" data-number="[[index]]" on-click="getConcept">[[item.title]]</h4>
+                            <h4 id="[[index]]" data-number="[[index]]" on-click="showConcepts">[[item.title]]</h4>
                         </template>
                       </dom-repeat>
                     </div>
                     <h2>Concepts</h2>
                     <div id ="concepts">
-                      <dom-repeat items="[[concepts]]" mutable-data>
+                      <dom-repeat items="[[concepts]]">
                         <template>
                             <h4 id="[[index]]" on-click="saveConcept">[[item.title]]</h4>
                         </template>
@@ -55,7 +54,6 @@
                 </dom-if>
             </template>
         </dom-if>
-
         <dom-if if="[[!loaded]]">
             <template>
                 Loading...

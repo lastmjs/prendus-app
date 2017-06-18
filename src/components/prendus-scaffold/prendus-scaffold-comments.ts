@@ -7,7 +7,6 @@ import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
 import {createUUID} from '../../services/utilities-service';
 
-
 class PrendusScaffoldComments extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;

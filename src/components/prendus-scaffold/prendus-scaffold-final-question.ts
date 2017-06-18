@@ -56,20 +56,8 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
         // checkForUserToken();
         const convertedQuestion = this.convertScaffoldToQuestion()
         const questionId = this.saveQuestion(convertedQuestion)
-        // this.saveQuestionToAssignment(this.questionId)
-        // this.action = {
-        //     type: 'CONVERT_QUESTION_SCAFFOLD_TO_QUESTION',
-        //     userToken: this.userToken,
-        //     questionId: this.questionScaffold.convertedQuestion ? this.questionScaffold.convertedQuestion.id : null
-        // };
-
-        // const questionId: string = await addQuestionToQuiz(this.quizId, this.questionScaffold.convertedQuestion);
-        // this.action = {
-        //     type: 'SET_QUESTION_SCAFFOLD_QUESTION_ID',
-        //     questionId
-        // };
       }
-
+      //Go through this next and implement the functionality with quizzes
       // async function addQuestionToQuiz(quizId: string, question: Question): Promise<string> {
       //   const questionId: string = await QuestionModel.save(question.id, question);
       //   const questionIds: string[] = await QuizModel.getQuestionIds(quizId);

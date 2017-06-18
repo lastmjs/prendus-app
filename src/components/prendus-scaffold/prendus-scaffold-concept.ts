@@ -40,7 +40,6 @@ class PrendusScaffoldComments extends Polymer.Element {
     }
     connectedCallback() {
         super.connectedCallback();
-        this.loadConcepts();
     }
 
     disableNext(): void {
@@ -53,9 +52,6 @@ class PrendusScaffoldComments extends Polymer.Element {
       } catch(error) {
         console.error(error);
       }
-    }
-    loadConcepts(){
-      console.log('load concepts')
     }
     plusOne(index: number): number {
       return index + 1;

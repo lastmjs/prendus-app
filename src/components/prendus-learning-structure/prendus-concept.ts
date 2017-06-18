@@ -4,6 +4,7 @@ import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusConcept extends Polymer.Element implements ContainerElement {
     conceptId: string;
@@ -31,18 +32,14 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
             }
         };
     }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
+    
     connectedCallback() {
         super.connectedCallback();
-
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
     }
 
     isViewMode(mode: Mode) {

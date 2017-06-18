@@ -9,7 +9,7 @@
 <dom-module id="prendus-question-review">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-        <style include="prendus-styles">
+        <style>
           .wrapper {
             margin-top: 10px;
             display: grid;
@@ -63,6 +63,11 @@
               </div>
             </template>
         </iron-pages>
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
     </template>
 
     <script src="prendus-question-review.ts"></script>

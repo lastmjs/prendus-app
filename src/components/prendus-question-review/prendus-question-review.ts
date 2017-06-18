@@ -10,6 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {generateGuiData} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
@@ -29,7 +30,6 @@ class PrendusQuestionReview extends Polymer.Element {
     questionScaffoldQuizId: string;
     assignmentId: string;
     questions: Question[];
-
     maxSliderValue: number;
     minSliderValue: number;
     quality: number;
@@ -45,23 +45,54 @@ class PrendusQuestionReview extends Polymer.Element {
             },
         };
     }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     async connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
-            key: 'loaded',
-            value: true
+            key: 'maxSliderValue',
+            value: 10
         };
-        this.maxSliderValue = 10;
-        this.minSliderValue = 1;
-        this.quality = 0;
-        this.difficulty = 0;
-        this.accuracy = 0;
-        this.numberOfAnswers = 4;
-        this.selectedIndex = 0;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'minSliderValue',
+            value: 1
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'quality',
+            value: 0
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'accuracy',
+            value: 0
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'difficulty',
+            value: 0
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'numberOfAnswers',
+            value: 4
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selectedIndex',
+            value: 0
+        };
         // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
         await this.loadAssignmentQuestions();
         this.generateQuestionScaffolds()
@@ -166,7 +197,13 @@ class PrendusQuestionReview extends Polymer.Element {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
+        if (Object.keys(state.components[this.componentId] || {}).includes('maxSliderValue')) this.maxSliderValue = state.components[this.componentId].maxSliderValue;
+        if (Object.keys(state.components[this.componentId] || {}).includes('minsliderValue')) this.minSliderValue = state.components[this.componentId].minSliderValue;
+        if (Object.keys(state.components[this.componentId] || {}).includes('quality')) this.quality = state.components[this.componentId].quality;
+        if (Object.keys(state.components[this.componentId] || {}).includes('difficulty')) this.difficulty = state.components[this.componentId].difficulty;
+        if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
         this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;

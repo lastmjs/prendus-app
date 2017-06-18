@@ -5,6 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusLearningStructure extends Polymer.Element implements ContainerElement {
     disciplines: Discipline[];
@@ -16,19 +17,14 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
     user: User;
 
     static get is() { return 'prendus-learning-structure'; }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     async connectedCallback() {
         super.connectedCallback();
-
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
         await this.loadData();
-        // this.action = {
-        //     type: 'SET_COMPONENT_PROPERTY',
-        //     componentId: this.componentId,
-        //     key: 'loaded',
-        //     value: true
-        // };
     }
 
     isViewMode(mode: Mode) {
