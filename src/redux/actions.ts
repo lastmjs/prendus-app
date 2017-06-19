@@ -89,13 +89,15 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
   };
 };
 
-export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
+export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, concept: string, resource: string, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
   const answersObj: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = getAnswers(currentQuestionScaffold, answers, comments);
   return {
       type: 'SET_PROPERTY',
       key: 'currentQuestionScaffold',
       value: {
         ...currentQuestionScaffold,
+        concept: concept,
+        resource: resource,
         answers: answersObj,
         // only take new explanation if given
         explanation: explanation || currentQuestionScaffold.explanation,

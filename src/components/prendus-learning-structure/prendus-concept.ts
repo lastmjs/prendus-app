@@ -36,8 +36,14 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
         super();
         this.componentId = createUUID();
     }
-    
+
     connectedCallback() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         super.connectedCallback();
         this.subscribeToData();
     }

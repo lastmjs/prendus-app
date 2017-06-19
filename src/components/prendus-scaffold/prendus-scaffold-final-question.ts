@@ -94,6 +94,8 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             // This will be implemented soon
             // concept: 'NOT_IMPLEMENTED',
             explanation: this.questionScaffold.explanation,
+            concept: this.questionScaffold.concept,
+            resource: this.questionScaffold.resource,
             answerComments: {
                 question0: shuffledAnswers[0].comment,
                 question1: shuffledAnswers[0].comment,
@@ -113,7 +115,9 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             authorId: "${this.user.id}"
             assignmentId: "${this.assignmentId}"
             text: "${question.text}"
+            conceptId: "${question.concept}"
             explanation: "${question.explanation}"
+            resource: "${question.resource}"
             code: "${code}"
           ) {
             id

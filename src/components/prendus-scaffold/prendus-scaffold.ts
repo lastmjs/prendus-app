@@ -1,5 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {initCurrentQuestionScaffold} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
@@ -42,7 +43,7 @@ class PrendusScaffold extends Polymer.Element {
     connectedCallback() {
         super.connectedCallback();
         this.selectedIndex = 0;
-        this.numberOfAnswers = 4;
+        this.action = initCurrentQuestionScaffold(4);
     }
     back(): void {
       --this.selectedIndex;

@@ -13,7 +13,7 @@
                 <dom-if if="[[isViewMode(mode)]]">
                     <template>
                       <!-- Not sure if its better to pass it in here or to have it in redux. Jordan?  -->
-                      <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[concepts]]"></prendus-scaffold>
+                      <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[assignment.concepts]]"></prendus-scaffold>
                       <!-- The scaffold is commented out while I test the question review -->
                       <!-- <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review> -->
                     </template>

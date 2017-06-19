@@ -7,7 +7,13 @@
 
         <dom-if if="[[loaded]]">
             <template>
-              <p>This is the question creator concept component</p>
+              <div id ="concepts">
+                <dom-repeat items="[[concepts]]">
+                  <template>
+                      <h4 id="[[index]]" on-click="saveConcept">[[item.title]]</h4>
+                  </template>
+                </dom-repeat>
+              </div>
             </template>
         </dom-if>
 

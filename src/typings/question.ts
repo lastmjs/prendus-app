@@ -17,6 +17,7 @@ export interface Question {
     readonly discipline: Discipline;
     readonly subject: Subject;
     readonly concept: Concept
+    readonly resource: string;
     readonly explanation: string;
     readonly answerComments: {};
 }

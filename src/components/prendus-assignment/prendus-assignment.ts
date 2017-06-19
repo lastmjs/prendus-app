@@ -20,7 +20,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     learningStructure: any;
     subjects: Subject[];
     concepts: Concept[];
-    selectedConcept: Concept;
 
     static get is() { return 'prendus-assignment'; }
     static get properties() {
@@ -43,7 +42,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     async connectedCallback() {
-      console.log('connec')
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -98,12 +96,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       };
     }
     async saveConcept(e: any){
-      this.selectedConcept = this.concepts[e.target.id]
+      const selectedConcept = this.concepts[e.target.id]
       const data = await GQLMutate(`
       mutation {
         updateAssignment(
           id: "${this.assignmentId}"
-          conceptsIds: "${this.selectedConcept.id}"
+          conceptsIds: "${selectedConcept.id}"
         ) {
           id
         }

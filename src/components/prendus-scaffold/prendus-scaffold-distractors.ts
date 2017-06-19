@@ -41,26 +41,26 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     }
     connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'distractors',
+            value: Array(3)
+        };
     }
 
 
-    numberOfAnswersSet(): void {
-      // - 1 because there are numberOfAnswers - 1 amount of distractors.
-      // This array determines how many distractors will be in the html
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'distractors',
-          value: Array(this.numberOfAnswers - 1)
-      };
-    }
+    // numberOfAnswersSet(): void {
+    //   // - 1 because there are numberOfAnswers - 1 amount of distractors.
+    //   // This array determines how many distractors will be in the html
+    // }
 
     disableNext(): void {
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const distractors: string[] = getDistractors(this);
           this.action = setDisabledNext(!isDefinedAndNotEmpty(distractors));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, null, distractors, null);
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, distractors, null);
         }
 
       } catch(error) {
