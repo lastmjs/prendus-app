@@ -5,6 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     disciplineId: string;
@@ -28,18 +29,14 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
             }
         };
     }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
 
     connectedCallback() {
         super.connectedCallback();
-
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
     }
 
     isViewMode(mode: Mode) {

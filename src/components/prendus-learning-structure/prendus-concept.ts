@@ -4,6 +4,7 @@ import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusConcept extends Polymer.Element implements ContainerElement {
     conceptId: string;
@@ -23,25 +24,22 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
                 observer: 'conceptIdChanged'
             },
             subjectId: {
-
+              type: String,
+              observer: 'subjectIdChanged'
             },
             mode: {
 
             }
         };
     }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
+    
     connectedCallback() {
         super.connectedCallback();
-
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
         this.subscribeToData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
     }
 
     isViewMode(mode: Mode) {
@@ -55,7 +53,9 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
     isCreateMode(mode: Mode) {
         return mode === 'create';
     }
-
+    subjectIdChanged(){
+      console.log('subjectId changed', this.subjectId)
+    }
     async conceptIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -105,6 +105,7 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
     async saveConcept() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
+        console.log('this subject', this.subjectId)
         if (this.conceptId) {
             GQLMutate(`
                 mutation {

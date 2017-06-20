@@ -1,9 +1,10 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-icon/iron-icon.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-icons/iron-icons.html">
-<link rel="import" href="../../node_modules/@npm-polymer/paper-slider/paper-slider.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="prendus-scaffold-new-question.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
 <link rel="import" href="prendus-scaffold-comments.html">
@@ -133,7 +134,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-concept my-index="1" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-concept>
+                <prendus-scaffold-concept my-index="1" selected-index="[[selectedIndex]]" concepts="[[concepts]]"></prendus-scaffold-concept>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -190,7 +191,7 @@
                 <div class="prendus-card centered">
                   <h3>Final Question</h3>
                 </div>
-                <prendus-scaffold-final-question quiz-id="[[quizId]]" my-index="8" selected-index="[[selectedIndex]]"></prendus-scaffold-final-question>
+                <prendus-scaffold-final-question assignment-id="[[assignmentId]]" my-index="8" selected-index="[[selectedIndex]]"></prendus-scaffold-final-question>
               </div>
               <div>
                 <div class="prendus-card centered">
