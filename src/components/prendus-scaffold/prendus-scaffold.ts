@@ -42,6 +42,12 @@ class PrendusScaffold extends Polymer.Element {
     }
     connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         this.selectedIndex = 0;
         this.action = initCurrentQuestionScaffold(4);
     }
@@ -74,7 +80,7 @@ class PrendusScaffold extends Polymer.Element {
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.userToken = state.userToken;
         this.user = state.user;
         this.disableNext = state.disableNext;

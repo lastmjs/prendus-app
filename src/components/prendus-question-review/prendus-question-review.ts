@@ -50,9 +50,6 @@ class PrendusQuestionReview extends Polymer.Element {
     constructor() {
         super();
         this.componentId = createUUID();
-    }
-    async connectedCallback() {
-        super.connectedCallback();
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -101,7 +98,15 @@ class PrendusQuestionReview extends Polymer.Element {
             key: 'questionReviewNumber',
             value: 1
         };
-        // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
+    }
+    async connectedCallback() {
+        super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
     async loadReview(){
       await this.loadAssignmentQuestions();

@@ -39,7 +39,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
     async connectedCallback() {
         super.connectedCallback();
-
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -49,7 +48,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-
         this.subscribeToData();
     }
 

@@ -42,13 +42,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     async connectedCallback() {
+        super.connectedCallback();
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
-        super.connectedCallback();
     }
 
     isViewMode(mode) {
@@ -192,7 +192,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         this.assignment = state[`assignment${this.assignmentId}`];
-        // this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
         this.userToken = state.userToken;
         this.user = state.user;
     }

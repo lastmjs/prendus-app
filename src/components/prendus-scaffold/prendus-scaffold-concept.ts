@@ -41,13 +41,13 @@ class PrendusScaffoldConcept extends Polymer.Element {
         this.componentId = createUUID();
     }
     connectedCallback() {
+      super.connectedCallback();
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
           key: 'loaded',
           value: true
       };
-      super.connectedCallback();
     }
 
     disableNext(): void {

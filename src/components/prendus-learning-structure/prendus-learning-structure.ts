@@ -22,13 +22,13 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
         this.componentId = createUUID();
     }
     async connectedCallback() {
+        super.connectedCallback();
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
-        super.connectedCallback();
         this.subscribeToData();
         await this.loadData();
     }

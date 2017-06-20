@@ -43,6 +43,12 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
     }
     async connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     /**
@@ -87,6 +93,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
 
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
     }
 }
