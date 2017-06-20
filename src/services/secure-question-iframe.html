@@ -117,8 +117,10 @@
             userCode
         });
 
-        questionWorker.onmessage = (event) => {
-            window.top.postMessage(event.data, '*');
-        };
+        questionWorker.addEventListener('message', (event) => {
+            window.parent.postMessage(Object.assign({}, event.data, {
+                type: 'secure-question-iframe-result'
+            }), '*');
+        });
     });
 </script>
