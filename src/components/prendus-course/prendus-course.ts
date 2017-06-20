@@ -88,9 +88,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
-        await GQLQuery(`
+        const data = await GQLQuery(`
             query {
-                assignmentsFromCourse${this.courseId}: allAssignments(filter: {
+                allAssignments(filter: {
                     course: {
                         id: "${this.courseId}"
                     }
@@ -98,19 +98,27 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     id
                     title
                 }
-                course${this.courseId}: Course(id: "${this.courseId}") {
+                Course(id: "${this.courseId}") {
                     title
                 }
             }
         `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
+          console.log('key', key, 'value', value)
         }, (error: any) => {
             console.log(error);
         });
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'assignments',
+            value: data.allAssignments
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'course',
+            value: data.course
+        };
     }
 
     subscribeToData() {
@@ -166,8 +174,10 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.assignments = state[`assignmentsFromCourse${this.courseId}`];
-        this.course = state[`course${this.courseId}`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('assignments')) this.assignments = state.components[this.componentId].assignments;
+        if (Object.keys(state.components[this.componentId] || {}).includes('course')) this.course = state.components[this.componentId].course;
+        // this.assignments = state[`assignmentsFromCourse${this.courseId}`];
+        // this.course = state[`course${this.courseId}`];
         this.userToken = state.userToken;
         this.user = state.user;
     }

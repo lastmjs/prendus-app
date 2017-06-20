@@ -43,6 +43,7 @@ class PrendusQuestionReview extends Polymer.Element {
     static get properties() {
         return {
             assignmentId: {
+              observer: "getInfoForQuestionScaffolds"
             },
         };
     }
@@ -106,10 +107,12 @@ class PrendusQuestionReview extends Polymer.Element {
             key: 'questionReviewNumber',
             value: 1
         };
-        await this.loadAssignmentQuestions();
-        this.generateQuestionScaffolds()
-    }
 
+    }
+    async getInfoForQuestionScaffolds(){
+      await this.loadAssignmentQuestions();
+      this.generateQuestionScaffolds()
+    }
     back(): void {
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
