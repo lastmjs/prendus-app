@@ -2,7 +2,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {Lesson} from '../../typings/lesson';
+import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
@@ -13,7 +13,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     mode: Mode;
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
-    lessons: Lesson[];
+    assignments: Assignment[];
     course: Course;
     loaded: boolean;
     userToken: string;
@@ -92,7 +92,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     async loadData() {
         await GQLQuery(`
             query {
-                lessonsFromCourse${this.courseId}: allLessons(filter: {
+                assignmentsFromCourse${this.courseId}: allAssignments(filter: {
                     course: {
                         id: "${this.courseId}"
                     }
@@ -117,8 +117,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
     subscribeToData() {
         GQLSubscribe(`
-            subscription changedLesson {
-                Lesson(
+            subscription changedAssignment {
+                Assignment(
                     filter: {
                         mutation_in: [CREATED, UPDATED, DELETED]
                     }
@@ -168,7 +168,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.lessons = state[`lessonsFromCourse${this.courseId}`];
+        this.assignments = state[`assignmentsFromCourse${this.courseId}`];
         this.course = state[`course${this.courseId}`];
         this.userToken = state.userToken;
         this.user = state.user;

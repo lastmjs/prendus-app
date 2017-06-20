@@ -43,6 +43,7 @@ class PrendusQuestionReview extends Polymer.Element {
     static get properties() {
         return {
             assignmentId: {
+              observers: "loadReview"
             },
         };
     }
@@ -101,8 +102,10 @@ class PrendusQuestionReview extends Polymer.Element {
             value: 1
         };
         // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
-        await this.loadAssignmentQuestions();
-        this.generateQuestionScaffolds()
+    }
+    async loadReview(){
+      await this.loadAssignmentQuestions();
+      this.generateQuestionScaffolds()
     }
     back(): void {
       this.action = {
@@ -222,8 +225,7 @@ class PrendusQuestionReview extends Polymer.Element {
           key: 'questionReviewNumber',
           value: ++this.questionReviewNumber
       };
-      console.log('his.questionReviewNumber', this.questionReviewNumber)
-      console.log('selectedIndex', this.selectedIndex, 'scaffolds length', this.questionScaffoldsToRate.length)
+
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
         alert('Congratulations, you are done rating questions')
       }
@@ -242,7 +244,6 @@ class PrendusQuestionReview extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
         // if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state[`questionsInAssignment`];
         this.questions = state[`questionsInAssignment`];
-        console.log('this.questions', this.questions)
         this.userToken = state.userToken;
         this.user = state.user;
     }

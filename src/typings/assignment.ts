@@ -1,4 +1,4 @@
-import {Lesson} from './lesson';
+import {Course} from './course';
 import {User} from './user';
 
 export interface Assignment {
@@ -6,6 +6,6 @@ export interface Assignment {
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly title: string;
-    readonly lesson: Lesson;
+    readonly course: Course;
     readonly author: User;
 }
