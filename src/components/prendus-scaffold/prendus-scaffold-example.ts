@@ -37,6 +37,12 @@ class PrendusScaffoldExample extends Polymer.Element {
     }
     connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
@@ -47,7 +53,7 @@ class PrendusScaffoldExample extends Polymer.Element {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.answers = this.questionScaffold ? getQuestionScaffoldAnswers(this.questionScaffold) : this.answers;
     }
 }

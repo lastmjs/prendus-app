@@ -1,5 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {initCurrentQuestionScaffold} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
@@ -38,11 +39,22 @@ class PrendusScaffold extends Polymer.Element {
     constructor() {
         super();
         this.componentId = createUUID();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selectedIndex',
+            value: 0
+        };
     }
     connectedCallback() {
         super.connectedCallback();
-        this.selectedIndex = 0;
-        this.numberOfAnswers = 4;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
+        this.action = initCurrentQuestionScaffold(4);
     }
     back(): void {
       --this.selectedIndex;
@@ -73,7 +85,7 @@ class PrendusScaffold extends Polymer.Element {
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.userToken = state.userToken;
         this.user = state.user;
         this.disableNext = state.disableNext;

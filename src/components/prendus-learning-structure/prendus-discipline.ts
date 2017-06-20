@@ -36,7 +36,12 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this.subscribeToData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     isViewMode(mode: Mode) {
@@ -72,9 +77,6 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-    }
-    subscribeToData() {
-
     }
     async loadData() {
         await GQLQuery(`

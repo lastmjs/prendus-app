@@ -1,12 +1,12 @@
 import {User} from './user';
-import {Lesson} from './lesson';
+import {Assignment} from './assignment';
 
 export interface Course {
     readonly id: string;
     readonly createdAt: Date;
     readonly updatedAt: Date;
     readonly title: string;
-    readonly lessons: Lesson[];
+    readonly assignments: Assignment[];
     readonly description: string | null;
     readonly dueDate: Date | null;
     readonly author: User;

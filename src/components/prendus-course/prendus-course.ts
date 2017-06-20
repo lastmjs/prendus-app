@@ -2,7 +2,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {Lesson} from '../../typings/lesson';
+import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
@@ -13,7 +13,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     mode: Mode;
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
-    lessons: Lesson[];
+    assignments: Assignment[];
     course: Course;
     loaded: boolean;
     userToken: string;
@@ -39,7 +39,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
     async connectedCallback() {
         super.connectedCallback();
-
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -49,7 +48,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-
         this.subscribeToData();
     }
 
@@ -90,9 +88,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
-        await GQLQuery(`
+        const data = await GQLQuery(`
             query {
-                lessonsFromCourse${this.courseId}: allLessons(filter: {
+                allAssignments(filter: {
                     course: {
                         id: "${this.courseId}"
                     }
@@ -100,25 +98,33 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     id
                     title
                 }
-                course${this.courseId}: Course(id: "${this.courseId}") {
+                Course(id: "${this.courseId}") {
                     title
                 }
             }
         `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
+          console.log('key', key, 'value', value)
         }, (error: any) => {
             console.log(error);
         });
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'assignments',
+            value: data.allAssignments
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'course',
+            value: data.course
+        };
     }
 
     subscribeToData() {
         GQLSubscribe(`
-            subscription changedLesson {
-                Lesson(
+            subscription changedAssignment {
+                Assignment(
                     filter: {
                         mutation_in: [CREATED, UPDATED, DELETED]
                     }
@@ -168,8 +174,10 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
         if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.lessons = state[`lessonsFromCourse${this.courseId}`];
-        this.course = state[`course${this.courseId}`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('assignments')) this.assignments = state.components[this.componentId].assignments;
+        if (Object.keys(state.components[this.componentId] || {}).includes('course')) this.course = state.components[this.componentId].course;
+        // this.assignments = state[`assignmentsFromCourse${this.courseId}`];
+        // this.course = state[`course${this.courseId}`];
         this.userToken = state.userToken;
         this.user = state.user;
     }

@@ -36,12 +36,14 @@ class PrendusQuestionReview extends Polymer.Element {
     difficulty: number;
     accuracy: number;
     querySelector: any;
+    questionReviewNumber: number;
 
     static get is() { return 'prendus-question-review'; }
 
     static get properties() {
         return {
             assignmentId: {
+              observer: "getInfoForQuestionScaffolds"
             },
         };
     }
@@ -51,6 +53,12 @@ class PrendusQuestionReview extends Polymer.Element {
     }
     async connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -93,9 +101,17 @@ class PrendusQuestionReview extends Polymer.Element {
             key: 'selectedIndex',
             value: 0
         };
-        // this.action = await Actions.initializeQuestionScaffoldQuiz(this.quizId, 5);
-        await this.loadAssignmentQuestions();
-        this.generateQuestionScaffolds()
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'questionReviewNumber',
+            value: 1
+        };
+
+    }
+    async getInfoForQuestionScaffolds(){
+      await this.loadAssignmentQuestions();
+      this.generateQuestionScaffolds()
     }
     back(): void {
       this.action = {
@@ -122,12 +138,16 @@ class PrendusQuestionReview extends Polymer.Element {
     async loadAssignmentQuestions() {
         await GQLQuery(`
             query {
-                questionsInAssignment: Assignment(id: "${this.assignmentId}") {
-                    questions(first: 3){
+                Assignment(id: "${this.assignmentId}") {
+                    questions(first: 9){
                       id
                       code
                       text
                       explanation
+                      resource
+                      concept{
+                        title
+                      }
                       answerComments{
                         text
                       }
@@ -136,8 +156,9 @@ class PrendusQuestionReview extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Question[]) => {
             this.action = {
-                type: 'SET_PROPERTY',
-                key,
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'questions',
                 value
             };
             return value;
@@ -167,6 +188,8 @@ class PrendusQuestionReview extends Polymer.Element {
             id: question.id,
             answers: questionScaffoldAnswers,
             question: guiQuestion.stem,
+            concept: question.concept.title,
+            resource: question.resource,
             explanation: question.explanation,
             convertedQuestion: question
         };
@@ -199,7 +222,19 @@ class PrendusQuestionReview extends Polymer.Element {
       } catch(error) {
         console.error(error);
       }
-      ++this.selectedIndex;
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedIndex',
+          value: ++this.selectedIndex
+      };
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'questionReviewNumber',
+          value: ++this.questionReviewNumber
+      };
+
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
         alert('Congratulations, you are done rating questions')
       }
@@ -209,12 +244,15 @@ class PrendusQuestionReview extends Polymer.Element {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
+        if (Object.keys(state.components[this.componentId] || {}).includes('questionReviewNumber')) this.questionReviewNumber = state.components[this.componentId].questionReviewNumber;
+        if (Object.keys(state.components[this.componentId] || {}).includes('minSliderValue')) this.minSliderValue = state.components[this.componentId].minSliderValue;
         if (Object.keys(state.components[this.componentId] || {}).includes('maxSliderValue')) this.maxSliderValue = state.components[this.componentId].maxSliderValue;
-        if (Object.keys(state.components[this.componentId] || {}).includes('minsliderValue')) this.minSliderValue = state.components[this.componentId].minSliderValue;
         if (Object.keys(state.components[this.componentId] || {}).includes('quality')) this.quality = state.components[this.componentId].quality;
         if (Object.keys(state.components[this.componentId] || {}).includes('difficulty')) this.difficulty = state.components[this.componentId].difficulty;
         if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
-        this.questions = state[`questionsInAssignment`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state.components[this.componentId].questions;
+        // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
     }

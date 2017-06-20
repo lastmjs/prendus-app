@@ -51,7 +51,7 @@ class PrendusScaffoldComments extends Polymer.Element {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const comments: string[] = getComments(this);
           this.action = setDisabledNext(!isDefinedAndNotEmpty(comments));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, comments, null, null);
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, comments, null, null);
         }
       } catch(error) {
         console.error(error);
@@ -71,7 +71,7 @@ class PrendusScaffoldComments extends Polymer.Element {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
         this.answers = state.currentQuestionScaffold ? getQuestionScaffoldAnswers(state.currentQuestionScaffold) : this.answers;
     }
