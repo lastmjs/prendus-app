@@ -42,10 +42,11 @@
             <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
               <div>
                 <div class="prendus-card centered">
-                  <h2> Rate question </h2>
+                  <h2> Rate question [[questionReviewNumber]]</h2>
                   <!--TODO fix this description -->
                 </div>
                 <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
+                <div>[[item.resource]]</div>
                 <div class="wrapper">
                     <div class="quality">
                       Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
