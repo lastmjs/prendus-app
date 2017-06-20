@@ -3,6 +3,7 @@ import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {State} from '../../typings/state';
 import {QuestionScaffoldResource} from '../../typings/question-scaffold-resource';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusApp extends Polymer.Element {
     componentId: string;
@@ -13,16 +14,12 @@ class PrendusApp extends Polymer.Element {
     assignmentId: string;
 
     static get is() { return 'prendus-scaffold-resource'; }
-
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;

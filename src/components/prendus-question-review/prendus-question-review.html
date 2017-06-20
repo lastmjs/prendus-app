@@ -1,0 +1,74 @@
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
+<link rel="import" href="../../node_modules/@npm-polymer/paper-slider/paper-slider.html">
+<link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
+
+<dom-module id="prendus-question-review">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style>
+          .wrapper {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(1, 0fr);
+          }
+
+          .quality {
+            grid-column: 1;
+            grid-row: 1;
+          }
+
+          .difficulty {
+            grid-column: 2;
+            grid-row: 1;
+          }
+
+          .accuracy {
+            grid-column: 3;
+            grid-row: 1;
+          }
+
+          .submit-button {
+            justify-self: right;
+            grid-column: 4;
+            grid-row: 1;
+          }
+        </style>
+        <iron-pages id="iron-pages" selected="[[selectedIndex]]">
+            <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
+              <div>
+                <div class="prendus-card centered">
+                  <h2> Rate question </h2>
+                  <!--TODO fix this description -->
+                </div>
+                <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
+                <div class="wrapper">
+                    <div class="quality">
+                      Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                    </div>
+                    <div class="difficulty">
+                      Difficulty<paper-slider id="difficulty" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                    </div>
+                    <div class="accuracy">
+                      Accuracy<paper-slider id="accuracy" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                    </div>
+                    <div class="submit-button">
+                        <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+                    </div>
+                </div>
+              </div>
+            </template>
+        </iron-pages>
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script src="prendus-question-review.ts"></script>
+</dom-module>

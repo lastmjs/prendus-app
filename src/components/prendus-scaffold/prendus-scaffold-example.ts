@@ -5,6 +5,7 @@ import {User} from '../../typings/user';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
     componentId: string;
@@ -26,24 +27,21 @@ class PrendusScaffoldExample extends Polymer.Element {
             type: Number
           },
           questionScaffold: {
-            type: Object
+            type: Object,
           }
         };
     }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
     connectedCallback() {
         super.connectedCallback();
-        this.componentId = this.shadowRoot.querySelector('#reduxStoreElement').elementId;
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
     }
-
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        this.action = Actions.setDisabledNext(false);
+        console.log('disable next')
+        // this.action = Actions.setDisabledNext(false);
       }
     }
 
