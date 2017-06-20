@@ -43,13 +43,21 @@ class PrendusQuestionReview extends Polymer.Element {
     static get properties() {
         return {
             assignmentId: {
-              observers: "loadReview"
             },
         };
     }
     constructor() {
         super();
         this.componentId = createUUID();
+    }
+    async connectedCallback() {
+        super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -98,20 +106,10 @@ class PrendusQuestionReview extends Polymer.Element {
             key: 'questionReviewNumber',
             value: 1
         };
+        await this.loadAssignmentQuestions();
+        this.generateQuestionScaffolds()
     }
-    async connectedCallback() {
-        super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-    }
-    async loadReview(){
-      await this.loadAssignmentQuestions();
-      this.generateQuestionScaffolds()
-    }
+
     back(): void {
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
@@ -137,7 +135,7 @@ class PrendusQuestionReview extends Polymer.Element {
     async loadAssignmentQuestions() {
         await GQLQuery(`
             query {
-                questionsInAssignment: Assignment(id: "${this.assignmentId}") {
+                Assignment(id: "${this.assignmentId}") {
                     questions(first: 9){
                       id
                       code
@@ -155,8 +153,9 @@ class PrendusQuestionReview extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Question[]) => {
             this.action = {
-                type: 'SET_PROPERTY',
-                key,
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'questions',
                 value
             };
             return value;
@@ -186,6 +185,8 @@ class PrendusQuestionReview extends Polymer.Element {
             id: question.id,
             answers: questionScaffoldAnswers,
             question: guiQuestion.stem,
+            concept: question.concept.title,
+            resource: question.resource,
             explanation: question.explanation,
             convertedQuestion: question
         };
@@ -247,8 +248,8 @@ class PrendusQuestionReview extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('quality')) this.quality = state.components[this.componentId].quality;
         if (Object.keys(state.components[this.componentId] || {}).includes('difficulty')) this.difficulty = state.components[this.componentId].difficulty;
         if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
-        // if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state[`questionsInAssignment`];
-        this.questions = state[`questionsInAssignment`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state.components[this.componentId].questions;
+        // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
     }

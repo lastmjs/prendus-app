@@ -132,7 +132,6 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      const userT = this.userToken;
       Object.keys(question.answerComments).forEach(async function(key) {
           await GQLMutate(`
             mutation {
@@ -143,7 +142,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
                 id
               }
             }
-          `, userT, (error: any) => {
+          `, this.userToken, (error: any) => {
               console.log(error);
           });
       });

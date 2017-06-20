@@ -13,7 +13,17 @@
         <dom-if if="[[loaded]]">
             <template>
                 <div inner-h-t-m-l="[[getSanitizedText(builtQuestion.transformedText)]]"></div>
-                <button on-click="checkAnswer">Check</button>
+
+                <div>
+                    <button on-click="checkAnswer">Check</button>
+                    <button on-click="showEmbedCodeClick">Embed</button>
+                </div>
+
+                <dom-if if="[[showEmbedCode]]">
+                    <template>
+                        <input id="embedInput" type="text" value='<iframe src="http://localhost:8000/question/[[questionId]]/view" frameborder="0" onload="window.addEventListener(`message`, (event) => { this.style.height = `${event.data.height + 125}px`; this.style.width = `${event.data.width}px`; });"></iframe>'>
+                    </template>
+                </dom-if>
             </template>
         </dom-if>
 

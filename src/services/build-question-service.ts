@@ -28,6 +28,10 @@ export async function buildQuestion(rawQuestion: Question, secureIframe: HTMLIFr
         }
 
         window.addEventListener('message', (event) => {
+            if (event.data.type !== 'secure-question-iframe-result') {
+                return;
+            }
+
             const result: {
                 answer: string | number,
                 // hint: string,

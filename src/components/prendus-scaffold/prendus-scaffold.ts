@@ -39,6 +39,12 @@ class PrendusScaffold extends Polymer.Element {
     constructor() {
         super();
         this.componentId = createUUID();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selectedIndex',
+            value: 0
+        };
     }
     connectedCallback() {
         super.connectedCallback();
@@ -48,7 +54,6 @@ class PrendusScaffold extends Polymer.Element {
             key: 'loaded',
             value: true
         };
-        this.selectedIndex = 0;
         this.action = initCurrentQuestionScaffold(4);
     }
     back(): void {

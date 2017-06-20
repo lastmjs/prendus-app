@@ -42,7 +42,6 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-        this.subscribeToData();
     }
 
     isViewMode(mode: Mode) {
