@@ -7,6 +7,17 @@
 
 <dom-module id="prendus-view-question">
     <template>
+        <style>
+            * {
+                font-size: calc(125px - 5vw);
+            }
+
+            input[type=radio] {
+                width: calc(75px - 3vw);
+                height: calc(75px - 3vw);
+            }
+        </style>
+
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <iframe id="secureIframe" sandbox="allow-scripts" style="display: none;" src="services/secure-question-iframe.html"></iframe>
 
