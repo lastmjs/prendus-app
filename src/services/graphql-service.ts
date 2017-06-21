@@ -2,12 +2,13 @@ import {GQLQueryDataCallback} from '../typings/gql-query-data-callback';
 import {GQLQueryErrorCallback} from '../typings/gql-query-error-callback';
 import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback';
 import {GQLMutateErrorCallback} from '../typings/gql-mutate-error-callback';
+import {getGraphcoolHTTPEndpoint, getGraphcoolWebSocketEndpoint} from '../services/utilities-service';
 
-const httpEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
+const httpEndpoint = getGraphcoolHTTPEndpoint();
 
 //TODO the GraphQL web socket protocol used below is deprecated and will be changing soon: https://github.com/apollographql/subscriptions-transport-ws/issues/149
 //TODO We'll need to wait for graph.cool to update their back end before we change our client
-let webSocket = new WebSocket('wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r', 'graphql-subscriptions');
+let webSocket = new WebSocket(getGraphcoolWebSocketEndpoint(), 'graphql-subscriptions');
 let subscriptions: {
     [key: string]: GQLSubscribeCallback
 } = {};

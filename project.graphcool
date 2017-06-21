@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 182
+# version: 209
 
 type File implements Node {
   id: ID! @isUnique
@@ -27,6 +27,7 @@ type User implements Node {
   ltiJWT: String
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
+  questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
 }
 
 type Course implements Node {
@@ -35,6 +36,7 @@ type Course implements Node {
   updatedAt: DateTime!
   title: String!
   lessons: [Lesson!]! @relation(name: "CourseOnLesson")
+  assignments: [Assignment!]! @relation(name: "CourseOnAssignment")
   description: String
   dueDate: DateTime
   author: User! @relation(name: "AuthorOnCourse")
@@ -46,7 +48,6 @@ type Lesson implements Node {
   updatedAt: DateTime!
   title: String!
   course: Course! @relation(name: "CourseOnLesson")
-  assignments: [Assignment!]! @relation(name: "LessonOnAssignment")
   author: User! @relation(name: "AuthorOnLesson")
 }
 
@@ -55,9 +56,12 @@ type Assignment implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   title: String!
-  lesson: Lesson! @relation(name: "LessonOnAssignment")
+  course: Course @relation(name: "CourseOnAssignment")
   author: User! @relation(name: "AuthorOnAssignment")
   students: [User!]! @relation(name: "StudentsAndAssignments")
+  questions: [Question!]! @relation(name: "AssignmentQuestions")
+  concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
+  quiz: Quiz @relation(name: "AssignmentOnQuiz")
 }
 
 type Quiz implements Node {
@@ -67,6 +71,7 @@ type Quiz implements Node {
   title: String!
   author: User! @relation(name: "AuthorOnQuiz")
   questions: [Question!]! @relation(name: "QuizOnQuestion")
+  assignment: Assignment @relation(name: "AssignmentOnQuiz")
 }
 
 type Question implements Node {
@@ -75,8 +80,33 @@ type Question implements Node {
   updatedAt: DateTime!
   text: String!
   code: String!
+  explanation: String
   quiz: Quiz @relation(name: "QuizOnQuestion")
   author: User! @relation(name: "AuthorOnQuestion")
+  assignment: Assignment @relation(name: "AssignmentQuestions")
+  answerComments: [AnswerComment!]! @relation(name: "QuestionOnAnswerComment")
+  ratings: [QuestionRating!]! @relation(name: "QuestionOnQuestionRating")
+  concept: Concept @relation(name: "ConceptOnQuestion")
+  resource: String
+}
+
+type QuestionRating implements Node {
+  id: ID! @isUnique
+  quality: Int
+  difficulty: Int
+  alignment: Int
+  rater: User! @relation(name: "RaterOnQuestionRating")
+  question: Question! @relation(name: "QuestionOnQuestionRating")
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type AnswerComment implements Node {
+  id: ID! @isUnique
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  question: Question! @relation(name: "QuestionOnAnswerComment")
 }
 
 type Discipline implements Node {
@@ -102,6 +132,8 @@ type Concept implements Node {
   updatedAt: DateTime!
   title: String!
   subject: Subject! @relation(name: "SubjectOnConcept")
+  assignments: [Assignment!]! @relation(name: "AssignmentOnConcepts")
+  questions: [Question!]! @relation(name: "ConceptOnQuestion")
 }
 
 type LTIUser implements Node {
@@ -110,14 +142,6 @@ type LTIUser implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User! @relation(name: "UserOnLTIUser")
-}
-
-type LTISecret implements Node {
-  id: ID! @isUnique
-  key: String! @isUnique
-  secret: String! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 enum UserRole {

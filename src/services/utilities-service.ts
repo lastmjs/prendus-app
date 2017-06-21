@@ -1,6 +1,33 @@
 import {QuestionScaffold} from '../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
+export function getGraphcoolHTTPEndpoint() {
+    if (process.env.NODE_ENV === 'production') {
+        return '';
+    }
+    else {
+        return 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
+    }
+}
+
+export function getGraphcoolWebSocketEndpoint() {
+    if (process.env.NODE_ENV === 'production') {
+        return '';
+    }
+    else {
+        return 'wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r';
+    }
+}
+
+export function getPrendusLTIServerOrigin() {
+    if (process.env.NODE_ENV === 'production') {
+        return 'https://prenduslearning.com';
+    }
+    else {
+        return 'http://localhost:5000';
+    }
+}
+
 export const isDefinedAndNotEmpty = (objects: string | string[]): boolean => {
   if(!objects) {
     return false;
