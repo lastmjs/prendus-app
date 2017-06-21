@@ -3,7 +3,6 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {initCurrentQuestionScaffold} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Concept} from '../../typings/concept';
-import {User} from '../../typings/user';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {createUUID} from '../../services/utilities-service';
@@ -13,7 +12,6 @@ class PrendusScaffold extends Polymer.Element {
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
     userToken: string | null;
-    user: User | null;
     selectedIndex: number;
     disableNext: boolean;
     numberOfAnswers: number;
@@ -39,13 +37,6 @@ class PrendusScaffold extends Polymer.Element {
     constructor() {
         super();
         this.componentId = createUUID();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'selectedIndex',
-            value: 0
-        };
-        console.log('tjs', this.selectedIndex)
     }
     connectedCallback() {
         super.connectedCallback();
@@ -54,6 +45,12 @@ class PrendusScaffold extends Polymer.Element {
             componentId: this.componentId,
             key: 'loaded',
             value: true
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selectedIndex',
+            value: 0
         };
         this.action = initCurrentQuestionScaffold(4);
     }
@@ -72,7 +69,13 @@ class PrendusScaffold extends Polymer.Element {
      * Called when you press next
      */
     next(): void {
-      ++this.selectedIndex;
+      const nextIndex = ++this.selectedIndex;
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedIndex',
+          value: nextIndex
+      };
       if(this.selectedIndex === this.shadowRoot.querySelector('#iron-pages').items.length - 1) {
         // Reached the limit.
         //this.action = Actions.setDisabledNext(true);
@@ -89,7 +92,6 @@ class PrendusScaffold extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
         this.userToken = state.userToken;
-        this.user = state.user;
         this.disableNext = state.disableNext;
     }
 }
