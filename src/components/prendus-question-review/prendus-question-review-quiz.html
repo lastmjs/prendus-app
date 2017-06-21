@@ -1,13 +1,13 @@
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-quiz/prendus-quiz.html">
 
 <dom-module id="prendus-question-review-quiz">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style>
         </style>
-        <p>Hello World</p>
-        
+        <prendus-quiz quiz-id = "[[quizId]]"></prendus-quiz>
         <dom-if if="[[!loaded]]">
             <template>
                 Loading...

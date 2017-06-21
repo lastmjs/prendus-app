@@ -2,7 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
-<!-- <link rel="import" href="../prendus-question-review/prendus-question-review.html"> -->
+<link rel="import" href="../prendus-question-review/prendus-question-review.html">
 
 <dom-module id="prendus-assignment">
     <template>
@@ -13,9 +13,9 @@
                 <dom-if if="[[isViewMode(mode)]]">
                     <template>
                       <!-- Not sure if its better to pass it in here or to have it in redux. Jordan?  -->
-                      <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[assignment.concepts]]"></prendus-scaffold>
+                      <!-- <prendus-scaffold assignment-id="[[assignmentId]]" concepts="[[assignment.concepts]]"></prendus-scaffold> -->
                       <!-- The scaffold is commented out while I test the question review -->
-                      <!-- <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review> -->
+                      <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review>
                     </template>
                 </dom-if>
                 <dom-if if="[[!isViewMode(mode)]]">

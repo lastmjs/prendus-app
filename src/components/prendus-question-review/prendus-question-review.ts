@@ -10,7 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {generateGuiData} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, shuffleArray} from '../../services/utilities-service';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
@@ -30,6 +30,7 @@ class PrendusQuestionReview extends Polymer.Element {
     questionScaffoldQuizId: string;
     assignmentId: string;
     questions: Question[];
+    quizQuestions: Question[];
     maxSliderValue: number;
     minSliderValue: number;
     quality: number;
@@ -155,33 +156,27 @@ class PrendusQuestionReview extends Polymer.Element {
                 }
             }
         `, this.userToken, (key: string, value: Question[]) => {
-            if(value.questions.length < 3){
+              const questionsToReview = shuffleArray(value.questions).slice(0,3);
+              const quizQuestions = shuffleArray(value.questions).slice(0,5);
               this.action = {
                   type: 'SET_COMPONENT_PROPERTY',
                   componentId: this.componentId,
                   key: 'questions',
-                  value
+                  value: questionsToReview
               };
-            }else{
-              const randomQuestions = function(){
-                const len = value.questions.length;
-                const ran = Math.random()
-                const lenran = len * ran;
-                console.log('lenran', lenran)
-                return lenran;
-              }
-              console.log('questions', value.questions.length)
-              console.log('random', Math.random())
-              console.log('random', Math.random())
-              console.log('random', Math.random())
-            }
+              this.action = {
+                  type: 'SET_COMPONENT_PROPERTY',
+                  componentId: this.componentId,
+                  key: 'quizQuestions',
+                  value: quizQuestions
+              };
         }, (error: any) => {
             console.log(error);
         });
     }
     generateQuestionScaffolds(){
       // const questionComments = this.questions.questions;
-      this.questionScaffoldsToRate = this.questions.questions.map(function(question: Question){
+      this.questionScaffoldsToRate = this.questions.map(function(question: Question){
         const guiQuestion: GuiQuestion = generateGuiData({
             text: question.text,
             code: question.code
@@ -264,6 +259,7 @@ class PrendusQuestionReview extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('difficulty')) this.difficulty = state.components[this.componentId].difficulty;
         if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
         if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state.components[this.componentId].questions;
+        if (Object.keys(state.components[this.componentId] || {}).includes('quizQuestions')) this.quizQuestions = state.components[this.componentId].quizQuestions;
         // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;

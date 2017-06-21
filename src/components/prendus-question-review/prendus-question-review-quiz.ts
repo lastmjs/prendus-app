@@ -20,14 +20,19 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     user: User | null;
     selectedIndex: number;
     questions: Question[];
+    assignmentId: string;
+    quizId: string;
+
 
     static get is() { return 'prendus-question-review-quiz'; }
 
     static get properties() {
         return {
-            assignmentId: {
-              observer: "getInfoForQuestionScaffolds"
+            questions: {
+              observer: "generateQuiz"
             },
+            assignmentId: {
+            }
         };
     }
     constructor() {
@@ -36,87 +41,40 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
     async connectedCallback() {
         super.connectedCallback();
-        // await this.loadAssignmentQuestions();
-        this.generateQuiz()
     }
 
-    async loadAssignmentQuestions() {
-        await GQLQuery(`
-            query {
-                Assignment(id: "${this.assignmentId}") {
-                    questions(first: 1 after: 2){
-                      id
-                      code
-                      text
-                      explanation
-                      resource
-                      concept{
-                        title
-                      }
-                      answerComments{
-                        text
-                      }
-                    },
-                }
-            }
-        `, this.userToken, (key: string, value: Question[]) => {
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'questions',
-                value
-            };
-            return value;
-        }, (error: any) => {
-            console.log(error);
-        });
-    }
-    generateQuiz(){
-      // const questionComments = this.questions.questions;
-      console.log('quiz', quiz)
-    }
-
-    async submit(e: any): Promise<void> {
-      try {
-        const questionId: string = e.target.id;
-        const quality: number = this.shadowRoot.querySelector('#quality').value;
-        const difficulty: number = this.shadowRoot.querySelector('#difficulty').value;
-        const accuracy: number = this.shadowRoot.querySelector('#accuracy').value;
-        const data = await GQLMutate(`
+    async generateQuiz(){
+      const questionIds = this.questions.map(function(a) {return a.id;});
+      const questionIdsString = `["${questionIds.join('","')}"]`;
+      const data = await GQLMutate(`
           mutation {
-            createQuestionRating(
-              quality: ${quality}
-              difficulty: ${difficulty}
-              alignment: ${accuracy}
-              raterId: "${this.user.id}"
-              questionId: "${questionId}"
-            ) {
-              id
-            }
+              createQuiz(
+                  authorId: "${this.user.id}"
+                  title: "Assignment Quiz"
+                  questionsIds: ${questionIdsString}
+              ) {
+                  id
+              }
           }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = setDisabledNext(false);
-        // Actions.showNotification(this, 'success', 'Ratings submitted');
-      } catch(error) {
-        console.error(error);
-      }
+      `, this.userToken, (error: any) => {
+          alert(error);
+      });
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
-          key: 'selectedIndex',
-          value: ++this.selectedIndex
+          key: 'quizId',
+          value: data.createQuiz.id
       };
-
     }
+
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
+        if (Object.keys(state.components[this.componentId] || {}).includes('quizId')) this.quizId = state.components[this.componentId].quizId;
         this.userToken = state.userToken;
-
+        this.user = state.user;
     }
 }
 

@@ -5,7 +5,7 @@
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
 <link rel="import" href="../../node_modules/@npm-polymer/paper-slider/paper-slider.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
-<!-- <link rel="import" href="prendus-question-review-quiz.html"> -->
+<link rel="import" href="prendus-question-review-quiz.html">
 
 <dom-module id="prendus-question-review">
     <template>
@@ -63,11 +63,8 @@
                 </div>
               </div>
             </template>
-            <div>
-              THis is some content
-            </div>
         </iron-pages>
-        <!-- <prendus-question-review-quiz></prendus-question-review-quiz> -->
+        <prendus-question-review-quiz assignment-id="[[assignmentId]]" questions="[[quizQuestions]]"></prendus-question-review-quiz>
         <dom-if if="[[!loaded]]">
             <template>
                 Loading...
