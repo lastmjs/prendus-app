@@ -21,6 +21,12 @@
                         <button on-click="loadNewQuestion">New Question</button>
                     </template>
                 </dom-if>
+
+                <dom-if if="[[!showNewQuestionButton(currentQuestionIndex, numberOfQuestions)]]">
+                    <template>
+                        <button on-click="submit">Submit</button>
+                    </template>
+                </dom-if>
             </template>
         </dom-if>
 
