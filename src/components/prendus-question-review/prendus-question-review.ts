@@ -139,7 +139,7 @@ class PrendusQuestionReview extends Polymer.Element {
         await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
-                    questions(first: 9){
+                    questions{
                       id
                       code
                       text
@@ -155,13 +155,26 @@ class PrendusQuestionReview extends Polymer.Element {
                 }
             }
         `, this.userToken, (key: string, value: Question[]) => {
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'questions',
-                value
-            };
-            return value;
+            if(value.questions.length < 3){
+              this.action = {
+                  type: 'SET_COMPONENT_PROPERTY',
+                  componentId: this.componentId,
+                  key: 'questions',
+                  value
+              };
+            }else{
+              const randomQuestions = function(){
+                const len = value.questions.length;
+                const ran = Math.random()
+                const lenran = len * ran;
+                console.log('lenran', lenran)
+                return lenran;
+              }
+              console.log('questions', value.questions.length)
+              console.log('random', Math.random())
+              console.log('random', Math.random())
+              console.log('random', Math.random())
+            }
         }, (error: any) => {
             console.log(error);
         });
@@ -243,7 +256,6 @@ class PrendusQuestionReview extends Polymer.Element {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
         if (Object.keys(state.components[this.componentId] || {}).includes('questionReviewNumber')) this.questionReviewNumber = state.components[this.componentId].questionReviewNumber;
         if (Object.keys(state.components[this.componentId] || {}).includes('minSliderValue')) this.minSliderValue = state.components[this.componentId].minSliderValue;

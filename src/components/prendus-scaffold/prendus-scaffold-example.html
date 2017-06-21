@@ -22,7 +22,7 @@
           width: 45%;
           margin-right: 10px;
         }
-        .answers-comments-header {
+        .item-header {
           padding: 15px;
           margin-bottom: 0px;
         }
@@ -30,34 +30,54 @@
         .right-column {
           width: 45%;
         }
+        .prendus-card {
+					border-radius: 2px;
+					padding: 15px;
+					background-color: white;
+
+					/* material design shadows */
+					@apply(--shadow-elevation-2dp);
+				}
         </style>
         <div class="wrapper">
           <div class="row">
-            <div class="prendus-card left-column">
+            <div class="left-column item-header">
               <h3>Concept</h3>
-              [[questionScaffold.concept]]
             </div>
-            <div class="prendus-card right-column">
+            <div class="right-column item-header">
               <h3>Resource</h3>
-              [[questionScaffold.resource]]
             </div>
           </div>
           <div class="row">
             <div class="prendus-card left-column">
+              [[questionScaffold.concept]]
+            </div>
+            <div class="prendus-card right-column">
+              [[questionScaffold.resource]]
+            </div>
+          </div>
+          <div class="row">
+            <div class="left-column item-header">
               <h3>Question</h3>
+            </div>
+            <div class="right-column item-header">
+              <h3>Explanation</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="prendus-card left-column">
               [[questionScaffold.question]]
             </div>
             <div class="prendus-card right-column">
-              <h3>Explanation</h3>
               [[questionScaffold.explanation]]
             </div>
           </div>
 
           <div class="row">
-            <div class="left-column answers-comments-header">
+            <div class="left-column item-header">
               <h3>Answers</h3>
             </div>
-            <div class="right-column answers-comments-header">
+            <div class="right-column item-header">
               <h3>Comments</h3>
             </div>
           </div>

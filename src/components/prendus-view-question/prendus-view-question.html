@@ -1,12 +1,48 @@
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/@npm-polymer/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../node_modules/@npm-polymer/paper-tabs/paper-tab.html">
 
 <!--TODO ensure that this script does not do a network request for each instance of a question-->
 <script src="../../node_modules/dompurify/dist/purify.min.js"></script>
 
 <dom-module id="prendus-view-question">
     <template>
+        <style>
+            :host {
+                position: relative;
+            }
+
+            * {
+                font-size: calc(125px - 5vw);
+                font-family: Ubuntu;
+            }
+
+            input[type=radio] {
+                width: calc(75px - 3vw);
+                height: calc(75px - 3vw);
+            }
+
+            .bottomButtons {
+                /*position: absolute;*/
+                /*width: 100%;*/
+                display: flex;
+                flex-direction: row;
+                text-align: center;
+                cursor: pointer;
+                color: grey;
+            }
+
+            .checkButton {
+                flex: 1;
+            }
+
+            .embedButton {
+                flex: 1;
+            }
+        </style>
+
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <iframe id="secureIframe" sandbox="allow-scripts" style="display: none;" src="services/secure-question-iframe.html"></iframe>
 
@@ -14,10 +50,12 @@
             <template>
                 <div inner-h-t-m-l="[[getSanitizedText(builtQuestion.transformedText)]]"></div>
 
-                <div>
-                    <button on-click="checkAnswer">Check</button>
-                    <button on-click="showEmbedCodeClick">Embed</button>
+                <!-- <div style="width: 100%; position: relative"> -->
+                <div class="bottomButtons">
+                    <div on-click="checkAnswer" class="checkButton">Check</div>
+                    <!-- <div on-click="showEmbedCodeClick" class="embedButton">Embed</div> -->
                 </div>
+                <!-- </div> -->
 
                 <dom-if if="[[showEmbedCode]]">
                     <template>

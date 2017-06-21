@@ -45,6 +45,7 @@ class PrendusScaffold extends Polymer.Element {
             key: 'selectedIndex',
             value: 0
         };
+        console.log('tjs', this.selectedIndex)
     }
     connectedCallback() {
         super.connectedCallback();
@@ -86,6 +87,7 @@ class PrendusScaffold extends Polymer.Element {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
         this.userToken = state.userToken;
         this.user = state.user;
         this.disableNext = state.disableNext;
