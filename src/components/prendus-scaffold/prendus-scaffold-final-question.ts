@@ -9,7 +9,7 @@ import {generateMultipleChoice} from '../../services/question-to-code-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Question} from '../../typings/question';
 import {AnswerTypes} from '../../typings/answer-types';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;
@@ -152,6 +152,13 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           key: 'questionId',
           value: data.createQuestion.id
       };
+
+      window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
+          method: 'post',
+          mode: 'no-cors',
+          credentials: 'include'
+      });
+
       return data.createQuestion.id
     }
     stateChange(e: CustomEvent) {
