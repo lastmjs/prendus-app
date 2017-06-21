@@ -176,7 +176,7 @@ class PrendusQuestionReview extends Polymer.Element {
     }
     generateQuestionScaffolds(){
       // const questionComments = this.questions.questions;
-      this.questionScaffoldsToRate = this.questions.map(function(question: Question){
+      const qScaffolds = this.questions.map(function(question: Question){
         const guiQuestion: GuiQuestion = generateGuiData({
             text: question.text,
             code: question.code
@@ -202,6 +202,12 @@ class PrendusQuestionReview extends Polymer.Element {
             convertedQuestion: question
         };
       })
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'questionScaffoldsToRate',
+          value: qScaffolds
+      };
     }
 
     async submit(e: any): Promise<void> {
@@ -265,6 +271,7 @@ class PrendusQuestionReview extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
         if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state.components[this.componentId].questions;
         if (Object.keys(state.components[this.componentId] || {}).includes('quizQuestions')) this.quizQuestions = state.components[this.componentId].quizQuestions;
+        if (Object.keys(state.components[this.componentId] || {}).includes('questionScaffoldsToRate')) this.questionScaffoldsToRate = state.components[this.componentId].questionScaffoldsToRate;
         // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;

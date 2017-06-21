@@ -68,7 +68,6 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
 
     submitQuiz(){
-      console.log('submitQuiz')
       window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',

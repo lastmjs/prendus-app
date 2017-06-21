@@ -69,7 +69,7 @@ class PrendusScaffold extends Polymer.Element {
      * Called when you press next
      */
     next(): void {
-      const nextIndex = ++this.selectedIndex;
+      const nextIndex = this.selectedIndex + 1;
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
