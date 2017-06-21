@@ -10,7 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {generateGuiData} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 
 class PrendusQuestionReviewQuiz extends Polymer.Element {
     componentId: string;
@@ -67,6 +67,14 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
       };
     }
 
+    submitQuiz(){
+      console.log('submitQuiz')
+      window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
+          method: 'post',
+          mode: 'no-cors',
+          credentials: 'include'
+      });
+    }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;

@@ -244,7 +244,12 @@ class PrendusQuestionReview extends Polymer.Element {
       };
 
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
-        alert('Congratulations, you are done rating questions')
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selectedIndex',
+            value: ++this.selectedIndex
+        };
       }
     }
 
