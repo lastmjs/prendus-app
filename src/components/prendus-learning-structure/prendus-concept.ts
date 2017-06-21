@@ -25,7 +25,6 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
             },
             subjectId: {
               type: String,
-              observer: 'subjectIdChanged'
             },
             mode: {
 
@@ -36,10 +35,15 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
         super();
         this.componentId = createUUID();
     }
-    
+
     connectedCallback() {
         super.connectedCallback();
-        this.subscribeToData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     isViewMode(mode: Mode) {
@@ -53,22 +57,13 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
     isCreateMode(mode: Mode) {
         return mode === 'create';
     }
-    subjectIdChanged(){
-      console.log('subjectId changed', this.subjectId)
-    }
+
     async conceptIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'conceptId',
             value: this.conceptId
-        };
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
         };
         await this.loadData();
         this.action = {
@@ -77,9 +72,6 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-    }
-    subscribeToData() {
-
     }
     async loadData() {
         await GQLQuery(`
@@ -104,8 +96,6 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
 
     async saveConcept() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-        //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
-        console.log('this subject', this.subjectId)
         if (this.conceptId) {
             GQLMutate(`
                 mutation {

@@ -6,6 +6,7 @@ export interface QuestionScaffold {
     [ questionScaffoldAnswerId: string]: QuestionScaffoldAnswer;
   };
   readonly question: string;
+  readonly concept: string;
   readonly explanation: string;
   readonly convertedQuestion: Question;
 }

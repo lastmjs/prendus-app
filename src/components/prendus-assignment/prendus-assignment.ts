@@ -11,7 +11,7 @@ import {createUUID} from '../../services/utilities-service';
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
-    lessonId: string;
+    courseId: string;
     assignmentId: string;
     loaded: boolean;
     assignment: Assignment;
@@ -20,7 +20,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     learningStructure: any;
     subjects: Subject[];
     concepts: Concept[];
-    selectedConcept: Concept;
 
     static get is() { return 'prendus-assignment'; }
     static get properties() {
@@ -28,7 +27,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             assignmentId: {
                 observer: 'assignmentIdChanged'
             },
-            lessonId: {
+            courseId: {
 
             },
             mode: {
@@ -43,14 +42,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     async connectedCallback() {
-      console.log('connec')
+        super.connectedCallback();
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
-        super.connectedCallback();
     }
 
     isViewMode(mode) {
@@ -98,12 +96,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       };
     }
     async saveConcept(e: any){
-      this.selectedConcept = this.concepts[e.target.id]
+      const selectedConcept = this.concepts[e.target.id]
       const data = await GQLMutate(`
       mutation {
         updateAssignment(
           id: "${this.assignmentId}"
-          conceptsIds: "${this.selectedConcept.id}"
+          conceptsIds: "${selectedConcept.id}"
         ) {
           id
         }
@@ -117,7 +115,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             query {
                 assignment${this.assignmentId}: Assignment(id: "${this.assignmentId}") {
                     title,
-                    lesson {
+                    course {
                         id
                     }
                     concepts{
@@ -151,11 +149,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (key: string, value: any) => {
-          this.action = {
-              type: 'SET_PROPERTY',
-              key,
-              value
-          };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'learningStructure',
+            value
+        };
       }, (error: any) => {
           console.log(error);
       });
@@ -168,7 +167,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             mutation {
                 createAssignment(
                   title: "${title}"
-                  lessonId: "${this.lessonId}"
+                  courseId: "${this.courseId}"
                   authorId: "${this.user ? this.user.id : null}"
                 ) {
                     id
@@ -191,8 +190,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('subjects')) this.subjects = state.components[this.componentId].subjects;
         if (Object.keys(state.components[this.componentId] || {}).includes('concepts')) this.concepts = state.components[this.componentId].concepts;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
+        if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         this.assignment = state[`assignment${this.assignmentId}`];
-        this.lessonId = this.assignment ? this.assignment.lesson.id : this.lessonId;
         this.userToken = state.userToken;
         this.user = state.user;
     }

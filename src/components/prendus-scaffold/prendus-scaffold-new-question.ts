@@ -43,14 +43,20 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
     }
     async connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     /**
      * Called when numberOfAnswers is set
      */
-    initCurrentQuestionScaffold(): void {
-      this.action = initCurrentQuestionScaffold(this.numberOfAnswers);
-    }
+    // initCurrentQuestionScaffold(): void {
+    //   this.action = initCurrentQuestionScaffold(this.numberOfAnswers);
+    // }
     /**
      * Checks if the question and answer have been entered and aren't empty and if
      * the inputs aren't empty.
@@ -62,7 +68,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
           const answer: string = this.shadowRoot.querySelector('#answer') ? this.shadowRoot.querySelector('#answer').value : null;
           const answers: string[] = getAnswers(this, answer);
           this.action = setDisabledNext(!isDefinedAndNotEmpty([question, answer]))
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, question, null, answers, null)
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, question, null, answers, null)
         }
       } catch(error) {
         console.error(error);
@@ -87,6 +93,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
 
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
     }
 }

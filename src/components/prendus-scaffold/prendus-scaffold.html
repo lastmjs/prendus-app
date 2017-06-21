@@ -9,11 +9,9 @@
 <link rel="import" href="prendus-scaffold-distractors.html">
 <link rel="import" href="prendus-scaffold-comments.html">
 <link rel="import" href="prendus-scaffold-explanation.html">
-<!-- <link rel="import" href="prendus-scaffold-rate-question.html"> -->
-<!-- <link rel="import" href="prendus-scaffold-take-quiz.html"> -->
 <link rel="import" href="prendus-scaffold-final-question.html">
-<!-- <link rel="import" href="prendus-scaffold-resource.html"> -->
-<!-- <link rel="import" href="prendus-scaffold-concept.html"> -->
+<link rel="import" href="prendus-scaffold-resource.html">
+<link rel="import" href="prendus-scaffold-concept.html">
 
 <dom-module id="prendus-scaffold">
     <template>
@@ -134,7 +132,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-concept my-index="1" selected-index="[[selectedIndex]]" concepts="[[concepts]]"></prendus-scaffold-concept>
+                <prendus-scaffold-concept my-index="2" selected-index="[[selectedIndex]]" concepts="[[concepts]]"></prendus-scaffold-concept>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -148,7 +146,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-resource my-index="2" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
+                <prendus-scaffold-resource my-index="3" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -199,23 +197,6 @@
                   You have now submitted the first part of the assignment. For the next part, you will rate other questions for difficulty, quality, and accuracy.
                 </div>
               </div>
-              <!-- Move the rate question to a seperate component -->
-              <!-- <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
-                <div>
-                  <div class="prendus-card centered">
-                    <h3> Rate question [[plusOne(index)]]</h3>
-                  </div>
-                  <prendus-scaffold-rate-question my-index="[[calculateRateIndex(index)]]" selected-index="[[selectedIndex]]" scaffold="[[item]]"></prendus-scaffold-rate-question>
-                </div>
-              </template> -->
-              <!-- Move the Take Quiz to another component -->
-              <!-- <div>
-                <div class="prendus-card centered">
-                  <h3>Take quiz</h3>
-                </div>
-                <prendus-scaffold-take-quiz course-id="[[courseId]]" quiz-id="[[questionScaffoldQuizId]]" my-index="[[calculateTakeIndex(index)]]" selected-index="[[selectedIndex]]"></prendus-scaffold-take-quiz>
-              </div> -->
-
             </iron-pages>
           </div>
 

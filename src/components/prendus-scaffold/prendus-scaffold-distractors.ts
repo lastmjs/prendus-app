@@ -41,18 +41,18 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     }
     connectedCallback() {
         super.connectedCallback();
-    }
-
-
-    numberOfAnswersSet(): void {
-      // - 1 because there are numberOfAnswers - 1 amount of distractors.
-      // This array determines how many distractors will be in the html
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'distractors',
-          value: Array(this.numberOfAnswers - 1)
-      };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'distractors',
+            value: Array(3)
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
     }
 
     disableNext(): void {
@@ -60,7 +60,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const distractors: string[] = getDistractors(this);
           this.action = setDisabledNext(!isDefinedAndNotEmpty(distractors));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, null, null, distractors, null);
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, distractors, null);
         }
 
       } catch(error) {
@@ -79,6 +79,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
+        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('distractors')) this.distractors = state.components[this.componentId].distractors;
         this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;

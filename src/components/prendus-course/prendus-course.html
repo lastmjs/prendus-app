@@ -23,15 +23,15 @@
                     </template>
                 </dom-if>
                 <br>
-                <div>Lessons</div>
-                  <dom-repeat items="[[lessons]]">
+                <div>Assignments</div>
+                  <dom-repeat items="[[assignments]]">
                       <template>
                           <div>
-                              <a href="lesson/[[item.id]]/view">[[item.title]]</a>
+                              <a href="assignment/[[item.id]]/view">[[item.title]]</a>
 
                               <dom-if if="[[isEditMode(mode)]]">
                                   <template>
-                                      <a href="lesson/[[item.id]]/edit">Edit</a>
+                                      <a href="assignment/[[item.id]]/edit">Edit</a>
                                   </template>
                               </dom-if>
                           </div>
@@ -41,7 +41,7 @@
                 <dom-if if="[[!isCreateMode(mode)]]">
                     <template>
                         <button>
-                            <a href="lesson/create?courseId=[[courseId]]">Add lesson</a>
+                            <a href="assignment/create?courseId=[[courseId]]">Add assignment</a>
                         </button>
                     </template>
                 </dom-if>

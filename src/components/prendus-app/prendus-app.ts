@@ -25,7 +25,9 @@ class PrendusApp extends Polymer.Element {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
     }
-    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createLessonRouteActive: any, viewLessonRouteActive: any, editLessonRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any) {
+
+    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any) {
+
         if (rootRouteActive) return 'rootView';
 
         if (signupRouteActive) return 'signupView';
@@ -35,10 +37,6 @@ class PrendusApp extends Polymer.Element {
         if (createCourseRouteActive) return 'createCourseView';
         if (viewCourseRouteActive) return 'viewCourseView';
         if (editCourseRouteActive) return 'editCourseView';
-
-        if (createLessonRouteActive) return 'createLessonView';
-        if (viewLessonRouteActive) return 'viewLessonView';
-        if (editLessonRouteActive) return 'editLessonView';
 
         if (createAssignmentRouteActive) return 'createAssignmentView';
         if (viewAssignmentRouteActive) return 'viewAssignmentView';

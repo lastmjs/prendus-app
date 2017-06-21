@@ -39,6 +39,12 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
     }
     connectedCallback() {
         super.connectedCallback();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         this.subscribeToData();
     }
 
