@@ -15,25 +15,65 @@
 <link rel="import" href="../../node_modules/@npm-polymer/app-route/app-location.html">
 <link rel="import" href="../../node_modules/@npm-polymer/app-route/app-route.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
+<link rel="import" href="../../node_modules/@npm-polymer/paper-styles/typography.html">
+<link rel="import" href="../../node_modules/@npm-polymer/paper-styles/color.html">
 
 <dom-module id="prendus-app">
     <template>
         <style>
-            .viewQuestionContainer {
-                display: grid;
-                grid-template-rows: 1fr;
-                grid-template-columns: 1fr;
-                justify-items: center;
-                align-items: center;
-            }
+          :host {
+    				display: block;
+            background-color: #fafafa;
+            min-height: calc(100vh);
+    			}
+  				:root {
+  					--prendus-primary-color: var(--paper-indigo-500);
+  					--prendus-primary-color-emphasis: var(--paper-indigo-700);
+  					--prendus-primary-color-light: var(--paper-indigo-50);
+  					--prendus-off-white: #fafafa;
+  					--prendus-grey: #f0f0f0;
+  					--prendus-green: var(--paper-green-500);
+  					--prendus-blue: var(--paper-blue-500);
+  					--prendus-yellow: var(--paper-yellow-500);
+  					--prendus-red: var(--paper-red-500);
+  				}
+          * {
+  					font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  					word-wrap: break-word;
+  					min-width: 0;
+  				}
+          code {
+  					font-family: 'Inconsolata', 'Monaco', 'Consolas', 'Courier New', Courier;
+  					font-size: .9em;
+  					background-color: var(--prendus-grey)
+  				}
+          .viewQuestionContainer {
+              display: grid;
+              grid-template-rows: 1fr;
+              grid-template-columns: 1fr;
+              justify-items: center;
+              align-items: center;
+          }
 
-            .viewQuestionWrapper {
-                box-shadow: 0px 0px 3px grey;
-                padding-top: 25px;
-                padding-bottom: 25px;
-                padding-left: calc(25px + 5vw);
-                padding-right: calc(25px + 5vw);
-            }
+          .viewQuestionWrapper {
+              box-shadow: 0px 0px 3px grey;
+              padding-top: 25px;
+              padding-bottom: 25px;
+              padding-left: calc(25px + 5vw);
+              padding-right: calc(25px + 5vw);
+          }
+          .prendus-card {
+  					border-radius: 2px;
+  					padding: 15px;
+  					background-color: white;
+
+  					/* material design shadows */
+  					@apply(--shadow-elevation-2dp);
+  				}
+
+  				.prendus-card--no-padding {
+  					padding: 0;
+  				}
         </style>
 
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
