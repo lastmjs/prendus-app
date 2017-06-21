@@ -192,6 +192,12 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
         };
     }
 
+    submit() {
+        this.dispatchEvent(new CustomEvent('submit', {
+            bubbles: false
+        }));
+    }
+
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
