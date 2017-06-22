@@ -70,8 +70,17 @@
                   <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
               </div>
             </div>
-            <prendus-question-review-quiz questions="[[quizQuestions]]"></prendus-question-review-quiz>
+            <dom-if if="[[hasQuestions(quizQuestions)]]">
+              <template>
+                <prendus-question-review-quiz questions="[[quizQuestions]]"></prendus-question-review-quiz>
+              </template>
+            </dom-if>
         </iron-pages>
+        <dom-if if="[[!hasQuestions(quizQuestions)]]">
+            <template>
+              <p>No Questions have been made yet for this assignment</p>
+            </template>
+        </dom-if>
         <dom-if if="[[!loaded]]">
             <template>
                 Loading...

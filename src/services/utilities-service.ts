@@ -75,3 +75,8 @@ export function createUUID() {
 	var uuid = s.join("");
 	return uuid;
 }
+
+export function navigate(redirectUrl: string) {
+    window.history.pushState({}, '', redirectUrl || '/');
+    window.dispatchEvent(new CustomEvent('location-changed'));
+}

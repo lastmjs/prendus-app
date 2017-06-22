@@ -156,6 +156,7 @@ class PrendusQuestionReview extends Polymer.Element {
                 }
             }
         `, this.userToken, (key: string, value: Question[]) => {
+            if(value){
               const questionsToReview = shuffleArray(value.questions).slice(0,3);
               const quizQuestions = shuffleArray(value.questions).slice(0,5);
               this.action = {
@@ -170,6 +171,15 @@ class PrendusQuestionReview extends Polymer.Element {
                   key: 'quizQuestions',
                   value: quizQuestions
               };
+            }else{
+              this.action = {
+                  type: 'SET_COMPONENT_PROPERTY',
+                  componentId: this.componentId,
+                  key: 'questions',
+                  value: null
+              };
+            }
+
         }, (error: any) => {
             console.log(error);
         });
@@ -209,7 +219,10 @@ class PrendusQuestionReview extends Polymer.Element {
           value: qScaffolds
       };
     }
-
+    //Checks if questions exist. If not, notifies the user. 
+    hasQuestions(item: any) {
+      return item.id && item.title;
+    }
     async submit(e: any): Promise<void> {
       try {
         const questionId: string = e.target.id;

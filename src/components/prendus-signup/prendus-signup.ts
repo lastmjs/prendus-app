@@ -3,7 +3,7 @@ import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -152,10 +152,10 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             return data;
         }
 
-        function navigate(redirectUrl) {
-            window.history.pushState({}, '', redirectUrl || '/');
-            window.dispatchEvent(new CustomEvent('location-changed'));
-        }
+        // function navigate(redirectUrl) {
+        //     window.history.pushState({}, '', redirectUrl || '/');
+        //     window.dispatchEvent(new CustomEvent('location-changed'));
+        // }
     }
 
     stateChange(e: CustomEvent) {
