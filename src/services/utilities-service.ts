@@ -77,6 +77,6 @@ export function createUUID() {
 }
 
 export function navigate(redirectUrl: string) {
-    window.history.pushState({}, '', redirectUrl || '/');
+    window.history.pushState({}, '', redirectUrl);
     window.dispatchEvent(new CustomEvent('location-changed'));
 }

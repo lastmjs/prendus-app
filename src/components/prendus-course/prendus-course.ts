@@ -97,7 +97,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }) {
                     id
                     title
-                    assignmentType
                 }
                 Course(id: "${this.courseId}") {
                     title

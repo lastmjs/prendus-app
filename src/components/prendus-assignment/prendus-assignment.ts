@@ -196,12 +196,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
 
-        const reviewData = await GQLMutate(`
+        const data = await GQLMutate(`
             mutation {
                 createAssignment(
                   title: "${title}"
                   courseId: "${this.courseId}"
-                  assignmentType: REVIEW
                   authorId: "${this.user ? this.user.id : null}"
                 ) {
                     id
@@ -214,27 +213,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'assignmentId',
-            value: reviewData.createAssignment.id
-        };
-        const createData = await GQLMutate(`
-            mutation {
-                createAssignment(
-                  title: "${title}"
-                  courseId: "${this.courseId}"
-                  assignmentType: CREATE
-                  authorId: "${this.user ? this.user.id : null}"
-                ) {
-                    id
-                }
-            }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'assignmentId',
-            value: createData.createAssignment.id
+            value: data.createAssignment.id
         };
         navigate(`/course/${this.courseId}/edit`)
     }
