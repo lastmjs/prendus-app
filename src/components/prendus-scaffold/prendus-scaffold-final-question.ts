@@ -93,10 +93,9 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
         });
         const convertedQuestion: Question = {
             ...this.questionScaffold.convertedQuestion,
-            author: this.userToken,
+            author: this.user,
             text: convertedTextAndCode.text,
             code: convertedTextAndCode.code,
-            license: 'attribution',
             // This will be implemented soon
             // concept: 'NOT_IMPLEMENTED',
             explanation: this.questionScaffold.explanation,
@@ -132,8 +131,8 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      Object.keys(question.answerComments).forEach(async function(key) {
-          await GQLMutate(`
+      Object.keys(question.answerComments).forEach((key) => {
+          GQLMutate(`
             mutation {
               createAnswerComment(
                 text: "${question.answerComments[key]}"

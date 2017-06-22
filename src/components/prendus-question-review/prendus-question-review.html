@@ -5,6 +5,7 @@
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
 <link rel="import" href="../../node_modules/@npm-polymer/paper-slider/paper-slider.html">
 <link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
+<link rel="import" href="prendus-question-review-quiz.html">
 
 <dom-module id="prendus-question-review">
     <template>
@@ -63,6 +64,13 @@
                 </div>
               </div>
             </template>
+            <div>
+              Congratulations you have finished the review of the questions. You will now take 5 questions.
+              <div class="submit-button">
+                  <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+              </div>
+            </div>
+            <prendus-question-review-quiz questions="[[quizQuestions]]"></prendus-question-review-quiz>
         </iron-pages>
         <dom-if if="[[!loaded]]">
             <template>

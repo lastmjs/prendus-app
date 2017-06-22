@@ -1,0 +1,19 @@
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-quiz/prendus-quiz.html">
+
+<dom-module id="prendus-question-review-quiz">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style>
+        </style>
+        <prendus-quiz quiz-id = "[[quizId]]" on-submit="submitQuiz"></prendus-quiz>
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script src="prendus-question-review-quiz.ts"></script>
+</dom-module>
