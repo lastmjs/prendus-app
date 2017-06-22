@@ -25,10 +25,6 @@ class PrendusApp extends Polymer.Element {
 
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        //Maybe need to put this in every component
-        if(!this.user){
-           navigate(`/authenticate/view`)
-        }
     }
 
     getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any) {
