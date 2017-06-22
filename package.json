@@ -1,6 +1,6 @@
 {
   "name": "prendus-graphql-demo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
     "start": "cd src && npm install && node_modules/.bin/zwitterion-production --port 5000",
