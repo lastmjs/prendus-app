@@ -27,8 +27,8 @@
                   <dom-repeat items="[[assignments]]">
                       <template>
                           <div>
-                              <a href="assignment/[[item.id]]/view">[[item.title]]</a>
-
+                              <a href="assignment/[[item.id]]/view?assignmentType=CREATE">[[item.title]] (Create)</a>
+                              <a href="assignment/[[item.id]]/view?assignmentType=REVIEW">[[item.title]] (Review)</a>
                               <dom-if if="[[isEditMode(mode)]]">
                                   <template>
                                       <a href="assignment/[[item.id]]/edit">Edit</a>

@@ -6,7 +6,7 @@ import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 import {AssignmentType} from '../../typings/assignment-type';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
@@ -145,7 +145,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     async loadData() {
         await GQLQuery(`
             query {
-                assignment${this.assignmentId}: Assignment(id: "${this.assignmentId}") {
+                Assignment(id: "${this.assignmentId}") {
                     title,
                     course {
                         id
@@ -158,8 +158,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {
             this.action = {
-                type: 'SET_PROPERTY',
-                key,
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'assignment',
                 value
             };
         }, (error: any) => {
@@ -214,6 +215,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'assignmentId',
             value: data.createAssignment.id
         };
+        navigate(`/course/${this.courseId}/edit`)
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
@@ -225,7 +227,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentType')) this.assignmentType = state.components[this.componentId].assignmentType;
-        this.assignment = state[`assignment${this.assignmentId}`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('assignment')) this.assignment = state.components[this.componentId].assignment;
         this.userToken = state.userToken;
         this.user = state.user;
     }

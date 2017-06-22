@@ -6,7 +6,7 @@ import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -103,7 +103,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (key: string, value: any) => {
-          console.log('key', key, 'value', value)
         }, (error: any) => {
             console.log(error);
         });
@@ -117,7 +116,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'course',
-            value: data.course
+            value: data.Course
         };
     }
 
@@ -167,6 +166,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'courseId',
             value: data.updateOrCreateCourse.id
         };
+        navigate(`/course/${data.updateOrCreateCourse.id}/edit`)
     }
 
     stateChange(e: CustomEvent) {

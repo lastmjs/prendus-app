@@ -1,5 +1,6 @@
 import {Course} from './course';
 import {User} from './user';
+import {AssignmentType} from './assignment-type'
 
 export interface Assignment {
     readonly id: string;
