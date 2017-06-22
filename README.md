@@ -8,4 +8,5 @@
 - [ ] Keep the old version
 - [ ] Copy all functions
   - [ ] Change the JWTs
+  - [ ] Change the endpoints
 - [ ] Copy all permissions
