@@ -54,25 +54,33 @@ class PrendusScaffoldDistractors extends Polymer.Element {
             value: true
         };
     }
-
+    enableNext(){
+      const distractors: string[] = this.getDistractors(this);
+      if(isDefinedAndNotEmpty(distractors)){
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
+        };
+      }else{
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: true
+        };
+      }
+    }
     disableNext(): void {
-      try {
-        if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          const distractors: string[] = getDistractors(this);
-          this.action = setDisabledNext(!isDefinedAndNotEmpty(distractors));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, distractors, null);
-        }
-
-      } catch(error) {
-        console.error(error);
+      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
+        const distractors: string[] = this.getDistractors(this);
+        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, distractors, null);
       }
-
-      function getDistractors(context: PrendusScaffoldDistractors): string[] {
-        return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-          const id: string = `#distractor${index}`;
-          return context.shadowRoot.querySelector(id) ? context.shadowRoot.querySelector(id).value : null;
-        });
-      }
+    }
+    getDistractors(context: PrendusScaffoldDistractors): string[] {
+      return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
+        const id: string = `#distractor${index}`;
+        return context.shadowRoot.querySelector(id) ? context.shadowRoot.querySelector(id).value : null;
+      });
     }
     plusOne(index: number): number {
       return index + 1;

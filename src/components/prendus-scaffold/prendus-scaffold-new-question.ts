@@ -51,28 +51,30 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
         };
     }
 
-    /**
-     * Called when numberOfAnswers is set
-     */
-    // initCurrentQuestionScaffold(): void {
-    //   this.action = initCurrentQuestionScaffold(this.numberOfAnswers);
-    // }
-    /**
-     * Checks if the question and answer have been entered and aren't empty and if
-     * the inputs aren't empty.
-     */
+    enableNext(e:any): void{
+      const question: string = this.shadowRoot.querySelector('#question') ? this.shadowRoot.querySelector('#question').value : null;
+      const answer: string = this.shadowRoot.querySelector('#answer') ? this.shadowRoot.querySelector('#answer').value : null;
+      if(question && answer){
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
+        };
+      }else{
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: true
+        };
+      }
+    }
     disableNext(e: any): void {
-      try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const question: string = this.shadowRoot.querySelector('#question') ? this.shadowRoot.querySelector('#question').value : null;
           const answer: string = this.shadowRoot.querySelector('#answer') ? this.shadowRoot.querySelector('#answer').value : null;
           const answers: string[] = getAnswers(this, answer);
-          this.action = setDisabledNext(!isDefinedAndNotEmpty([question, answer]))
           this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, question, null, answers, null)
         }
-      } catch(error) {
-        console.error(error);
-      }
 
       function getAnswers(context: PrendusScaffoldNewQuestion, text: string): string[] {
         const newAnswers: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = {

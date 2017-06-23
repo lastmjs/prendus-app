@@ -71,6 +71,11 @@ class PrendusScaffoldConcept extends Polymer.Element {
           key: 'conceptId',
           value: this.concepts[e.target.id].id
       };
+      this.action = {
+          type: 'SET_PROPERTY',
+          key: 'disableNext',
+          value: false
+      };
     }
 
     stateChange(e: CustomEvent) {

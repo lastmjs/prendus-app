@@ -1,4 +1,4 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
@@ -60,7 +60,7 @@
                 [[item.text]]
               </div>
               <div class="prendus-card right-column">
-                <textarea id="comment[[index]]" label="Comment [[plusOne(index)]]" on-value-changed="disableNext"></textarea>
+                <textarea id="comment[[index]]" label="Comment [[plusOne(index)]]" on-input="enableNext"></textarea>
               </div>
             </div>
           </template>
