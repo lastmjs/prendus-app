@@ -27,9 +27,9 @@
                   <dom-repeat items="[[assignments]]">
                       <template>
                           <div>
-                              <a href="assignment/[[item.id]]/view?assignmentType=CREATE">[[item.title]] (Create)</a>LTI Link http://prendus.com/api/lti/assignment/[[item.id]]/assignment-type/CREATE
+                              <a href="assignment/[[item.id]]/view?assignmentType=CREATE">[[item.title]] (Create)</a>LTI Link https://prenduslearning.com/api/lti/assignment/[[item.id]]/assignment-type/CREATE
                               <br>
-                              <a href="assignment/[[item.id]]/view?assignmentType=REVIEW">[[item.title]] (Review)</a>LTI Link http://prendus.com/api/lti/assignment/[[item.id]]/assignment-type/REVIEW
+                              <a href="assignment/[[item.id]]/view?assignmentType=REVIEW">[[item.title]] (Review)</a>LTI Link https://prenduslearning.com/lti/assignment/[[item.id]]/assignment-type/REVIEW
                               <dom-if if="[[isEditMode(mode)]]">
                                   <template>
                                       <a href="assignment/[[item.id]]/edit">Edit</a>
