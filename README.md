@@ -10,3 +10,4 @@
   - [ ] Change the JWTs
   - [ ] Change the endpoints
 - [ ] Copy all permissions
+- [ ] Use the Dokku letsencrypt plugin: https://github.com/dokku/dokku-letsencrypt
