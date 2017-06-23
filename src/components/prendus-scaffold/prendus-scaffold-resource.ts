@@ -44,14 +44,26 @@ class PrendusScaffoldResource extends Polymer.Element {
             value: true
         };
     }
+    enableNext(): void {
+      if(this.shadowRoot.querySelector('#resourceInput').value == ''){
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: true
+        };
+      }else{
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
+        };
+      }
+
+    }
     disableNext(): void {
-      try {
-        if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          const resource = this.shadowRoot.querySelector('#resourceInput').value;
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, resource, null, null, null);
-        }
-      } catch(error) {
-        console.error(error);
+      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
+        const resource = this.shadowRoot.querySelector('#resourceInput').value;
+        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, resource, null, null, null);
       }
     }
     stateChange(e: CustomEvent) {

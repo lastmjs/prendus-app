@@ -1,4 +1,4 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
@@ -28,11 +28,11 @@
         <div class="wrapper">
           <div>
             <h3>Question</h3>
-            <textarea id="question" value="[[question]]" on-value-changed="disableNext"></textarea>
+            <textarea id="question" value="[[question]]" on-input="enableNext"></textarea>
           </div>
           <div>
             <h3>Correct Answer</h3>
-            <textarea id="answer" value="[[answer]]" on-value-changed="disableNext"></textarea>
+            <textarea id="answer" value="[[answer]]" on-input="enableNext"></textarea>
           </div>
         </div>
     </template>

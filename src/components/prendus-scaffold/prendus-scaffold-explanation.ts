@@ -41,15 +41,24 @@ class PrendusScaffoldExplanation extends Polymer.Element {
             value: true
         };
     }
-
+    enableNext(){
+      if(isDefinedAndNotEmpty(this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null)){
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
+        };
+      }else{
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: true
+        };
+      }
+    }
     disableNext(): void {
-      try {
-        if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          this.action = setDisabledNext(isDefinedAndNotEmpty(this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, null, this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null);
-        }
-      } catch(error) {
-        console.error(error);
+      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
+        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, null, this.shadowRoot.querySelector('#explanation') ? this.shadowRoot.querySelector('#explanation').value : null);
       }
     }
 
