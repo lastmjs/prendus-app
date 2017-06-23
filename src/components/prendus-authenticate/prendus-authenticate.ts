@@ -28,19 +28,8 @@ class PrendusAuthenticate extends Polymer.Element {
         }
     }
 
-    getTail(redirectUrl: string, linkLtiAccount: string) {
-        if (redirectUrl && linkLtiAccount) {
-            return `?redirectUrl=${redirectUrl}&linkLtiAccount=${linkLtiAccount}`;
-        }
-        else if (redirectUrl) {
-            return `?redirectUrl=${redirectUrl}`;
-        }
-        else if (linkLtiAccount) {
-            return `?linkLtiAccount=${linkLtiAccount}`;
-        }
-        else {
-            return '';
-        }
+    getTail() {
+        return window.location.search;
     }
 }
 
