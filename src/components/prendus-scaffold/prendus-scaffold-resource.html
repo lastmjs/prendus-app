@@ -1,10 +1,13 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <dom-module id="prendus-scaffold-resource">
     <template>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-      <input id="resourceInput" on-input="enableNext" type="text"></input>
+      <div>
+        <paper-input id="resourceInput" on-input="enableNext" type="text"></paper-input>
+      </div>
     </template>
 
     <script src="prendus-scaffold-resource.ts"></script>
