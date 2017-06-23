@@ -5,7 +5,7 @@ import {ContainerElement} from '../../typings/container-element';
 import {Concept} from '../../typings/concept';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusScaffold extends Polymer.Element {
     componentId: string;
@@ -92,6 +92,11 @@ class PrendusScaffold extends Polymer.Element {
             key: 'disableNext',
             value: false
         };
+
+      }
+      if(this.selectedIndex === (this.shadowRoot.querySelector('#iron-pages').items.length - 1)) {
+        this.shadowRoot.querySelector('#next-button').style.display = 'none';
+        this.shadowRoot.querySelector('#back-button').style.display = 'none';
       }
     }
     stateChange(e: CustomEvent) {
