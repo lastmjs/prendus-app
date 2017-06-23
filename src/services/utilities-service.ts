@@ -21,7 +21,7 @@ export function getGraphcoolWebSocketEndpoint() {
 
 export function getPrendusLTIServerOrigin() {
     if (process.env.NODE_ENV === 'production') {
-        return 'https://prenduslearning.com';
+        return 'https://api.prendus.com';
     }
     else {
         return 'http://localhost:5000';
