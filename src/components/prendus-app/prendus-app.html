@@ -12,6 +12,7 @@
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
+<link rel="import" href="../prendus-ui/prendus-dropdown.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -20,7 +21,13 @@
 
 <dom-module id="prendus-app">
     <template>
-
+      <style>
+        #navbar{
+          display: inline-flex;
+          flex-wrap: nowrap;
+          grid-template-columns: 20% 20% 20% 20% 20%;
+        }
+      </style>
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
 
         <!--TODO get rid of the two-way data binding, listen to events and integrate with Redux-->
@@ -57,28 +64,37 @@
 
         <app-route route="[[route]]" pattern="/question/:questionId/view" data="{{viewQuestionRouteData}}" active="{{viewQuestionRouteActive}}"></app-route>
 
-        <a href="/">Prendus</a>
 
-        <dom-if if="[[user]]">
+        <div id="navbar">
+          <dom-if if="[[user]]">
             <template>
-                [[user.email]]
-                <button on-click="logout">
-                    Logout
-                </button>
+              <a href="/">Prendus</a>
+              <prendus-drop-down button-text="[[user.email]]" button-type="recommended" button-title="Your account and courses" horizontal-align="right" responsive>
+                <a href="/profile">Your account</a>
+                <a href="/">Your courses</a>
+                <!-- <template is="dom-if" if="[[isAdmin]]">
+                  <a href="/learning-structure">Learning structure</a>
+                  <a href="/teacher-approval">Teacher Approval</a>
+                </template> -->
+                <button on-click="logout">Log out</button>
+              </prendus-drop-down>
+
             </template>
-        </dom-if>
+          </dom-if>
 
-        <dom-if if="[[!user]]">
-          <template>
-            <button>
-                <a href="signup">Signup</a>
-            </button>
+          <dom-if if="[[!user]]">
+            <template>
+              <a href="/">Prendus</a>
+              <button>
+                  <a href="signup">Signup</a>
+              </button>
 
-            <button>
-                <a href="login">Login</a>
-            </button>
-          </template>
-        </dom-if>
+              <button>
+                  <a href="login">Login</a>
+              </button>
+            </template>
+          </dom-if>
+        </div>
 
         <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
         <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
