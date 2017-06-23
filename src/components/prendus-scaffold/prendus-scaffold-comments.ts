@@ -45,25 +45,34 @@ class PrendusScaffoldComments extends Polymer.Element {
             value: true
         };
     }
-
-    disableNext(): void {
-      try {
-        if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-          const comments: string[] = getComments(this);
-          this.action = setDisabledNext(!isDefinedAndNotEmpty(comments));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, comments, null, null);
-        }
-      } catch(error) {
-        console.error(error);
-      }
-
-      function getComments(context: PrendusScaffoldComments): string[] {
-        return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-          return context.shadowRoot.querySelector(`#comment${index}`) ? context.shadowRoot.querySelector(`#comment${index}`).value : null;
-        });
+    enableNext(){
+      const comments: string[] = this.getComments(this);
+      if(isDefinedAndNotEmpty(comments)){
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
+        };
+      }else{
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: true
+        };
       }
     }
-
+    disableNext(): void {
+      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
+        const comments: string[] = this.getComments(this);
+        this.action = setDisabledNext(!isDefinedAndNotEmpty(comments));
+        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, comments, null, null);
+      }
+    }
+    getComments(context: PrendusScaffoldComments): string[] {
+      return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
+        return context.shadowRoot.querySelector(`#comment${index}`) ? context.shadowRoot.querySelector(`#comment${index}`).value : null;
+      });
+    }
     plusOne(index: number): number {
       return index + 1;
     }

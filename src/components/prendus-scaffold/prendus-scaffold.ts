@@ -55,13 +55,17 @@ class PrendusScaffold extends Polymer.Element {
         this.action = initCurrentQuestionScaffold(4);
     }
     back(): void {
-      --this.selectedIndex;
       // this.action = Actions.setDisabledNext(false);
+      this.action = {
+          type: 'SET_PROPERTY',
+          key: 'disableNext',
+          value: false
+      };
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
-          key: 'setDisabledNext',
-          value: false
+          key: 'selectedIndex',
+          value: this.selectedIndex -1
       };
     }
 
@@ -76,14 +80,17 @@ class PrendusScaffold extends Polymer.Element {
           key: 'selectedIndex',
           value: nextIndex
       };
-      if(this.selectedIndex === this.shadowRoot.querySelector('#iron-pages').items.length - 1) {
+      this.action = {
+          type: 'SET_PROPERTY',
+          key: 'disableNext',
+          value: true
+      };
+      if(this.selectedIndex === (this.shadowRoot.querySelector('#iron-pages').items.length - 2)) {
         // Reached the limit.
-        //this.action = Actions.setDisabledNext(true);
         this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'setDisabledNext',
-            value: true
+            type: 'SET_PROPERTY',
+            key: 'disableNext',
+            value: false
         };
       }
     }

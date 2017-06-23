@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../prendus-style/prendus-drow-down.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-navbar">
+    <template>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <p>[[user.email]]</p>
+
+        <!-- <paper-header-panel>
+            <paper-toolbar>
+              <a id="home-link" href="/"><img id="logo" src="../../images/navbar-logo.png" alt="Prendus"></a>
+              <template is="dom-if" if="[[user.email]]">
+                <p>In the user</p>
+    						<prendus-drop-down button-text="[[user]]" button-type="recommended" button-title="Your account and courses" horizontal-align="right" responsive>
+    							<a href="/profile">Your account</a>
+    							<a href="/courses/home">Your courses</a>
+    							<template is="dom-if" if="[[isAdmin]]">
+    								<a href="/learning-structure">Learning structure</a>
+    								<a href="/teacher-approval">Teacher Approval</a>
+    							</template>
+    							<button on-tap="logOutUser">Log out</button>
+    						</prendus-drop-down>
+              </template>
+              <template is="dom-if" if="[[!user]]">
+                <a class="prendus-button prendus-button--recommended navbar-text" href="/login">Log In</a>
+                <a class="prendus-button prendus-button--recommended navbar-text" href="/signup">Sign Up</a>
+              </template>
+            </paper-toolbar>
+        </paper-header-panel> -->
+    </template>
+
+    <script src="prendus-navbar.ts"></script>
+</dom-module>
