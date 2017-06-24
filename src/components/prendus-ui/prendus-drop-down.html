@@ -1,7 +1,7 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-dropdown/iron-dropdown.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../prendus-styles.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="prendus-styles.html">
 
 <dom-module id="prendus-drop-down">
 
@@ -62,7 +62,7 @@
 
 		<!-- MENU BUTTON -->
 		<!-- NOTE: use on-up here in order to maintain menu functionality -->
-		<button id="drop-down-button" class$="[[classes]]" title$="[[buttonTitle]]" on-keydown="toggleMenuWithKeyboard" on-up="toggleMenu">
+		<button id="drop-down-button" class$="[[classes]]" title$="[[buttonTitle]]" on-keydown="toggleMenuWithKeyboard" on-up="toggleMenu" on-click="toggleMenu">
 			<template is="dom-if" if="[[buttonIcon]]">
 			  <iron-icon id="button-icon" icon="[[buttonIcon]]"></iron-icon>
 			</template>
@@ -71,7 +71,7 @@
 			<iron-icon id="menu-icon" icon="menu"></iron-icon>
 		</button>
 		<!-- MENU ITEMS -->
-		<div id="drop-down-container" on-tap="toggleMenu">
+		<div id="drop-down-container" on-click="toggleMenu">
 			<iron-dropdown id="drop-down" horizontal-align="[[horizontalAlign]]" no-auto-focus allow-outside-scroll>
 				<div id="drop-down-items-container" class="dropdown-content prendus-card prendus-card--no-padding">
 					<content></content>

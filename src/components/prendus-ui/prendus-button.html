@@ -1,0 +1,118 @@
+<dom-module id="prendus-button">
+    <template>
+      <style>
+      .prendus-button {
+        color: black;
+        font-size: 1em;
+        background-color: var(--paper-grey-200);
+        border-radius: 3px;
+        padding: .7em 1.4em;
+        box-sizing: border-box;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+      }
+
+      .prendus-button:hover {
+        text-decoration: none;
+        background-color: var(--paper-grey-300);
+      }
+
+      .prendus-button:focus {
+        font-weight: bold;
+        outline: none;
+      }
+
+      .prendus-button[disabled] {
+        color: var(--paper-grey-500);
+        background-color: var(--paper-grey-200);
+        cursor: default;
+      }
+
+      .prendus-button[disabled]:hover {
+        background-color: var(--paper-grey-200);
+      }
+
+      .prendus-button iron-icon {
+        height: 1.3em;
+        width: 1.3em;
+        flex-shrink: 0;
+      }
+
+      .prendus-button > * + * {
+        margin-left: 5px;
+      }
+
+      .prendus-button--recommended {
+        color: white;
+        background-color: var(--prendus-primary-color);
+      }
+
+      .prendus-button--recommended:hover {
+        background-color: var(--prendus-primary-color-emphasis);
+      }
+
+      .prendus-button--minor {
+        color: var(--prendus-primary-color);
+        background: none;
+      }
+
+      .prendus-button--minor:hover {
+        text-decoration: underline;
+        background: none;
+      }
+
+      .prendus-button--destructive {
+        color: var(--paper-red-500);
+        background-color: white;
+      }
+
+      .prendus-button--destructive:hover {
+        color: white;
+        background-color: var(--paper-red-500);
+      }
+
+      .prendus-button--big {
+        font-size: 1.1em;
+        padding: .9em 1.8em;
+      }
+
+      /* Formats buttons in any div with the class "buttons" */
+      .buttons .prendus-button + .prendus-button {
+        margin-left: 5px;
+      }
+
+      /* For buttons that look like inline text links */
+      .prendus-link-button {
+        color: var(--prendus-primary-color);
+        background-color: inherit;
+        font-size: 1em;
+        padding: 0;
+        cursor: pointer;
+        border: none;
+        display: inline;
+      }
+
+      .prendus-link-button:hover {
+        text-decoration: underline;
+      }
+
+      .prendus-icon-button {
+        flex-shrink: 0;
+        cursor: pointer;
+        opacity: .6;
+        color: initial;
+      }
+
+      .prendus-icon-button:hover {
+        opacity: 1;
+      }
+      </style>
+      <button class="prendus-button"><button>
+    </template>
+    <script src="prendus-button.ts"></script>
+
+</dom-module>

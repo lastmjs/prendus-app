@@ -104,12 +104,6 @@ class PrendusApp extends Polymer.Element {
         this.user = state.user;
         this.userToken = state.userToken;
 
-        // console.log(state);
-        // console.log(state);
-        //
-        // this.route = state.route;
-        // this.routeData = state.routeData;
-        // this.queryParams = state.queryParams;
     }
 }
 

@@ -219,9 +219,9 @@ class PrendusQuestionReview extends Polymer.Element {
           value: qScaffolds
       };
     }
-    //Checks if questions exist. If not, notifies the user. 
+    //Checks if questions exist. If not, notifies the user.
     hasQuestions(item: any) {
-      return item.id && item.title;
+      return item;
     }
     async submit(e: any): Promise<void> {
       try {
