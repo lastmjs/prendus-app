@@ -5,6 +5,7 @@
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="prendus-question-review-quiz.html">
 
 <dom-module id="prendus-question-review">
@@ -47,7 +48,6 @@
                   <!--TODO fix this description -->
                 </div>
                 <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
-                <div>[[item.resource]]</div>
                 <div class="wrapper">
                     <div class="quality">
                       Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>

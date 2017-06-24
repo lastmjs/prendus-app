@@ -1,4 +1,4 @@
-export class PrendusDropDown {
+class PrendusDropDown extends Polymer.Element implements ContainerElement {
 
   public is: string;
 	public buttonType: string;
@@ -8,15 +8,15 @@ export class PrendusDropDown {
 	public properties: any;
 	public querySelector: any;
 
-  beforeRegister(): void {
-    this.is = 'prendus-drop-down';
-		this.properties = {
-			classes: {
-				type: String,
-				value: 'prendus-button',
-				computed: '_computeClasses(buttonType)'
-			}
-		}
+  static get is() { return 'prendus-drop-down'; }
+  static get properties() {
+      return {
+        classes: {
+  				type: String,
+  				value: 'prendus-button',
+  				computed: '_computeClasses(buttonType)'
+  			}
+      };
   }
 
 	_computeClasses(type: string): string {
@@ -24,7 +24,9 @@ export class PrendusDropDown {
 	}
 
 	toggleMenu(e: any): void {
-		const items: any = this.querySelector('#drop-down');
+		const items: any = this.shadowRoot.querySelector('#drop-down');
+    console.log('items', items)
+    items.open();
 		items.toggle();
 	}
 
@@ -37,4 +39,4 @@ export class PrendusDropDown {
 
 }
 
-Polymer(PrendusDropDown);
+window.customElements.define(PrendusDropDown.is, PrendusDropDown);

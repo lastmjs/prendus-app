@@ -12,10 +12,11 @@
 <link rel="import" href="prendus-scaffold-final-question.html">
 <link rel="import" href="prendus-scaffold-resource.html">
 <link rel="import" href="prendus-scaffold-concept.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-scaffold">
     <template>
-        <style>
+        <style include ="prendus-styles">
         .content {
           display: grid;
           grid-template-columns: 50% 50%;
@@ -145,7 +146,7 @@
                       Use any resource pertinent to the class or online - a textbook, youtube link, Wikipedia article.
                     </li>
                     <li>
-                      Do not copy material from the resource. Anything plaigarized will be removed and your instructor will be notified. 
+                      Do not copy material from the resource. Anything plaigarized will be removed and your instructor will be notified.
                     </li>
                   </ol>
                 </div>
@@ -202,7 +203,6 @@
               </div>
             </iron-pages>
           </div>
-
           <template is="dom-if" if="[[selectedIndex]]">
             <div class="back">
               <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>
