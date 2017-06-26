@@ -3,7 +3,7 @@ import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
 export function getGraphcoolHTTPEndpoint() {
     if (process.env.NODE_ENV === 'production') {
-        return '';
+        return 'https://api.graph.cool/simple/v1/cj48qaw2u6uyd01411y8gj8fr';
     }
     else {
         return 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
@@ -12,7 +12,7 @@ export function getGraphcoolHTTPEndpoint() {
 
 export function getGraphcoolWebSocketEndpoint() {
     if (process.env.NODE_ENV === 'production') {
-        return '';
+        return 'wss://subscriptions.us-west-2.graph.cool/v1/cj48qaw2u6uyd01411y8gj8fr';
     }
     else {
         return 'wss://subscriptions.graph.cool/v1/cj36de9q4dem00134bhkwm44r';
@@ -21,7 +21,7 @@ export function getGraphcoolWebSocketEndpoint() {
 
 export function getPrendusLTIServerOrigin() {
     if (process.env.NODE_ENV === 'production') {
-        return 'https://prenduslearning.com';
+        return 'https://api.prendus.com';
     }
     else {
         return 'http://localhost:5000';
