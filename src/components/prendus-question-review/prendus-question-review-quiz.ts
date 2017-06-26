@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext} from '../../redux/actions'
+import {setDisabledNext, checkForUserToken} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
@@ -32,6 +32,8 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
               observer: "generateQuiz"
             },
             assignmentId: {
+            },
+            user:{
             }
         };
     }

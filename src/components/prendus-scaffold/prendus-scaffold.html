@@ -1,9 +1,9 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
-<link rel="import" href="../../node_modules/@npm-polymer/iron-pages/iron-pages.html">
-<link rel="import" href="../../node_modules/@npm-polymer/iron-icon/iron-icon.html">
-<link rel="import" href="../../node_modules/@npm-polymer/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="prendus-scaffold-new-question.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
@@ -12,10 +12,11 @@
 <link rel="import" href="prendus-scaffold-final-question.html">
 <link rel="import" href="prendus-scaffold-resource.html">
 <link rel="import" href="prendus-scaffold-concept.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-scaffold">
     <template>
-        <style>
+        <style include ="prendus-styles">
         .content {
           display: grid;
           grid-template-columns: 50% 50%;
@@ -142,7 +143,10 @@
                       Make sure the resource aligns with a concept
                     </li>
                     <li>
-                      Create a question in a <span class="bold">topic area that you are struggling with.</span>
+                      Use any resource pertinent to the class or online - a textbook, youtube link, Wikipedia article.
+                    </li>
+                    <li>
+                      Do not copy material from the resource. Anything plaigarized will be removed and your instructor will be notified.
                     </li>
                   </ol>
                 </div>
@@ -173,15 +177,13 @@
               </div>
               <div>
                 <div class="prendus-card big">
-                  Now, add in correct and incorrect answer comments based on the <b>misconceptions you identified</b>
-                  in the previous problem.
+                  Add comments to the question that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
                 <prendus-scaffold-comments my-index="6" selected-index="[[selectedIndex]]"></prendus-scaffold-comments>
               </div>
               <div>
                 <div class="prendus-card big">
-                  Finally, add an explanation <b>that explains how to solve </b>the problem.  Remember to
-                  <b> highlight common misconceptions</b> with the problem in your explanation.
+                  Finally, add an explanation about the question. Why does the question fit with the concept you selected? Explain any other pertinent information about the question.
                 </div>
                 <prendus-scaffold-explanation my-index="7" selected-index="[[selectedIndex]]"></prendus-scaffold-explanation>
               </div>
@@ -199,7 +201,6 @@
               </div>
             </iron-pages>
           </div>
-
           <template is="dom-if" if="[[selectedIndex]]">
             <div class="back">
               <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>

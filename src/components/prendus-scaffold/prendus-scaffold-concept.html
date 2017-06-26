@@ -1,5 +1,9 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
 
 <dom-module id="prendus-scaffold-concept">
     <template>
@@ -8,11 +12,15 @@
         <dom-if if="[[loaded]]">
             <template>
               <div id ="concepts">
-                <dom-repeat items="[[concepts]]">
-                  <template>
-                      <h4 id="[[index]]" on-click="saveConcept">[[item.title]]</h4>
-                  </template>
-                </dom-repeat>
+                <paper-dropdown-menu label="Concept">
+                  <paper-listbox slot="dropdown-content" selected="1">
+                    <dom-repeat items="[[concepts]]">
+                      <template>
+                          <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
+                      </template>
+                    </dom-repeat>
+                  </paper-listbox>
+                </paper-dropdown-menu>
               </div>
             </template>
         </dom-if>

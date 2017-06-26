@@ -1,7 +1,8 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="prendus-scaffold-new-question">
     <template>
@@ -28,11 +29,11 @@
         <div class="wrapper">
           <div>
             <h3>Question</h3>
-            <textarea id="question" value="[[question]]" on-input="enableNext"></textarea>
+            <paper-textarea id="question" value="[[question]]" on-input="enableNext"></paper-textarea>
           </div>
           <div>
             <h3>Correct Answer</h3>
-            <textarea id="answer" value="[[answer]]" on-input="enableNext"></textarea>
+            <paper-textarea id="answer" value="[[answer]]" on-input="enableNext"></paper-textarea>
           </div>
         </div>
     </template>
