@@ -46,11 +46,8 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
 
     async generateQuiz(){
-      console.log('user', this.user)
-      console.log('questions', this.questions)
       const questionIds = this.questions.map(function(a) {return a.id;});
       const questionIdsString = `["${questionIds.join('","')}"]`;
-      console.log('questionIds', questionIdsString)
       const data = await GQLMutate(`
           mutation {
               createQuiz(
@@ -64,7 +61,6 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
       `, this.userToken, (error: any) => {
           alert(error);
       });
-      console.log('this.data', this.data)
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
