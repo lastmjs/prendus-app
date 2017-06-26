@@ -1,7 +1,9 @@
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/polymer.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../node_modules/@npm-polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="prendus-scaffold-explanation">
     <template>
@@ -41,7 +43,7 @@
                 </div>
                 <div class="prendus-card right-column">
                   <h3>Explanation</h3>
-                  <textarea id="explanation" label="Explanation" value="[[explanation]]" on-input="enableNext"></textarea>
+                  <paper-textarea id="explanation" label="Explanation" value="[[explanation]]" on-input="enableNext"></paper-textarea>
                 </div>
               </div>
 

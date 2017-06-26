@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext} from '../../redux/actions'
+import {setDisabledNext, checkForUserToken} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
@@ -32,6 +32,8 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
               observer: "generateQuiz"
             },
             assignmentId: {
+            },
+            user:{
             }
         };
     }
@@ -44,8 +46,11 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
 
     async generateQuiz(){
+      console.log('user', this.user)
+      console.log('questions', this.questions)
       const questionIds = this.questions.map(function(a) {return a.id;});
       const questionIdsString = `["${questionIds.join('","')}"]`;
+      console.log('questionIds', questionIdsString)
       const data = await GQLMutate(`
           mutation {
               createQuiz(
@@ -59,6 +64,7 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
       `, this.userToken, (error: any) => {
           alert(error);
       });
+      console.log('this.data', this.data)
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
