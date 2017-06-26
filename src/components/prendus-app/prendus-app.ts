@@ -95,8 +95,8 @@ class PrendusApp extends Polymer.Element {
       if (this.userToken){
         this.action = removeUser();
         this.action = removeUserToken();
+        navigate(`/signup`)
       }
-
     }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;

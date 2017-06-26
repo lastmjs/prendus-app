@@ -118,10 +118,10 @@
 
         <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive)]]">
 
-            <prendus-courses show="rootView"></prendus-courses>
+            <prendus-courses class="app-window" show="rootView"></prendus-courses>
 
 
-            <prendus-signup class="app-window"  show="signupView" redirect-url="[[queryParams.redirectUrl]]"></prendus-signup>
+            <prendus-signup show="signupView" redirect-url="[[queryParams.redirectUrl]]"></prendus-signup>
             <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]"></prendus-login>
             <prendus-authenticate show="authenticateView" redirect-url="[[queryParams.redirectUrl]]" link-lti-account="[[queryParams.linkLtiAccount]]" assignment-type="[[queryParams.assignmentType]]" active="[[authenticateRouteActive]]"></prendus-authenticate>
 

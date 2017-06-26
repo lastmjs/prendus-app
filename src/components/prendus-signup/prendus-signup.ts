@@ -93,6 +93,46 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                 return false;
             }
         }
+        function hardValidateEmail(): void {
+      		const emailElement: any = this.shadowRoot.querySelector('#email');
+      		emailElement.validate();
+      	}
+
+      	function softValidateEmail(): void {
+      		const emailElement: any = this.shadowRoot.querySelector('#email');
+      		if(this.email.match(ConstantsService.EMAIL_REGEX) !== null) emailElement.invalid = false;
+      	}
+        function hardValidatePassword(): void {
+      		const passwordElement: any = this.querySelector('#password');
+      		passwordElement.validate();
+      	}
+
+      	function softValidatePassword(): void {
+      		const passwordElement: any = this.querySelector('#password');
+      		if(this.password.length >= 6) passwordElement.invalid = false;
+      	}
+
+      	function hardValidateConfirmPassword(): void {
+      		const confirmPasswordElement: any = this.querySelector('#confirm-password');
+      		if(this.password !== this.confirmPassword) confirmPasswordElement.invalid = true;
+      	}
+
+      	function softValidateConfirmPassword(): void {
+      		const confirmPasswordElement: any = this.querySelector('#confirm-password');
+      		if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
+      	}
+
+      	function enableSignup(userType: string, email: string, password: string, confirmPassword: string): boolean {
+      		return	userType !== ''
+      				&&	email.match(ConstantsService.EMAIL_REGEX) !== null
+      				&&	password !== ''
+      				&&	confirmPassword !== ''
+      				&&	password === confirmPassword;
+      	}
+
+      	function createUserOnEnter(e: any): void {
+      		if(e.keyCode === 13 && this.enableSignup(this.userType, this.email, this.password, this.confirmPassword)) this.createUser(e);
+      	}
 
         async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
@@ -151,11 +191,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
             return data;
         }
-
-        // function navigate(redirectUrl) {
-        //     window.history.pushState({}, '', redirectUrl || '/');
-        //     window.dispatchEvent(new CustomEvent('location-changed'));
-        // }
+        navigate(`/`)
     }
 
     stateChange(e: CustomEvent) {
