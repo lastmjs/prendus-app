@@ -7,11 +7,12 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="prendus-question-review-quiz.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-question-review">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-        <style>
+        <style include="prendus-styles">
           .wrapper {
             margin-top: 10px;
             display: grid;
@@ -72,7 +73,7 @@
             </div>
             <dom-if if="[[hasQuestions(quizQuestions)]]">
               <template>
-                <prendus-question-review-quiz questions="[[quizQuestions]]"></prendus-question-review-quiz>
+                <prendus-question-review-quiz questions="[[quizQuestions]]" user="[[user]]"></prendus-question-review-quiz>
               </template>
             </dom-if>
         </iron-pages>

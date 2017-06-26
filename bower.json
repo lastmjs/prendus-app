@@ -37,7 +37,8 @@
     "paper-item": "PolymerElements/paper-item#^2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.0",
-    "paper-slider": "PolymerElements/paper-slider#^2.0.1"
+    "paper-slider": "PolymerElements/paper-slider#^2.0.1",
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0"

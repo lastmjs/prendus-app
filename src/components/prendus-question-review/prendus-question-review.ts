@@ -60,6 +60,7 @@ class PrendusQuestionReview extends Polymer.Element {
             key: 'loaded',
             value: true
         };
+        console.log('loading')
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
