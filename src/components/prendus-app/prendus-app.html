@@ -1,15 +1,15 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/webcomponentsjs/webcomponents-loader.js">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../bower_components/app-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
-<link rel="import" href="../../bower_components/app-layout/app-header.html">
-<link rel="import" href="../../bower_components/app-layout/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
 <link rel="import" href="../prendus-assignment/prendus-assignment.html">
@@ -113,7 +113,6 @@
             </dom-if>
           <app-toolbar>
         </app-header>
-        </div>
 
         <br>
 
@@ -132,9 +131,9 @@
                 </div>
             </div>
 
-            <prendus-course show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
-            <prendus-course show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
-            <prendus-course show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
+            <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
+            <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
+            <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
 
             <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create"></prendus-assignment>
             <prendus-assignment class="app-window" show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.assignmentId]]" assignment-type="[[queryParams.assignmentType]]" mode="view"></prendus-assignment>
@@ -142,17 +141,17 @@
 
             <prendus-learning-structure show="learningStructureView" mode="view"></prendus-learning-structure>
 
-            <prendus-discipline show="createDisciplineView" discipline-id="[[createDisciplineRouteData.disciplineId]]" mode="create"></prendus-discipline>
-            <prendus-discipline show="viewDisciplineView" discipline-id="[[viewDisciplineRouteData.disciplineId]]" mode="view"></prendus-discipline>
-            <prendus-discipline show="editDisciplineView" discipline-id="[[editDisciplineRouteData.disciplineId]]" mode="edit"></prendus-discipline>
+            <prendus-discipline class="app-window" show="createDisciplineView" discipline-id="[[createDisciplineRouteData.disciplineId]]" mode="create"></prendus-discipline>
+            <prendus-discipline class="app-window" show="viewDisciplineView" discipline-id="[[viewDisciplineRouteData.disciplineId]]" mode="view"></prendus-discipline>
+            <prendus-discipline class="app-window" show="editDisciplineView" discipline-id="[[editDisciplineRouteData.disciplineId]]" mode="edit"></prendus-discipline>
 
-            <prendus-subject show="createSubjectView" subject-id="[[createSubjectRouteData.subjectId]]" discipline-id="[[queryParams.disciplineId]]" mode="create"></prendus-subject>
-            <prendus-subject show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view"></prendus-subject>
-            <prendus-subject show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit"></prendus-subject>
+            <prendus-subject class="app-window" show="createSubjectView" subject-id="[[createSubjectRouteData.subjectId]]" discipline-id="[[queryParams.disciplineId]]" mode="create"></prendus-subject>
+            <prendus-subject class="app-window" show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view"></prendus-subject>
+            <prendus-subject class="app-window" show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit"></prendus-subject>
 
-            <prendus-concept show="createConceptView" concept-id="[[createConceptRouteData.subjectId]]" subject-id="[[queryParams.subjectId]]" mode="create"></prendus-subject>
-            <prendus-concept show="viewConceptView" concept-id="[[viewConceptRouteData.subjectId]]" mode="view"></prendus-subject>
-            <prendus-concept show="editConceptView" concept-id="[[editConceptRouteData.subjectId]]" mode="edit"></prendus-subject>
+            <prendus-concept class="app-window" show="createConceptView" concept-id="[[createConceptRouteData.conceptId]]" subject-id="[[queryParams.subjectId]]" mode="create"></prendus-concept>
+            <prendus-concept class="app-window" show="viewConceptView" concept-id="[[viewConceptRouteData.conceptId]]" mode="view"></prendus-concept>
+            <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit"></prendus-concept>
 
         </iron-pages>
     </template>
