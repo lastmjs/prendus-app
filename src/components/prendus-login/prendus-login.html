@@ -1,21 +1,56 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/prendus-styles/prendus-styles.html">
 
 <dom-module id="prendus-login">
     <template>
+      <style include="prendus-styles">
+        :host {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        paper-card {
+          width: 100%;
+          max-width: 320px;
+        }
+
+        #create-account {
+          padding: 16px;
+        }
+      </style>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
         <dom-if if="[[loaded]]">
             <template>
-                <div>
-                    Email: <input id="emailInput" type="text">
+              <paper-card id="login-container" heading="Log in">
+                <form id="login-form" class="card-content" is="iron-form" on-keydown="loginOnEnter">
+                  <paper-input id="email" name="email" label="Email" value="{{email}}" required on-change="hardValidateEmail" on-keyup="softValidateEmail" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address."></paper-input>
+                  <paper-input id="password" name="password" label="Password" value="{{password}}" type="password" required auto-validate error-message="Please enter your password."></paper-input>
+                </form>
+                <div class="card-actions">
+                  <!-- <button class="prendus-button prendus-button--minor" on-tap="openResetPasswordDialog">Forgot password</button> -->
+        					<button class="prendus-button prendus-button--recommended" disabled="[[!enableLogIn(email, password)]]" on-click="loginClick">Log in</button>
                 </div>
+                <div id="create-account">Don't have an account? <a href="/signup">Sign up</a></div>
+              </paper-card>
 
-                <div>
-                    Password: <input id="passwordInput" type="password">
-                </div>
-
-                <button on-click="loginClick">Login</button>
+              <paper-dialog id="reset-password-dialog" with-backdrop>
+                <form is="iron-form">
+                  <h2>Reset password</h2>
+        					<p>Enter your email address below.  We'll send you a link to reset your password.</p>
+                  <paper-input id="reset-password-email" label="Email address" value="{{resetPasswordEmail}}" required auto-validate error-message="Please enter a valid email address." on-keydown="resetPasswordOnEnter"></paper-input>
+        					<div class="buttons">
+        						<button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+        						<button class="prendus-button prendus-button--recommended" disabled$="[[!enableResetPassword(resetPasswordEmail)]]" on-tap="sendResetEmail">Submit</button>
+        					</div>
+                </form>
+              </paper-dialog>
             </template>
         </dom-if>
 

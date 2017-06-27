@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -20,6 +19,7 @@
         paper-card {
           width: 100%;
           max-width: 320px;
+          padding: 15px;
         }
 
         #email-confirmation-dialog {
@@ -44,28 +44,11 @@
             <paper-input id="last-name" name="lastName" label="Last Name"></paper-input>
             <paper-input id="institution" name="Intitution" label="Institution (school)"></paper-input> -->
               <div>By clicking the Signup button below, I agree to the <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md" target="_blank">Terms of Use</a> and the <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md" target="_blank">Privacy Policy</a></div>
-          </form>
+          <!-- </form> -->
           <div class="card-actions">
-            <button class="prendus-button prendus-button--recommended" disabled$="[[!enableSignup(userType, email, password, confirmPassword)]]" on-tap="createUser">Submit</button>
+            <button class="prendus-button prendus-button--recommended" disabled$="[[!enableSignup(userType, email, password, confirmPassword)]]" on-click="signupClick">Submit</button>
           </div>
           </paper-card>
-            <template>
-                <div>
-                    Email: <input id="emailInput" type="text">
-                </div>
-
-                <div>
-                    Password: <input id="passwordInput" type="password">
-                </div>
-
-                <div>
-                    Repeat Password: <input id="repeatPasswordInput" type="password">
-                </div>
-
-                <div>By clicking the Signup button below, I agree to the <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md" target="_blank">Terms of Use</a> and the <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md" target="_blank">Privacy Policy</a></div>
-
-                <button on-click="signupClick">Signup</button>
-            </template>
         </dom-if>
 
         <dom-if if="[[!loaded]]">

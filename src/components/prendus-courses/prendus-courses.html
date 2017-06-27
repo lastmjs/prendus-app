@@ -6,12 +6,10 @@
 <dom-module id="prendus-courses">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-        <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
-        <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
         <dom-if if="[[loaded]]">
             <template>
 
-                <div>My Courses:</div>
+                <div>My Courses</div>
                 <dom-repeat items="[[courses]]">
                     <template>
                         <div>
@@ -19,7 +17,7 @@
                         </div>
                     </template>
                 </dom-repeat>
-
+                
                 <button>
                     <a href="course/create">Add Course</a>
                 </button>
