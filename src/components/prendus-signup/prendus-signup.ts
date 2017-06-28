@@ -61,7 +61,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     }
 
     softValidatePassword(): void {
-      console.log('soft validate ')
 
       const passwordElement: any = this.shadowRoot.querySelector('#password');
       if(this.password.length >= 6) passwordElement.invalid = false;
@@ -73,7 +72,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     }
 
     softValidateConfirmPassword(): void {
-      console.log('soft validate confirm')
       const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
       if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
     }
@@ -201,23 +199,16 @@ function getCookie(name) {
 
 //TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
 function deleteCookie(name) {
-    console.log('document.cookie before', document.cookie);
     document.cookie = document.cookie.split(';').reduce((result, cookieString) => {
         const cookieArray = cookieString.split('=');
         const key = cookieArray[0];
         const value = cookieArray[1];
 
-        console.log('key', key);
-        console.log('name', name);
-
         if (key !== name) {
-            console.log('i am here')
             return `${result};${key}${value}`;
         }
         else {
-            console.log('i am not here')
             return result;
         }
     }, '');
-    console.log('document.cookie after', document.cookie);
 }

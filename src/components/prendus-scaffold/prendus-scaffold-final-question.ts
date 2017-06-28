@@ -75,7 +75,6 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
                 type: AnswerTypes.MultipleChoice
             };
         }))
-        console.log('shuffledAnswers', shuffledAnswers)
         const convertedTextAndCode: {
             text: string,
             code: string

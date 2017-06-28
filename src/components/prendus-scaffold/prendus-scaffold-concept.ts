@@ -65,7 +65,6 @@ class PrendusScaffoldConcept extends Polymer.Element {
       return index + 1;
     }
     saveConcept(e){
-      console.log(this.concepts[e.target.id])
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
