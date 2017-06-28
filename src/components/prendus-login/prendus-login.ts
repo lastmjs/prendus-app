@@ -4,7 +4,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -13,6 +13,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     user: User | null;
     linkLtiAccount: boolean;
     loaded: boolean;
+    redirectUrl: string;
 
     static get is() { return 'prendus-login'; }
     static get properties() {
@@ -66,7 +67,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(gqlUser.User);
         if (this.linkLtiAccount) await addLtiJwtToUser(this.user, this.userToken);
-        navigateHome();
+        navigate(this.redirectUrl);
 
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -122,10 +123,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                 alert(error);
             });
             return data;
-        }
-        function navigateHome() {
-            window.history.pushState({}, '', '/');
-            window.dispatchEvent(new CustomEvent('location-changed'));
         }
 
         function setUserInRedux(user: User): SetPropertyAction {
