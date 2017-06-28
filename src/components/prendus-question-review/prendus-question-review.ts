@@ -206,7 +206,7 @@ class PrendusQuestionReview extends Polymer.Element {
             id: question.id,
             answers: questionScaffoldAnswers,
             question: guiQuestion.stem,
-            concept: question.concept.title,
+            concept: question.concept,
             resource: question.resource,
             explanation: question.explanation,
             convertedQuestion: question

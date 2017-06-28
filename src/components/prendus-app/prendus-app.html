@@ -34,8 +34,8 @@
   				flex-direction: column;
   				align-items: center;
   				position: relative;
+          min-height: calc(100vh - 150px);
   			}
-
   			.app-window {
   				box-sizing: border-box;
   				margin: auto;
@@ -51,7 +51,13 @@
   				width: 60px;
   				height: 60px;
   			}
-
+        .footer-items {
+  	      width: 100%;
+  	      display: flex;
+  	      justify-content: space-between;
+  	      align-items: center;
+          font-size: 15px;
+  	    }
   			@media (max-width: 768px) {
   				.app-window {
   					padding: 10px 20px;
@@ -119,7 +125,7 @@
 
         <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, openSourceRouteActive)]]">
 
-            <prendus-courses show="rootView"></prendus-courses>
+            <prendus-courses class="app-window" show="rootView"></prendus-courses>
 
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
@@ -156,10 +162,18 @@
             <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit"></prendus-concept>
 
         </iron-pages>
+        <app-toolbar>
+          <footer class="footer-items">
+            <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
+            <a target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
+            <a target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
+            <a href="/open-source">Open Source</a>
+            <!-- <a href="/terms-of-service">Terms&nbsp;<span id="terms-of-service" class="long-text">of Service</span></a>
+            <a href="/privacy-policy">Privacy&nbsp;<span id="privacy-policy" class="long-text">Policy</span></a>
+            <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
+          </footer>
+        </app-toolbar>
 
-        <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
-        <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
-        <a href="/open-source">Open Source</a>
 
     </template>
 

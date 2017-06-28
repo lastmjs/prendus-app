@@ -63,15 +63,6 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
         const convertedQuestion = this.convertScaffoldToQuestion()
         const questionId = this.saveQuestion(convertedQuestion)
       }
-      //Go through this next and implement the functionality with quizzes
-      // async function addQuestionToQuiz(quizId: string, question: Question): Promise<string> {
-      //   const questionId: string = await QuestionModel.save(question.id, question);
-      //   const questionIds: string[] = await QuizModel.getQuestionIds(quizId);
-      //
-      //   await QuizModel.associateQuestion(quizId, questionId, questionIds.length);
-      //
-      //   return questionId;
-      // }
     }
 
     convertScaffoldToQuestion(): Question {
@@ -103,9 +94,9 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             resource: this.questionScaffold.resource,
             answerComments: {
                 question0: shuffledAnswers[0].comment,
-                question1: shuffledAnswers[0].comment,
-                question2: shuffledAnswers[0].comment,
-                question3: shuffledAnswers[0].comment
+                question1: shuffledAnswers[1].comment,
+                question2: shuffledAnswers[2].comment,
+                question3: shuffledAnswers[3].comment
             }
         };
         return convertedQuestion;
@@ -120,7 +111,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             authorId: "${this.user.id}"
             assignmentId: "${this.assignmentId}"
             text: "${question.text}"
-            conceptId: "${question.concept}"
+            conceptId: "${question.concept.id}"
             explanation: "${question.explanation}"
             resource: "${question.resource}"
             code: "${code}"

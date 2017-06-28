@@ -4,6 +4,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
+import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -45,6 +46,47 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     subscribeToData() {
 
     }
+    hardValidateEmail(): void {
+      const emailElement: any = this.shadowRoot.querySelector('#email');
+      emailElement.validate();
+    }
+
+    softValidateEmail(): void {
+      const emailElement: any = this.shadowRoot.querySelector('#email');
+      if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+    }
+    hardValidatePassword(): void {
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+      passwordElement.validate();
+    }
+
+    softValidatePassword(): void {
+
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+      if(this.password.length >= 6) passwordElement.invalid = false;
+    }
+
+    hardValidateConfirmPassword(): void {
+      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
+      if(this.password !== this.confirmPassword) confirmPasswordElement.invalid = true;
+    }
+
+    softValidateConfirmPassword(): void {
+      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
+      if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
+    }
+
+    enableSignup(userType: string, email: string, password: string, confirmPassword: string): boolean {
+      return	userType !== ''
+          &&	email.match(EMAIL_REGEX) !== null
+          &&	password !== ''
+          &&	confirmPassword !== ''
+          &&	password === confirmPassword;
+    }
+
+    createUserOnEnter(e: any): void {
+      if(e.keyCode === 13 && this.enableSignup(this.userType, this.email, this.password, this.confirmPassword)) this.createUser(e);
+    }
 
     async signupClick() {
         this.action = {
@@ -54,22 +96,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: false
         };
 
-        const email: string = this.shadowRoot.querySelector('#emailInput').value;
-        const password: string = this.shadowRoot.querySelector('#passwordInput').value;
-        const repeatPassword: string = this.shadowRoot.querySelector('#repeatPasswordInput').value;
-        const passwordsMatch = checkPasswords(password, repeatPassword);
-        if (!passwordsMatch) {
-            alert('passwords must match');
-
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'loaded',
-                value: true
-            };
-
-            return;
-        }
+        const email: string = this.shadowRoot.querySelector('#email').value;
+        const password: string = this.shadowRoot.querySelector('#password').value;
         const signupData = await performSignupMutation(email, password, this.userToken);
         // deleteCookie('ltiJWT');
         // if (this.ltiUserId) await performLTIUserLinkMutation(this.ltiUserId, signupData.createUser.id, this.userToken);
@@ -84,15 +112,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-
-        function checkPasswords(password1: string, password2: string) {
-            if (password === repeatPassword) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
 
         async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
@@ -151,11 +170,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
             return data;
         }
-
-        // function navigate(redirectUrl) {
-        //     window.history.pushState({}, '', redirectUrl || '/');
-        //     window.dispatchEvent(new CustomEvent('location-changed'));
-        // }
     }
 
     stateChange(e: CustomEvent) {
@@ -184,23 +198,16 @@ function getCookie(name) {
 
 //TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
 function deleteCookie(name) {
-    console.log('document.cookie before', document.cookie);
     document.cookie = document.cookie.split(';').reduce((result, cookieString) => {
         const cookieArray = cookieString.split('=');
         const key = cookieArray[0];
         const value = cookieArray[1];
 
-        console.log('key', key);
-        console.log('name', name);
-
         if (key !== name) {
-            console.log('i am here')
             return `${result};${key}${value}`;
         }
         else {
-            console.log('i am not here')
             return result;
         }
     }, '');
-    console.log('document.cookie after', document.cookie);
 }
