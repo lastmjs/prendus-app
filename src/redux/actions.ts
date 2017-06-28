@@ -4,6 +4,7 @@ import {State} from '../typings/state';
 import {Question} from '../typings/question';
 import {QuestionScaffold} from '../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
+import {Concept} from '../typings/concept';
 import {Quiz} from '../typings/quiz';
 
 export function checkForUserToken(): SetPropertyAction | DefaultAction {
@@ -89,7 +90,7 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
   };
 };
 
-export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, concept: string, resource: string, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
+export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, concept: Concept, resource: string, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
   const answersObj: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = getAnswers(currentQuestionScaffold, answers, comments);
   return {
       type: 'SET_PROPERTY',

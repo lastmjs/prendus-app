@@ -20,7 +20,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
     concepts: Concept[]
-    conceptId: string;
+    selectedConcept: Concept
 
     static get is() { return 'prendus-scaffold-concept'; }
     static get properties() {
@@ -55,7 +55,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           // const concepts: string[] = getConcepts(this);
           // this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(comments));
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.conceptId, null, null, null, null, null);
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.selectedConcept, null, null, null, null, null);
         }
       } catch(error) {
         console.error(error);
@@ -65,11 +65,12 @@ class PrendusScaffoldConcept extends Polymer.Element {
       return index + 1;
     }
     saveConcept(e){
+      console.log(this.concepts[e.target.id])
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
-          key: 'conceptId',
-          value: this.concepts[e.target.id].id
+          key: 'selectedConcept',
+          value: this.concepts[e.target.id]
       };
       this.action = {
           type: 'SET_PROPERTY',
@@ -81,7 +82,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        if (Object.keys(state.components[this.componentId] || {}).includes('conceptId')) this.conceptId = state.components[this.componentId].conceptId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedConcept')) this.selectedConcept = state.components[this.componentId].selectedConcept;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
     }
 }

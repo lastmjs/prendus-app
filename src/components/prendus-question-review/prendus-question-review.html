@@ -57,11 +57,14 @@
                       Difficulty<paper-slider id="difficulty" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
                     <div class="accuracy">
-                      Accuracy<paper-slider id="accuracy" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                      Alignment<paper-slider id="accuracy" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
-                    <div class="submit-button">
-                        <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+                    <div class="cheating">
+                      Authenticity<paper-slider id="authenticity" value="[[authenticity]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
+                </div>
+                <div class="submit-button">
+                    <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
                 </div>
               </div>
             </template>
