@@ -4,7 +4,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
-import {ConstantsService} from '../../services/constants-service';
+import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -53,7 +53,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     softValidateEmail(): void {
       const emailElement: any = this.shadowRoot.querySelector('#email');
-      if(this.email.match(ConstantsService.EMAIL_REGEX) !== null) emailElement.invalid = false;
+      if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
     }
     hardValidatePassword(): void {
       const passwordElement: any = this.shadowRoot.querySelector('#password');
@@ -78,7 +78,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     enableSignup(userType: string, email: string, password: string, confirmPassword: string): boolean {
       return	userType !== ''
-          &&	email.match(ConstantsService.EMAIL_REGEX) !== null
+          &&	email.match(EMAIL_REGEX) !== null
           &&	password !== ''
           &&	confirmPassword !== ''
           &&	password === confirmPassword;
@@ -170,7 +170,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
             return data;
         }
-        navigate(`/`)
     }
 
     stateChange(e: CustomEvent) {
