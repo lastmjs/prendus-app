@@ -4,8 +4,8 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
-import {ConstantsService} from '../../services/constants-service';
+import {navigate, createUUID} from '../../services/utilities-service';
+import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -53,17 +53,17 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     }
     hardValidateEmail(): void {
-  		const emailElement: any = this.querySelector('#email');
+  		const emailElement: any = this.shadowRoot.querySelector('#email');
   		emailElement.validate();
   	}
 
   	softValidateEmail(): void {
-  		const emailElement: any = this.querySelector('#email');
-  		if(this.email.match(ConstantsService.EMAIL_REGEX) !== null) emailElement.invalid = false;
+  		const emailElement: any = this.shadowRoot.querySelector('#email');
+  		if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
   	}
 
   	enableLogIn(email: string, password: string): boolean {
-  		return 	email.match(ConstantsService.EMAIL_REGEX) !== null
+  		return 	email.match(EMAIL_REGEX) !== null
   				&&	password.length >= 6;
   	}
 
@@ -72,7 +72,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
   	}
       //Implement these once GraphCool has feature to reset password.
     	// openResetPasswordDialog(): void {
-    	// 	this.querySelector('#reset-password-dialog').open()
+    	// 	this.shadowRoot.querySelector('#reset-password-dialog').open()
     	// }
       //
     	// enableResetPassword(resetPasswordEmail: string): boolean {
