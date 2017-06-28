@@ -1,24 +1,56 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/prendus-styles/prendus-styles.html">
 
 <dom-module id="prendus-courses">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style include="prendus-styles">
+          .courses-container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 800px;
+          }
+          .course-card {
+            margin: 0 20px 20px 0;
+            flex-basis: 30%;
+      			height: 350px;
+            flex-grow: 0;
+            min-width: 0;
+          }
+          .card-content {
+            overflow: hidden;
+    				flex-grow: 1;
+          }
+
+          #delete-button {
+    				background-color: var(--prendus-red);
+            color: white;
+          }
+        </style>
         <dom-if if="[[loaded]]">
             <template>
-
-                <div>My Courses:</div>
-                <dom-repeat items="[[courses]]">
+      				  <h1>Courses</h1>
+                <dom-repeat items="[[courses]]" class="courses-container">
                     <template>
-                        <div>
-                            <a href="course/[[item.id]]/view">[[item.title]]</a> <a href="course/[[item.id]]/edit">Edit</a>
+                      <paper-card class="course-card" heading="[[item.title]]">
+                        <div class="card-actions">
+                          <a href="course/[[item.id]]/edit"><iron-icon id="edit-course" class="prendus-icon-button" icon="create"></iron-icon></a>
+                          <paper-tooltip for="edit-course" offset="0" animation-delay="300">Edit Course</paper-tooltip>
+                            <!-- <paper-icon-button id="delete-course" class="prendus-icon-button" icon="delete" on-tap="openDeleteModal"></paper-icon-button>
+                            <paper-tooltip for="delete-course" offset="0" animation-delay="300">Delete Course</paper-tooltip> -->
                         </div>
+                      </paper-card>
+                        <!-- <div>
+                            <a href="course/[[item.id]]/view">[[item.title]]</a> <a href="course/[[item.id]]/edit">Edit</a>
+                        </div> -->
                     </template>
                 </dom-repeat>
-
-                <a href="course/create">Add Course</a>
+                <a class="prendus-button prendus-button--recommended" href="course/create">Add Course</a>
             </template>
         </dom-if>
 

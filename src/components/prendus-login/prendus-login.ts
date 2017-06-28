@@ -4,7 +4,8 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {navigate, createUUID} from '../../services/utilities-service';
+import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -51,7 +52,39 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     subscribeToData() {
 
     }
+    hardValidateEmail(): void {
+  		const emailElement: any = this.shadowRoot.querySelector('#email');
+  		emailElement.validate();
+  	}
 
+  	softValidateEmail(): void {
+  		const emailElement: any = this.shadowRoot.querySelector('#email');
+  		if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+  	}
+
+  	enableLogIn(email: string, password: string): boolean {
+  		return 	email.match(EMAIL_REGEX) !== null
+  				&&	password.length >= 6;
+  	}
+
+  	loginOnEnter(e: any) {
+  		if(e.keyCode === 13 && this.enableLogIn(this.email, this.password)) this.login();
+  	}
+      //Implement these once GraphCool has feature to reset password.
+    	// openResetPasswordDialog(): void {
+    	// 	this.shadowRoot.querySelector('#reset-password-dialog').open()
+    	// }
+      //
+    	// enableResetPassword(resetPasswordEmail: string): boolean {
+    	// 	return resetPasswordEmail.match(ConstantsService.EMAIL_REGEX) !== null;
+    	// }
+      //
+    	// resetPasswordOnEnter(e: any): void {
+    	// 	if(e.keyCode === 13) {
+    	// 		if(this.enableResetPassword(this.resetPasswordEmail)) this.sendResetEmail(e);
+    	// 		else e.preventDefault();
+    	// 	}
+    	// }
     async loginClick() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -60,8 +93,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             value: false
         };
 
-        const email: string = this.shadowRoot.querySelector('#emailInput').value;
-        const password: string = this.shadowRoot.querySelector('#passwordInput').value;
+        const email: string = this.shadowRoot.querySelector('#email').value;
+        const password: string = this.shadowRoot.querySelector('#password').value;
         const data = await signinUser(email, password, this.userToken);
         const gqlUser = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
