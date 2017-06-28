@@ -1,12 +1,13 @@
 {
   "name": "prendus-graphql-demo",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
-    "start": "npm install -g bower && bower install && cd src && npm install && node_modules/.bin/zwitterion-production --port 5000",
+    "start": "cd src && node_modules/.bin/zwitterion-production --port 5000",
     "dev": "cd src && node_modules/.bin/zwitterion-production --watch-files --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r"
+    "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
+    "install": "npm install -g bower && bower install && cd src && npm install"
   },
   "engines": {
     "node": "8.1.2"
