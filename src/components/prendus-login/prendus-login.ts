@@ -5,7 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
 import {createUUID} from '../../services/utilities-service';
-import {EMAIL_REGEX} from '../../services/constants-service';
+import {ConstantsService} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -59,11 +59,11 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
   	softValidateEmail(): void {
   		const emailElement: any = this.querySelector('#email');
-  		if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+  		if(this.email.match(ConstantsService.EMAIL_REGEX) !== null) emailElement.invalid = false;
   	}
 
   	enableLogIn(email: string, password: string): boolean {
-  		return 	email.match(EMAIL_REGEX) !== null
+  		return 	email.match(ConstantsService.EMAIL_REGEX) !== null
   				&&	password.length >= 6;
   	}
 
