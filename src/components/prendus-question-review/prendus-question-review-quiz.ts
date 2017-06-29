@@ -70,11 +70,13 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
 
     submitQuiz(){
-      window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
+      console.log('questions submitted')
+      window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
           credentials: 'include'
       });
+      alert('Congratulations! You have successfully completed the Assignment')
     }
 
     stateChange(e: CustomEvent) {

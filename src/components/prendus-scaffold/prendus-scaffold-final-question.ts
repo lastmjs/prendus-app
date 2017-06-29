@@ -143,7 +143,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           value: data.createQuestion.id
       };
 
-      window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
+      window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
           credentials: 'include'
