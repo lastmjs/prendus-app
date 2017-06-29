@@ -1,4 +1,4 @@
-import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {setDisabledNext, checkForUserToken} from '../../redux/actions'
@@ -70,11 +70,12 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
     }
 
     submitQuiz(){
-      window.fetch(`${getPrendusLTIServerOrigin()}/api/lti/grade-passback`, {
+      window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
           credentials: 'include'
       });
+      alert('Congratulations! You have successfully completed the Assignment')
     }
 
     stateChange(e: CustomEvent) {
