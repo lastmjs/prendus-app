@@ -2,11 +2,16 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-view-question/prendus-view-question.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-quiz">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-
+        <style include="prendus-styles">
+          #submit-button{
+            border: 1px;
+          }
+        </style>
         <dom-if if="[[loaded]]">
             <template>
                 <div>[[quiz.title]]</div>
@@ -18,13 +23,13 @@
 
                 <dom-if if="[[showNewQuestionButton(currentQuestionIndex, numberOfQuestions)]]">
                     <template>
-                        <button on-click="loadNewQuestion">New Question</button>
+                      <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="loadNewQuestion">New Question</button>
                     </template>
                 </dom-if>
 
                 <dom-if if="[[!showNewQuestionButton(currentQuestionIndex, numberOfQuestions)]]">
                     <template>
-                        <button on-click="submit">Submit</button>
+                      <button class="prendus-button prendus-button--recommended" on-click="submit">Submit Assignment</button>
                     </template>
                 </dom-if>
             </template>
