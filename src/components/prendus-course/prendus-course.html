@@ -2,28 +2,55 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-tooltip. Remove it when possible -->
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-course">
     <template>
         <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <style include="prendus-styles">
+        .edit-section {
+    			display: flex;
+    			align-items: center;
+    		}
 
+    		.edit-section .edit-input {
+    			flex-grow: 1;
+    		}
+
+    		.edit-input {
+    			min-width: 200px;
+    		}
+
+    		.edit-section .edit-button {
+    			align-self: flex-start;
+    			flex-shrink: 0;
+    		}
+        #course-title {
+          --paper-input-container-input: {
+            font-size: 48px;
+          };
+        }
+        .prendus-margin{
+          margin-top: 25px;
+        }
+        </style>
         <dom-if if="[[loaded]]">
             <template>
-                <dom-if if="[[isViewMode(mode)]]">
-                    <template>
-                        <div>[[course.title]]</div>
-                    </template>
-                </dom-if>
-
-                <dom-if if="[[!isViewMode(mode)]]">
-                    <template>
-                        <input id="titleInput" type="text" value="[[course.title]]">
-
-                        <button on-click="saveCourse">Save</button>
-                    </template>
-                </dom-if>
-                <br>
-                <div>Assignments</div>
+              <div class="edit-section">
+    						<h1 hidden$="[[editingTitle]]">[[course.title]]</h1>
+    						<template is="dom-if" if="[[!isViewMode(mode)]]">
+    							<paper-input id="course-title" class="edit-input" hidden$="[[!editingTitle]]" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-change="titleChanged" required auto-validate error-message="Please enter a title."></paper-input>
+    							<paper-icon-button id="edit-title" class="edit-button prendus-icon-button" icon="[[getEditIcon(editingTitle)]]" noink on-tap="toggleEditTitle"></paper-icon-button>
+    							<paper-tooltip for="edit-title" offset="0" animation-delay="300">Click to edit course title</paper-tooltip>
+    						</template>
+    					</div>
+              <h2 class="prendus-margin">Assignments</h2>
+              <dom-if if="[[assignments.length]]">
+                <template>
                   <dom-repeat items="[[assignments]]">
                       <template>
                           <div>
@@ -38,12 +65,16 @@
                           </div>
                       </template>
                   </dom-repeat>
-
-                <dom-if if="[[!isCreateMode(mode)]]">
-                    <template>
-                        <a href="assignment/create?courseId=[[courseId]]">Add assignment</a>
-                    </template>
-                </dom-if>
+                </template>
+              </dom-if>
+              <dom-if if="[[isCreateMode(mode)]]">
+                  <template>
+                      <div>No assignments have been added to the course yet.</div>
+                  </template>
+              </dom-if>
+              <div class="prendus-margin">
+                <a class="prendus-button prendus-button--recommended" href="assignment/create?courseId=[[courseId]]">Add assignment</a>
+              </div>
             </template>
         </dom-if>
 

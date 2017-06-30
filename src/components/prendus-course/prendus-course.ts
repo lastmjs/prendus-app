@@ -18,6 +18,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     loaded: boolean;
     userToken: string;
     user: User;
+    editingTitle: boolean;
 
     static get is() { return 'prendus-course'; }
     static get properties() {
@@ -45,20 +46,22 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
         this.subscribeToData();
     }
 
     isViewMode(mode: Mode) {
+        this.editingTitle = false;
         return mode === 'view';
     }
 
     isEditMode(mode: Mode) {
+        this.editingTitle = false;
         return mode === 'edit';
     }
     isCreateMode(mode: Mode) {
+        this.editingTitle = true;
         return mode === 'create';
     }
 
@@ -86,6 +89,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: true
         };
     }
+    toggleEditTitle(e: any): void {
+      if(this.shadowRoot.querySelector('#course-title').invalid) return;
+      this.editingTitle = !this.editingTitle;
+      if(this.editingTitle) this.shadowRoot.querySelector('#course-title').focus();
+    }
+
+    getEditIcon(editStatus: boolean): string {
+  		return editStatus ? 'check' : 'create';
+  	}
 
     async loadData() {
         const data = await GQLQuery(`
@@ -119,7 +131,48 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: data.Course
         };
     }
+    async titleChanged(e: any){
+      if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
+        //JORDAN!!! You should be so proud of me. This is my first time using object spread!
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'course',
+            value: {
+              ...this.course,
+              title: e.target.value
+            }
+        };
+        this.saveCourse();
+      }else{
+        const data = await GQLMutate(`
+            mutation {
+                createCourse(
+                  title: "${e.target.value}"
+                  authorId: "${this.user.id}"
+                ){
+                  id
+                  title
+                }
+            }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'courseId',
+            value: data.id
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'course',
+            value: data
+        };
+      }
 
+    }
     subscribeToData() {
         GQLSubscribe(`
             subscription changedAssignment {
@@ -139,17 +192,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async saveCourse() {
-        const title = this.shadowRoot.querySelector('#titleInput').value;
-
         const data = await GQLMutate(`
             mutation {
                 updateOrCreateCourse(
                     update: {
                         id: "${this.courseId}"
-                        title: "${title}"
+                        title: "${this.course.title}"
                     }
                     create: {
-                        title: "${title}"
+                        title: "${this.course.title}"
                         authorId: "${this.user.id}"
                     }
                 ) {
