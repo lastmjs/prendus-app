@@ -4,7 +4,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken} from '../../redux/actions';
-import {navigate, createUUID} from '../../services/utilities-service';
+import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service';
 import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
@@ -21,9 +21,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         return {
             redirectUrl: {
                 type: String
-            },
-            linkLtiAccount: {
-                type: Boolean
             }
         };
     }
@@ -99,8 +96,9 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const gqlUser = await getUser(email, password, data.signinUser.token)
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(gqlUser.User);
-        if (this.linkLtiAccount) await addLtiJwtToUser(this.user, this.userToken);
-        navigate(this.redirectUrl);
+        await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
+        navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
+        deleteCookie('redirectUrl');
 
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -177,17 +175,3 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusLogin.is, PrendusLogin);
-
-//TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
-function getCookie(name) {
-    const cookiesObj = document.cookie.split(';').reduce((result, cookieString) => {
-        const cookieArray = cookieString.split('=');
-        const key = cookieArray[0];
-        const value = cookieArray[1];
-        return {
-            ...result,
-            [key]: value
-        };
-    }, {});
-    return cookiesObj[name];
-}

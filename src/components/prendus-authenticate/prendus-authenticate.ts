@@ -11,12 +11,6 @@ class PrendusAuthenticate extends Polymer.Element {
             active: {
                 type: Boolean,
                 observer: 'activeChanged'
-            },
-            redirectUrl: {
-                type: String
-            },
-            linkLtiAccount: {
-                type: Boolean
             }
         };
     }
