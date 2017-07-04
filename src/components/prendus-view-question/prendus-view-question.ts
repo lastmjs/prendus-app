@@ -149,7 +149,9 @@ class PrendusViewQuestion extends Polymer.Element {
     }
 
     getSanitizedText(transformedText: string) {
-        return DOMPurify.sanitize(transformedText);
+        return DOMPurify.sanitize(transformedText, {
+            ADD_ATTR: ['contenteditable']
+        });
     }
 
     checkAnswer() {
