@@ -7,6 +7,12 @@
 <!--TODO ensure that this script does not do a network request for each instance of a question-->
 <script src="../../node_modules/dompurify/dist/purify.min.js"></script>
 
+<!--TODO ensure that this script does not do a network request for each instance of a question-->
+<script src="../../node_modules/esprima/dist/esprima.js"></script>
+
+<!--TODO ensure that this script does not do a network request for each instance of a question-->
+<script src="../../node_modules/escodegen/escodegen.browser.js"></script>
+
 <dom-module id="prendus-view-question">
     <template>
         <style>
@@ -48,7 +54,7 @@
 
         <dom-if if="[[loaded]]">
             <template>
-                <div inner-h-t-m-l="[[getSanitizedText(builtQuestion.transformedText)]]"></div>
+                <div inner-h-t-m-l="[[getSanitizedHTML(builtQuestion.html)]]"></div>
 
                 <!-- <div style="width: 100%; position: relative"> -->
                 <div class="bottomButtons">

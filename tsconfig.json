@@ -3,5 +3,10 @@
         "noImplicitAny": true,
         "strictNullChecks": true,
         "target": "es5"
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "src/node_modules",
+        "src/bower_components"
+    ]
 }

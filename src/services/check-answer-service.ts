@@ -2,70 +2,25 @@ import {UserAnswerInfo} from '../typings/user-answer-info';
 import {ReturnAnswerInfo} from '../typings/return-answer-info';
 import {Answer} from '../typings/answer';
 
-export function checkAnswer(userAnswerInfo: UserAnswerInfo, answer: Answer): ReturnAnswerInfo {
-    try {
-        const answerInputValue = userAnswerInfo.answerInputValue;
-        const userInputsAnswers = userAnswerInfo.userInputsAnswers;
-        const userCheckboxesAnswers = userAnswerInfo.userCheckboxesAnswers;
-        const userRadiosAnswers = userAnswerInfo.userRadiosAnswers;
+export function checkAnswer(code: string, userVariables, userInputs, userEssays, userChecks, userRadios) {
+    let answer;
+    const defineUserVariablesString = userVariables.reduce((result: string, userVariable) => {
+        return `${result}let ${userVariable.varName} = new Number(${userVariable.value});`;
+    }, '');
+    const defineUserInputsString = userInputs.reduce((result: string, userInput) => {
+        return `${result}let ${userInput.varName} = '${userInput.value}';`; //TODO we must protect against single quotes in the user string
+    }, '');
+    const defineUserEssaysString = userEssays.reduce((result: string, userEssay) => {
+        return `${result}let ${userEssay.varName} = '${userEssay.value}';`; //TODO we must protect against single quotes in the user string
+    }, '');
+    const defineUserChecksString = userChecks.reduce((result: string, userCheck) => {
+        return `${result}let ${userCheck.varName} = ${userCheck.checked};`;
+    }, '');
+    const defineUserRadiosString = userRadios.reduce((result: string, userRadio) => {
+        return `${result}let ${userRadio.varName} = ${userRadio.checked};`;
+    }, '');
 
-        const userInputVarNames = Object.keys(userInputsAnswers || {});
-        const userCheckboxVarNames = Object.keys(userCheckboxesAnswers || {});
-        const userRadioVarNames = Object.keys(userRadiosAnswers || {});
+    eval(`${defineUserVariablesString}${defineUserInputsString}${defineUserEssaysString}${defineUserChecksString}${defineUserRadiosString}${code}`);
 
-        if (typeof answer !== 'object') {
-
-            if (answer.toString().toLowerCase() === answerInputValue.toLowerCase()) {
-                return 'Correct';
-            }
-            else {
-                return 'Incorrect';
-            }
-        }
-        else {
-
-            const inputsCorrect = userInputVarNames.reduce((prev: boolean, curr: string) => {
-                const userAnswer: string = userInputsAnswers[curr];
-
-                if (answer[curr].toString().toLowerCase() === userAnswer.toLowerCase()) {
-                    return prev;
-                }
-                else {
-                    return false;
-                }
-            }, true);
-
-            const checkboxesCorrect = userCheckboxVarNames.reduce((prev: boolean, curr: string) => {
-                const userAnswer: boolean = userCheckboxesAnswers[curr];
-
-                if (answer[curr] === userAnswer) {
-                    return prev;
-                }
-                else {
-                    return false;
-                }
-            }, true);
-
-            const radiosCorrect = userRadioVarNames.reduce((prev: boolean, curr: string) => {
-                const userAnswer: boolean = userRadiosAnswers[curr];
-
-                if (answer[curr] === userAnswer) {
-                    return prev;
-                }
-                else {
-                    return false;
-                }
-            }, true);
-
-            if (inputsCorrect && checkboxesCorrect && radiosCorrect) {
-                return 'Correct';
-            }
-            else {
-                return 'Incorrect';
-            }
-        }
-    }
-    catch(error) {
-        return 'No valid answer was provided for this question';
-    }
+    return answer;
 }
