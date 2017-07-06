@@ -72,17 +72,23 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
     openDeleteModal(e: any): void {
       e.stopPropagation();
-			e.preventDefault();
-			// this dialog does not have a backdrop for now because of issues with the
-			// paper-dialog element (see https://github.com/PolymerElements/paper-dialog/issues/7)
-			// this is a hack to prevent stacking errors
-			// this.style.zIndex = 1;
+			e.preventDefault();;
 			this.shadowRoot.querySelector('#confirm-delete-modal').open();
 		}
     deleteCourse(e: any){
       this.shadowRoot.querySelector('#confirm-delete-modal').close();
-      // this.style.zIndex = 0;
-
+      console.log('e.target', e.target.id)
+      // const data = await GQLMutate(`
+      // mutation {
+      //   deleteCourse(
+      //     id: "${this.courseId}"
+      //   ) {
+      //     id
+      //   }
+      // }
+      // `, this.userToken, (error: any) => {
+      //     console.log(error);
+      // });
     }
     subscribeToData() {
         GQLSubscribe(`
