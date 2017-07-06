@@ -77,7 +77,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
 		}
     deleteCourse(e: any){
       this.shadowRoot.querySelector('#confirm-delete-modal').close();
-      console.log('e.target', e.target.id)
       // const data = await GQLMutate(`
       // mutation {
       //   deleteCourse(
