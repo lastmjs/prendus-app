@@ -80,3 +80,22 @@ export function navigate(redirectUrl: string) {
     window.history.pushState({}, '', redirectUrl);
     window.dispatchEvent(new CustomEvent('location-changed'));
 }
+
+//TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
+export function getCookie(name: string) {
+    const cookiesObj = document.cookie.split('; ').reduce((result, cookieString) => {
+        const cookieArray = cookieString.split('=');
+        const key = cookieArray[0];
+        const value = cookieArray[1];
+        return {
+            ...result,
+            [key]: value
+        };
+    }, {});
+    return cookiesObj[name];
+}
+
+//TODO put this into redux somehow. Manage all cookies from Redux.
+export function deleteCookie(name: string) {
+    document.cookie = `${name}=; Max-Age=0; path=/`;
+}

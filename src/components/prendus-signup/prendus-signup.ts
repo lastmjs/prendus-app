@@ -3,7 +3,7 @@ import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {createUUID, navigate, getCookie, deleteCookie} from '../../services/utilities-service';
 import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
@@ -104,7 +104,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         const loginData = await performLoginMutation(email, password, this.userToken);
         this.action = persistUserToken(loginData.signinUser.token);
         this.action = await getAndSetUser(this.userToken);
-        navigate(this.redirectUrl);
+        navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
+        deleteCookie('redirectUrl');
 
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -181,33 +182,3 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusSignup.is, PrendusSignup);
-
-//TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
-function getCookie(name) {
-    const cookiesObj = document.cookie.split(';').reduce((result, cookieString) => {
-        const cookieArray = cookieString.split('=');
-        const key = cookieArray[0];
-        const value = cookieArray[1];
-        return {
-            ...result,
-            [key]: value
-        };
-    }, {});
-    return cookiesObj[name];
-}
-
-//TODO put this into redux somehow. Manage all cookies from Redux. Also, use regex
-function deleteCookie(name) {
-    document.cookie = document.cookie.split(';').reduce((result, cookieString) => {
-        const cookieArray = cookieString.split('=');
-        const key = cookieArray[0];
-        const value = cookieArray[1];
-
-        if (key !== name) {
-            return `${result};${key}${value}`;
-        }
-        else {
-            return result;
-        }
-    }, '');
-}
