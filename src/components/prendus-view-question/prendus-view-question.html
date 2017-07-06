@@ -11,7 +11,7 @@
 <script src="../../node_modules/esprima/dist/esprima.js"></script>
 
 <!--TODO ensure that this script does not do a network request for each instance of a question-->
-<script src="../../node_modules/escodegen/escodegen.browser.js"></script>
+<script src="../../node_modules/escodegen-temp/escodegen.browser.js"></script>
 
 <dom-module id="prendus-view-question">
     <template>
@@ -50,7 +50,6 @@
         </style>
 
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-        <iframe id="secureIframe" sandbox="allow-scripts" style="display: none;" src="services/secure-question-iframe.html"></iframe>
 
         <dom-if if="[[loaded]]">
             <template>

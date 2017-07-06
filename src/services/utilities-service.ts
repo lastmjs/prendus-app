@@ -28,6 +28,15 @@ export function getPrendusLTIServerOrigin() {
     }
 }
 
+export function getPrendusClientOrigin() {
+    if (process.env.NODE_ENV === 'production') {
+        return 'https://prendus.com';
+    }
+    else {
+        return 'http://localhost:8000'
+    }
+}
+
 export const isDefinedAndNotEmpty = (objects: string | string[]): boolean => {
   if(!objects) {
     return false;
@@ -98,4 +107,24 @@ export function getCookie(name: string) {
 //TODO put this into redux somehow. Manage all cookies from Redux.
 export function deleteCookie(name: string) {
     document.cookie = `${name}=; Max-Age=0; path=/`;
+}
+
+export async function asyncMap(collection: any[], behavior: any): Promise<any[]> {
+    if (collection.length === 0) {
+        return [];
+    }
+
+  const obj = await behavior(collection[0]);
+  if (collection.length === 1) {
+    return [obj];
+  }
+  return [obj, ...(await asyncMap(collection.slice(1), behavior))];
+}
+
+export async function asyncForEach(collection: any[], behavior: any): Promise<void> {
+    if (collection.length === 0) {
+        return;
+    }
+    await behavior(collection[0]);
+    await asyncForEach(collection.slice(1), behavior);
 }

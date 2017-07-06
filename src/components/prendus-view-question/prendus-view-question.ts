@@ -2,9 +2,8 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetComponentPropertyAction} from '../../typings/actions';
 import {Question} from '../../typings/question';
 import {BuiltQuestion} from '../../typings/built-question';
-import {buildQuestion} from '../../services/build-question-service';
+import {buildQuestion, checkAnswer} from '../../services/question-service';
 import {UserAnswerInfo} from '../../typings/user-answer-info';
-import {checkAnswer} from '../../services/check-answer-service';
 import {ReturnAnswerInfo} from '../../typings/return-answer-info';
 import {createUUID} from '../../services/utilities-service';
 import {compileToHTML, parse, getAstObjects} from '../../node_modules/assessml/assessml';
@@ -145,7 +144,7 @@ class PrendusViewQuestion extends Polymer.Element {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'builtQuestion',
-            value: buildQuestion(this.question.text, this.question.code)
+            value: await buildQuestion(this.question.text, this.question.code)
         };
     }
 
@@ -155,7 +154,7 @@ class PrendusViewQuestion extends Polymer.Element {
         });
     }
 
-    checkAnswer() {
+    async checkAnswer() {
         const astVariables = getAstObjects(this.builtQuestion.ast, 'VARIABLE');
         const astInputs = getAstObjects(this.builtQuestion.ast, 'INPUT');
         const astEssays = getAstObjects(this.builtQuestion.ast, 'ESSAY');
@@ -190,7 +189,9 @@ class PrendusViewQuestion extends Polymer.Element {
             };
         });
 
-        alert(checkAnswer(this.question.code, userVariables, userInputs, userEssays, userChecks, userRadios) ? 'Correct' : 'Incorrect');
+        const checkAnswerInfo = await checkAnswer(this.question.code, userVariables, userInputs, userEssays, userChecks, userRadios);
+
+        alert(checkAnswerInfo.answer === true ? 'Correct' : checkAnswerInfo.error ? `This question has errors:\n\n${checkAnswerInfo.error}` :'Incorrect');
     }
 
     stateChange(e: CustomEvent) {

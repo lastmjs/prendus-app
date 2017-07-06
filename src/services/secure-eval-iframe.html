@@ -1,0 +1,30 @@
+<script>
+    const evalWorkerSource = `
+        onmessage = function(event) {
+            console.log(event)
+
+            try {
+                eval(event.data);
+            }
+            catch(error) {
+                postMessage({
+                    error: error.toString()
+                });
+            }
+        }
+    `;
+
+    window.addEventListener('message', (event) => {
+        const blob = new window.Blob([evalWorkerSource]);
+        const objectURL = window.URL.createObjectURL(blob);
+        const evalWorker = new Worker(objectURL);
+
+        evalWorker.postMessage(event.data);
+
+        evalWorker.addEventListener('message', (event) => {
+            window.parent.postMessage(Object.assign({}, event.data, {
+                type: 'secure-eval-iframe-result'
+            }), '*');
+        });
+    });
+</script>

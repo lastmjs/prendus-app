@@ -21,7 +21,5 @@
     "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
-  "dependencies": {
-    "escodegen": "git+https://github.com/Prendus/escodegen.git"
-  }
+  "dependencies": {}
 }

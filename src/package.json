@@ -2,7 +2,7 @@
   "dependencies": {
     "assessml": "0.0.3",
     "dompurify": "^0.9.0",
-    "escodegen": "git+https://github.com/Prendus/escodegen.git",
+    "escodegen-temp": "git+https://github.com/Prendus/escodegen-temp.git",
     "esprima": "^4.0.0",
     "redux-store-element": "^1.2.6",
     "zwitterion-production": "0.0.9"
