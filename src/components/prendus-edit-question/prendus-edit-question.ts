@@ -1,7 +1,7 @@
 import {createUUID, navigate} from '../../services/utilities-service';
 import {Question} from '../../typings/question';
 import {SetComponentPropertyAction} from '../../typings/actions';
-import {GQLMutate, GQLQuery} from '../../services/graphql-service';
+import {GQLMutate, GQLQuery, escapeString} from '../../services/graphql-service';
 import {User} from '../../typings/user';
 
 class PrendusEditQuestion extends Polymer.Element {
@@ -158,9 +158,9 @@ class PrendusEditQuestion extends Polymer.Element {
             const data = await GQLMutate(`
                 mutation {
                     createQuestion(
-                        authorId: "${this.user.id}"
-                        text: "${this.question.text}"
-                        code: "${this.question.code}"
+                        authorId: "${escapeString(this.user.id)}"
+                        text: "${escapeString(this.question.text)}"
+                        code: "${escapeString(this.question.code)}"
                     ) {
                         id
                     }
@@ -175,9 +175,9 @@ class PrendusEditQuestion extends Polymer.Element {
             GQLMutate(`
                 mutation {
                     updateQuestion(
-                        id: "${this.questionId}"
-                        text: "${this.question.text}"
-                        code: "${this.question.code}"
+                        id: "${escapeString(this.questionId)}"
+                        text: "${escapeString(this.question.text)}"
+                        code: "${escapeString(this.question.code)}"
                     ) {
                         id
                     }
