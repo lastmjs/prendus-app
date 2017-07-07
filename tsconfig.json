@@ -2,6 +2,12 @@
     "compilerOptions": {
         "noImplicitAny": true,
         "strictNullChecks": true,
-        "target": "es5"
-    }
+        "target": "es5",
+        "lib": ["ES2015", "dom"]
+    },
+    "exclude": [
+        "node_modules",
+        "src/node_modules",
+        "src/bower_components"
+    ]
 }

@@ -8,7 +8,6 @@ import {GuiQuestion} from '../../typings/gui-question';
 import {GuiAnswer} from '../../typings/gui-answer';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {generateGuiData} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 

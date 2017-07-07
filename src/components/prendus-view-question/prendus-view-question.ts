@@ -2,11 +2,11 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {SetComponentPropertyAction} from '../../typings/actions';
 import {Question} from '../../typings/question';
 import {BuiltQuestion} from '../../typings/built-question';
-import {buildQuestion} from '../../services/build-question-service';
+import {buildQuestion, checkAnswer} from '../../services/question-service';
 import {UserAnswerInfo} from '../../typings/user-answer-info';
-import {checkAnswer} from '../../services/check-answer-service';
 import {ReturnAnswerInfo} from '../../typings/return-answer-info';
 import {createUUID} from '../../services/utilities-service';
+import {compileToHTML, parse, getAstObjects} from '../../node_modules/assessml/assessml';
 
 class PrendusViewQuestion extends Polymer.Element {
     componentId: string;
@@ -144,63 +144,54 @@ class PrendusViewQuestion extends Polymer.Element {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'builtQuestion',
-            value: await buildQuestion(this.question, this.shadowRoot.querySelector('#secureIframe'))
+            value: await buildQuestion(this.question.text, this.question.code)
         };
     }
 
-    getSanitizedText(transformedText: string) {
-        return DOMPurify.sanitize(transformedText, {
+    getSanitizedHTML(html: string) {
+        return DOMPurify.sanitize(html, {
             ADD_ATTR: ['contenteditable']
         });
     }
 
-    checkAnswer() {
-        const answerInputValue: string = '';
-        const userInputsAnswers: { [inputName: string]: string } = getUserInputsAnswers(this, this.builtQuestion.uuid, this.builtQuestion.userInputs || []);
-        const userCheckboxesAnswers: { [checkboxName: string]: boolean } = getUserCheckboxesAnswers(this, this.builtQuestion.uuid, this.builtQuestion.userCheckboxes || []);
-        const userRadiosAnswers: { [radioName: string]: boolean } = getUserRadiosAnswers(this, this.builtQuestion.uuid, this.builtQuestion.userRadios || []);
-        const userAnswerInfo: UserAnswerInfo =  {
-            answerInputValue,
-            userInputsAnswers,
-            userCheckboxesAnswers,
-            userRadiosAnswers
-        };
-        const returnAnswerInfo: ReturnAnswerInfo = checkAnswer(userAnswerInfo, this.builtQuestion.answer);
+    async checkAnswer() {
+        const astVariables = getAstObjects(this.builtQuestion.ast, 'VARIABLE');
+        const astInputs = getAstObjects(this.builtQuestion.ast, 'INPUT');
+        const astEssays = getAstObjects(this.builtQuestion.ast, 'ESSAY');
+        const astChecks = getAstObjects(this.builtQuestion.ast, 'CHECK');
+        const astRadios = getAstObjects(this.builtQuestion.ast, 'RADIO');
+        const astDrags = getAstObjects(this.builtQuestion.ast, 'DRAG');
+        const astDrops = getAstObjects(this.builtQuestion.ast, 'DROP');
 
-        alert(returnAnswerInfo);
+        const userVariables = astVariables;
+        const userInputs = astInputs.map((astInput) => {
+            return {
+                varName: astInput.varName,
+                value: this.shadowRoot.querySelector(`#${astInput.varName}`).textContent
+            };
+        });
+        const userEssays = astEssays.map((astEssay) => {
+            return {
+                varName: astEssay.varName,
+                value: this.shadowRoot.querySelector(`#${astEssay.varName}`).value
+            };
+        });
+        const userChecks = astChecks.map((astCheck) => {
+            return {
+                varName: astCheck.varName,
+                checked: this.shadowRoot.querySelector(`#${astCheck.varName}`).checked
+            };
+        });
+        const userRadios = astRadios.map((astRadio) => {
+            return {
+                varName: astRadio.varName,
+                checked: this.shadowRoot.querySelector(`#${astRadio.varName}`).checked
+            };
+        });
 
-        function getUserInputsAnswers(component: PrendusViewQuestion, uuid: string, userInputs: string[]): { [inputName: string]: string } {
-            return userInputs.reduce((prev: { [inputName: string]: string }, curr: string) => {
-                const userInputElement = component.shadowRoot.querySelector(`#${curr}${uuid}`);
-                const userAnswer: string = userInputElement.textContent;
+        const checkAnswerInfo = await checkAnswer(this.question.code, userVariables, userInputs, userEssays, userChecks, userRadios);
 
-                prev[curr] = userAnswer;
-
-                return prev;
-            }, {});
-        }
-
-        function getUserCheckboxesAnswers(component: PrendusViewQuestion, uuid: string, userCheckboxes: string[]): { [checkboxName: string]: boolean } {
-            return userCheckboxes.reduce((prev: { [checkboxName: string]: boolean }, curr: string) => {
-                const userCheckboxElement = component.shadowRoot.querySelector(`#${curr}${uuid}`);
-                const userAnswer: boolean = userCheckboxElement.checked;
-
-                prev[curr] = userAnswer;
-
-                return prev;
-            }, {});
-        }
-
-        function getUserRadiosAnswers(component: PrendusViewQuestion, uuid: string, userRadios: string[]): { [radioName: string]: boolean } {
-            return userRadios.reduce((prev: { [radioName: string]: boolean }, curr: string) => {
-                const userRadioElement = component.shadowRoot.querySelector(`#${curr}${uuid}`);
-                const userAnswer = userRadioElement.checked;
-
-                prev[curr] = userAnswer;
-
-                return prev;
-            }, {});
-        }
+        alert(checkAnswerInfo.answer === true ? 'Correct' : checkAnswerInfo.error ? `This question has errors:\n\n${checkAnswerInfo.error}` :'Incorrect');
     }
 
     stateChange(e: CustomEvent) {
