@@ -8,7 +8,7 @@ import {GuiQuestion} from '../../typings/gui-question';
 import {GuiAnswer} from '../../typings/gui-answer';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {generateGuiData} from '../../services/code-to-question-service'
+import {compileToGuiQuestion} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 
@@ -187,10 +187,7 @@ class PrendusQuestionReview extends Polymer.Element {
     generateQuestionScaffolds(){
       // const questionComments = this.questions.questions;
       const qScaffolds = this.questions.map(function(question: Question){
-        const guiQuestion: GuiQuestion = generateGuiData({
-            text: question.text,
-            code: question.code
-        });
+        const guiQuestion: GuiQuestion = compileToGuiQuestion(question.text, question.code);
         const questionScaffoldAnswers = guiQuestion.answers.reduce((result, guiAnswer: GuiAnswer, index: number) => {
             return {
                 ...result,
