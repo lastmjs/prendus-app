@@ -46,8 +46,17 @@
                     </template>
                 </dom-repeat>
                 <div id="add-course-button">
-                  <a class="prendus-button prendus-button--recommended" href="course/create">Add Course</a>
+                  <button class="prendus-button prendus-button--recommended" on-click="openCreateCourseDialog">Add Course </button>
                 </div>
+                <paper-dialog id="add-course-modal" modal>
+                  <div class="content">
+                    <h2>Add Course</h2>
+                    <paper-input id="titleInput" name="title" label="Course Title" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--recommended" on-click="createCourse">Continue</button>
+                  </div>
+                </paper-dialog>
                 <paper-dialog id="confirm-delete-modal" modal>
             			<div class="content">
             				<h2>Confirm Delete</h2>

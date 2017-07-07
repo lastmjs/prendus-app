@@ -5,7 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {User} from '../../typings/user';
 import {State} from '../../typings/state';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];
@@ -88,6 +88,27 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
       // `, this.userToken, (error: any) => {
       //     console.log(error);
       // });
+    }
+    openCreateCourseDialog(){
+      this.shadowRoot.querySelector('#add-course-modal').open();
+    }
+    async createCourse(){
+      const title = this.shadowRoot.querySelector('#titleInput').value;
+      const data = await GQLMutate(`
+          mutation {
+              createCourse(
+                title: "${title}"
+                authorId: "${this.user.id}"
+              ){
+                id
+                title
+              }
+          }
+      `, this.userToken, (error: any) => {
+          console.log(error);
+      });
+      this.shadowRoot.querySelector('#add-course-modal').close();
+      navigate(`/course/${data.createCourse.id}/edit`)
     }
     subscribeToData() {
         GQLSubscribe(`
