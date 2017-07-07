@@ -27,7 +27,7 @@ class PrendusApp extends Polymer.Element {
         this.action = await getAndSetUser();
     }
 
-    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, openSourceRouteActive: any) {
+    getSelectedView(rootRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, openSourceRouteActive: any) {
 
         if (rootRouteActive) return 'rootView';
 
@@ -60,6 +60,7 @@ class PrendusApp extends Polymer.Element {
 
         if (viewQuestionRouteActive) return 'viewQuestionView';
         if (createQuestionRouteActive) return 'createQuestionView';
+        if (editQuestionRouteActive) return 'editQuestionView';
     }
     //
     // subscribedToStore() {

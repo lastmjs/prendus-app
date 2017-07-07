@@ -102,6 +102,7 @@
 
         <app-route route="[[route]]" pattern="/question/create" data="{{createQuestionRouteData}}" active="{{createQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/view" data="{{viewQuestionRouteData}}" active="{{viewQuestionRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/question/:questionId/edit" data="{{editQuestionRouteData}}" active="{{editQuestionRouteActive}}"></app-route>
 
         <app-header id  ="prendus-navbar">
           <app-toolbar>
@@ -125,7 +126,7 @@
 
         <br>
 
-        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, openSourceRouteActive)]]">
+        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, openSourceRouteActive)]]">
 
             <prendus-courses class="app-window" show="rootView"></prendus-courses>
 
@@ -135,12 +136,13 @@
             <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]"></prendus-login>
             <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]"></prendus-authenticate>
 
-            <div show="viewQuestionView" class="viewQuestionContainer">
+            <div class="viewQuestionContainer">
                 <div class="viewQuestionWrapper">
-                    <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
+                    <prendus-view-question show="viewQuestionView" question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
                 </div>
             </div>
             <prendus-edit-question show="createQuestionView"></prendus-edit-question>
+            <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]"></prendus-edit-question>
 
             <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
