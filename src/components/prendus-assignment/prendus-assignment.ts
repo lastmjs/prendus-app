@@ -70,9 +70,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     isEditMode(mode) {
-        return mode === 'edit' || mode === 'create';
+        return mode === 'edit';
     }
-
+    isCreateMode(mode) {
+        return mode === 'create';
+    }
     async assignmentIdChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -80,9 +82,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             key: 'assignmentId',
             value: this.assignmentId
         };
-
         await this.loadData();
-        await this.loadLearningStructure();
     }
 
     assignmentTypeChanged() {
@@ -127,20 +127,41 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           value: this.subjects[e.target.id].concepts
       };
     }
+    openAssignmentConceptDialog(e: any){
+      if(!this.learningStructure){
+        //TODO Make it so that we listen for changes to the learningStructure.
+        this.loadLearningStructure();
+      }
+      this.shadowRoot.querySelector('#assignmentConceptDialog').open();
+    }
+    closeAssignmentConceptDialog(e){
+      this.shadowRoot.querySelector('#assignmentConceptDialog').close();
+    }
     async saveConcept(e: any){
       const selectedConcept = this.concepts[e.target.id]
+      if(!this.assignmentId){
+        await this.createAssignment();
+      }
       const data = await GQLMutate(`
       mutation {
-        updateAssignment(
-          id: "${this.assignmentId}"
-          conceptsIds: "${selectedConcept.id}"
+        addToAssignmentOnConcepts(
+          assignmentsAssignmentId: "${this.assignmentId}"
+          conceptsConceptId: "${selectedConcept.id}"
         ) {
-          id
+          assignmentsAssignment{
+            title
+          }
+          conceptsConcept{
+            title
+          }
         }
       }
       `, this.userToken, (error: any) => {
           console.log(error);
       });
+      //TODO. This needs to be optimized.
+      this.loadData();
+      this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async loadData() {
         await GQLQuery(`
@@ -162,6 +183,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                 componentId: this.componentId,
                 key: 'assignment',
                 value
+            };
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'courseId',
+                value: value.course.id
             };
         }, (error: any) => {
             console.log(error);
@@ -192,29 +219,48 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           console.log(error);
       });
     }
-
+    async createAssignment(){
+      const title = this.shadowRoot.querySelector('#titleInput').value;
+      const data = await GQLMutate(`
+        mutation {
+            createAssignment(
+              title: "${title}"
+              authorId: "${this.user ? this.user.id : null}"
+              courseId: "${this.courseId}"
+            ) {
+                id
+            }
+        }
+      `, this.userToken, (error: any) => {
+          console.log(error);
+      });
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'assignmentId',
+          value: data.createAssignment.id
+      };
+    }
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
-
-        const data = await GQLMutate(`
+        if(this.assignmentId){
+          const data = await GQLMutate(`
             mutation {
-                createAssignment(
+                updateAssignment(
+                  id: "${this.assignmentId}"
                   title: "${title}"
-                  courseId: "${this.courseId}"
-                  authorId: "${this.user ? this.user.id : null}"
                 ) {
                     id
                 }
             }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'assignmentId',
-            value: data.createAssignment.id
-        };
+          `, this.userToken, (error: any) => {
+              console.log(error);
+          });
+        }else{
+          if(title){
+            this.createAssignment();
+          }
+        }
         navigate(`/course/${this.courseId}/edit`)
     }
     stateChange(e: CustomEvent) {
@@ -225,9 +271,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('subjects')) this.subjects = state.components[this.componentId].subjects;
         if (Object.keys(state.components[this.componentId] || {}).includes('concepts')) this.concepts = state.components[this.componentId].concepts;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
-        if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentType')) this.assignmentType = state.components[this.componentId].assignmentType;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignment')) this.assignment = state.components[this.componentId].assignment;
+        if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
         this.userToken = state.userToken;
         this.user = state.user;
     }
