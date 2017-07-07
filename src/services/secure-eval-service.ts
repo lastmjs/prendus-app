@@ -16,12 +16,12 @@ export function secureEval(code: string): Promise<any> {
         document.body.appendChild(secureEvalIframe);
 
         function windowListener(event: Event) {
-            window.removeEventListener('message', windowListener); // remove the listener to avoid a memory leak
-            document.body.removeChild(secureEvalIframe); // remove the iframe to avoid a memory leak
-
             if (event.data.type !== 'secure-eval-iframe-result') { // Because we are listening to all messages on the window, we must check for only the result from our secure iframe
                 return;
             }
+
+            window.removeEventListener('message', windowListener); // remove the listener to avoid a memory leak
+            document.body.removeChild(secureEvalIframe); // remove the iframe to avoid a memory leak
 
             resolve(event.data);
         }
