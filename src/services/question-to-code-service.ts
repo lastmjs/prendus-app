@@ -10,15 +10,15 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
 	// define text string with question stem and radio buttons
 	const text: string 	= `<p>${guiQuestion.stem}</p>`
 										+ answers.reduce((prevText, answer, index) => {
-		return prevText + `<p>[*]${answer.text}</p>`;
+		return prevText + `<p>[*]${answer.text}[*]</p>`;
 	}, '');
 	// define code string with answers
 	const code: string = answers.reduce((prevCode, answer, index) => {
         if (index === answers.length - 1) {
-            return `${prevCode} choice${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
+            return `${prevCode} radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
         }
         else {
-            return prevCode + `choice${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'}; && `;
+            return prevCode + `radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'} && `;
         }
 	}, 'answer = ');
 

@@ -136,9 +136,9 @@
             <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]"></prendus-login>
             <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]"></prendus-authenticate>
 
-            <div class="viewQuestionContainer">
+            <div show="viewQuestionView" class="viewQuestionContainer">
                 <div class="viewQuestionWrapper">
-                    <prendus-view-question show="viewQuestionView" question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
+                    <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
                 </div>
             </div>
             <prendus-edit-question show="createQuestionView"></prendus-edit-question>
