@@ -76,6 +76,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         return mode === 'create';
     }
     async assignmentIdChanged() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'assignmentId',
+            value: this.assignmentId
+        };
         await this.loadData();
     }
 
@@ -123,7 +129,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     openAssignmentConceptDialog(e: any){
       if(!this.learningStructure){
-        //TO DO Make it so that we listen for changes to the learningStructure.
+        //TODO Make it so that we listen for changes to the learningStructure.
         this.loadLearningStructure();
       }
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
@@ -153,7 +159,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      //ToDo. This needs to be optimized.
+      //TODO. This needs to be optimized.
       this.loadData();
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
@@ -250,6 +256,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           `, this.userToken, (error: any) => {
               console.log(error);
           });
+        }else{
+          if(title){
+            this.createAssignment();
+          }
         }
         navigate(`/course/${this.courseId}/edit`)
     }

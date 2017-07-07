@@ -52,16 +52,19 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     isViewMode(mode: Mode) {
-        this.editingTitle = false;
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         return mode === 'view';
     }
 
     isEditMode(mode: Mode) {
-        this.editingTitle = false;
         return mode === 'edit';
     }
     isCreateMode(mode: Mode) {
-        this.editingTitle = true;
         return mode === 'create';
     }
 
@@ -88,11 +91,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-    }
-    toggleEditTitle(e: any): void {
-      if(this.shadowRoot.querySelector('#course-title').invalid) return;
-      this.editingTitle = !this.editingTitle;
-      if(this.editingTitle) this.shadowRoot.querySelector('#course-title').focus();
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.target.parentNode.id}`).open();
@@ -147,7 +145,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     async titleChanged(e: any){
       if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
-        //JORDAN!!! You should be so proud of me. This is my first time using object spread!
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -158,34 +155,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
         };
         this.saveCourse();
-      }else{
-        const data = await GQLMutate(`
-            mutation {
-                createCourse(
-                  title: "${e.target.value}"
-                  authorId: "${this.user.id}"
-                ){
-                  id
-                  title
-                }
-            }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'courseId',
-            value: data.id
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'course',
-            value: data
-        };
       }
-
     }
     subscribeToData() {
         GQLSubscribe(`
