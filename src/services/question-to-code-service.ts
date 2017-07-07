@@ -10,51 +10,17 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
 	// define text string with question stem and radio buttons
 	const text: string 	= `<p>${guiQuestion.stem}</p>`
 										+ answers.reduce((prevText, answer, index) => {
-		return prevText + `<p>[*]choice${index}[*] ${answer.text}</p>`;
+		return prevText + `<p>[*]${answer.text}</p>`;
 	}, '');
 	// define code string with answers
 	const code: string = answers.reduce((prevCode, answer, index) => {
-		return prevCode + `\nanswer.choice${index} = ${		index == firstCorrectIndex
-																										? 'true'
-																										: 'false'};`;
-	}, '');
-
-	return {
-		text,
-		code
-	};
-};
-
-// generates code for a multiple response question
-export const generateMultipleResponse = (guiQuestion: GuiQuestion): { text: string, code: string } => {
-	const answers: GuiAnswer[] = guiQuestion.answers;
-	// define text string with question stem and check boxes
-	const text: string 	= `<p>${guiQuestion.stem}</p>`
-										+ answers.reduce((prevText, answer, index) => {
-		return prevText + `<p>[x]choice${index}[x] ${answer.text}</p>`;
-	}, '');
-	// define code string with answers
-	const code: string = answers.reduce((prevCode, answer, index) => {
-		return prevCode + `\nanswer.choice${index} = ${answer.correct
-										? 'true'
-										: 'false'};`;
-	}, '');
-
-	return {
-		text,
-		code
-	};
-};
-
-// generates code for a fill in the blank question
-export const generateFillInTheBlank = (guiQuestion: GuiQuestion): { text: string, code: string } => {
-	const answerText: string = guiQuestion.answers[0].text;
-	// define text string with question stem
-	const text: string = `<p>${guiQuestion.stem}</p>`;
-	// define code string; surround answer with quotes if not a number
-	const code: string 	= `answer = ${!isNaN(parseFloat(answerText)) && isFinite(parseFloat(answerText))
-											? answerText
-											: `'${answerText}'`};`;
+        if (index === answers.length - 1) {
+            return `${prevCode} choice${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
+        }
+        else {
+            return prevCode + `choice${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'}; && `;
+        }
+	}, 'answer = ');
 
 	return {
 		text,
