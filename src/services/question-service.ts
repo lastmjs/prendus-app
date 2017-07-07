@@ -34,6 +34,7 @@ export async function buildQuestion(text: string, code: string): Promise<{
         };
     }
     catch(error) {
+        console.log('probably a JS parsing error while the user is typing');
         // There will be many intermediate JavaScript parsing errors while the user is typing. If that happens, do nothing
         return {
             html: compileToHTML(text),
