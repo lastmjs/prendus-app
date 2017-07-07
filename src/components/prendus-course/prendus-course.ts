@@ -93,16 +93,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         };
     }
     getLTILinks(e){
-      this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.target.parentNode.id}`).open();
+      this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
     }
     getEditIcon(editStatus: boolean): string {
   		return editStatus ? 'check' : 'create';
   	}
     async deleteAssignment(e){
-      const assignmentId = e.target.parentNode.id
       const data = await GQLMutate(`
           mutation {
-              deleteAssignment(id: "${assignmentId}"){
+              deleteAssignment(id: "${e.model.item.id}"){
                 id
               }
           }
