@@ -149,9 +149,12 @@ class PrendusViewQuestion extends Polymer.Element {
     }
 
     getSanitizedHTML(html: string) {
-        return DOMPurify.sanitize(html, {
-            ADD_ATTR: ['contenteditable']
+        const sanitizedHTML = DOMPurify.sanitize(html, {
+            ADD_ATTR: ['contenteditable'],
+            SANITIZE_DOM: false // This allows DOMPurify.sanitize to be called multiple times in succession without changing the output (it was removing ids before)
         });
+
+        return sanitizedHTML;
     }
 
     async checkAnswer() {
