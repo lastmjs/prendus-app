@@ -1,0 +1,20 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-view-question/prendus-view-question.html">
+
+<dom-module id="prendus-edit-question">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <h1>Preview</h1>
+        <prendus-view-question question="[[previewQuestion]]"></prendus-view-question>
+
+        <h1>Text</h1>
+        <textarea id="textTextarea" style="width:500px; height: 250px" on-input="textTextareaInput"></textarea>
+
+        <h1>Code</h1>
+        <textarea id="codeTextarea" style="width:500px; height: 250px" on-input="codeTextareaInput"></textarea>
+    </template>
+
+    <script src="prendus-edit-question.ts"></script>
+</dom-module>

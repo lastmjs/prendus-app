@@ -7,7 +7,14 @@ export async function buildQuestion(text: string, code: string): Promise<{
     ast: AST
 }> {
     const originalAmlAst = parse(text);
-    const jsAst = esprima.parseScript(code);
+
+    try {
+        const jsAst = esprima.parseScript(code);
+    }
+    catch(error) {
+        // This will catch many intermediate syntax errors in the user JavaScript as the user is typing
+    }
+
     const newAmlAst = {
         ...originalAmlAst,
         ast: await asyncMap(originalAmlAst.ast, async (astObject) => {
