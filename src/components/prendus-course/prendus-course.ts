@@ -18,6 +18,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     loaded: boolean;
     userToken: string;
     user: User;
+    editingTitle: boolean;
 
     static get is() { return 'prendus-course'; }
     static get properties() {
@@ -45,13 +46,18 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'loaded',
             value: true
         };
-
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
         this.subscribeToData();
     }
 
     isViewMode(mode: Mode) {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
         return mode === 'view';
     }
 
@@ -86,7 +92,24 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: true
         };
     }
-
+    getLTILinks(e){
+      this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
+    }
+    getEditIcon(editStatus: boolean): string {
+  		return editStatus ? 'check' : 'create';
+  	}
+    async deleteAssignment(e){
+      const data = await GQLMutate(`
+          mutation {
+              deleteAssignment(id: "${e.model.item.id}"){
+                id
+              }
+          }
+      `, this.userToken, (error: any) => {
+          console.log(error);
+      });
+      this.loadData();
+    }
     async loadData() {
         const data = await GQLQuery(`
             query {
@@ -119,7 +142,20 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             value: data.Course
         };
     }
-
+    async titleChanged(e: any){
+      if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'course',
+            value: {
+              ...this.course,
+              title: e.target.value
+            }
+        };
+        this.saveCourse();
+      }
+    }
     subscribeToData() {
         GQLSubscribe(`
             subscription changedAssignment {
@@ -139,17 +175,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async saveCourse() {
-        const title = this.shadowRoot.querySelector('#titleInput').value;
-
         const data = await GQLMutate(`
             mutation {
                 updateOrCreateCourse(
                     update: {
                         id: "${this.courseId}"
-                        title: "${title}"
+                        title: "${this.course.title}"
                     }
                     create: {
-                        title: "${title}"
+                        title: "${this.course.title}"
                         authorId: "${this.user.id}"
                     }
                 ) {
