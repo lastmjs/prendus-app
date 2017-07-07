@@ -41,7 +41,8 @@
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-tooltip": "PolymerElements/paper-tooltip#^2.0.0",
-    "iron-location": "https://github.com/Prendus/iron-location.git#^2.0.2"
+    "iron-location": "https://github.com/Prendus/iron-location.git#^2.0.2",
+    "iron-list": "PolymerElements/iron-list#^2.0.4"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0"

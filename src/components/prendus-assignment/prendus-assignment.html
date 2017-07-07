@@ -2,6 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
 <link rel="import" href="../prendus-question-review/prendus-question-review.html">
@@ -52,6 +53,12 @@
                   </template>
                   <paper-dialog id="assignmentConceptDialog" modal>
                     <div class="content">
+                      <h2>Disciplines iron list</h2>
+                      <iron-list items="[[learningStructure]]">
+                        <template>
+                          <h4 id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</h4>
+                        </template>
+                      </iron-list>
                       <h2>Disciplines</h2>
                       <dom-repeat items="[[learningStructure]]">
                         <template>
