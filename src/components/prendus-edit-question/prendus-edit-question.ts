@@ -12,6 +12,7 @@ class PrendusEditQuestion extends Polymer.Element {
     userToken: string;
     user: User;
     loaded: boolean;
+    selected: number;
 
     static get is() { return 'prendus-edit-question'; }
     static get properties() {
@@ -40,25 +41,36 @@ class PrendusEditQuestion extends Polymer.Element {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
+            key: 'selected',
+            value: 0
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
             key: 'loaded',
             value: true
         };
     }
 
-    textTextareaInput() {
+    textEditorChanged() {
+        if (!this.loaded) {
+            return;
+        }
+
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'question',
             value: {
                 ...this.question,
-                text: this.shadowRoot.querySelector('#textTextarea').value,
+                text: this.shadowRoot.querySelector('#textEditor').value,
                 code: this.question ? this.question.code : ''
             }
         };
     }
 
-    codeTextareaInput() {
+    codeEditorChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -66,7 +78,7 @@ class PrendusEditQuestion extends Polymer.Element {
             value: {
                 ...this.question,
                 text: this.question ? this.question.text : '',
-                code: this.shadowRoot.querySelector('#codeTextarea').value
+                code: this.shadowRoot.querySelector('#codeEditor').value
             }
         };
     }
@@ -188,12 +200,22 @@ class PrendusEditQuestion extends Polymer.Element {
         }
     }
 
+    selectedChanged(e: CustomEvent) {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selected',
+            value: e.detail.value
+        };
+    }
+
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('question')) this.question = state.components[this.componentId].question;
         if (Object.keys(state.components[this.componentId] || {}).includes('questionId')) this.questionId = state.components[this.componentId].questionId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selected')) this.selected = state.components[this.componentId].selected;
 
         this.userToken = state.userToken;
         this.user = state.user
