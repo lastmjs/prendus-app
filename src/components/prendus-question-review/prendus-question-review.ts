@@ -231,7 +231,6 @@ class PrendusQuestionReview extends Polymer.Element {
         const difficulty: number = this.shadowRoot.querySelector(`#difficulty${questionId}`).value;
         const accuracy: number = this.shadowRoot.querySelector(`#accuracy${questionId}`).value;
         const authenticity: number = this.shadowRoot.querySelector(`#authenticity${questionId}`).value;
-        console.log('quality', quality, 'difficulty', difficulty, 'accuracy', accuracy)
         const data = await GQLMutate(`
           mutation {
             createQuestionRating(
