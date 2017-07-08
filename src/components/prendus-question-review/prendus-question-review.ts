@@ -159,6 +159,9 @@ class PrendusQuestionReview extends Polymer.Element {
             if(value){
               const questionsToReview = shuffleArray(value.questions).slice(0,3);
               const quizQuestions = shuffleArray(value.questions).slice(0,5);
+              console.log('questions to review', questionsToReview)
+              console.log('questions Quiz', quizQuestions)
+
               this.action = {
                   type: 'SET_COMPONENT_PROPERTY',
                   componentId: this.componentId,
