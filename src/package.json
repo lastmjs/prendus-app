@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "assessml": "0.0.3",
+    "assessml": "0.0.4",
     "dompurify": "^0.9.0",
     "escodegen-temp": "git+https://github.com/Prendus/escodegen-temp.git",
     "esprima": "^4.0.0",
