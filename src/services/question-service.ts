@@ -6,37 +6,44 @@ export async function buildQuestion(text: string, code: string): Promise<{
     html: string;
     ast: AST
 }> {
-    const originalAmlAst = parse(text);
-
     try {
+        const originalAmlAst = parse(text);
         const jsAst = esprima.parseScript(code);
+
+        const newAmlAst = {
+            ...originalAmlAst,
+            ast: await asyncMap(originalAmlAst.ast, async (astObject) => {
+                if (astObject.type === 'VARIABLE') {
+                    const newMin = await newPropertyValue(jsAst, astObject.varName, 'min', 0);
+                    const newMax = await newPropertyValue(jsAst, astObject.varName, 'max', 100);
+                    const precision = await newPropertyValue(jsAst, astObject.varName, 'precision', 0);
+
+                    const randomVariable = (Math.random() * (newMax - newMin + 1)) + newMin;
+
+                    return {
+                        ...astObject,
+                        value: precision === 0 ? Math.floor(randomVariable) : +randomVariable.toPrecision(precision)
+                    };
+                }
+                else {
+                    return astObject;
+                }
+            })
+        };
+
+        return {
+            html: compileToHTML(newAmlAst),
+            ast: newAmlAst
+        };
     }
     catch(error) {
-        // This will catch many intermediate syntax errors in the user JavaScript as the user is typing
+        console.log('probably a JS parsing error while the user is typing');
+        // There will be many intermediate JavaScript parsing errors while the user is typing. If that happens, do nothing
+        return {
+            html: compileToHTML(text),
+            ast: parse(text)
+        };
     }
-
-    const newAmlAst = {
-        ...originalAmlAst,
-        ast: await asyncMap(originalAmlAst.ast, async (astObject) => {
-            if (astObject.type === 'VARIABLE') {
-                const newMin = await newPropertyValue(jsAst, astObject.varName, 'min', 0);
-                const newMax = await newPropertyValue(jsAst, astObject.varName, 'max', 100);
-
-                return {
-                    ...astObject,
-                    value: Math.floor(Math.random() * (newMax - newMin + 1)) + newMin
-                };
-            }
-            else {
-                return astObject;
-            }
-        })
-    };
-
-    return {
-        html: compileToHTML(newAmlAst),
-        ast: newAmlAst
-    };
 }
 
 async function newPropertyValue(jsAst, varName: string, propertyName: string, defaultValue: number): Promise<number> {

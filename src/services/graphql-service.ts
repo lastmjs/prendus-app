@@ -130,3 +130,8 @@ export const GQLSubscribe = (queryString: string, id: string, callback: GQLSubsc
 
     webSocket.send(JSON.stringify(message));
 };
+
+
+export function escapeString(string: string) {
+    return string.replace(/\n/g, '\\n').replace(/"/g, '\\"');
+}

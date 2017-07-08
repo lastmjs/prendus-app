@@ -1,7 +1,7 @@
 import {createUUID, navigate} from '../../services/utilities-service';
 import {Question} from '../../typings/question';
 import {SetComponentPropertyAction} from '../../typings/actions';
-import {GQLMutate, GQLQuery} from '../../services/graphql-service';
+import {GQLMutate, GQLQuery, escapeString} from '../../services/graphql-service';
 import {User} from '../../typings/user';
 
 class PrendusEditQuestion extends Polymer.Element {
@@ -12,6 +12,7 @@ class PrendusEditQuestion extends Polymer.Element {
     userToken: string;
     user: User;
     loaded: boolean;
+    selected: number;
 
     static get is() { return 'prendus-edit-question'; }
     static get properties() {
@@ -40,25 +41,64 @@ class PrendusEditQuestion extends Polymer.Element {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
+            key: 'selected',
+            value: 0
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: false
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
             key: 'loaded',
             value: true
         };
+
+        setTimeout(() => { //TODO fix this...it would be nice to be able to set the font-size officially through the ace editor web component, and then we wouldn't have to hack. The timeout is to ensure the current task on the event loop completes and the dom template is stamped because of the loaded property before accessing the dom
+            this.shadowRoot.querySelector('#codeEditor').shadowRoot.querySelector('#juicy-ace-editor-container').style = 'font-size: calc(40px - 1vw)';
+            this.shadowRoot.querySelector('#codeEditor').shadowRoot.querySelector('.ace_gutter').style = 'background: #2a9af2';
+        }, 2000);
     }
 
-    textTextareaInput() {
+    async textEditorChanged() {
+        if (!this.shadowRoot.querySelector('#textEditor')) {
+            return;
+        }
+
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'question',
             value: {
                 ...this.question,
-                text: this.shadowRoot.querySelector('#textTextarea').value,
+                text: this.shadowRoot.querySelector('#textEditor').value,
                 code: this.question ? this.question.code : ''
             }
         };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: true
+        };
+
+        await this.save();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: false
+        };
     }
 
-    codeTextareaInput() {
+    async codeEditorChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -66,8 +106,24 @@ class PrendusEditQuestion extends Polymer.Element {
             value: {
                 ...this.question,
                 text: this.question ? this.question.text : '',
-                code: this.shadowRoot.querySelector('#codeTextarea').value
+                code: this.shadowRoot.querySelector('#codeEditor').value
             }
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: true
+        };
+
+        await this.save();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: false
         };
     }
 
@@ -158,9 +214,9 @@ class PrendusEditQuestion extends Polymer.Element {
             const data = await GQLMutate(`
                 mutation {
                     createQuestion(
-                        authorId: "${this.user.id}"
-                        text: "${this.question.text}"
-                        code: "${this.question.code}"
+                        authorId: "${escapeString(this.user.id)}"
+                        text: "${escapeString(this.question.text)}"
+                        code: "${escapeString(this.question.code)}"
                     ) {
                         id
                     }
@@ -172,12 +228,12 @@ class PrendusEditQuestion extends Polymer.Element {
             navigate(`/question/${data.createQuestion.id}/edit`);
         }
         else {
-            GQLMutate(`
+            await GQLMutate(`
                 mutation {
                     updateQuestion(
-                        id: "${this.questionId}"
-                        text: "${this.question.text}"
-                        code: "${this.question.code}"
+                        id: "${escapeString(this.questionId)}"
+                        text: "${escapeString(this.question.text)}"
+                        code: "${escapeString(this.question.code)}"
                     ) {
                         id
                     }
@@ -188,15 +244,30 @@ class PrendusEditQuestion extends Polymer.Element {
         }
     }
 
+    getSavingText(saving: boolean) {
+        return saving ? 'Saving...' : 'Saved';
+    }
+
+    selectedChanged(e: CustomEvent) {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'selected',
+            value: e.detail.value
+        };
+    }
+
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
 
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         if (Object.keys(state.components[this.componentId] || {}).includes('question')) this.question = state.components[this.componentId].question;
         if (Object.keys(state.components[this.componentId] || {}).includes('questionId')) this.questionId = state.components[this.componentId].questionId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selected')) this.selected = state.components[this.componentId].selected;
+        if (Object.keys(state.components[this.componentId] || {}).includes('saving')) this.saving = state.components[this.componentId].saving;
 
         this.userToken = state.userToken;
-        this.user = state.user
+        this.user = state.user;
     }
 }
 
