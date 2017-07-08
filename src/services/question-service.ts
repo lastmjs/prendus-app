@@ -16,10 +16,13 @@ export async function buildQuestion(text: string, code: string): Promise<{
                 if (astObject.type === 'VARIABLE') {
                     const newMin = await newPropertyValue(jsAst, astObject.varName, 'min', 0);
                     const newMax = await newPropertyValue(jsAst, astObject.varName, 'max', 100);
+                    const precision = await newPropertyValue(jsAst, astObject.varName, 'precision', 0);
+
+                    const randomVariable = (Math.random() * (newMax - newMin + 1)) + newMin;
 
                     return {
                         ...astObject,
-                        value: Math.floor(Math.random() * (newMax - newMin + 1)) + newMin
+                        value: precision === 0 ? Math.floor(randomVariable) : +randomVariable.toPrecision(precision)
                     };
                 }
                 else {

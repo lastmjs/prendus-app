@@ -133,5 +133,5 @@ export const GQLSubscribe = (queryString: string, id: string, callback: GQLSubsc
 
 
 export function escapeString(string: string) {
-    return string.replace(/\n/g, '').replace(/"/g, '\\"');
+    return string.replace(/\n/g, '\\n').replace(/"/g, '\\"');
 }

@@ -48,12 +48,24 @@ class PrendusEditQuestion extends Polymer.Element {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
+            key: 'saving',
+            value: false
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
             key: 'loaded',
             value: true
         };
+
+        setTimeout(() => { //TODO fix this...it would be nice to be able to set the font-size officially through the ace editor web component, and then we wouldn't have to hack. The timeout is to ensure the current task on the event loop completes and the dom template is stamped because of the loaded property before accessing the dom
+            this.shadowRoot.querySelector('#codeEditor').shadowRoot.querySelector('#juicy-ace-editor-container').style = 'font-size: calc(40px - 1vw)';
+            this.shadowRoot.querySelector('#codeEditor').shadowRoot.querySelector('.ace_gutter').style = 'background: #2a9af2';
+        }, 2000);
     }
 
-    textEditorChanged() {
+    async textEditorChanged() {
         if (!this.shadowRoot.querySelector('#textEditor')) {
             return;
         }
@@ -68,9 +80,25 @@ class PrendusEditQuestion extends Polymer.Element {
                 code: this.question ? this.question.code : ''
             }
         };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: true
+        };
+
+        await this.save();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: false
+        };
     }
 
-    codeEditorChanged() {
+    async codeEditorChanged() {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -80,6 +108,22 @@ class PrendusEditQuestion extends Polymer.Element {
                 text: this.question ? this.question.text : '',
                 code: this.shadowRoot.querySelector('#codeEditor').value
             }
+        };
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: true
+        };
+
+        await this.save();
+
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'saving',
+            value: false
         };
     }
 
@@ -184,7 +228,7 @@ class PrendusEditQuestion extends Polymer.Element {
             navigate(`/question/${data.createQuestion.id}/edit`);
         }
         else {
-            GQLMutate(`
+            await GQLMutate(`
                 mutation {
                     updateQuestion(
                         id: "${escapeString(this.questionId)}"
@@ -198,6 +242,10 @@ class PrendusEditQuestion extends Polymer.Element {
                 console.log(error);
             });
         }
+    }
+
+    getSavingText(saving: boolean) {
+        return saving ? 'Saving...' : 'Saved';
     }
 
     selectedChanged(e: CustomEvent) {
@@ -216,6 +264,7 @@ class PrendusEditQuestion extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('question')) this.question = state.components[this.componentId].question;
         if (Object.keys(state.components[this.componentId] || {}).includes('questionId')) this.questionId = state.components[this.componentId].questionId;
         if (Object.keys(state.components[this.componentId] || {}).includes('selected')) this.selected = state.components[this.componentId].selected;
+        if (Object.keys(state.components[this.componentId] || {}).includes('saving')) this.saving = state.components[this.componentId].saving;
 
         this.userToken = state.userToken;
         this.user = state.user;
