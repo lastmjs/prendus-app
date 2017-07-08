@@ -267,7 +267,7 @@ class PrendusEditQuestion extends Polymer.Element {
         if (Object.keys(state.components[this.componentId] || {}).includes('saving')) this.saving = state.components[this.componentId].saving;
 
         this.userToken = state.userToken;
-        this.user = state.user
+        this.user = state.user;
     }
 }
 
