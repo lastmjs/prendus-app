@@ -2,21 +2,41 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-view-question/prendus-view-question.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/wysiwyg-e/wysiwyg-e.html">
+<link rel="import" href="../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 
 <dom-module id="prendus-edit-question">
     <template>
+        <style>
+            .pages {
+                margin-top: 25px;
+            }
+
+            .editor {
+                width: calc(750px - 1vw);
+                height: 300px;
+                box-shadow: 0px 0px 3px grey;
+                margin: 0 auto;
+            }
+        </style>
+
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
         <dom-if if="[[loaded]]">
             <template>
+                <paper-tabs selected="[[selected]]" on-selected-changed="selectedChanged">
+                    <paper-tab>Question</paper-tab>
+                    <paper-tab>Answer</paper-tab>
+                </paper-tabs>
+
+                <iron-pages id="ironPages" selected="[[selected]]" class="pages">
+                    <wysiwyg-e id="textEditor" class="editor" value="[[question.text]]" on-value-changed="textEditorChanged"></wysiwyg-e>
+                    <juicy-ace-editor id="codeEditor" theme="ace/theme/chrome" class="editor" value="[[question.code]]" on-change="codeEditorChanged"></juicy-ace-editor>
+                </iron-pages>
+
                 <h1>Preview</h1>
                 <prendus-view-question question="[[question]]"></prendus-view-question>
-
-                <h1>Text</h1>
-                <textarea id="textTextarea" style="width:500px; height: 250px" on-input="textTextareaInput" value="[[question.text]]"></textarea>
-
-                <h1>Code</h1>
-                <textarea id="codeTextarea" style="width:500px; height: 250px" on-input="codeTextareaInput" value="[[question.code]]"></textarea>
 
                 <br>
 
