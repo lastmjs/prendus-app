@@ -54,7 +54,7 @@ class PrendusEditQuestion extends Polymer.Element {
     }
 
     textEditorChanged() {
-        if (!this.loaded) {
+        if (!this.shadowRoot.querySelector('#textEditor')) {
             return;
         }
 
