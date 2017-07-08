@@ -20,6 +20,10 @@
                 margin: 0 auto;
             }
 
+            .editorContainer {
+                position: relative;
+            }
+
             #paperTabs {
                 font-size: calc(50px - 1vw);
                 --paper-tabs-selection-bar-color: #2a9af2;
@@ -62,12 +66,12 @@
                 </paper-tabs>
 
                 <iron-pages id="ironPages" selected="[[selected]]" class="pages">
-                    <div style="position: relative">
+                    <div class="editorContainer">
                         <wysiwyg-e id="textEditor" class="editor" value="[[question.text]]" on-value-changed="textEditorChanged"></wysiwyg-e>
                         <div class="savingText">[[getSavingText(saving)]]</div>
                     </div>
 
-                    <div style="position: relative">
+                    <div class="editorContainer">
                         <juicy-ace-editor id="codeEditor" theme="ace/theme/chrome" mode="ace/mode/javascript" class="editor" value="[[question.code]]" on-change="codeEditorChanged"></juicy-ace-editor>
                         <div class="savingText">[[getSavingText(saving)]]</div>
                     </div>
