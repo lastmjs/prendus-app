@@ -14,10 +14,23 @@
             }
 
             .editor {
-                width: calc(750px - 1vw);
+                width: calc(1000px - 10vw);
                 height: 300px;
                 box-shadow: 0px 0px 3px grey;
                 margin: 0 auto;
+            }
+
+            #paperTabs {
+                font-size: calc(50px - 1vw);
+            }
+
+            #textEditor {
+                --wysiwyg-font: Ubuntu;
+                font-size: calc(40px - 1vw);
+            }
+
+            #codeEditor {
+                font-size: calc(40px - 1vw);
             }
         </style>
 
@@ -25,7 +38,7 @@
 
         <dom-if if="[[loaded]]">
             <template>
-                <paper-tabs selected="[[selected]]" on-selected-changed="selectedChanged">
+                <paper-tabs id="paperTabs" selected="[[selected]]" on-selected-changed="selectedChanged">
                     <paper-tab>Question</paper-tab>
                     <paper-tab>Answer</paper-tab>
                 </paper-tabs>
