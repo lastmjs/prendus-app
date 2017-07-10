@@ -1,9 +1,6 @@
 {
   "dependencies": {
-    "assessml": "0.0.6",
-    "dompurify": "^0.9.0",
-    "escodegen-temp": "git+https://github.com/Prendus/escodegen-temp.git",
-    "esprima": "^4.0.0",
+    "prendus-question-elements": "0.0.6",
     "redux-store-element": "^1.2.6",
     "zwitterion": "^0.8.1"
   }
