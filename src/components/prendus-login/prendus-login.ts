@@ -94,6 +94,13 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         const password: string = this.shadowRoot.querySelector('#password').value;
         const data = await signinUser(email, password, this.userToken);
         const gqlUser = await getUser(email, password, data.signinUser.token)
+        const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
+        const ownedCourses = gqlUser.User.ownedCourses;
+        this.action = {
+            type: 'SET_PROPERTY',
+            coursesRedux,
+            ownedCourses
+        };
         this.action = persistUserToken(data.signinUser.token);
         this.action = setUserInRedux(gqlUser.User);
         await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
@@ -147,6 +154,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                 User(email:"${email}") {
                     id
                     email
+                    ownedCourses{
+                      id
+                      title
+                    }
                 }
               }
             `, userToken, (key: string, value: any) => {

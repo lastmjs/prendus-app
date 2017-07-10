@@ -137,24 +137,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             return data;
         }
 
-        // async function performLTIUserLinkMutation(ltiUserId: string, userId: string, userToken: string | null) {
-        //     //TODO use a create or update if possible
-        //     const data = await GQLMutate(`
-        //         mutation {
-        //             createLTIUser(
-        //                 ltiUserId: "${ltiUserId}"
-        //                 userId: "${userId}"
-        //             ) {
-        //                 id
-        //             }
-        //         }
-        //     `, userToken, (error: any) => {
-        //         console.log(error);
-        //     });
-        //
-        //     return data;
-        // }
-
         async function performLoginMutation(email: string, password: string, userToken: string | null) {
             const data = await GQLMutate(`
                 mutation {
