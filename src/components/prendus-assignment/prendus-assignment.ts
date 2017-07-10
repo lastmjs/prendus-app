@@ -65,14 +65,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isViewMode(mode: String) {
+    isViewMode(mode: string) {
         return mode === 'view';
     }
 
-    isEditMode(mode: String) {
+    isEditMode(mode: string) {
         return mode === 'edit';
     }
-    isCreateMode(mode: String) {
+    isCreateMode(mode: string) {
         return mode === 'create';
     }
     async assignmentIdChanged() {

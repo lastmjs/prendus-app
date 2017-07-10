@@ -73,7 +73,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     async openDeleteModal(e: any): void {
       e.stopPropagation();
 			e.preventDefault();
-      console.log('this item id', e.model.item.id);
       const data = await GQLMutate(`
         mutation {
           deleteCourse(
@@ -88,7 +87,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
       this.loadData()
 			// this.shadowRoot.querySelector('#confirm-delete-modal').open();
 		}
-    //We need to think about how we delete courses. Should we allow instructors to delete courses when there is live student data? I don't think GraphCool will let us. Maybe we could disassociate the course with the professor though? 
+    //We need to think about how we delete courses. Should we allow instructors to delete courses when there is live student data? I don't think GraphCool will let us. Maybe we could disassociate the course with the professor though?
     deleteCourse(e: any){
       this.shadowRoot.querySelector('#confirm-delete-modal').close();
     }
