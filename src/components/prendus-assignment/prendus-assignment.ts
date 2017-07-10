@@ -65,14 +65,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isViewMode(mode) {
+    isViewMode(mode: string) {
         return mode === 'view';
     }
 
-    isEditMode(mode) {
+    isEditMode(mode: string) {
         return mode === 'edit';
     }
-    isCreateMode(mode) {
+    isCreateMode(mode: string) {
         return mode === 'create';
     }
     async assignmentIdChanged() {
@@ -94,11 +94,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         };
     }
 
-    isCreateType(assignmentType) {
+    isCreateType(assignmentType: String) {
         return assignmentType === 'CREATE';
     }
 
-    isReviewType(assignmentType) {
+    isReviewType(assignmentType: String) {
         return assignmentType === 'REVIEW';
     }
 
