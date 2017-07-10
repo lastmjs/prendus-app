@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "prendus-question-elements": "0.0.6",
+    "prendus-question-elements": "^0.1.0",
     "redux-store-element": "^1.2.6",
     "zwitterion": "^0.8.1"
   }
