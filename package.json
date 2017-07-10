@@ -7,7 +7,8 @@
     "dev": "cd src && node_modules/.bin/zwitterion --watch-files --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
-    "install": "npm install -g bower && bower install && cd src && npm install"
+    "install": "npm install -g bower && bower install && cd src && npm install",
+    "attribution": "generate-attribution && cd src && generate-attribution"
   },
   "engines": {
     "node": "8.1.2"
@@ -21,5 +22,8 @@
     "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "oss-attribution-generator": "^1.2.0"
+  }
 }
