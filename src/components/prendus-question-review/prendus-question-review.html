@@ -51,16 +51,16 @@
                 <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
                 <div class="wrapper">
                     <div class="quality">
-                      Quality <paper-slider id="quality" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                      Quality <paper-slider id="quality[[item.id]]" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
                     <div class="difficulty">
-                      Difficulty<paper-slider id="difficulty" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                      Difficulty<paper-slider id="difficulty[[item.id]]" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
                     <div class="accuracy">
-                      Alignment<paper-slider id="accuracy" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                      Alignment<paper-slider id="accuracy[[item.id]]" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
                     <div class="cheating">
-                      Authenticity<paper-slider id="authenticity" value="[[authenticity]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
+                      Authenticity<paper-slider id="authenticity[[item.id]]" value="[[authenticity]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
                     </div>
                 </div>
                 <div class="submit-button">
@@ -71,7 +71,7 @@
             <div>
               Congratulations you have finished the review of the questions. You will now take 5 questions.
               <div class="submit-button">
-                  <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+                  <button class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
               </div>
             </div>
             <dom-if if="[[hasQuestions(quizQuestions)]]">

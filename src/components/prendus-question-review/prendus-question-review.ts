@@ -223,9 +223,10 @@ class PrendusQuestionReview extends Polymer.Element {
     async submit(e: any): Promise<void> {
       try {
         const questionId: string = e.target.id;
-        const quality: number = this.shadowRoot.querySelector('#quality').value;
-        const difficulty: number = this.shadowRoot.querySelector('#difficulty').value;
-        const accuracy: number = this.shadowRoot.querySelector('#accuracy').value;
+        const quality: number = this.shadowRoot.querySelector(`#quality${questionId}`).value;
+        const difficulty: number = this.shadowRoot.querySelector(`#difficulty${questionId}`).value;
+        const accuracy: number = this.shadowRoot.querySelector(`#accuracy${questionId}`).value;
+        const authenticity: number = this.shadowRoot.querySelector(`#authenticity${questionId}`).value;
         const data = await GQLMutate(`
           mutation {
             createQuestionRating(
