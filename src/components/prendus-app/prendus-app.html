@@ -25,6 +25,7 @@
 <link rel="import" href="../prendus-ui/prendus-drop-down.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
+<link rel="import" href="../prendus-landing-page/prendus-landing-page.html">
 
 
 <dom-module id="prendus-app">
@@ -44,6 +45,12 @@
   				max-width: 800px;
   				width: 100%;
   			}
+
+        .landing{
+          max-width: 100%;
+          margin:0;
+          padding:0;
+        }
 
   			.loading-spinner {
   				position: fixed;
@@ -125,11 +132,11 @@
           <app-toolbar>
         </app-header>
 
-        <br>
+
 
         <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, openSourceRouteActive)]]">
 
-            <prendus-courses class="app-window" show="rootView"></prendus-courses>
+            <prendus-landing-page  class="app-window landing" show="rootView"></prendus-landing-page>
 
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
