@@ -21,9 +21,7 @@
 			}
 
 	  </style>
-
-    <redux-store on-statechange="mapStateToThis" action="[[action]]"></redux-store>
-
+		<redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 		<div class="prendus-vertical-container">
 			<h1>Teacher Approval</h1>
 			<p>Here you can approve users to be teachers once you have verified their teacher status.</p>
@@ -33,8 +31,8 @@
 				<p hidden$=[[showUnverifiedTeachers(unverifiedTeachers)]]><strong>There are no more teachers to verify.</strong></p>
 				<template is="dom-repeat" items="[[unverifiedTeachers]]" as="unverifiedTeacher">
 					<div class="teacher prendus-horizontal-container">
-						<span>[[unverifiedTeacher.metaData.email]]</span>
-						<button class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
+						<span>[[unverifiedTeacher.email]]</span>
+						<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
 					</div>
 				</template>
 			</div>
