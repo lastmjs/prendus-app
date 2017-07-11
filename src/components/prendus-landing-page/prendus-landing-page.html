@@ -16,28 +16,27 @@
           background-position: center;
           background-repeat: no-repeat;
           background-size: cover;
-          justify-content: center;
           position: absolute;
           z-index: 999;
+            text-align: center;
           }
 
         #logo{
-          max-width: 100%;
-          max-height:200px;
-          min-height: 150px;
+          height:calc(200px - 1vw);
           padding-top: 300px;
           display: block;
           margin: 0 auto;
         }
 
-      .button{
-        max-width: 100%;
-        text-align: center;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
-        }
+
+        @media (max-width: 1000px) {
+          #button {
+            font-size: 80px;
+            margin:30px 30px;
+            padding:30px 0;
+          display:block;
+            }
+          }
 
       </style>
         <div id="hero">
