@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "escodegen-temp": "git+https://github.com/Prendus/escodegen-temp.git",
-    "prendus-question-elements": "^0.1.1",
+    "prendus-question-elements": "^0.1.3",
     "redux-store-element": "^1.2.6",
     "zwitterion": "^0.8.1"
   }
