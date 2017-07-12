@@ -67,9 +67,14 @@
   	      align-items: center;
           font-size: 15px;
   	    }
+
+        /*The code below wasn't actually doing anything because the viewport meta tag had not been added in the header of the index.html file. I added the viewport meta tag
+          in order to get media queries working for the landing page which also caused the media query below to kick in. It looked super awkard and caused the page to offset
+          and it wasn't even working before so i just commented it out.
+        */
   			@media (max-width: 768px) {
   				.app-window {
-  					padding: 10px 20px;
+  					/*padding: 10px 20px;*/
   				}
   			}
       </style>
@@ -133,14 +138,7 @@
             </dom-if>
           <app-toolbar>
         </app-header>
-<<<<<<< HEAD
-test
-        <prendus-notificatons><prendus-notifications>
-          test
-        <br>
-=======
 
->>>>>>> f442c0eee461904e4d8ec659a6778dd7c3869234
 
 
         <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive)]]">
