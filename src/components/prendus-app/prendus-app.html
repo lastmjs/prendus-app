@@ -70,13 +70,14 @@
 
         /*The code below wasn't actually doing anything because the viewport meta tag had not been added in the header of the index.html file. I added the viewport meta tag
           in order to get media queries working for the landing page which also caused the media query below to kick in. It looked super awkard and caused the page to offset
-          and it wasn't even working before so i just commented it out.
-        */
+          and it wasn't even working before so i just commented it out. --- using media query below isn't neccessary, the same result can be achieved using css flexbox and/or css grid.
+
   			@media (max-width: 768px) {
   				.app-window {
-  					/*padding: 10px 20px;*/
+  					padding: 10px 20px;
   				}
   			}
+        */
       </style>
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
 
