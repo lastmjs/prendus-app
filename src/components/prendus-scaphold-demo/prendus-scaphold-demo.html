@@ -1,0 +1,15 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<!-- <link rel="import" href="../../node_modules/prendus-question-elements/prendus-edit-question.html"> -->
+
+<dom-module id="prendus-scaphold-demo">
+    <template>
+        <p>Enter the stem of your question</p>
+        <div style="margin-bottom: 50px">
+            <paper-input id="stemInput" type="text" on-value-changed="stemInputChanged"></paper-input>
+        </div>
+        <prendus-edit-question id="stemEditor" question="[[question]]" no-save></prendus-edit-question>
+    </template>
+
+    <script src="prendus-scaphold-demo.ts"></script>
+</dom-module>
