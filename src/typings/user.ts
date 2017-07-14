@@ -7,7 +7,7 @@ export interface User {
     readonly id: string;
     readonly createdAt: Date;
     readonly updatedAt: Date;
-    readonly courses: Course[];
+    readonly ownedCourses: Course[];
     readonly assignments: Assignment[];
     readonly quizzes: Quiz[];
     readonly questions: Question[];

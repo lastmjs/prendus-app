@@ -23,6 +23,7 @@
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
+<link rel="import" href="../prendus-teacher-approval/prendus-teacher-approval.html">
 <link rel="import" href="../prendus-ui/prendus-drop-down.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
@@ -92,6 +93,7 @@
         <app-route route="[[route]]" pattern="/authenticate" active="{{authenticateRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/open-source" active="{{openSourceRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/courses" data="{{coursesRouteData}}" active="{{coursesRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
@@ -101,6 +103,8 @@
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/edit" data="{{editAssignmentRouteData}}" active="{{editAssignmentRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/learning-structure" data="{{learningStructureRouteData}}" active="{{learningStructureRouteActive}}"></app-route>
+
+        <app-route route="[[route]]" pattern="/teacher-approval" data="{{teacherApprovalRouteData}}" active="{{teacherApprovalRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/discipline/create" data="{{createDisciplineRouteData}}" active="{{createDisciplineRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/discipline/:disciplineId/view" data="{{viewDisciplineRouteData}}" active="{{viewDisciplineRouteActive}}"></app-route>
@@ -140,11 +144,9 @@
           <app-toolbar>
         </app-header>
 
+        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive)]]">
 
-
-        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive)]]">
-
-            <prendus-landing-page  class="app-window landing" show="rootView"></prendus-landing-page>
+            <prendus-landing-page class="app-window landing" show="rootView"></prendus-landing-page>
 
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
@@ -157,11 +159,12 @@
                     <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
                 </div>
             </div>
-            <prendus-edit-question show="createQuestionView" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
-            <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
-            <prendus-edit-question show="editDemoQuestionView" question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
-            <prendus-question-examples show="examplesQuestionView"></prendus-question-examples>
+            <prendus-edit-question class="app-window" show="createQuestionView" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+            <prendus-edit-question class="app-window" show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+            <prendus-edit-question class="app-window" show="editDemoQuestionView" question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
+            <prendus-question-examples class="app-window" show="examplesQuestionView"></prendus-question-examples>
 
+            <prendus-courses class="app-window" show="coursesView"></prendus-courses>
             <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
             <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
@@ -171,6 +174,8 @@
             <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit"></prendus-assignment>
 
             <prendus-learning-structure show="learningStructureView" mode="view"></prendus-learning-structure>
+
+            <prendus-teacher-approval show="teacherApprovalView" mode="view"></prendus-teacher-approval>
 
             <prendus-discipline class="app-window" show="createDisciplineView" discipline-id="[[createDisciplineRouteData.disciplineId]]" mode="create"></prendus-discipline>
             <prendus-discipline class="app-window" show="viewDisciplineView" discipline-id="[[viewDisciplineRouteData.disciplineId]]" mode="view"></prendus-discipline>
