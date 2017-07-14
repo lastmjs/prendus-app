@@ -42,7 +42,7 @@
                     </template>
                 </dom-if>
 
-                <dom-if if="[[!isViewMode(mode)]]">
+                <dom-if if="[[isEditMode(mode)]]">
                   <template>
                     <button class="prendus-button" on-click="saveAssignment">Save and Return to Course</button>
                     <paper-input id="titleInput" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>

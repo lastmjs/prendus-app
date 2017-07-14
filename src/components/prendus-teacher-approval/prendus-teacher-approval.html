@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+<dom-module id="prendus-teacher-approval">
+
+	<template>
+
+	  <style include="prendus-styles">
+
+			.teacher {
+				padding: 5px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.teacher:hover {
+				background-color: var(--prendus-primary-color-light);
+			}
+
+	  </style>
+		<redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+		<div class="prendus-vertical-container">
+			<h1>Teacher Approval</h1>
+			<p>Here you can approve users to be teachers once you have verified their teacher status.</p>
+
+			<h2>Unverified Teachers</h2>
+			<div class="container">
+				<p hidden$=[[showUnverifiedTeachers(unverifiedTeachers)]]><strong>There are no more teachers to verify.</strong></p>
+				<dom-repeat items="[[unverifiedTeachers]]">
+					<template>
+						<div class="teacher prendus-horizontal-container">
+							<span>[[item.email]]</span>
+							<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
+						</div>
+					</template>
+				</dom-repeat>
+			</div>
+
+			<h2>Verified Teachers</h2>
+			<div class="container">
+				<p hidden$=[[showVerifiedTeachers(verifiedTeachers)]]><strong>No teachers have been verified yet.</strong></p>
+				<dom-repeat items="[[verifiedTeachers]]">
+					<template>
+						<div class="teacher prendus-horizontal-container">
+							<span>[[item.email]]</span>
+							<button class="prendus-button prendus-button--destructive" on-tap="revokeTeacher">Revoke</button>
+						</div>
+					</template>
+				</dom-repeat>
+			</div>
+		</div>
+
+  </template>
+
+  <script src="prendus-teacher-approval.ts"></script>
+</dom-module>
