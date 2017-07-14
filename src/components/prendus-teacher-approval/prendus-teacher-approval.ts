@@ -31,8 +31,12 @@ class PrendusTeacherApproval extends Polymer.Element {
     //TODO this needs to be paginated eventually. Or we need to put in a search to find specific users
     await GQLQuery(`
         query {
-          allUsers(first: 10 orderBy: createdAt_DESC filter:{
-            role: STUDENT
+          allUsers(
+            first: 10
+            orderBy:
+            createdAt_DESC
+            filter:{
+              role: STUDENT
           }) {
             id
             role
@@ -63,7 +67,7 @@ class PrendusTeacherApproval extends Polymer.Element {
     const teacherData = await GQLMutate(`
         mutation {
           updateUser(
-            id:"${e.model.unverifiedTeacher.id}"
+            id:"${e.model.item.id}"
             role: INSTRUCTOR
           ){
             id
@@ -74,7 +78,7 @@ class PrendusTeacherApproval extends Polymer.Element {
             console.log(error);
         });
         const newUnverifiedTeachers = this.unverifiedTeachers.filter((teacher) => {
-          if(teacher.id != teacherData.updateUser.id){ return teacher }
+          if(teacher.id !== teacherData.updateUser.id){ return teacher }
         });
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',

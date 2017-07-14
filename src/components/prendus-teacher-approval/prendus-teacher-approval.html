@@ -29,23 +29,27 @@
 			<h2>Unverified Teachers</h2>
 			<div class="container">
 				<p hidden$=[[showUnverifiedTeachers(unverifiedTeachers)]]><strong>There are no more teachers to verify.</strong></p>
-				<template is="dom-repeat" items="[[unverifiedTeachers]]" as="unverifiedTeacher">
-					<div class="teacher prendus-horizontal-container">
-						<span>[[unverifiedTeacher.email]]</span>
-						<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
-					</div>
-				</template>
+				<dom-repeat items="[[unverifiedTeachers]]">
+					<template>
+						<div class="teacher prendus-horizontal-container">
+							<span>[[item.email]]</span>
+							<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
+						</div>
+					</template>
+				</dom-repeat>
 			</div>
 
 			<h2>Verified Teachers</h2>
 			<div class="container">
 				<p hidden$=[[showVerifiedTeachers(verifiedTeachers)]]><strong>No teachers have been verified yet.</strong></p>
-				<template is="dom-repeat" items="[[verifiedTeachers]]" as="verifiedTeacher">
-					<div class="teacher prendus-horizontal-container">
-						<span>[[verifiedTeacher.metaData.email]]</span>
-						<button class="prendus-button prendus-button--destructive" on-tap="revokeTeacher">Revoke</button>
-					</div>
-				</template>
+				<dom-repeat items="[[verifiedTeachers]]">
+					<template>
+						<div class="teacher prendus-horizontal-container">
+							<span>[[item.email]]</span>
+							<button class="prendus-button prendus-button--destructive" on-tap="revokeTeacher">Revoke</button>
+						</div>
+					</template>
+				</dom-repeat>
 			</div>
 		</div>
 

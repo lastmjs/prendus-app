@@ -13,12 +13,13 @@
 <link rel="import" href="../prendus-courses/prendus-courses.html">
 <link rel="import" href="../prendus-course/prendus-course.html">
 <link rel="import" href="../prendus-assignment/prendus-assignment.html">
+<link rel="import" href="../prendus-question-examples/prendus-question-examples.html">
 <link rel="import" href="../prendus-learning-structure/prendus-learning-structure.html">
 <link rel="import" href="../prendus-learning-structure/prendus-discipline.html">
 <link rel="import" href="../prendus-learning-structure/prendus-subject.html">
 <link rel="import" href="../prendus-learning-structure/prendus-concept.html">
-<link rel="import" href="../prendus-view-question/prendus-view-question.html">
-<link rel="import" href="../prendus-edit-question/prendus-edit-question.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/dist/prendus-view-question.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/dist/prendus-edit-question.html">
 <link rel="import" href="../prendus-signup/prendus-signup.html">
 <link rel="import" href="../prendus-login/prendus-login.html">
 <link rel="import" href="../prendus-authenticate/prendus-authenticate.html">
@@ -26,6 +27,7 @@
 <link rel="import" href="../prendus-ui/prendus-drop-down.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
+<link rel="import" href="../prendus-landing-page/prendus-landing-page.html">
 
 
 <dom-module id="prendus-app">
@@ -45,6 +47,12 @@
   				max-width: 800px;
   				width: 100%;
   			}
+
+        .landing{
+          max-width: 100%;
+          margin:0;
+          padding:0;
+        }
 
   			.loading-spinner {
   				position: fixed;
@@ -79,6 +87,7 @@
         <app-route route="[[route]]" pattern="/authenticate" active="{{authenticateRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/open-source" active="{{openSourceRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/courses" data="{{coursesRouteData}}" active="{{coursesRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
@@ -89,7 +98,7 @@
 
         <app-route route="[[route]]" pattern="/learning-structure" data="{{learningStructureRouteData}}" active="{{learningStructureRouteActive}}"></app-route>
 
-        <app-route route="[[route]]" pattern="/teacher-approval" data="{{learningStructureRouteData}}" active="{{teacherApprovalRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/teacher-approval" data="{{teacherApprovalRouteData}}" active="{{teacherApprovalRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/discipline/create" data="{{createDisciplineRouteData}}" active="{{createDisciplineRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/discipline/:disciplineId/view" data="{{viewDisciplineRouteData}}" active="{{viewDisciplineRouteActive}}"></app-route>
@@ -106,6 +115,8 @@
         <app-route route="[[route]]" pattern="/question/create" data="{{createQuestionRouteData}}" active="{{createQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/view" data="{{viewQuestionRouteData}}" active="{{viewQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/edit" data="{{editQuestionRouteData}}" active="{{editQuestionRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/question/:questionId/demo" data="{{editDemoQuestionRouteData}}" active="{{editDemoQuestionRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/question/examples" data="{{examplesQuestionRouteData}}" active="{{examplesQuestionRouteActive}}"></app-route>
 
         <app-header id  ="prendus-navbar">
           <app-toolbar>
@@ -127,11 +138,9 @@
           <app-toolbar>
         </app-header>
 
-        <br>
+        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive)]]">
 
-        <iron-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, learningStructureRouteActive, teacherApprovalRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, openSourceRouteActive)]]">
-
-            <prendus-courses class="app-window" show="rootView"></prendus-courses>
+            <prendus-landing-page class="app-window landing" show="rootView"></prendus-landing-page>
 
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
@@ -144,9 +153,12 @@
                     <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
                 </div>
             </div>
-            <prendus-edit-question show="createQuestionView"></prendus-edit-question>
-            <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]"></prendus-edit-question>
+            <prendus-edit-question class="app-window" show="createQuestionView" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+            <prendus-edit-question class="app-window" show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+            <prendus-edit-question class="app-window" show="editDemoQuestionView" question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
+            <prendus-question-examples class="app-window" show="examplesQuestionView"></prendus-question-examples>
 
+            <prendus-courses class="app-window" show="coursesView"></prendus-courses>
             <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create"></prendus-course>
             <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view"></prendus-course>
             <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit"></prendus-course>
