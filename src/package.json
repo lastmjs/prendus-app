@@ -4,5 +4,6 @@
     "prendus-question-elements": "^0.1.9",
     "redux-store-element": "^1.2.6",
     "zwitterion": "^0.8.1"
-  }
+  },
+  "devDependencies": {}
 }
