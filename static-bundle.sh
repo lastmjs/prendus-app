@@ -4,6 +4,7 @@
 tsc --module ES2015 --target ES2015 || echo TypeScript compilation complete
 
 # Copy the src directory into the dist directory
+rm -rf dist
 cp -r src dist
 
 # Replace all .ts extensions in script tags to .js
@@ -21,6 +22,6 @@ rm components/*/*.js
 cd ../dist
 for directory in components/* ; do
     for file in $directory/*.js ; do
-        rollup $file --format iife --output $file
+        ../node_modules/.bin/rollup $file --format iife --output $file
     done
 done
