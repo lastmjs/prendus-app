@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "install": "npm install -g bower && bower install && cd src && npm install",
-    "attribution": "generate-attribution && cd src && generate-attribution"
+    "attribution": "generate-attribution && cd src && generate-attribution",
+    "static-build": "./static-bundle.sh"
   },
   "engines": {
     "node": "8.1.2"
@@ -24,6 +25,8 @@
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
   "dependencies": {},
   "devDependencies": {
-    "oss-attribution-generator": "^1.2.0"
+    "oss-attribution-generator": "^1.2.0",
+    "rollup": "^0.45.2",
+    "typescript": "^2.4.1"
   }
 }

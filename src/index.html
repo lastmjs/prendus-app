@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
     <head>
       <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Prendus</title>
         <link rel="icon" href="images/favicon.png">
         <meta charset="utf-8"/>
         <base href="/">
@@ -18,22 +19,7 @@
 
         <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
         <script src="zwitterion-config.js"></script>
-        <script>
-            if (window.location.hostname === 'prendus.com') {
-                window.process = {
-                    env: {
-                        NODE_ENV: 'production'
-                    }
-                };
-            }
-            else {
-                window.process = {
-                    env: {
-                        NODE_ENV: 'development'
-                    }
-                };
-            }
-        </script>
+        <script src="/environment.js"></script>
         <script src="/node_modules/esprima/dist/esprima.js"></script>
         <link rel="import" href="/components/prendus-app/prendus-app.html">
     </body>
