@@ -9,7 +9,7 @@
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "install": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "static-build": "tsc --module system --target ES2015 || echo done && cp -r src dist && cd dist && find . -name '*.html' -exec sed -i 's/.ts\"><\\/script>/.js\"><\\/script>/g' {} \\; && cd ../src && rm typings/*.js && rm services/*.js && rm redux/*.js && rm components/*/*.js"
+    "static-build": "./static-bundle.sh"
   },
   "engines": {
     "node": "8.1.2"
@@ -26,6 +26,7 @@
   "dependencies": {},
   "devDependencies": {
     "oss-attribution-generator": "^1.2.0",
+    "rollup": "^0.45.2",
     "typescript": "^2.4.1"
   }
 }
