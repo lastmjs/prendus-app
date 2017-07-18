@@ -22,15 +22,17 @@ class PrendusApp extends Polymer.Element {
 
     async connectedCallback() {
         super.connectedCallback();
-
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
     }
 
     getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
 
-        if (rootRouteActive) return 'rootView';
-
+        if(this.user){
+          if (rootRouteActive) return 'rootView';
+        }else{
+          return 'coursesView';
+        }
         if (signupRouteActive) return 'signupView';
         if (loginRouteActive) return 'loginView';
         if (authenticateRouteActive) return 'authenticateView';
