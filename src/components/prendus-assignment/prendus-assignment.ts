@@ -107,6 +107,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     showSubjects(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
+      this.shadowRoot.querySelector('#subject-menu').disabled = false;
       if(this.concepts){
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -123,6 +124,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       };
     }
     showConcepts(e){
+      this.shadowRoot.querySelector('#concept-menu').disabled = false;
+      this.shadowRoot.querySelector('#save-concept').disabled = false;
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
@@ -141,7 +144,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async saveConcept(e: any){
-      const selectedConcept = this.concepts[e.target.id]
+      const selectedConcept = this.concepts[this.shadowRoot.querySelector('#selectedConcept').selected]
       if(!this.assignmentId){
         await this.createAssignment();
       }
@@ -200,7 +203,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     async loadLearningStructure(){
       await GQLQuery(`
           query {
-              learningStructure: allDisciplines(first: 30) {
+              learningStructure: allDisciplines(
+                first: 30
+                filter: {
+                  approved:YES
+                }){
                 title
                 subjects{
                   title

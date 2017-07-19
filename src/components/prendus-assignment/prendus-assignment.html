@@ -5,6 +5,9 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-dropdown-menu. Remove it when possible -->
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
 <link rel="import" href="../prendus-question-review/prendus-question-review.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -45,6 +48,7 @@
 
                 <dom-if if="[[isEditMode(mode)]]">
                   <template>
+                    <h1>Edit Assignment</h1>
                     <button class="prendus-button" on-click="saveAssignment">Save and Return to Course</button>
                     <paper-input id="titleInput" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
                       <!-- <input id="titleInput" type="text" value="[[assignment.title]]"> -->
@@ -58,36 +62,42 @@
                   </template>
                   <paper-dialog id="assignmentConceptDialog" modal>
                     <div class="content">
-                      <h2>Disciplines</h2>
-                      <div role="listbox">
-                        <dom-repeat items="[[learningStructure]]">
-                          <template>
-                              <paper-item id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</paper-item>
-                          </template>
-                        </dom-repeat>
-                      </div>
-                      <h2>Subjects</h2>
-                      <div id ="subjects">
-                        <div role="listbox">
-                          <dom-repeat items="[[subjects]]">
+                      <h2>Add a Concept to Assignment</h2>
+                      <paper-dropdown-menu label="Discipline">
+                        <paper-listbox slot="dropdown-content" selected="1">
+                          <dom-repeat items="[[learningStructure]]">
                             <template>
-                                <paper-item id="[[index]]" data-number="[[index]]" on-click="showConcepts">[[item.title]]</paper-item>
+                                <paper-item id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</paper-item>
                             </template>
                           </dom-repeat>
-                        </div>
+                        </paper-listbox>
+                      </paper-dropdown-menu>
+                      <div id ="subjects">
+                        <paper-dropdown-menu id="subject-menu" label="Subject" disabled>
+                          <paper-listbox slot="dropdown-content" selected="1">
+                            <dom-repeat items="[[subjects]]">
+                              <template>
+                                  <paper-item id="[[index]]" data-number="[[index]]" on-click="showConcepts">[[item.title]]</paper-item>
+                              </template>
+                            </dom-repeat>
+                          </paper-listbox>
+                        </paper-dropdown-menu>
                       </div>
-                      <h2>Concepts</h2>
                       <div id ="concepts">
-                        <dom-repeat items="[[concepts]]">
-                          <template>
-                              <h4 id="[[index]]" on-click="saveConcept">[[item.title]]</h4>
-                          </template>
-                        </dom-repeat>
+                        <paper-dropdown-menu id="concept-menu" label="Concept" disabled>
+                          <paper-listbox id="selectedConcept" slot="dropdown-content" selected="0">
+                            <dom-repeat items="[[concepts]]">
+                              <template>
+                                  <paper-item id="[[index]]">[[item.title]]</paper-item>
+                              </template>
+                            </dom-repeat>
+                          </paper-listbox>
+                        </paper-dropdown-menu>
                       </div>
                     </div>
                     <div class="buttons">
                       <button class="prendus-button prendus-button--minor" dialog-dismiss on-click="closeAssignmentConceptDialog">Cancel</button>
-                      <!-- <button class="prendus-button prendus-button--recommended" dialog-dismiss>Save</button> -->
+                      <button id="save-concept" class="prendus-button prendus-button--recommended" on-click="saveConcept" disabled>Save</button>
                     </div>
                   </paper-dialog>
                 </dom-if>
