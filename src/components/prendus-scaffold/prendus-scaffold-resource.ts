@@ -1,11 +1,11 @@
-import {ContainerElement} from '../../typings/container-element';
-import {Course} from '../../typings/course';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {updateCurrentQuestionScaffold} from '../../redux/actions';
-import {State} from '../../typings/state';
-import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldResource} from '../../typings/question-scaffold-resource';
-import {createUUID} from '../../services/utilities-service';
+import {ContainerElement} from '../../typings/container-element.js';
+import {Course} from '../../typings/course.js';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions.js';
+import {updateCurrentQuestionScaffold} from '../../redux/actions.js';
+import {State} from '../../typings/state.js';
+import {QuestionScaffold} from '../../typings/question-scaffold.js';
+import {QuestionScaffoldResource} from '../../typings/question-scaffold-resource.js';
+import {createUUID} from '../../services/utilities-service.js';
 
 class PrendusScaffoldResource extends Polymer.Element {
     componentId: string;

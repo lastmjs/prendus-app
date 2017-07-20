@@ -1,5 +1,5 @@
-import {QuestionScaffold} from '../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
+import {QuestionScaffold} from '../typings/question-scaffold.js';
+import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer.js';
 
 export function getGraphcoolHTTPEndpoint() {
     if (window.process.env.NODE_ENV === 'production') {

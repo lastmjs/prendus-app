@@ -1,14 +1,14 @@
-import {ContainerElement} from '../../typings/container-element';
-import {Course} from '../../typings/course';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
-import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {State} from '../../typings/state';
-import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {isDefinedAndNotEmpty} from '../../services/utilities-service';
-import {createUUID} from '../../services/utilities-service';
+import {ContainerElement} from '../../typings/container-element.js';
+import {Course} from '../../typings/course.js';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions.js';
+import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions.js';
+import {User} from '../../typings/user.js';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions.js';
+import {State} from '../../typings/state.js';
+import {QuestionScaffold} from '../../typings/question-scaffold.js';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer.js';
+import {isDefinedAndNotEmpty} from '../../services/utilities-service.js';
+import {createUUID} from '../../services/utilities-service.js';
 
 class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerElement {
     componentId: string;

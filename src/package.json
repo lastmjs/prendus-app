@@ -5,6 +5,6 @@
     "redux-store-element": "^1.2.6"
   },
   "devDependencies": {
-    "zwitterion": "^0.8.1"
+    "zwitterion": "git+ssh://git@github.com/lastmjs/zwitterion.git"
   }
 }

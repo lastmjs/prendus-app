@@ -1,4 +1,4 @@
-import {AnswerTypes} from './answer-types';
+import {AnswerTypes} from './answer-types.js';
 
 export interface GuiAnswer {
 		type: AnswerTypes;

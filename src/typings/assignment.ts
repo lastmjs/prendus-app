@@ -1,6 +1,6 @@
-import {Course} from './course';
-import {User} from './user';
-import {AssignmentType} from './assignment-type'
+import {Course} from './course.js';
+import {User} from './user.js';
+import {AssignmentType} from './assignment-type.js'
 
 export interface Assignment {
     readonly id: string;

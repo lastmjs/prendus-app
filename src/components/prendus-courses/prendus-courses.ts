@@ -1,11 +1,11 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {Course} from '../../typings/course';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {State} from '../../typings/state';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service.js';
+import {ContainerElement} from '../../typings/container-element.js';
+import {Course} from '../../typings/course.js';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions.js';
+import {User} from '../../typings/user.js';
+import {State} from '../../typings/state.js';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions.js';
+import {createUUID, navigate} from '../../services/utilities-service.js';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];

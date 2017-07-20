@@ -1,8 +1,8 @@
-import {GQLQueryDataCallback} from '../typings/gql-query-data-callback';
-import {GQLQueryErrorCallback} from '../typings/gql-query-error-callback';
-import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback';
-import {GQLMutateErrorCallback} from '../typings/gql-mutate-error-callback';
-import {getGraphcoolHTTPEndpoint, getGraphcoolWebSocketEndpoint} from '../services/utilities-service';
+import {GQLQueryDataCallback} from '../typings/gql-query-data-callback.js';
+import {GQLQueryErrorCallback} from '../typings/gql-query-error-callback.js';
+import {GQLSubscribeCallback} from '../typings/gql-subscribe-callback.js';
+import {GQLMutateErrorCallback} from '../typings/gql-mutate-error-callback.js';
+import {getGraphcoolHTTPEndpoint, getGraphcoolWebSocketEndpoint} from '../services/utilities-service.js';
 
 const httpEndpoint = getGraphcoolHTTPEndpoint();
 

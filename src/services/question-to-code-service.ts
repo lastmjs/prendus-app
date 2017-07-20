@@ -1,6 +1,6 @@
-import {Question} from '../typings/question';
-import {GuiQuestion} from '../typings/gui-question';
-import {GuiAnswer} from '../typings/gui-answer';
+import {Question} from '../typings/question.js';
+import {GuiQuestion} from '../typings/gui-question.js';
+import {GuiAnswer} from '../typings/gui-answer.js';
 
 // generates code for a multiple choice question
 export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string, code: string } => {

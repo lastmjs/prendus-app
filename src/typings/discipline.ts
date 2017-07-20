@@ -1,5 +1,5 @@
-import {User} from './user';
-import {Subject} from './subject';
+import {User} from './user.js';
+import {Subject} from './subject.js';
 
 export interface Discipline {
     readonly id: string;

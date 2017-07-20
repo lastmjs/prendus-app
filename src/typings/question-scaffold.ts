@@ -1,5 +1,5 @@
-import {QuestionScaffoldAnswer} from './question-scaffold-answer';
-import {Question} from './question';
+import {QuestionScaffoldAnswer} from './question-scaffold-answer.js';
+import {Question} from './question.js';
 
 export interface QuestionScaffold {
   readonly answers: {

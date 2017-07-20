@@ -1,11 +1,11 @@
-import {GQLQuery} from '../services/graphql-service';
-import {SetPropertyAction, DefaultAction} from '../typings/actions';
-import {State} from '../typings/state';
-import {Question} from '../typings/question';
-import {QuestionScaffold} from '../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
-import {Concept} from '../typings/concept';
-import {Quiz} from '../typings/quiz';
+import {GQLQuery} from '../services/graphql-service.js';
+import {SetPropertyAction, DefaultAction} from '../typings/actions.js';
+import {State} from '../typings/state.js';
+import {Question} from '../typings/question.js';
+import {QuestionScaffold} from '../typings/question-scaffold.js';
+import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer.js';
+import {Concept} from '../typings/concept.js';
+import {Quiz} from '../typings/quiz.js';
 
 export function checkForUserToken(): SetPropertyAction | DefaultAction {
     const userToken = window.localStorage.getItem('userToken');

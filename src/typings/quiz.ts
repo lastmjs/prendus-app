@@ -1,5 +1,5 @@
-import {User} from './user';
-import {Question} from './question';
+import {User} from './user.js';
+import {Question} from './question.js';
 
 export interface Quiz {
     readonly id: string;

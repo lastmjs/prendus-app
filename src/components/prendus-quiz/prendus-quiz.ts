@@ -1,10 +1,10 @@
-import {ContainerElement} from '../../typings/container-element';
-import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions';
-import {GQLQuery} from '../../services/graphql-service';
-import {Quiz} from '../../typings/quiz';
-import {checkForUserToken} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
-import {Question} from '../../typings/question';
+import {ContainerElement} from '../../typings/container-element.js';
+import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions.js';
+import {GQLQuery} from '../../services/graphql-service.js';
+import {Quiz} from '../../typings/quiz.js';
+import {checkForUserToken} from '../../redux/actions.js';
+import {createUUID} from '../../services/utilities-service.js';
+import {Question} from '../../typings/question.js';
 
 class PrendusQuiz extends Polymer.Element implements ContainerElement {
     componentId: string;

@@ -1,11 +1,11 @@
-import {RootReducer} from '../../redux/reducers';
-import {GQLSubscribe} from '../../services/graphql-service';
-import {navigate} from '../../services/utilities-service';
-import {Reducer} from '../../typings/reducer';
-import {State} from '../../typings/state';
-import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
-import {SetPropertyAction, DefaultAction} from '../../typings/actions';
+import {RootReducer} from '../../redux/reducers.js';
+import {GQLSubscribe} from '../../services/graphql-service.js';
+import {navigate} from '../../services/utilities-service.js';
+import {Reducer} from '../../typings/reducer.js';
+import {State} from '../../typings/state.js';
+import {User} from '../../typings/user.js';
+import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions.js';
+import {SetPropertyAction, DefaultAction} from '../../typings/actions.js';
 
 class PrendusApp extends Polymer.Element {
     rootReducer: Reducer;

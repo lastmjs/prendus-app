@@ -1,4 +1,4 @@
-import {State} from '../typings/state';
+import {State} from '../typings/state.js';
 
 export const InitialState: State = {
     userToken: null,
