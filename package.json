@@ -4,7 +4,7 @@
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --port 5000",
-    "dev": "cd src && node_modules/.bin/zwitterion --watch-files --port 8000",
+    "dev": "cd src && node_modules/.bin/zwitterion --ts-warning --watch-files --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
