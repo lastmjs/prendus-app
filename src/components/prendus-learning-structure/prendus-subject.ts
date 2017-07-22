@@ -1,11 +1,11 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {Mode} from '../../typings/mode.js';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {Subject} from '../../typings/subject.js';
-import {Concept} from '../../typings/concept.js';
-import {User} from '../../typings/user.js';
-import {createUUID} from '../../services/utilities-service.js';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {Mode} from '../../typings/mode';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {Subject} from '../../typings/subject';
+import {Concept} from '../../typings/concept';
+import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusSubject extends Polymer.Element implements ContainerElement {
     subjectId: string;

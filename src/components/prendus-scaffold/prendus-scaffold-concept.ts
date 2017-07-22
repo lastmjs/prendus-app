@@ -1,11 +1,11 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {updateCurrentQuestionScaffold} from '../../redux/actions.js';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {QuestionScaffold} from '../../typings/question-scaffold.js';
-import {User} from '../../typings/user.js';
-import {Concept} from '../../typings/concept.js';
-import {createUUID} from '../../services/utilities-service.js';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {updateCurrentQuestionScaffold} from '../../redux/actions';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {User} from '../../typings/user';
+import {Concept} from '../../typings/concept';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldConcept extends Polymer.Element {
     componentId: string;

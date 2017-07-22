@@ -1,5 +1,5 @@
-import {Subject} from './subject.js';
-import {User} from './user.js';
+import {Subject} from './subject';
+import {User} from './user';
 
 export interface Concept {
     readonly id: string;

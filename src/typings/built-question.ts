@@ -1,5 +1,5 @@
-import {Answer} from './answer.js';
-import {User} from './user.js';
+import {Answer} from './answer';
+import {User} from './user';
 
 export interface BuiltQuestion {
     readonly transformedText: string;

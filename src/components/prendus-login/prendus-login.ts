@@ -1,11 +1,11 @@
-import {ContainerElement} from '../../typings/container-element.js';
-import {State} from '../../typings/state.js';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service.js';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {User} from '../../typings/user.js';
-import {persistUserToken} from '../../redux/actions.js';
-import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service.js';
-import {EMAIL_REGEX} from '../../services/constants-service.js';
+import {ContainerElement} from '../../typings/container-element';
+import {State} from '../../typings/state';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {User} from '../../typings/user';
+import {persistUserToken} from '../../redux/actions';
+import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service';
+import {EMAIL_REGEX} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;

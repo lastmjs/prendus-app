@@ -1,11 +1,11 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {User} from '../../typings/user.js';
-import {QuestionScaffold} from '../../typings/question-scaffold.js';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer.js';
-import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service.js';
-import {createUUID} from '../../services/utilities-service.js';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {User} from '../../typings/user';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
     componentId: string;

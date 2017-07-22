@@ -1,7 +1,7 @@
-import {State} from '../typings/state.js';
-import {InitialState} from './initial-state.js';
-import {Action, SetPropertyAction, SetComponentPropertyAction} from '../typings/actions.js';
-import {Reducer} from '../typings/reducer.js';
+import {State} from '../typings/state';
+import {InitialState} from './initial-state';
+import {Action, SetPropertyAction, SetComponentPropertyAction} from '../typings/actions';
+import {Reducer} from '../typings/reducer';
 
 export const RootReducer: Reducer = (state: State = InitialState, action: Action): State => {
     switch(action.type) {

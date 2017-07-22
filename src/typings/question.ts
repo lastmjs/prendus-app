@@ -1,8 +1,8 @@
-import {Quiz} from './quiz.js';
-import {User} from './user.js';
-import {Discipline} from './discipline.js';
-import {Subject} from './subject.js';
-import {Concept} from './concept.js';
+import {Quiz} from './quiz';
+import {User} from './user';
+import {Discipline} from './discipline';
+import {Subject} from './subject';
+import {Concept} from './concept';
 
 
 export interface Question {

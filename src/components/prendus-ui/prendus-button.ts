@@ -1,4 +1,4 @@
-import {ContainerElement} from '../../typings/container-element.js';
+import {ContainerElement} from '../../typings/container-element';
 
 class PrendusButton extends Polymer.Element implements ContainerElement {
     static get is() { return 'prendus-button'; }

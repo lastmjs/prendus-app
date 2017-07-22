@@ -1,13 +1,13 @@
-import {GQLQuery, GQLMutate} from '../../services/graphql-service.js';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {Assignment} from '../../typings/assignment.js';
-import {Subject} from '../../typings/subject.js';
-import {Concept} from '../../typings/concept.js';
-import {User} from '../../typings/user.js';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions.js';
-import {createUUID, navigate} from '../../services/utilities-service.js';
-import {AssignmentType} from '../../typings/assignment-type.js';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {ContainerElement} from '../../typings/container-element';
+import {Assignment} from '../../typings/assignment';
+import {Subject} from '../../typings/subject';
+import {Concept} from '../../typings/concept';
+import {User} from '../../typings/user';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {createUUID, navigate} from '../../services/utilities-service';
+import {AssignmentType} from '../../typings/assignment-type';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;

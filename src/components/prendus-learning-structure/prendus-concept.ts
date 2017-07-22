@@ -1,10 +1,10 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {Mode} from '../../typings/mode.js';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {Concept} from '../../typings/concept.js';
-import {User} from '../../typings/user.js';
-import {createUUID} from '../../services/utilities-service.js';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {Mode} from '../../typings/mode';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {Concept} from '../../typings/concept';
+import {User} from '../../typings/user';
+import {createUUID} from '../../services/utilities-service';
 
 class PrendusConcept extends Polymer.Element implements ContainerElement {
     conceptId: string;

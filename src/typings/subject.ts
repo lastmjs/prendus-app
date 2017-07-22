@@ -1,7 +1,7 @@
-import {Discipline} from './discipline.js';
-import {Concept} from './concept.js';
-import {Assignment} from './assignment.js';
-import {User} from './user.js';
+import {Discipline} from './discipline';
+import {Concept} from './concept';
+import {Assignment} from './assignment';
+import {User} from './user';
 
 export interface Subject {
     readonly id: string;

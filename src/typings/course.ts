@@ -1,5 +1,5 @@
-import {User} from './user.js';
-import {Assignment} from './assignment.js';
+import {User} from './user';
+import {Assignment} from './assignment';
 
 export interface Course {
     readonly id: string;

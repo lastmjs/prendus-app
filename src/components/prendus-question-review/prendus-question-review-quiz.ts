@@ -1,15 +1,15 @@
-import {SetPropertyAction, SetComponentPropertyAction } from '../../typings/actions.js';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {setDisabledNext, checkForUserToken} from '../../redux/actions.js'
-import {User} from '../../typings/user.js';
-import {Question} from '../../typings/question.js';
-import {GuiQuestion} from '../../typings/gui-question.js';
-import {GuiAnswer} from '../../typings/gui-answer.js';
-import {QuestionScaffold} from '../../typings/question-scaffold.js';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer.js';
-import {QuestionRating} from '../../typings/question-rating.js';
-import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service.js';
+import {SetPropertyAction, SetComponentPropertyAction } from '../../typings/actions';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {setDisabledNext, checkForUserToken} from '../../redux/actions'
+import {User} from '../../typings/user';
+import {Question} from '../../typings/question';
+import {GuiQuestion} from '../../typings/gui-question';
+import {GuiAnswer} from '../../typings/gui-answer';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {QuestionRating} from '../../typings/question-rating';
+import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 
 class PrendusQuestionReviewQuiz extends Polymer.Element {
     componentId: string;

@@ -1,15 +1,15 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions.js';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service.js';
-import {checkForUserToken, setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions.js';
-import {User} from '../../typings/user.js';
-import {QuestionScaffold} from '../../typings/question-scaffold.js';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer.js';
-import {shuffleArray} from '../../services/utilities-service.js';
-import {generateMultipleChoice} from '../../services/question-to-code-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {Question} from '../../typings/question.js';
-import {AnswerTypes} from '../../typings/answer-types.js';
-import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service.js';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {checkForUserToken, setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
+import {User} from '../../typings/user';
+import {QuestionScaffold} from '../../typings/question-scaffold';
+import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {shuffleArray} from '../../services/utilities-service';
+import {generateMultipleChoice} from '../../services/question-to-code-service';
+import {ContainerElement} from '../../typings/container-element';
+import {Question} from '../../typings/question';
+import {AnswerTypes} from '../../typings/answer-types';
+import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;

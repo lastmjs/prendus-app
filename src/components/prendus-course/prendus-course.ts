@@ -1,12 +1,12 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service.js';
-import {ContainerElement} from '../../typings/container-element.js';
-import {Mode} from '../../typings/mode.js';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions.js';
-import {Assignment} from '../../typings/assignment.js';
-import {Course} from '../../typings/course.js';
-import {User} from '../../typings/user.js';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions.js';
-import {createUUID, navigate} from '../../services/utilities-service.js';
+import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {ContainerElement} from '../../typings/container-element';
+import {Mode} from '../../typings/mode';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {Assignment} from '../../typings/assignment';
+import {Course} from '../../typings/course';
+import {User} from '../../typings/user';
+import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;

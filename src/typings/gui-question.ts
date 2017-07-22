@@ -1,4 +1,4 @@
-import {GuiAnswer} from './gui-answer.js';
+import {GuiAnswer} from './gui-answer';
 
 export interface GuiQuestion {
 		stem: string;

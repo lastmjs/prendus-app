@@ -1,4 +1,4 @@
-import {InputAnswer} from './input-answer.js';
-import {CheckOrRadioAnswer} from './check-or-radio-answer.js';
+import {InputAnswer} from './input-answer';
+import {CheckOrRadioAnswer} from './check-or-radio-answer';
 
 export type Answer = string | InputAnswer | CheckOrRadioAnswer;
