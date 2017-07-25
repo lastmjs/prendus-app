@@ -1,4 +1,4 @@
-import {SetPropertyAction, SetComponentPropertyAction, initializeQuestionScaffoldsToRate } from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {setDisabledNext} from '../../redux/actions'

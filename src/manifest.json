@@ -1,0 +1,12 @@
+{
+    "name": "Prendus",
+    "short_name": "Prendus",
+    "display": "standalone",
+    "background_color": "#3f51b5",
+    "icons": [{
+                "src": "images/favicon.png"
+            }, {
+                "src": "images/navbar-logo.png"
+            }
+    ]
+}
