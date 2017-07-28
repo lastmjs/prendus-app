@@ -3,16 +3,18 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-tooltip. Remove it when possible -->
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
-
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-course">
@@ -57,14 +59,56 @@
         </style>
         <dom-if if="[[loaded]]">
             <template>
-                <div class="edit-section">
-                  <template is="dom-if" if="[[isViewMode(mode)]]">
-                    <h1>[[course.title]]</h1>
-                  </template>
-  						    <template is="dom-if" if="[[!isViewMode(mode)]]">
-                    <paper-input id="course-title" class="edit-input" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-change="titleChanged" required auto-validate error-message="Please enter a title."></paper-input>
-      						</template>
-      					</div>
+              <div class="edit-section">
+                <template is="dom-if" if="[[isViewMode(mode)]]">
+                  <h1>[[course.title]]</h1>
+                </template>
+						    <template is="dom-if" if="[[!isViewMode(mode)]]">
+                  <paper-input id="course-title" class="edit-input" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-change="titleChanged" required auto-validate error-message="Please enter a title."></paper-input>
+    						</template>
+    					</div>
+              <paper-dropdown-menu label="Discipline">
+                <paper-listbox id="discipline-list" slot="dropdown-content">
+                  <dom-repeat items="[[learningStructure]]">
+                    <template>
+                        <paper-item id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</paper-item>
+                    </template>
+                  </dom-repeat>
+                  <paper-item id="new-discipline" on-click="openCreateDisciplineDialog"><iron-icon class="prendus-icon-button" icon="add"></iron-icon>&nbsp; Add Discipline &nbsp;</paper-item>
+                </paper-listbox>
+              </paper-dropdown-menu>
+              <paper-dialog id="create-discipline" with-backdrop>
+                  <div class="content">
+                    <h2 id ="dialog-header">Create New Discipline</h2>
+                    <paper-input id="discipline-title" id="disciplineTitle" label="Discipline"></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+                    <button id="save-new-discipline" class="prendus-button prendus-button--recommended" on-click="createDiscipline">Save</button>
+                  </div>
+              </paper-dialog>
+              <div id="subjects">
+                <paper-dropdown-menu id="subject-menu" label="Subject" disabled>
+                  <paper-listbox slot="dropdown-content" selected="1">
+                    <dom-repeat items="[[subjects]]">
+                      <template>
+                          <paper-item id="[[index]]" data-number="[[index]]" on-click="saveSubject">[[item.title]]</paper-item>
+                      </template>
+                    </dom-repeat>
+                    <paper-item id="new" on-click="openCreateSubjectDialog"><iron-icon class="prendus-icon-button" icon="add"></iron-icon>&nbsp; Add Subject &nbsp;</paper-item>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+              </div>
+              <paper-dialog id="create-subject" with-backdrop>
+                  <div class="content">
+                    <h2 id="dialog-header">Create New Subject</h2>
+                    <paper-input id="subject-title" id="subjectTitle" label="Subject"></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+                    <button id="save-new-subject" class="prendus-button prendus-button--recommended" on-click="saveSubject">Save</button>
+                  </div>
+              </paper-dialog>
               <h2 class="prendus-margin">Assignments</h2>
               <dom-if if="[[assignments.length]]">
                 <template>
