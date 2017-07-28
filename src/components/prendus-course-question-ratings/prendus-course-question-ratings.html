@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+<dom-module id="prendus-course-question-ratings">
+
+  <template>
+
+    <style include="prendus-styles">
+      #questions {
+      }
+
+      .question-row {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-gap: 10px;
+        grid-auto-rows: minmax(100px, auto);
+      }
+
+      .question-text {
+        grid-column: span 2;
+        grid-row: 1;
+      }
+
+      .question-alignment {
+        grid-column: 3;
+        grid-row: 1;
+      }
+
+      .question-quality {
+        grid-column: 4;
+        grid-row: 1;
+      }
+
+      .question-quality {
+        grid-column: 5;
+        grid-row: 1;
+      }
+      
+      .question-difficulty {
+        grid-column: 6;
+        grid-row: 1;
+      }
+
+      .question-score {
+        grid-column: 7;
+        grid-row: 1;
+      }
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <div>
+      <h2>Course Questions</h2>
+      <div id="questions">
+        <div class="question-row">
+          <div class="question-text">Question</div>
+          <div class="question-alignment">Accuracy</div>
+          <div class="question-quality">Quality</div>
+          <div class="question-difficulty">Difficulty</div>
+          <div class="question-score">Overall Quality Score</div>
+        </div>
+        <template is="dom-repeat" items="[[_applyFilter(assignments, filter)]]">
+          <div class="question-row">
+            <div class="question-text">[[_questionOnly(item.text)]]</div>
+            <div class="question-alignment"></div>
+            <div class="question-quality"></div>
+            <div class="question-difficulty"></div>
+            <div class="question-score"></div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+  <script src="prendus-course-question-ratings.ts"></script>
+</dom-module>

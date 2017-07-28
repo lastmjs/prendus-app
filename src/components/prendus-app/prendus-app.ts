@@ -47,6 +47,7 @@ class PrendusApp extends Polymer.Element {
         if (createCourseRouteActive) return 'createCourseView';
         if (viewCourseRouteActive) return 'viewCourseView';
         if (editCourseRouteActive) return 'editCourseView';
+        if (courseQuestionRatingsRouteActive) return 'courseQuestionRatingsView';
 
         if (createAssignmentRouteActive) return 'createAssignmentView';
         if (viewAssignmentRouteActive) return 'viewAssignmentView';
