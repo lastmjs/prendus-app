@@ -36,7 +36,7 @@ class PrendusApp extends Polymer.Element {
             return 'rootView';
           }
         }
-        
+
         if (signupRouteActive) return 'signupView';
         if (loginRouteActive) return 'loginView';
         if (authenticateRouteActive) return 'authenticateView';
@@ -82,6 +82,38 @@ class PrendusApp extends Polymer.Element {
         navigate(`/signup`)
       }
     }
+    //TODO put the route in redux
+      // subscribedToStore() {
+     //     this.subscribedToStore = true;
+     // }
+     //
+     // routeChanged(e: CustomEvent) {
+     //     if (this.subscribedToStore) return;
+     //
+     //     const appLocation = this.shadowRoot.querySelector('#appLocation');
+     //     const route = appLocation.route;
+     //     const routeData = appLocation.routeData;		
+    //     const queryParams = appLocation.queryParams;
+    //
+    //     this.action = {
+    //         type: 'SET_PROPERTY',
+    //         key: 'route',
+    //         value: route
+    //     };
+    //
+     //     this.action = {
+    //         type: 'SET_PROPERTY',
+    //         key: 'routeData',
+    //         value: routeData
+    //     };
+     //
+     //     this.action = {
+     //         type: 'SET_PROPERTY',
+     //         key: 'queryParams',
+     //         value: queryParams
+     //     };
+     // }
+     //
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
 
