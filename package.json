@@ -3,13 +3,12 @@
   "version": "0.1.17",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
-    "start": "cd src && node_modules/.bin/zwitterion --port 5000",
-    "dev": "cd src && node_modules/.bin/zwitterion --watch-files --port 8000",
+    "start": "cd src && zwitterion --ts-warning --watch-files",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
-    "install": "npm install -g bower && bower install && cd src && npm install",
+    "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "static-build": "./static-bundle.sh"
+    "build-static": "cd src && zwitterion --build-static"
   },
   "engines": {
     "node": "8.1.2"
@@ -25,8 +24,6 @@
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
   "dependencies": {},
   "devDependencies": {
-    "oss-attribution-generator": "^1.2.0",
-    "rollup": "^0.45.2",
-    "typescript": "^2.4.1"
+    "oss-attribution-generator": "^1.2.0"
   }
 }
