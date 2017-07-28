@@ -4,23 +4,19 @@
     <head>
       <meta name="viewport" content="width=device-width,initial-scale=1">
       <title>Prendus</title>
-        <link rel="icon" href="images/favicon.png">
+      <link rel="manifest" href="/manifest.json">
+        <link rel="icon" href="/images/favicon.png">
         <meta charset="utf-8"/>
         <base href="/">
     </head>
 
-
-
-
     <body style="margin: 0;">
-
-
         <prendus-app>Loading...</prendus-app>
 
         <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-        <script src="zwitterion-config.js"></script>
-        <script src="/environment.js"></script>
+        <script src="/node_modules/systemjs/dist/system.js"></script>
         <script src="/node_modules/esprima/dist/esprima.js"></script>
+        <script src="/client-settings.js"></script>
         <link rel="import" href="/components/prendus-app/prendus-app.html">
     </body>
 </html>
