@@ -124,7 +124,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   _averageProp = averageProp;
 
   _questionScore(ratings: QuestionRating[]): number {
-    return (this._averageProp(ratings, 'alignment') + this._averageProp(ratings, 'quality') + this._averageProp(ratings, 'difficulty')) / 3;
+    const avg = (this._averageProp(ratings, 'alignment') + this._averageProp(ratings, 'quality') + this._averageProp(ratings, 'difficulty')) / 3;
+    return avg.toPrecision(2);
   }
 
   stateChange(e: CustomEvent) {
