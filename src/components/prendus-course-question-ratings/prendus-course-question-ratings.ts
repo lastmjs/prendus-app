@@ -46,7 +46,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   _handleError(error: any) {
     console.log('error', error);
   }
-  
+
   async loadQuestions() {
     const data = GQLQuery(`
         query {
@@ -102,7 +102,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
           key: 'loaded',
           value: false
       };
-      
+
       await this.loadQuestions();
 
       this.action = {
