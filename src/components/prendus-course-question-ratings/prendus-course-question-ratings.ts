@@ -3,19 +3,19 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
+import {QuestionRating} from '../../typings/question-rating';
 import {createUUID} from '../../services/utilities-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
 class PrendusCourseQuestionRatings extends Polymer.Element {
+  loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
   userToken: string | null;
   user: User;
+  courseId: string;
   assignments: Assignment[];
-  filter: { [key: string]: string } = {
-    'assignmentId': 'ALL',
-    'conceptId': 'ALL'
-  };
+  filter: { [key: string]: string };
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -30,7 +30,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   constructor() {
     super();
     this.componentId = createUUID();
-    console.log('constructed');
+    this.filter = { assignmentId: 'ALL', conceptId: 'ALL' };
   }
 
   async connectedCallback() {
@@ -50,7 +50,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   async loadQuestions() {
     const data = GQLQuery(`
         query {
-          allAssignments(
+          assignments: allAssignments(
             filter:{
               course: {
                 id: "${this.courseId}"
@@ -81,8 +81,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
         this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
-          key: 'assignments',
-          value: value
+          key,
+          value
         };
       },
       this._handleError);
@@ -113,35 +113,56 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       };
   }
 
-  _flatten(arr: any[]) {
-    return arr.reduce((acc, elem) => {
-      if (Array.isArray(elem)) this._flatten(elem).forEach((el) => acc.push(el));
-      else acc.push(elem);
-      return acc;
-    },[]);
-  }
-
-  _applyFilter(assignments, filter) {
+  _applyFilter(assignments: Assignment[], filter: { [key: string]: string }): Question[] {
     if (!assignments) return;
-    let filtered = this._flatten(assignments.map(assignment => assignment.questions));
-    console.log(filtered);
+    let filtered = flatten(assignments.map(assignment => assignment.questions));
     return filtered;
   }
 
-  _questionOnly(text: string) {
-    console.log(text);
+  _questionOnly(text: string): string {
     return parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', '');
+  }
+
+  _questionAlignment(ratings: QuestionRating[]): number {
+    return averageProp(ratings, 'alignment');
+  }
+
+  _questionQuality(ratings: QuestionRating[]): number {
+    return averageProp(ratings, 'quality');
+  }
+
+  _questionDifficulty(ratings: QuestionRating[]): number {
+    return averageProp(ratings, 'difficulty');
+  }
+
+  _questionScore(ratings: QuestionRating[]): number {
+    return (this._questionAlignment(ratings) + this._questionQuality(ratings) + this._questionDifficulty(ratings)) / 3;
   }
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
-    if (Object.keys(state.components[this.componentId] || {}).includes('assignments')) this.assignments = state.components[this.componentId].assignments;
-    if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
-    if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+    const componentState = state.components[this.componentId] || {};
+    const keys = Object.keys(componentState);
+    if (keys.includes('assignments')) this.assignments = componentState.assignments;
+    if (keys.includes('courseId')) this.courseId = componentState.courseId;
+    if (keys.includes('loaded')) this.loaded = componentState.loaded;
     this.userToken = state.userToken;
     this.user = state.user;
     console.log('state changed', state);
   }
 }
 
+function flatten(arr: any[]): any[] {
+  return arr.reduce((acc, elem) => {
+    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
+  },[]);
+}
+
+function averageProp(arr: Object[], prop: string): number {
+  if (!arr.length) return 0;
+  return arr.reduce((sum, obj) => sum + obj[prop], 0) / arr.length;
+}
+
+
 window.customElements.define(PrendusCourseQuestionRatings.is, PrendusCourseQuestionRatings);
+
