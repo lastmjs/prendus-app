@@ -102,14 +102,14 @@
           <div class="question-difficulty">Difficulty</div>
           <div class="question-score">Overall</div>
         </div>
-        <dom-repeat items="[[_applyFilter(assignments, assignmentId, conceptId)]]">
+        <dom-repeat items="[[questionRows]]" filter="_filterQuestions" sort="_sortQuestions">
           <template>
             <div class="question-row">
               <div class="question-text">[[_questionOnly(item.text)]]</div>
-              <div class="question-alignment">[[_averageProp(item.ratings, 'alignment')]]</div>
-              <div class="question-quality">[[_averageProp(item.ratings, 'quality')]]</div>
-              <div class="question-difficulty">[[_averageProp(item.ratings, 'difficulty')]]</div>
-              <div class="question-score">[[_questionScore(item.ratings)]]</div>
+              <div class="question-alignment">[[item.alignment]]</div>
+              <div class="question-quality">[[item.quality]]</div>
+              <div class="question-difficulty">[[item.difficulty]]</div>
+              <div class="question-score">[[item.overall]]</div>
             </div>
           </template>
         </dom-repeat>

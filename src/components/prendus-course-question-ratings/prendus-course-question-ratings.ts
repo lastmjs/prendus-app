@@ -9,6 +9,16 @@ import {Concept} from '../../typings/concept';
 import {createUUID} from '../../services/utilities-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
+interface QuestionRatingRow {
+  readonly assignmentId: string,
+  readonly conceptId: string,
+  readonly text: string,
+  readonly quality: number,
+  readonly difficulty: number,
+  readonly alignment: number,
+  readonly overall: string
+}
+
 class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
@@ -17,8 +27,10 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   user: User;
   courseId: string;
   assignments: Assignment[];
-  assignmentId: string;
-  conceptId: string;
+  questionRows: QuestionRatingRow[];
+  assignmentId: string = 'ALL';
+  conceptId: string = 'ALL';
+  sortField: string = 'overall';
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -91,41 +103,54 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     this._fireAction('loaded', true);
   }
 
-  _applyFilter(assignments: Assignment[], assignmentId: string, conceptId: string): Question[] {
-    if (!assignments) return [];
-    const filteredAssignments = !assignmentId || assignmentId === 'ALL'
-      ? assignments
-      : assignments.filter(filterProp('id', assignmentId));
-    const questions: Question[] = flatten(filteredAssignments.map(assignment => assignment.questions));
-    return !conceptId || conceptId === 'ALL'
-      ? questions
-      : questions.filter(question => question.concept.id === conceptId);
-  }
-
   _assignmentIdChanged(e) {
     this._fireAction('assignmentId', e.target.value);
+    //this.$.questions.render();
   }
 
   _conceptIdChanged(e) {
     this._fireAction('conceptId', e.target.value);
+    //this.$.questions.render();
+  }
+
+  _questions(assignments: Assignment[]): Question[] {
+    return flatten(assignments.map(assignment => assignment.questions));
+  }
+
+  _filterQuestions(question: QuestionRatingRow): boolean {
+    return (this.assignmentId === 'ALL' || question.assignmentId === this.assignmentId)
+      && (this.conceptId === 'ALL' || this.conceptId === question.conceptId);
+  }
+
+  _sortQuestions(a: QuestionRatingRow, b: QuestionRatingRow): number {
+    return 1;
   }
 
   _concepts(assignments: Assignment[]): Concept[] {
-    return uniqueProp(
-      flatten(assignments.map(assignment => assignment.questions)).map(question => question.concept),
-      'id'
-    );
+    return uniqueProp(this._questions(assignments).map(question => question.concept), 'id');
   }
 
   _questionOnly(text: string): string {
     return parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', '');
   }
 
-  _averageProp = averageProp;
-
-  _questionScore(ratings: QuestionRating[]): number {
-    const avg = (this._averageProp(ratings, 'alignment') + this._averageProp(ratings, 'quality') + this._averageProp(ratings, 'difficulty')) / 3;
-    return avg.toPrecision(2);
+  _computeQuestionStats(assignments: Assignment[]): QuestionRatingRow[] {
+    return flatten(assignments.map(assignment => {
+      return assignment.questions.map(question => {
+        const quality = averageProp(question.ratings, 'quality');
+        const alignment = averageProp(question.ratings, 'alignment');
+        const difficulty = averageProp(question.ratings, 'difficulty');
+        return {
+          assignmentId: assignment.id,
+          conceptId: question.concept.id,
+          text: question.text
+          quality,
+          alignment,
+          difficulty,
+          overall: ((quality + alignment + difficulty) / 3).toPrecision(2)
+        };
+      });
+    }));
   }
 
   stateChange(e: CustomEvent) {
@@ -133,13 +158,13 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('assignments')) this.assignments = componentState.assignments;
+    if (keys.includes('assignments')) this.questionRows = this._computeQuestionStats(componentState.assignments);
     if (keys.includes('courseId')) this.courseId = componentState.courseId;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignmentId')) this.assignmentId = componentState.assignmentId;
     if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
     this.userToken = state.userToken;
     this.user = state.user;
-    console.log('state changed', state);
   }
 }
 
