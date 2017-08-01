@@ -18,7 +18,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   courseId: string;
   assignments: Assignment[];
   questionStats: QuestionRatingStats[];
-  initialized: boolean = false;
   assignmentId: string = 'ALL';
   conceptId: string = 'ALL';
   sortField: string = 'overall';
@@ -58,7 +57,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   async loadQuestions() {
-    const data = GQLQuery(`
+    const data = await GQLQuery(`
         query {
           assignments: allAssignments(
             filter:{
@@ -86,6 +85,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     `, this.userToken,
       (key: string, value: any) => { this._fireAction(key, value) },
       this._handleError);
+    this._fireAction('questionStats', this._computeQuestionStats(data.assignments));
   }
 
   async _courseIdChanged() {
@@ -138,7 +138,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
-    console.log('computing');
     return flatten(assignments.map(assignment => {
       return assignment.questions.map(question => {
         const quality = averageProp(question.ratings, 'quality');
@@ -162,10 +161,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('assignments')) this.assignments = componentState.assignments;
-    if (keys.includes('assignments') && !this.initialized) {
-      this.questionStats = this._computeQuestionStats(componentState.assignments);
-      this.initialized = true;
-    }
+    if (keys.includes('questionStats')) this.questionStats = componentState.questionStats;
     if (keys.includes('courseId')) this.courseId = componentState.courseId;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignmentId')) this.assignmentId = componentState.assignmentId;
