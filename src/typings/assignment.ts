@@ -10,5 +10,5 @@ export interface Assignment {
     readonly title: string;
     readonly course: Course;
     readonly author: User;
-    readonly questions: Question[]
+    readonly questions: Question[];
 }

@@ -3,6 +3,7 @@ import {User} from './user';
 import {Discipline} from './discipline';
 import {Subject} from './subject';
 import {Concept} from './concept';
+import {QuestionRating} from './question-rating';
 
 
 export interface Question {
@@ -20,4 +21,5 @@ export interface Question {
     readonly resource: string;
     readonly explanation: string;
     readonly answerComments: {};
+    readonly ratings: QuestionRating[];
 }
