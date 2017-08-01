@@ -1,5 +1,6 @@
 import {Course} from './course';
 import {User} from './user';
+import {Question} from './question';
 import {AssignmentType} from './assignment-type'
 
 export interface Assignment {
@@ -9,4 +10,5 @@ export interface Assignment {
     readonly title: string;
     readonly course: Course;
     readonly author: User;
+    readonly questions: Question[]
 }
