@@ -3,21 +3,11 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
-import {QuestionRating} from '../../typings/question-rating';
+import {QuestionRating, QuestionRatingStats} from '../../typings/question-rating';
 import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {createUUID} from '../../services/utilities-service';
 import {parse} from '../../node_modules/assessml/assessml';
-
-interface QuestionRatingRow {
-  readonly assignmentId: string,
-  readonly conceptId: string,
-  readonly text: string,
-  readonly quality: number,
-  readonly difficulty: number,
-  readonly alignment: number,
-  readonly overall: string
-}
 
 class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
@@ -27,10 +17,11 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   user: User;
   courseId: string;
   assignments: Assignment[];
-  questionRows: QuestionRatingRow[];
+  questionStats: QuestionRatingStats[];
   assignmentId: string = 'ALL';
   conceptId: string = 'ALL';
   sortField: string = 'overall';
+  sortAsc: boolean = false;
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -105,25 +96,36 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _assignmentIdChanged(e) {
     this._fireAction('assignmentId', e.target.value);
-    //this.$.questions.render();
   }
 
   _conceptIdChanged(e) {
     this._fireAction('conceptId', e.target.value);
-    //this.$.questions.render();
   }
 
   _questions(assignments: Assignment[]): Question[] {
     return flatten(assignments.map(assignment => assignment.questions));
   }
 
-  _filterQuestions(question: QuestionRatingRow): boolean {
-    return (this.assignmentId === 'ALL' || question.assignmentId === this.assignmentId)
-      && (this.conceptId === 'ALL' || this.conceptId === question.conceptId);
+  _makeFilter(assignmentId: string, conceptId: string): (question: QuestionRatingStats) => boolean {
+    return (question: QuestionRatingStats) => {
+      return (assignmentId === 'ALL' || question.assignmentId === assignmentId)
+      && (conceptId === 'ALL' || conceptId === question.conceptId);
+    };
   }
 
-  _sortQuestions(a: QuestionRatingRow, b: QuestionRatingRow): number {
-    return 1;
+  _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
+    let first: number, last: number;
+    first = sortAsc ? 1 : 0;
+    last = first ? 0 : 1;
+    return (a: QuestionRatingStats, b: QuestionRatingStats) => {
+      return a[sortField] > b[sortField] ? first : last;
+    };
+  }
+
+  _toggleSort(e) {
+    const field = e.target.innerHTML.toLowerCase();
+    if (this.sortField !== field) this._fireAction('sortField', field);
+    else this._fireAction('sortAsc', !this.sortAsc);
   }
 
   _concepts(assignments: Assignment[]): Concept[] {
@@ -134,20 +136,20 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', '');
   }
 
-  _computeQuestionStats(assignments: Assignment[]): QuestionRatingRow[] {
+  _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
     return flatten(assignments.map(assignment => {
       return assignment.questions.map(question => {
         const quality = averageProp(question.ratings, 'quality');
-        const alignment = averageProp(question.ratings, 'alignment');
+        const accuracy = averageProp(question.ratings, 'alignment');
         const difficulty = averageProp(question.ratings, 'difficulty');
         return {
           assignmentId: assignment.id,
           conceptId: question.concept.id,
           text: question.text
           quality,
-          alignment,
+          accuracy,
           difficulty,
-          overall: ((quality + alignment + difficulty) / 3).toPrecision(2)
+          overall: ((quality + accuracy + difficulty) / 3).toPrecision(2)
         };
       });
     }));
@@ -158,11 +160,13 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('assignments')) this.assignments = componentState.assignments;
-    if (keys.includes('assignments')) this.questionRows = this._computeQuestionStats(componentState.assignments);
+    if (keys.includes('assignments')) this.questionStats = this._computeQuestionStats(componentState.assignments);
     if (keys.includes('courseId')) this.courseId = componentState.courseId;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignmentId')) this.assignmentId = componentState.assignmentId;
     if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
+    if (keys.includes('sortField')) this.sortField = componentState.sortField;
+    if (keys.includes('sortAsc')) this.sortAsc = componentState.sortAsc;
     this.userToken = state.userToken;
     this.user = state.user;
   }
