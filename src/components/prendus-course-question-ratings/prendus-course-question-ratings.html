@@ -90,7 +90,7 @@
       <label for="assignmentId">Assignment</label>
       <select id="assignmentId" on-change="_assignmentIdChanged">
         <option value="ALL">All</option>
-        <!-- For some reason the <dom-repeat> element does not play nice inside select boxes -->
+        <!-- TODO For some reason the <dom-repeat> element does not play nice inside select boxes -->
         <template is="dom-repeat" items="[[assignments]]">
           <option value="[[item.id]]">[[item.title]]</option>
         </template>
