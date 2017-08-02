@@ -38,7 +38,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireAction(key: string, value: any) {
+  _fireLocalAction(key: string, value: any) {
     this.action = {
       type: 'SET_COMPONENT_PROPERTY',
       componentId: this.componentId,
@@ -49,7 +49,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
-    this._fireAction('loaded', true);
+    this._fireLocalAction('loaded', true);
   }
 
   _handleError(error: any) {
@@ -83,24 +83,24 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
           }
         }
     `, this.userToken,
-      (key: string, value: any) => { this._fireAction(key, value) },
+      (key: string, value: any) => { this._fireLocalAction(key, value) },
       this._handleError);
-    this._fireAction('questionStats', this._computeQuestionStats(data.assignments));
+    this._fireLocalAction('questionStats', this._computeQuestionStats(data.assignments));
   }
 
   async _courseIdChanged() {
-    this._fireAction('courseId', this.courseId);
-    this._fireAction('loaded', false);
+    this._fireLocalAction('courseId', this.courseId);
+    this._fireLocalAction('loaded', false);
     await this.loadQuestions();
-    this._fireAction('loaded', true);
+    this._fireLocalAction('loaded', true);
   }
 
   _assignmentIdChanged(e) {
-    this._fireAction('assignmentId', e.target.value);
+    this._fireLocalAction('assignmentId', e.target.value);
   }
 
   _conceptIdChanged(e) {
-    this._fireAction('conceptId', e.target.value);
+    this._fireLocalAction('conceptId', e.target.value);
   }
 
   _questions(assignments: Assignment[]): Question[] {
@@ -125,8 +125,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _toggleSort(e) {
     const field = e.target.innerHTML.toLowerCase();
-    if (this.sortField !== field) this._fireAction('sortField', field);
-    else this._fireAction('sortAsc', !this.sortAsc);
+    if (this.sortField !== field) this._fireLocalAction('sortField', field);
+    else this._fireLocalAction('sortAsc', !this.sortAsc);
   }
 
   _concepts(assignments: Assignment[]): Concept[] {

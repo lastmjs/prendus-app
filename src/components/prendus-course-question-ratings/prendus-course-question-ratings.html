@@ -27,15 +27,15 @@
         align-items: baseline;
       }
 
-      #table-header div {
+      #table-header .table-cell {
         border: none;
       }
 
-      #table-header div span {
+      .column-header {
         cursor: pointer;
       }
 
-      #table-header div span:hover {
+      .column-header:hover {
         text-decoration: underline;
       }
 
@@ -46,7 +46,7 @@
         border-left: 1px solid;
       }
 
-      .question-row div {
+      .question-row .table-cell {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -55,7 +55,7 @@
         border-bottom: 1px solid;
       }
 
-      .question-row div:first-child {
+      .question-row .column-header:first-child {
         justify-content: normal;
       }
 
@@ -104,20 +104,20 @@
       </select>
       <div id="questions">
         <div id="table-header" class="question-row">
-          <div class="question-text">Question</div>
-          <div class="question-accuracy"><span on-click="_toggleSort">Accuracy</span></div>
-          <div class="question-quality"><span on-click="_toggleSort">Quality</span></div>
-          <div class="question-difficulty"><span on-click="_toggleSort">Difficulty</span></div>
-          <div class="question-overall sorted"><span on-click="_toggleSort">Overall</span></div>
+          <div class="table-cell question-text">Question</div>
+          <div class="column-header table-cell question-accuracy"><span class="column-header" on-click="_toggleSort">Accuracy</span></div>
+          <div class="column-header table-cell question-quality"><span class="column-header" on-click="_toggleSort">Quality</span></div>
+          <div class="column-header table-cell question-difficulty"><span class="column-header" on-click="_toggleSort">Difficulty</span></div>
+          <div class="column-header table-cell question-overall sorted"><span class="column-header" on-click="_toggleSort">Overall</span></div>
         </div>
         <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]">
           <template>
             <div class="question-row">
-              <div class="question-text">[[_questionOnly(item.text)]]</div>
-              <div class="question-accuracy">[[item.accuracy]]</div>
-              <div class="question-quality">[[item.quality]]</div>
-              <div class="question-difficulty">[[item.difficulty]]</div>
-              <div class="question-overall">[[item.overall]]</div>
+              <div class="table-cell question-text">[[_questionOnly(item.text)]]</div>
+              <div class="table-cell question-accuracy">[[item.accuracy]]</div>
+              <div class="table-cell question-quality">[[item.quality]]</div>
+              <div class="table-cell question-difficulty">[[item.difficulty]]</div>
+              <div class="table-cell question-overall">[[item.overall]]</div>
             </div>
           </template>
         </dom-repeat>
