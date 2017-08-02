@@ -115,9 +115,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
-    const first: number, last: number;
-    first = sortAsc ? 1 : 0;
-    last = first ? 0 : 1;
+    const first: number = sortAsc ? 1 : 0;
+    const last: number = first ? 0 : 1;
     return (a: QuestionRatingStats, b: QuestionRatingStats) => {
       return a[sortField] > b[sortField] ? first : last;
     };
