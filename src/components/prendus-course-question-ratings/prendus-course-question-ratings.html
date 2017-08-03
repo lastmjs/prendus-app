@@ -86,19 +86,19 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <div>
-      <h2>Course Questions</h2>
+      <h2>Questions: [[course.title]]</h2>
       <label for="assignmentId">Assignment</label>
       <select id="assignmentId" on-change="_assignmentIdChanged">
         <option value="ALL">All</option>
         <!-- TODO For some reason the <dom-repeat> element does not play nice inside select boxes -->
-        <template is="dom-repeat" items="[[assignments]]">
+        <template is="dom-repeat" items="[[course.assignments]]">
           <option value="[[item.id]]">[[item.title]]</option>
         </template>
       </select>
       <label for="conceptId">Concept</label>
       <select id="conceptId" on-change="_conceptIdChanged">
         <option value="ALL">All</option>
-          <template is="dom-repeat" items="[[_concepts(assignments)]]">
+          <template is="dom-repeat" items="[[_concepts(course.assignments)]]">
             <option value="[[item.id]]">[[item.title]]</option>
           </template>
       </select>

@@ -3,6 +3,7 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
+import {Course} from '../../typings/course';
 import {QuestionRating} from '../../typings/question-rating';
 import {QuestionRatingStats} from '../../typings/question-rating-stats';
 import {Question} from '../../typings/question';
@@ -17,7 +18,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   userToken: string | null;
   user: User;
   courseId: string;
-  assignments: Assignment[];
+  course: Course;
   questionStats: QuestionRatingStats[];
   assignmentId: string = 'ALL';
   conceptId: string = 'ALL';
@@ -60,25 +61,24 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   async loadQuestions() {
     const data = await GQLQuery(`
         query {
-          assignments: allAssignments(
-            filter:{
-              course: {
-                id: "${this.courseId}"
-              }
-          }) {
+          course: Course(id: "${this.courseId}") {
             id
             title
-            questions {
+            assignments {
               id
-              text
-              concept {
+              title
+              questions {
                 id
-                title
-              }
-              ratings {
-                alignment
-                difficulty
-                quality
+                text
+                concept {
+                  id
+                  title
+                }
+                ratings {
+                  alignment
+                  difficulty
+                  quality
+                }
               }
             }
           }
@@ -86,7 +86,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     `, this.userToken,
       (key: string, value: any) => { this._fireLocalAction(key, value) },
       this._handleError);
-    this._fireLocalAction('questionStats', this._computeQuestionStats(data.assignments));
+    this._fireLocalAction('questionStats', this._computeQuestionStats(data.course.assignments));
   }
 
   async _courseIdChanged() {
@@ -160,7 +160,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
-    if (keys.includes('assignments')) this.assignments = componentState.assignments;
+    if (keys.includes('course')) this.course = componentState.course;
     if (keys.includes('questionStats')) this.questionStats = componentState.questionStats;
     if (keys.includes('courseId')) this.courseId = componentState.courseId;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
