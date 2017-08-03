@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLQuery, GQLMutate, GQLMutateWithVariables} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
@@ -104,69 +104,88 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isReviewType(assignmentType: String) {
         return assignmentType === 'REVIEW';
     }
-
-    showSubjects(e){
-      //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
-      this.shadowRoot.querySelector('#subject-menu').disabled = false;
-      if(this.concepts){
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'concepts',
-            value: ''
-        };
-      }
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'subjects',
-          value: this.learningStructure[e.target.id].subjects
-      };
-    }
-    showConcepts(e){
-      this.shadowRoot.querySelector('#concept-menu').disabled = false;
-      this.shadowRoot.querySelector('#save-concept').disabled = false;
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'concepts',
-          value: this.subjects[e.target.id].concepts
-      };
-    }
     openAssignmentConceptDialog(e: any){
-      if(!this.learningStructure){
-        //TODO Make it so that we listen for changes to the learningStructure.
-        this.loadLearningStructure();
-      }
+      //THIS WAS INTENDED TO SELECT THE CURRENT CONCEPTS. THERE IS A WEIRD ERROR THAT IF THE CONCEPTS ARE EDITED AND THEN THE MODAL IS OPENED AGAIN IT WONT SELECT THE CONCEPTS. LEAVING THIS HERE UNTIL WE CAN FIGURE IT OUT
+      // const conceptIds = this.assignment.concepts.map(function(concept:Concept){
+      //    return concept.id
+      // })
+      // const that = this;
+      // this.concepts.map(function(subjectConcept: Concept, index: number){
+      //   that.assignment.concepts.map(function(assignmentConcept: Concept){
+      //     if(subjectConcept.id === assignmentConcept.id){
+      //       that.shadowRoot.querySelector('#courseConcepts').selectIndex(index)
+      //     }
+      //   })
+      // })
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     closeAssignmentConceptDialog(e){
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
-    async saveConcept(e: any){
-      const selectedConcept = this.concepts[this.shadowRoot.querySelector('#selectedConcept').selected]
-      if(!this.assignmentId){
-        await this.createAssignment();
-      }
+    async saveConcept(e){
+      const newConcept = e.target;
+      const customConcept = this.shadowRoot.querySelector('#custom-concept').value;
       const data = await GQLMutate(`
-      mutation {
-        addToAssignmentOnConcepts(
-          assignmentsAssignmentId: "${this.assignmentId}"
-          conceptsConceptId: "${selectedConcept.id}"
-        ) {
-          assignmentsAssignment{
-            title
-          }
-          conceptsConcept{
-            title
+        mutation{
+          createConcept(
+            title: "${customConcept}"
+            subjectId: "${this.assignment.course.subject.id}"
+          ){
+            id
+            subject{
+              concepts{
+                id
+                title
+              }
+            }
           }
         }
-      }
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      //TODO. This needs to be optimized.
-      this.loadData();
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'concepts',
+          value: data.createConcept.subject.concepts
+      };
+      this.shadowRoot.querySelector('#custom-concept').value = '';
+    }
+    async updateAssignmentConcepts(e: any){
+      const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
+      const conceptIds = selectedConcepts.map(function(concept: Concept){
+        return `"${concept.id}"`
+      })
+      const variableString = `{"conceptsIds": [${conceptIds}]}`
+      const data = await GQLMutateWithVariables(`
+        mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!]) {
+          updateAssignment(
+            id: "${this.assignmentId}"
+            conceptsIds: $conceptsIds
+          ) {
+            id
+            title,
+            course {
+                id
+                subject{
+                  id
+                }
+            }
+            concepts{
+              id
+              title
+            }
+          }
+        }
+      `, this.userToken, variableString, (error: any) => {
+          console.log(error);
+      });
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'assignment',
+          value: data.updateAssignment
+      };
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async loadData() {
@@ -176,6 +195,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                     title,
                     course {
                         id
+                        subject{
+                          id
+                        }
                     }
                     concepts{
                       id
@@ -184,6 +206,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (key: string, value: any) => {
+            this.loadConcepts(value.course.subject.id);
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',
                 componentId: this.componentId,
@@ -200,34 +223,27 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             console.log(error);
         });
     }
-    async loadLearningStructure(){
-      await GQLQuery(`
-          query {
-              learningStructure: allDisciplines(
-                first: 30
-                filter: {
-                  approved:YES
-                }){
+    async loadConcepts(subjectId: string){
+        await GQLQuery(`
+          query{
+            Subject(id:"${subjectId}"){
+              id
+              concepts{
+                id
                 title
-                subjects{
-                  title
-                  concepts{
-                    id
-                    title
-                  }
-                }
               }
+            }
           }
-      `, this.userToken, (key: string, value: any) => {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'learningStructure',
-            value
-        };
-      }, (error: any) => {
-          console.log(error);
-      });
+        `, this.userToken, (key: string, value: any) => {
+          this.action = {
+              type: 'SET_COMPONENT_PROPERTY',
+              componentId: this.componentId,
+              key: 'concepts',
+              value: value.concepts
+          };
+        }, (error: any) => {
+            console.log(error);
+        });
     }
     async createAssignment(){
       const title = this.shadowRoot.querySelector('#titleInput').value;

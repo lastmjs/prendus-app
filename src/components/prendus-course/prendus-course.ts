@@ -23,7 +23,10 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     user: User;
     editingTitle: boolean;
     subjects: Subject[];
-    selectedDiscipline: Discipline;
+    selectedDisciplineId: string;
+    customDiscipline: boolean;
+    customSubject: boolean;
+    selectedSubjectId: string;
 
     static get is() { return 'prendus-course'; }
     static get properties() {
@@ -39,7 +42,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
 
     constructor() {
         super();
-
         this.componentId = createUUID();
     }
 
@@ -55,7 +57,29 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         this.action = await getAndSetUser();
         this.subscribeToData();
     }
+    async courseIdChanged() {
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'courseId',
+            value: this.courseId
+        };
 
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: false
+        };
+        await this.loadLearningStructure();
+        await this.loadData();
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'loaded',
+            value: true
+        };
+    }
     isViewMode(mode: Mode) {
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -73,7 +97,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         return mode === 'create';
     }
     openCreateDisciplineDialog(e){
-      console.log('openingn')
       this.shadowRoot.querySelector('#create-discipline').open();
     }
     async createDiscipline(){
@@ -90,7 +113,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         console.log('error', error)
       });
       //TODO combine this with the creatediscipline above
-      this.saveDiscipline(data.createDiscipline.id);
+      this.saveDisciplineToCourse(data.createDiscipline.id);
       if(this.subjects){
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
@@ -100,8 +123,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         };
       }
     }
-    //TODO Allow the user to only create one discipline, but allow them to edit that discipline if necessary
-    async saveDiscipline(disciplineId: string){
+    async saveDisciplineToCourse(disciplineId: string){
       const courseData = await GQLMutate(`
         mutation {
           addToCourseDiscipline(
@@ -109,7 +131,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             disciplineDisciplineId: "${disciplineId}"
           ) {
         		disciplineDiscipline{
+              id
               title
+              approved
               subjects{
                 id
                 title
@@ -120,29 +144,113 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
         console.log('error', error)
       });
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedDisciplineId',
+          value: disciplineId
+      };
+      if(courseData.addToCourseDiscipline.disciplineDiscipline.approved !== "YES"){
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customDiscipline',
+            value: true
+        };
+      }else{
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customDiscipline',
+            value: null
+        };
+      }
+
       this.loadLearningStructure();
-      this.shadowRoot.querySelector('#subject-menu').disabled = false;
+      this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
     }
-    showSubjects(e){
+
+    async saveSubjectToCourse(subjectId: string){
+      const courseData = await GQLMutate(`
+        mutation {
+          addToCourseSubject(
+            coursesCourseId: "${this.courseId}"
+            subjectSubjectId: "${subjectId}"
+          ) {
+            subjectSubject{
+              id
+              title
+              approved
+            }
+          }
+        }
+      `, this.userToken, (error: any) => {
+        console.log('error', error)
+      });
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedSubjectId',
+          value: subjectId
+      };
+      if(courseData.addToCourseSubject.subjectSubject.approved !== "YES"){
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customSubject',
+            value: true
+        };
+      }else{
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customSubject',
+            value: null
+        };
+      }
+
+      this.loadLearningStructure();
+      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      this.shadowRoot.querySelector('#create-discipline').close();
+    }
+
+
+    updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
-      this.shadowRoot.querySelector('#subject-menu').disabled = false;
-      this.saveDiscipline(this.learningStructure[e.target.id].id);
+      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      this.saveDisciplineToCourse(e.target.id);
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedDisciplineId',
+          value: e.target.id
+      };
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
           componentId: this.componentId,
           key: 'subjects',
-          value: this.learningStructure[e.target.id].subjects
+          value: this.learningStructure[e.model.index].subjects
       };
     }
     openCreateSubjectDialog(e){
       this.shadowRoot.querySelector('#create-subject').open();
     }
-    async saveSubject(){
+    updateCourseSubject(e){
+      this.saveSubjectToCourse(e.target.id);
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedSubjectId',
+          value: e.target.id
+      };
+    }
+    async createSubject(){
       const data = await GQLMutate(`
           mutation {
               createSubject(
                   title: "${this.shadowRoot.querySelector('#subject-title').value}"
+                  disciplineId: "${this.selectedDisciplineId}"
               ) {
                   id
               }
@@ -152,29 +260,32 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           alert(error);
       });
     }
-    async courseIdChanged() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'courseId',
-            value: this.courseId
-        };
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
-        };
-
-        await this.loadData();
-        await this.loadLearningStructure();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+    async saveCourseSubject(e){
+      const data = await GQLMutate(`
+        mutation {
+          addToCourseSubject(
+            coursesCourseId: "${this.courseId}"
+            subjectSubjectId: "${e.target.id}"
+          ) {
+            subjectSubject{
+              title
+              concepts{
+                id
+                title
+              }
+            }
+          }
+        }
+      `, this.userToken, (error: any) => {
+        console.log('error', error)
+          alert(error);
+      });
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+          componentId: this.componentId,
+          key: 'selectedSubjectId',
+          value: e.target.id
+      };
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -207,6 +318,16 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }
                 Course(id: "${this.courseId}") {
                     title
+                    discipline{
+                      id
+                      title
+                      approved
+                    }
+                    subject{
+                      id
+                      title
+                      approved
+                    }
                 }
             }
         `, this.userToken, (key: string, value: any) => {
@@ -225,6 +346,59 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             key: 'course',
             value: data.Course
         };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customDiscipline',
+            value: null
+        };
+        this.action = {
+            type: 'SET_COMPONENT_PROPERTY',
+            componentId: this.componentId,
+            key: 'customSubject',
+            value: null
+        };
+        if(data.Course.discipline){
+          this.action = {
+              type: 'SET_COMPONENT_PROPERTY',
+              componentId: this.componentId,
+              key: 'selectedDisciplineId',
+              value: data.Course.discipline.id
+          };
+          const learningStructureDiscipline = this.learningStructure.filter(function(discipline: Discipline){
+            return discipline.id === data.Course.discipline.id
+          })[0]
+          this.action = {
+              type: 'SET_COMPONENT_PROPERTY',
+              componentId: this.componentId,
+              key: 'subjects',
+              value: learningStructureDiscipline.subjects
+          };
+          if(data.Course.discipline.approved !== "YES"){
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'customDiscipline',
+                value: true
+            };
+          }
+        }
+        if(data.Course.subject){
+          this.action = {
+              type: 'SET_COMPONENT_PROPERTY',
+              componentId: this.componentId,
+              key: 'selectedSubjectId',
+              value: data.Course.subject.id
+          };
+          if(data.Course.subject.approved !== "YES"){
+            this.action = {
+                type: 'SET_COMPONENT_PROPERTY',
+                componentId: this.componentId,
+                key: 'customSubject',
+                value: true
+            };
+          }
+        }
     }
     async titleChanged(e: any){
       if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
@@ -297,12 +471,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             id
             title
             subjects{
+              id
               title
             }
           }
         }
       `, this.userToken, (key: string, value: any) => {
-        console.log('value', value)
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
@@ -322,8 +496,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('course')) this.course = state.components[this.componentId].course;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('subjects')) this.subjects = state.components[this.componentId].subjects;
-        if (Object.keys(state.components[this.componentId] || {}).includes('selectedDiscipline')) this.selectedDiscipline = state.components[this.componentId].selectedDiscipline;
-//      this.assignments = state[`assignmentsFromCourse${this.courseId}`];
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedDisciplineId')) this.selectedDisciplineId = state.components[this.componentId].selectedDisciplineId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedSubjectId')) this.selectedSubjectId = state.components[this.componentId].selectedSubjectId;
+        if (Object.keys(state.components[this.componentId] || {}).includes('customDiscipline')) this.customDiscipline = state.components[this.componentId].customDiscipline;
+        if (Object.keys(state.components[this.componentId] || {}).includes('customSubject')) this.customSubject = state.components[this.componentId].customSubject;
+//this.assignments = state[`assignmentsFromCourse${this.courseId}`];
         // this.course = state[`course${this.courseId}`];
         this.userToken = state.userToken;
         this.user = state.user;
