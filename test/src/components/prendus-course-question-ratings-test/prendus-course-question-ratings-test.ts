@@ -61,6 +61,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
             id
             title
             questions {
+              id
               concept {
                 id
                 title
@@ -76,6 +77,27 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
       }
     }`
     return GQLMutate(mutation, '', null);
+  }
+
+  async _deleteNode(id) {
+    const mutation = `mutation { deleteNode(id: "${id}") { id } }`;
+    return GQLMutate(mutation, '', null);
+  }
+
+  async _tearDown(ids) {
+    return Promise.all(ids.map(this._deleteNode));
+  }
+
+  _toIds(nodes) {
+    const toIds = this._toIds.bind(this);
+    return nodes.reduce((acc, node) => {
+      acc.push(node.id);
+      Object.keys(node).forEach(key => {
+        if (Array.isArray(node[key])) acc.concat(toIds(node[key]));
+        else if (node[key].id) acc.push(node[key].id);
+      });
+      return acc;
+    });
   }
 
   _arbToGQLQuery(obj) {
