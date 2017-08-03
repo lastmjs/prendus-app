@@ -4,7 +4,7 @@
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --ts-warning --watch-files",
-    "test": "xvfb-run electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
+    "test": "xvfb-run -a electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
