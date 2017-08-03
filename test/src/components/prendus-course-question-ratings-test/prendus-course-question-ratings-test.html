@@ -1,0 +1,14 @@
+<link rel="import" href="../../../../src/bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../src/components/prendus-course-question-ratings/prendus-course-question-ratings.html">
+<link rel="import" href="../../../../src/node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-course-question-ratings-test">
+
+  <template>
+    <redux-store root-reducer="[[rootReducer]]" action="[[action]]"></redux-store>
+    <prendus-course-question-ratings id="table"></prendus-course-question-ratings>
+  </template>
+
+  <script src="prendus-course-question-ratings-test.ts"></script>
+
+</dom-module>
