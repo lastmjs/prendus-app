@@ -11,9 +11,6 @@
     "build-static": "cd src && zwitterion --build-static",
     "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window"
   },
-  "engines": {
-    "node": "8.1.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lastmjs/prendus-graphql-demo.git"
