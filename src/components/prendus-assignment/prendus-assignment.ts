@@ -117,12 +117,29 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       //     }
       //   })
       // })
-      this.shadowRoot.querySelector('#assignmentConceptDialog').open();
+
+      if(!this.assignment){
+        if(this.shadowRoot.querySelector('#titleInput').value){
+          this.shadowRoot.querySelector('#assignmentConceptDialog').open();
+          this.createAssignment();
+        }else{
+          //Make this a notification once the notifications exist
+          alert('Enter a title for the assignment before adding concepts')
+        }
+      }else{
+        this.shadowRoot.querySelector('#assignmentConceptDialog').open();
+      }
+
+
     }
     closeAssignmentConceptDialog(e){
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
-    async saveConcept(e){
+    async createConcept(e){
+      if(!this.shadowRoot.querySelector('#custom-concept').value){
+        console.log('error')
+        alert('Must enter a title for the new concept before adding it')
+      }
       const newConcept = e.target;
       const customConcept = this.shadowRoot.querySelector('#custom-concept').value;
       const data = await GQLMutate(`

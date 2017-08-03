@@ -35,7 +35,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 observer: 'courseIdChanged'
             },
             mode: {
-
             }
         };
     }
@@ -44,49 +43,30 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         super();
         this.componentId = createUUID();
     }
-
+    _fireLocalAction(key: string, value: any) {
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+        componentId: this.componentId,
+        key,
+        value
+      };
+    }
     async connectedCallback() {
         super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this._fireLocalAction('loaded', true)
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
         this.subscribeToData();
     }
     async courseIdChanged() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'courseId',
-            value: this.courseId
-        };
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
-        };
+        this._fireLocalAction('courseId', this.courseId)
+        this._fireLocalAction('loaded', false)
         await this.loadLearningStructure();
         await this.loadData();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this._fireLocalAction('loaded', true)
     }
     isViewMode(mode: Mode) {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+      this._fireLocalAction('loaded', true)
         return mode === 'view';
     }
 
@@ -115,13 +95,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
       if(this.subjects){
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'subjects',
-            value: null
-        };
+        this._fireLocalAction('subjects', null)
       }
+      this.shadowRoot.querySelector('#subject-list').disabled = false;
     }
     async saveDisciplineToCourse(disciplineId: string){
       const courseData = await GQLMutate(`
@@ -144,26 +120,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
         console.log('error', error)
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedDisciplineId',
-          value: disciplineId
-      };
+      this._fireLocalAction('selectedDisciplineId', disciplineId)
+      this._fireLocalAction('customSubject', false)
       if(courseData.addToCourseDiscipline.disciplineDiscipline.approved !== "YES"){
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customDiscipline',
-            value: true
-        };
+        this._fireLocalAction('customDiscipline', true)
       }else{
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customDiscipline',
-            value: null
-        };
+        this._fireLocalAction('customDiscipline', null)
       }
 
       this.loadLearningStructure();
@@ -188,28 +150,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
         console.log('error', error)
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedSubjectId',
-          value: subjectId
-      };
+      this._fireLocalAction('selectedSubjectId', subjectId)
       if(courseData.addToCourseSubject.subjectSubject.approved !== "YES"){
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customSubject',
-            value: true
-        };
+        this._fireLocalAction('customSubject', true)
       }else{
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customSubject',
-            value: null
-        };
+        this._fireLocalAction('customSubject', null)
       }
-
       this.loadLearningStructure();
       this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
@@ -220,30 +166,16 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
       this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.saveDisciplineToCourse(e.target.id);
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedDisciplineId',
-          value: e.target.id
-      };
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'subjects',
-          value: this.learningStructure[e.model.index].subjects
-      };
+      this._fireLocalAction('selectedDisciplineId', e.target.id)
+      this._fireLocalAction('customSubject', false)
+      this._fireLocalAction('subjects', this.learningStructure[e.model.index].subjects)
     }
     openCreateSubjectDialog(e){
       this.shadowRoot.querySelector('#create-subject').open();
     }
     updateCourseSubject(e){
       this.saveSubjectToCourse(e.target.id);
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedSubjectId',
-          value: e.target.id
-      };
+      this._fireLocalAction('selectedSubjectId', e.target.id)
     }
     async createSubject(){
       const data = await GQLMutate(`
@@ -253,12 +185,20 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                   disciplineId: "${this.selectedDisciplineId}"
               ) {
                   id
+                  title
               }
           }
       `, this.userToken, (error: any) => {
         console.log('error', error)
           alert(error);
       });
+      // this.loadData()
+      // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
+      const newSubjects = [...this.subjects, data.createSubject]
+      this._fireLocalAction('subjects', newSubjects)
+      this._fireLocalAction('customSubject', true)
+      this._fireLocalAction('selectedSubjectId', data.createSubject.id)
+      this.shadowRoot.querySelector('#create-subject').close();
     }
     async saveCourseSubject(e){
       const data = await GQLMutate(`
@@ -280,12 +220,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         console.log('error', error)
           alert(error);
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedSubjectId',
-          value: e.target.id
-      };
+      this._fireLocalAction('selectedSubjectId', e.target.id)
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -334,83 +269,33 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         }, (error: any) => {
             console.log(error);
         });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'assignments',
-            value: data.allAssignments
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'course',
-            value: data.Course
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customDiscipline',
-            value: null
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'customSubject',
-            value: null
-        };
-        if(data.Course.discipline){
-          this.action = {
-              type: 'SET_COMPONENT_PROPERTY',
-              componentId: this.componentId,
-              key: 'selectedDisciplineId',
-              value: data.Course.discipline.id
-          };
+        this._fireLocalAction('assignments', data.allAssignments)
+        this._fireLocalAction('course', data.Course)
+        this._fireLocalAction('customDiscipline', null)
+        this._fireLocalAction('customSubject', null)
+        if(data.Course && data.Course.discipline){
+          this._fireLocalAction('selectedDisciplineId', data.Course.discipline.id)
           const learningStructureDiscipline = this.learningStructure.filter(function(discipline: Discipline){
             return discipline.id === data.Course.discipline.id
           })[0]
-          this.action = {
-              type: 'SET_COMPONENT_PROPERTY',
-              componentId: this.componentId,
-              key: 'subjects',
-              value: learningStructureDiscipline.subjects
-          };
+          this._fireLocalAction('subjects', learningStructureDiscipline.subjects)
           if(data.Course.discipline.approved !== "YES"){
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'customDiscipline',
-                value: true
-            };
+            this._fireLocalAction('customDiscipline', true)
           }
         }
-        if(data.Course.subject){
-          this.action = {
-              type: 'SET_COMPONENT_PROPERTY',
-              componentId: this.componentId,
-              key: 'selectedSubjectId',
-              value: data.Course.subject.id
-          };
+        if(data.Course && data.Course.subject){
+          this._fireLocalAction('selectedSubjectId', data.Course.subject.id)
           if(data.Course.subject.approved !== "YES"){
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'customSubject',
-                value: true
-            };
+            this._fireLocalAction('customSubject', true)
           }
         }
     }
     async titleChanged(e: any){
       if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'course',
-            value: {
-              ...this.course,
-              title: e.target.value
-            }
-        };
+        this._fireLocalAction('course', {
+          ...this.course,
+          title: e.target.value
+        })
         this.saveCourse();
       }
     }
@@ -430,29 +315,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         `, this.componentId, (data: any) => {
             this.loadData();
         });
-    }
-
-    async saveCourse() {
-        const data = await GQLMutate(`
-            mutation {
-                updateOrCreateCourse(
-                    update: {
-                        id: "${this.courseId}"
-                        title: "${this.course.title}"
-                    }
-                    create: {
-                        title: "${this.course.title}"
-                        authorId: "${this.user.id}"
-                    }
-                ) {
-                    id
-                    title
-                }
-            }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        navigate(`/course/${data.updateOrCreateCourse.id}/edit`)
     }
     async loadLearningStructure(){
       await GQLQuery(`
@@ -477,12 +339,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (key: string, value: any) => {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'learningStructure',
-            value
-        };
+        this._fireLocalAction('learningStructure', value)
       }, (error: any) => {
           console.log(error);
       });

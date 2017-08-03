@@ -100,25 +100,25 @@
                           <paper-item id="[[item.id]]" data-index="[[index]]" on-click="updateCourseSubject">[[item.title]]</paper-item>
                       </template>
                     </dom-repeat>
-                    <dom-if if="[[!customDiscipline]]">
+                    <dom-if if="[[!customSubject]]">
                       <template>
-                        <paper-item id="new-discipline" on-click="openCreateDisciplineDialog"><iron-icon class="prendus-icon-button" icon="add"></iron-icon>&nbsp; Add Custom &nbsp;</paper-item>
+                        <paper-item id="new-subject" on-click="openCreateSubjectDialog"><iron-icon class="prendus-icon-button" icon="add"></iron-icon>&nbsp; Add Custom &nbsp;</paper-item>
                       </template>
                     </dom-if>
                   </paper-listbox>
                 </paper-dropdown-menu>
               </div>
 
-              <paper-dialog id="create-discipline" with-backdrop>
+              <!-- <paper-dialog id="create-subject" with-backdrop>
                   <div class="content">
                     <h2 id ="dialog-header">Create New Discipline</h2>
-                    <paper-input id="discipline-title" id="disciplineTitle" label="Discipline"></paper-input>
+                    <paper-input id="subject-title" id="disciplineTitle" label="Subject"></paper-input>
                   </div>
                   <div class="buttons">
                     <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
                     <button id="save-new-discipline" class="prendus-button prendus-button--recommended" on-click="createDiscipline">Save</button>
                   </div>
-              </paper-dialog>
+              </paper-dialog> -->
 
               <!-- <div id="subjects">
                 <paper-dropdown-menu id="subject-menu" label="Subject">
