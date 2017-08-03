@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate} from '../../../../src/services/graphql-service';
+import {GQLQuery, GQLMutate, escapeString} from '../../../../src/services/graphql-service';
 import {RootReducer} from '../../../../src/redux/reducers';
 
 const jsc = require('jsverify');
@@ -46,12 +46,33 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
     this.userId = "cj5wuc7s61p4c0152633ivdrj"; //TODO: using hard coded user id for tests because it is hard to tap into the life cycle of test runner to do set up and tear down stuff.
   }
 
-  async makeCourses(coursesContainer) {
-    const makeQueryStr = this._arbToGQLQuery.bind(this); // Don't mess up this arg when it is called recursively
-    const coursesStr = "[" + coursesContainer.courses.map(makeQuery).join(",") + "]";
+  async GQLUpdateTestUser(arbObject) {
+    const makeQueryStr = this._arbToGQLQuery.bind(this); // 'this' gets corrupted when function is called recursively
+    const queryStr = Array.isArray(arbObject) ? arbObject.map(makeQueryStr).join(",") : makeQueryStr(arbObject);
     const mutation = `mutation {
-      updateUser(id: "${this.userId}") {
-        courses: "${coursesStr}"
+      updateUser(
+        id: "${this.userId}",
+        ownedCourses: [${queryStr}]
+        ) {
+        ownedCourses {
+          id
+          title
+          assignments {
+            id
+            title
+            questions {
+              concept {
+                id
+                title
+              }
+              ratings {
+                alignment
+                difficulty
+                quality
+              }
+            }
+          }
+        }
       }
     }`
     return GQLMutate(mutation, '', null);
@@ -61,7 +82,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
     const makeQuery = this._arbToGQLQuery.bind(this);
     return "{" + Object.keys(obj).map(key => {
       const prefix = key + ": ";
-      if (typeof obj[key] === 'string') return prefix + "\"" + obj[key].replace(/"/g, '') + "\"";
+      if (typeof obj[key] === 'string') return prefix + "\"" + obj[key].replace(/"/g, '').replace(/\\/g, '') + "\"";
       if (typeof obj[key] === 'number') return prefix + obj[key];
       if (Array.isArray(obj[key])) return prefix + "[" + obj[key].map(makeQuery).join(", ") + "]";
       return prefix + makeQuery(obj[key]);
