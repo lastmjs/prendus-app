@@ -94,7 +94,7 @@
 
               <div id="subjects">
                 <paper-dropdown-menu label="Subject">
-                  <paper-listbox id="subject-list" slot="dropdown-content" attr-for-selected="id" selected="[[selectedSubjectId]]" disabled>
+                  <paper-listbox id="subject-list" slot="dropdown-content" attr-for-selected="id" selected="[[selectedSubjectId]]">
                     <dom-repeat items="[[subjects]]">
                       <template>
                           <paper-item id="[[item.id]]" data-index="[[index]]" on-click="updateCourseSubject">[[item.title]]</paper-item>

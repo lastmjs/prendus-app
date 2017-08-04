@@ -97,7 +97,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       if(this.subjects){
         this._fireLocalAction('subjects', null)
       }
-      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      // this.shadowRoot.querySelector('#subject-list').disabled = false;
     }
     async saveDisciplineToCourse(disciplineId: string){
       const courseData = await GQLMutate(`
@@ -129,7 +129,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       }
 
       this.loadLearningStructure();
-      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
     }
 
@@ -157,14 +157,14 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         this._fireLocalAction('customSubject', null)
       }
       this.loadLearningStructure();
-      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
     }
 
 
     updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
-      this.shadowRoot.querySelector('#subject-list').disabled = false;
+      // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.saveDisciplineToCourse(e.target.id);
       this._fireLocalAction('selectedDisciplineId', e.target.id)
       this._fireLocalAction('customSubject', false)
