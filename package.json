@@ -22,7 +22,9 @@
     "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
-  "dependencies": {},
+  "dependencies": {
+    "zwitterion": "^0.12.10"
+  },
   "devDependencies": {
     "oss-attribution-generator": "^1.2.0"
   }
