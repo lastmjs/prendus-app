@@ -3,7 +3,7 @@
   "version": "0.1.17",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
-    "start": "cd src && node_modules/.bin/zwitterion --ts-warning --watch-files",
+    "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --ts-warning --watch-files",
     "test": "exit 0",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
