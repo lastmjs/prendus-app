@@ -46,23 +46,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         super();
         this.componentId = createUUID();
     }
-
+    _fireLocalAction(key: string, value: any) {
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+        componentId: this.componentId,
+        key,
+        value
+      };
+    }
     async connectedCallback() {
         super.connectedCallback();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'connected',
-            value: true
-        };
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this._fireLocalAction('connected', true)
+        this._fireLocalAction('loaded', true)
     }
 
     isViewMode(mode: string) {
@@ -79,22 +74,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         return mode === 'result';
     }
     async assignmentIdChanged() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'assignmentId',
-            value: this.assignmentId
-        };
+        this._fireLocalAction('assignmentId', this.assignmentId)
         await this.loadData();
     }
 
     assignmentTypeChanged() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'assignmentType',
-            value: this.assignmentType
-        };
+        this._fireLocalAction('assignmentType', this.assignmentType)
     }
 
     isCreateType(assignmentType: String) {
@@ -161,17 +146,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'concepts',
-          value: data.createConcept.subject.concepts
-      };
+      this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this.shadowRoot.querySelector('#custom-concept').value = '';
     }
     async updateAssignmentConcepts(e: any){
       const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
-      const conceptIds = selectedConcepts.map(function(concept: Concept){
+      const conceptIds = selectedConcepts.map((concept: Concept)=>{
         return `"${concept.id}"`
       })
       const variableString = `{"conceptsIds": [${conceptIds}]}`
@@ -198,16 +178,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       `, this.userToken, variableString, (error: any) => {
           console.log(error);
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'assignment',
-          value: data.updateAssignment
-      };
+      this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async loadData() {
-        await GQLQuery(`
+        const data = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
                     title,
@@ -224,25 +199,15 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (key: string, value: any) => {
-            this.loadConcepts(value.course.subject.id);
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'assignment',
-                value
-            };
-            this.action = {
-                type: 'SET_COMPONENT_PROPERTY',
-                componentId: this.componentId,
-                key: 'courseId',
-                value: value.course.id
-            };
         }, (error: any) => {
             console.log(error);
         });
+        this.loadConcepts(data.Assignment.course.subject.id);
+        this._fireLocalAction('assignment', data.Assignment)
+        this._fireLocalAction('courseId', data.Assignment.course.id)
     }
     async loadConcepts(subjectId: string){
-        await GQLQuery(`
+        const conceptData = await GQLQuery(`
           query{
             Subject(id:"${subjectId}"){
               id
@@ -253,15 +218,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (key: string, value: any) => {
-          this.action = {
-              type: 'SET_COMPONENT_PROPERTY',
-              componentId: this.componentId,
-              key: 'concepts',
-              value: value.concepts
-          };
         }, (error: any) => {
             console.log(error);
         });
+        this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }
     async createAssignment(){
       const title = this.shadowRoot.querySelector('#titleInput').value;
@@ -278,12 +238,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
           console.log(error);
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'assignmentId',
-          value: data.createAssignment.id
-      };
+      this._fireLocalAction('assignmentId', data.createAssignment.id)
     }
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
