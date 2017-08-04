@@ -5,6 +5,11 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-dropdown-menu. Remove it when possible -->
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
 <link rel="import" href="../prendus-question-review/prendus-question-review.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -21,7 +26,18 @@
         }
         .prendus-list-item{
           height: 30px;
-
+        }
+        paper-dialog paper-dialog-scrollable {
+          --paper-dialog-scrollable: {
+            margin-bottom: 25px;
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 360px;
+            height: 80%;
+          }
+        }
+        #dialogTitle{
+          margin-top: 10px;
         }
         </style>
         <dom-if if="[[loaded]]">
@@ -45,49 +61,35 @@
 
                 <dom-if if="[[isEditMode(mode)]]">
                   <template>
+                    <h1>Edit Assignment</h1>
                     <button class="prendus-button" on-click="saveAssignment">Save and Return to Course</button>
                     <paper-input id="titleInput" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
                       <!-- <input id="titleInput" type="text" value="[[assignment.title]]"> -->
-                    <h2>Course Concepts</h2>
+                    <h2>[[assignment.title]] Concepts</h2>
                     <dom-repeat items="[[assignment.concepts]]">
                       <template>
                           <h4>[[item.title]]</h4>
                       </template>
                     </dom-repeat>
-                    <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add Concept</button>
+                    <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add or Remove Concepts</button>
                   </template>
                   <paper-dialog id="assignmentConceptDialog" modal>
-                    <div class="content">
-                      <h2>Disciplines</h2>
-                      <div role="listbox">
-                        <dom-repeat items="[[learningStructure]]">
-                          <template>
-                              <paper-item id="[[index]]" data-number="[[index]]" on-click="showSubjects">[[item.title]]</paper-item>
-                          </template>
-                        </dom-repeat>
-                      </div>
-                      <h2>Subjects</h2>
-                      <div id ="subjects">
-                        <div role="listbox">
-                          <dom-repeat items="[[subjects]]">
-                            <template>
-                                <paper-item id="[[index]]" data-number="[[index]]" on-click="showConcepts">[[item.title]]</paper-item>
-                            </template>
-                          </dom-repeat>
-                        </div>
-                      </div>
-                      <h2>Concepts</h2>
+                    <h2 id="dialogTitle">Select Concepts</h2>
+                    <paper-dialog-scrollable>
                       <div id ="concepts">
-                        <dom-repeat items="[[concepts]]">
-                          <template>
-                              <h4 id="[[index]]" on-click="saveConcept">[[item.title]]</h4>
-                          </template>
-                        </dom-repeat>
+                        <paper-input id="custom-concept" label="Add Custom Concept"></paper-input><span class="prendus-button" on-click="createConcept">Add</span>
+                          <paper-listbox id="courseConcepts" slot="dropdown-content" multi >
+                            <dom-repeat items="[[concepts]]">
+                              <template>
+                                  <paper-item id="[[item.id]]" class="course-concepts">[[item.title]]</paper-item>
+                              </template>
+                            </dom-repeat>
+                          </paper-listbox>
                       </div>
-                    </div>
+                    </paper-dialog-scrollable>
                     <div class="buttons">
                       <button class="prendus-button prendus-button--minor" dialog-dismiss on-click="closeAssignmentConceptDialog">Cancel</button>
-                      <!-- <button class="prendus-button prendus-button--recommended" dialog-dismiss>Save</button> -->
+                      <button id="save-concept" class="prendus-button prendus-button--recommended" on-click="updateAssignmentConcepts">Save</button>
                     </div>
                   </paper-dialog>
                 </dom-if>
