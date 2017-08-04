@@ -78,7 +78,7 @@
                     <paper-dialog-scrollable>
                       <div id ="concepts">
                         <paper-input id="custom-concept" label="Add Custom Concept"></paper-input><span class="prendus-button" on-click="createConcept">Add</span>
-                          <paper-listbox id="courseConcepts" slot="dropdown-content" multi>
+                          <paper-listbox id="courseConcepts" slot="dropdown-content" multi >
                             <dom-repeat items="[[concepts]]">
                               <template>
                                   <paper-item id="[[item.id]]" class="course-concepts">[[item.title]]</paper-item>

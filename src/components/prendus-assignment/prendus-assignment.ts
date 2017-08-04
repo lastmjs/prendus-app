@@ -138,7 +138,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
         console.log('error')
-        alert('Must enter a title for the new concept before adding it')
+        alert('Must enter a valid title for the new concept before adding it')
+        return;
       }
       const newConcept = e.target;
       const customConcept = this.shadowRoot.querySelector('#custom-concept').value;
