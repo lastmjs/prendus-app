@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLQuery, GQLMutate, GQLrequest} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {setDisabledNext} from '../../redux/actions'
 import {User} from '../../typings/user';
@@ -10,6 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {compileToGuiQuestion} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
+import {rubric} from '../../typings/evaluation-rubric';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 
 class PrendusQuestionReview extends Polymer.Element {
@@ -38,6 +39,8 @@ class PrendusQuestionReview extends Polymer.Element {
     accuracy: number;
     querySelector: any;
     questionReviewNumber: number;
+    rubricCategories: string[];
+    rubricScores: { [key: string]: number };
 
     static get is() { return 'prendus-question-review'; }
 
@@ -52,88 +55,67 @@ class PrendusQuestionReview extends Polymer.Element {
         super();
         this.componentId = createUUID();
     }
+    _fireLocalAction(key: string, value: any) {
+      this.action = {
+        type: 'SET_COMPONENT_PROPERTY',
+        componentId: this.componentId,
+        key,
+        value
+      };
+    }
     async connectedCallback() {
         super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'maxSliderValue',
-            value: 10
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'minSliderValue',
-            value: 1
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'quality',
-            value: 0
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'accuracy',
-            value: 0
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'difficulty',
-            value: 0
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'numberOfAnswers',
-            value: 4
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'selectedIndex',
-            value: 0
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'questionReviewNumber',
-            value: 1
-        };
-
+        this._fireLocalAction('loaded', true);
+        this._fireLocalAction('rubricCategories', this._makeRubricCategories(rubric));
+        this._fireLocalAction('numberOfAnswers', 4);
+        this._fireLocalAction('selectedIndex', 0);
+        this._fireLocalAction('questionReviewNumber', 1);
     }
     async getInfoForQuestionScaffolds(){
       await this.loadAssignmentQuestions();
       this.generateQuestionScaffolds()
     }
     back(): void {
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedIndex',
-          value: --this.selectedIndex
-      };
+      this._fireLocalAction('selectedIndex', --this.selectedIndex);
       this.action = setDisabledNext(false);
     }
     next(): void {
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedIndex',
-          value: ++this.selectedIndex
-      };
+      this._fireLocalAction('selectedIndex', ++this.selectedIndex)
       if(this.selectedIndex === this.querySelector('#iron-pages').items.length - 1) {
         // Reached the limit.
         this.action = setDisabledNext(true);
       }
+    }
+
+    _makeRubricCategories(rubric: Object): Object[] {
+      const categories = Object.keys(rubric);
+      return categories.map(category => {
+        return {
+          label: category,
+          options: this._makeRubricOptions(rubric[category])
+        };
+      };
+    }
+
+    _makeRubricOptions(options: Object): Object[] {
+      const labels = Object.keys(options);
+      return labels.map(label => {
+        return {
+          label,
+          ...options[label]
+        }
+      });
+    }
+
+    _paperItemId(category: Object, option: Object) {
+      return category.label.replace(/\s/, '') + '-' + option.label;
+    }
+
+    _rubricScoreChanged(e) {
+      const changed = { [e.model.category.label]: e.detail.item.value };
+      this.rubricScores || this.rubricScores = {};
+      const newRubricScores = {...this.rubricScores, ...changed};
+      this._fireLocalAction('rubricScores', newRubricScores);
     }
 
     async loadAssignmentQuestions() {
@@ -159,25 +141,10 @@ class PrendusQuestionReview extends Polymer.Element {
             if(value){
               const questionsToReview = shuffleArray(value.questions).slice(0,3);
               const quizQuestions = shuffleArray(value.questions).slice(0,5);
-              this.action = {
-                  type: 'SET_COMPONENT_PROPERTY',
-                  componentId: this.componentId,
-                  key: 'questions',
-                  value: questionsToReview
-              };
-              this.action = {
-                  type: 'SET_COMPONENT_PROPERTY',
-                  componentId: this.componentId,
-                  key: 'quizQuestions',
-                  value: quizQuestions
-              };
+              this._fireLocalAction('questions', questionsToReview);
+              this._fireLocalAction('quizQuestions', quizQuestions);
             }else{
-              this.action = {
-                  type: 'SET_COMPONENT_PROPERTY',
-                  componentId: this.componentId,
-                  key: 'questions',
-                  value: null
-              };
+              this._fireLocalAction('questions', null);
             }
 
         }, (error: any) => {
@@ -209,12 +176,7 @@ class PrendusQuestionReview extends Polymer.Element {
             convertedQuestion: question
         };
       })
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'questionScaffoldsToRate',
-          value: qScaffolds
-      };
+      this._fireLocalAction('questionScaffoldsToRate', qScaffolds);
     }
     //Checks if questions exist. If not, notifies the user.
     hasQuestions(item: any) {
@@ -222,67 +184,51 @@ class PrendusQuestionReview extends Polymer.Element {
     }
     async submit(e: any): Promise<void> {
       try {
-        const questionId: string = e.target.id;
-        const quality: number = this.shadowRoot.querySelector(`#quality${questionId}`).value;
-        const difficulty: number = this.shadowRoot.querySelector(`#difficulty${questionId}`).value;
-        const accuracy: number = this.shadowRoot.querySelector(`#accuracy${questionId}`).value;
-        const authenticity: number = this.shadowRoot.querySelector(`#authenticity${questionId}`).value;
-        const data = await GQLMutate(`
-          mutation {
+        const variables = {
+          json: JSON.stringify(this.rubricScores),
+          rater: this.user.id,
+          question: e.target.id
+        };
+        const mutation = `mutation submitRating($json: Json!, $rater: ID!, $question: ID!) {
             createQuestionRating(
-              quality: ${quality}
-              difficulty: ${difficulty}
-              alignment: ${accuracy}
-              raterId: "${this.user.id}"
-              questionId: "${questionId}"
+              ratingJson: $json
+              raterId: $rater
+              questionId: $question
             ) {
               id
+              ratingJson
             }
-          }
-        `, this.userToken, (error: any) => {
-            console.log(error);
-        });
-        this.action = setDisabledNext(false);
-        // Actions.showNotification(this, 'success', 'Ratings submitted');
+          }`;
+        GQLrequest(mutation, variables, this.userToken);
       } catch(error) {
         console.error(error);
       }
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'selectedIndex',
-          value: ++this.selectedIndex
-      };
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'questionReviewNumber',
-          value: ++this.questionReviewNumber
-      };
+      this._fireLocalAction('selectedIndex', ++this.selectedIndex);
+      this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);
 
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'selectedIndex',
-            value: ++this.selectedIndex
-        };
+        this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       }
     }
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        if (Object.keys(state.components[this.componentId] || {}).includes('selectedIndex')) this.selectedIndex = state.components[this.componentId].selectedIndex;
-        if (Object.keys(state.components[this.componentId] || {}).includes('questionReviewNumber')) this.questionReviewNumber = state.components[this.componentId].questionReviewNumber;
-        if (Object.keys(state.components[this.componentId] || {}).includes('minSliderValue')) this.minSliderValue = state.components[this.componentId].minSliderValue;
-        if (Object.keys(state.components[this.componentId] || {}).includes('maxSliderValue')) this.maxSliderValue = state.components[this.componentId].maxSliderValue;
-        if (Object.keys(state.components[this.componentId] || {}).includes('quality')) this.quality = state.components[this.componentId].quality;
-        if (Object.keys(state.components[this.componentId] || {}).includes('difficulty')) this.difficulty = state.components[this.componentId].difficulty;
-        if (Object.keys(state.components[this.componentId] || {}).includes('accuracy')) this.accuracy = state.components[this.componentId].accuracy;
-        if (Object.keys(state.components[this.componentId] || {}).includes('questions')) this.questions = state.components[this.componentId].questions;
-        if (Object.keys(state.components[this.componentId] || {}).includes('quizQuestions')) this.quizQuestions = state.components[this.componentId].quizQuestions;
-        if (Object.keys(state.components[this.componentId] || {}).includes('questionScaffoldsToRate')) this.questionScaffoldsToRate = state.components[this.componentId].questionScaffoldsToRate;
+        const componentState = state.components[this.componentId];
+        const keys = Object.keys(componentState || {});
+        if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('selectedIndex')) this.selectedIndex = componentState.selectedIndex;
+        if (keys.includes('questionReviewNumber')) this.questionReviewNumber = componentState.questionReviewNumber;
+        if (keys.includes('minSliderValue')) this.minSliderValue = componentState.minSliderValue;
+        if (keys.includes('maxSliderValue')) this.maxSliderValue = componentState.maxSliderValue;
+        if (keys.includes('quality')) this.quality = componentState.quality;
+        if (keys.includes('difficulty')) this.difficulty = componentState.difficulty;
+        if (keys.includes('accuracy')) this.accuracy = componentState.accuracy;
+        if (keys.includes('questions')) this.questions = componentState.questions;
+        if (keys.includes('quizQuestions')) this.quizQuestions = componentState.quizQuestions;
+        if (keys.includes('questionScaffoldsToRate')) this.questionScaffoldsToRate = componentState.questionScaffoldsToRate;
+        if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
+        if (keys.includes('rubricScores')) this.rubricScores = componentState.rubricScores;
+        
         // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
