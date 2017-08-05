@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 234
+# version: 259
 
 type File implements Node {
   id: ID! @isUnique
@@ -40,6 +40,8 @@ type Course implements Node {
   description: String
   dueDate: DateTime
   author: User! @relation(name: "AuthorOnCourse")
+  discipline: Discipline @relation(name: "CourseDiscipline")
+  subject: Subject @relation(name: "CourseSubject")
 }
 
 type Lesson implements Node {
@@ -115,6 +117,8 @@ type Discipline implements Node {
   updatedAt: DateTime!
   title: String!
   subjects: [Subject!]! @relation(name: "DisciplineOnSubject")
+  courses: [Course!]! @relation(name: "CourseDiscipline")
+  approved: PrendusApproved! @defaultValue(value: TBD)
 }
 
 type Subject implements Node {
@@ -124,6 +128,8 @@ type Subject implements Node {
   title: String!
   discipline: Discipline! @relation(name: "DisciplineOnSubject")
   concepts: [Concept!]! @relation(name: "SubjectOnConcept")
+  approved: PrendusApproved! @defaultValue(value: TBD)
+  courses: [Course!]! @relation(name: "CourseSubject")
 }
 
 type Concept implements Node {
@@ -148,4 +154,10 @@ enum UserRole {
   INSTRUCTOR
   STUDENT
   ADMIN
+}
+
+enum PrendusApproved {
+  YES
+  NO
+  TBD
 }

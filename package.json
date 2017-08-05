@@ -8,10 +8,7 @@
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "build-static": "cd src && zwitterion --build-static"
-  },
-  "engines": {
-    "node": "8.1.2"
+    "build-static": "cd src && node_modules/.bin/zwitterion --target ES2015 --build-static"
   },
   "repository": {
     "type": "git",
@@ -24,6 +21,7 @@
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
   "dependencies": {},
   "devDependencies": {
+    "graphcool": "^1.2.1",
     "oss-attribution-generator": "^1.2.0"
   }
 }
