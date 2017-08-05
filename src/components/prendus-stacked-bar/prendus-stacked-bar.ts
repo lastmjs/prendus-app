@@ -1,24 +1,17 @@
 class PrendusStackedBar extends Polymer.Element {
-  total: number;
   static get is() { return 'prendus-stacked-bar' }
 
   static get properties() {
     return {
-      data: {
-        type: Array,
-        observer: "_dataChanged"
-      }
+      data: Array,
       label: String
     }
   }
 
-  _dataChanged(data: number[]) {
-    this.total = data.reduce((sum, num) => sum + num, 0);
-  }
-
-  _computeWidth(num: number) {
-    if (!this.total) return '';
-    return 'width: ' + (num / this.total * 100) + '%;';
+  _computeWidth(data: number[], num: number) {
+    const total = data.reduce((sum, num) => sum + num, 0);
+    if (!total) return '';
+    return 'width: ' + (num / total * 100) + '%;';
   }
 
 }

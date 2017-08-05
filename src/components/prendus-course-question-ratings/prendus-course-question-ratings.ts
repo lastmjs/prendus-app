@@ -154,18 +154,15 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return (vals.reduce(sum, 0) / vals.length).toPrecision(2) || 0;
   }
 
-  _barStats(ratings: Object[]): Object[] {
+  _barStats(ratings: Object[], category: string): Object[] {
     return ratings.reduce((stats, rating) => {
-      this.categories.forEach(category => {
-        if (!stats[category]) stats[category] = [];
-        const i = rating[category];
-        if (i !== NaN && i >=0) {
-          while (i > stats[category].length - 1) stats[category].push(0);
-          stats[category][i]++;
-        }
-      });
+      const i = rating[category];
+      if (i !== NaN && i >=0) {
+        while (i > stats.length - 1) stats.push(0);
+        stats[i]++;
+      }
       return stats;
-    }, {});
+    }, []);
   }
 
   _computeRatingStats(ratings: Object[]): Object {
@@ -173,7 +170,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return {
       Overall: this._computeQuestionOverall(categoryScores),
       ...categoryScores,
-      barChartStats: this._barStats(ratings)
     };
   }
 
@@ -185,6 +181,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
         text: question.text,
+        ratings,
         stats
       }
     })));
