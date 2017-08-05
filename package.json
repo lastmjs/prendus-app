@@ -1,6 +1,6 @@
 {
   "name": "prendus-graphql-demo",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --watch-files --ts-warning",
