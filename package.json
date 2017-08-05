@@ -8,7 +8,7 @@
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "build-static": "cd src && zwitterion --build-static"
+    "build-static": "cd src && node_modules/.bin/zwitterion --target ES2015 --build-static"
   },
   "engines": {
     "node": "8.1.2"
