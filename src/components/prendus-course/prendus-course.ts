@@ -194,6 +194,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       });
       // this.loadData()
       // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
+<<<<<<< HEAD
       if(this.subjects){
         const newSubjects = [...this.subjects, data.createSubject]
         this._fireLocalAction('subjects', newSubjects)
@@ -202,6 +203,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       }
       this._fireLocalAction('customSubject', true)
       this._fireLocalAction('selectedSubjectId', data.createSubject.id)
+=======
+      const newSubjects = [...this.subjects, data.createSubject];
+      this._fireLocalAction('subjects', newSubjects);
+      this._fireLocalAction('customSubject', true);
+      this._fireLocalAction('selectedSubjectId', data.createSubject.id);
+>>>>>>> 6395ddc606da680cb80859cb68898002d3fb4a30
       this.shadowRoot.querySelector('#create-subject').close();
     }
     async saveCourseSubject(e){
