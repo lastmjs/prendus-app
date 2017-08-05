@@ -194,10 +194,14 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       });
       // this.loadData()
       // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
-      const newSubjects = [...this.subjects, data.createSubject];
-      this._fireLocalAction('subjects', newSubjects);
-      this._fireLocalAction('customSubject', true);
-      this._fireLocalAction('selectedSubjectId', data.createSubject.id);
+      if(this.subjects){
+        const newSubjects = [...this.subjects, data.createSubject]
+        this._fireLocalAction('subjects', newSubjects)
+      }else{
+        this._fireLocalAction('subjects', [data.createSubject])
+      }
+      this._fireLocalAction('customSubject', true)
+      this._fireLocalAction('selectedSubjectId', data.createSubject.id)
       this.shadowRoot.querySelector('#create-subject').close();
     }
     async saveCourseSubject(e){
