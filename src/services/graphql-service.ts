@@ -50,7 +50,7 @@ webSocket.onmessage = (event) => {
     }
 };
 
-export const GQLrequest = async (query: string, variables: {[key:string]: any}, userToken: string) {
+export const GQLrequest = async (query: string, variables: {[key:string]: any}, userToken: string) => {
   const auth = userToken ? { 'Authorization': `Bearer ${userToken}` } : {};
   const headers = { 'Content-Type': 'application/json', ...auth };
   const body = JSON.stringify({ query, variables ? variables : undefined }); 
