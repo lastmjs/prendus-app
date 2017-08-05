@@ -2,8 +2,9 @@
   "dependencies": {
     "escodegen-temp": "git+https://github.com/Prendus/escodegen-temp.git",
     "prendus-question-elements": "^0.1.14",
-    "redux-store-element": "^1.2.13",
-    "zwitterion": "^0.15.0"
+    "redux-store-element": "^1.2.13"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "zwitterion": "^0.15.0"
+  }
 }
