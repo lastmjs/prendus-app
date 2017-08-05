@@ -6,7 +6,7 @@ import {parse} from '../node_modules/assessml/assessml';
 
 export function compileToGuiQuestion(text: string, code: string): GuiQuestion {
     const amlAst = parse(text);
-    const jsAst = esprima.parseScript(code);
+    const jsAst = esprima.parse(code);
 
     const answer1 = {
         type: AnswerTypes.MultipleChoice,
