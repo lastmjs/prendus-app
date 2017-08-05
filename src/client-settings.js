@@ -1,4 +1,4 @@
-if (window.location.hostname === 'prendus.com') {
+if (window.location.hostname === 'www.prendus.com') {
     window.process = {
         env: {
             NODE_ENV: 'production'
