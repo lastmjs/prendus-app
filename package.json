@@ -24,6 +24,7 @@
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
   "dependencies": {},
   "devDependencies": {
+    "graphcool": "^1.2.1",
     "oss-attribution-generator": "^1.2.0"
   }
 }
