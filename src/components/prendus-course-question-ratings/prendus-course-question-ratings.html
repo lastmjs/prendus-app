@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-stacked-bar/prendus-stacked-bar.html">
 
 <dom-module id="prendus-course-question-ratings">
 
@@ -93,7 +94,7 @@
               <div class="column-header table-cell" on-click="_toggleSort">[[item]]</div>
             </template>
           </dom-repeat>
-          <div class="table-cell column-header" on-click="_sortOverall">Overall</div>
+          <div class="table-cell column-header" on-click="_toggleSort">Overall</div>
         </div>
         <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
           <template>
@@ -101,10 +102,10 @@
               <div class="table-cell question-text">[[_questionOnly(item.text)]]</div>
               <dom-repeat items="[[categories]]" as="category" hidden>
                 <template>
-                  <div class="table-cell">[[_displayStats(item.stats, category)]]</div>
+                  <div class="table-cell"><prendus-stacked-bar label="ratings" data="[[_prop(item.stats.barChartStats, category)]]"></prendus-stacked-bar></div>
                 </template>
               </dom-repeat>
-              <div class="table-cell">[[item.overall]]</div>
+              <div class="table-cell">[[item.stats.Overall]]</div>
             </div>
           </template>
         </dom-repeat>

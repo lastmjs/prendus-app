@@ -120,21 +120,14 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const first: number = sortAsc ? 1 : 0;
     const last: number = first ? 0 : 1;
     return (a: QuestionRatingStats, b: QuestionRatingStats) => {
-      const aField = sortField === 'overall' ? Number(a.overall) : Number(a.stats[sortField]);
-      const bField = sortField === 'overall' ? Number(b.overall) : Number(b.stats[sortField]);
-      return aField > bField ? first : last;
+      return a.stats[sortField] > b.stats[sortField] ? first : last;
     };
   }
 
   _toggleSort(e) {
-    const field = e.model.item;
+    const field = e.model ? e.model.item : e.target.innerHTML;
     if (this.sortField !== field) this._fireLocalAction('sortField', field);
     else this._fireLocalAction('sortAsc', !this.sortAsc);
-  }
-
-  _sortOverall(e) {
-    if (this.sortField === 'overall') this._fireLocalAction('sortAsc', !this.sortAsc);
-    else this._fireLocalAction('sortField', 'overall');
   }
 
   _concepts(assignments: Assignment[]): Concept[] {
@@ -145,29 +138,54 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', '');
   }
 
-  _displayStats(stats: Object, category: string): string {
-    return stats[category];
+  _prop(obj: Object, prop: string): any {
+    return obj[prop];
+  }
+
+  _categoryScores(ratings: Object[]): Object {
+    return this.categories.reduce((scores, category) =>
+      const score = sumProp(ratings, category);
+      return Object.assign(scores, {[category]: score});
+    }, {});
   }
 
   _computeQuestionOverall(stats: Object): number {
-    return (this.categories.reduce((sum, category) => sum + Number(stats[category]), 0) / this.categories.length).toPrecision(2) || 0;
+    const vals = Object.values(stats);
+    return (vals.reduce(sum, 0) / vals.length).toPrecision(2) || 0;
+  }
+
+  _barStats(ratings: Object[]): Object[] {
+    return ratings.reduce((stats, rating) => {
+      this.categories.forEach(category => {
+        if (!stats[category]) stats[category] = [];
+        const i = rating[category];
+        if (i !== NaN && i >=0) {
+          while (i > stats[category].length - 1) stats[category].push(0);
+          stats[category][i]++;
+        }
+      });
+      return stats;
+    }, {});
+  }
+
+  _computeRatingStats(ratings: Object[]): Object {
+    const categoryScores = this._categoryScores(ratings);
+    return {
+      Overall: this._computeQuestionOverall(categoryScores),
+      ...categoryScores,
+      barChartStats: this._barStats(ratings)
+    };
   }
 
   _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
     return flatten(assignments.map(assignment => assignment.questions.map(question => {
       const ratings = question.ratings.map(rating => JSON.parse(rating.ratingJson)).filter(rating => rating != null);
-      const stats = this.categories.reduce((stats, category) => {
-        if (!ratings) return Object.assign(stats, {[category]: 0});
-        const categoryStats = ratings.map(rating => rating[category]);
-        const total = categoryStats.reduce(sum, 0);
-        return Object.assign(stats, {[category]: (total / categoryStats.length * 5).toPrecision(2) });
-      }, {});
+      const stats = this._computeRatingStats(ratings);
       return {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
-        stats,
         text: question.text,
-        overall: this._computeQuestionOverall(stats);
+        stats
       }
     })));
   }
@@ -191,7 +209,11 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 }
 
 function sum (sum: number, num: number): number {
-  return sum + num;
+  return sum + (Number(num) || 0);
+}
+
+function sumProp (arr: Object[], prop): number {
+  return arr.reduce((sum, obj) => sum + (Number(obj[prop]) || 0), 0)
 }
 
 function weightedSum (sum: number, num: number, i: number): number {
