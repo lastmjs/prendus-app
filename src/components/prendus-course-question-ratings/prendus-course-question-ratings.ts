@@ -213,10 +213,6 @@ function sumProp (arr: Object[], prop): number {
   return arr.reduce((sum: number, obj: Object) => sum + (Number(obj[prop]) || 0), 0)
 }
 
-function weightedSum (sum: number, num: number, i: number): number {
-  return sum + num * i;
-}
-
 function flatten(arr: any[]): any[] {
   return arr.reduce((acc, elem) => {
     return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
