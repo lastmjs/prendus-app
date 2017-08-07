@@ -87,7 +87,7 @@
                     <paper-input id="discipline-title" id="disciplineTitle" label="Discipline"></paper-input>
                   </div>
                   <div class="buttons">
-                    <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+                    <button class="prendus-button prendus-button--minor" on-click="cancelDisciplineDialog">Cancel</button>
                     <button id="save-new-discipline" class="prendus-button prendus-button--recommended" on-click="createDiscipline">Save</button>
                   </div>
               </paper-dialog>
@@ -138,8 +138,19 @@
                     <paper-input id="subject-title" id="subjectTitle" label="Subject"></paper-input>
                   </div>
                   <div class="buttons">
-                    <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+                    <button class="prendus-button prendus-button--minor" on-click="cancelSubjectDialog">Cancel</button>
                     <button id="save-new-subject" class="prendus-button prendus-button--recommended" on-click="createSubject">Save</button>
+                  </div>
+              </paper-dialog>
+              <paper-dialog id="create-assignment" with-backdrop>
+                  <div class="content">
+                    <h2 id ="dialog-header">Create New Assignment</h2>
+                    <paper-input id="assignment-title" id="assignmentTitle" label="Assignment Title" required></paper-input>
+                    <paper-input id="concept-title" id="firstConcept" label="Concept (Add more at next step)" required></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+                    <button id="create-new-assignment" class="prendus-button prendus-button--recommended" on-click="createAssignment">Continue</button>
                   </div>
               </paper-dialog>
               <h2 class="prendus-margin">Assignments</h2>
@@ -178,7 +189,7 @@
                 </template>
               </dom-if>
               <div class="prendus-margin">
-                <a class="prendus-button prendus-button--recommended" href="assignment/create?courseId=[[courseId]]">Add assignment</a>
+                <button class="prendus-button prendus-button--recommended" on-click="openCreateAssignmentModal">Add assignment</button>
               </div>
             </template>
         </dom-if>
