@@ -228,7 +228,6 @@ class PrendusQuestionReview extends Polymer.Element {
         if (keys.includes('questionScaffoldsToRate')) this.questionScaffoldsToRate = componentState.questionScaffoldsToRate;
         if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
         if (keys.includes('rubricScores')) this.rubricScores = componentState.rubricScores;
-        
         // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
