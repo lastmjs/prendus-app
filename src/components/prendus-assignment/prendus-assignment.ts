@@ -117,14 +117,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       }
     }
     removeAssignmentConcept(e){
-      console.log(this.selectedConcepts.length)
       if(this.selectedConcepts.length === 1){
         alert('The Assignment needs at least 1 Concept')
       }else{
         const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
-          return e.model.item.id !== concept.id
+          return e.model.item.id !== concept.id;
         })
-        this._fireLocalAction('selectedConcepts', newSelectedConcepts)
+        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
       }
     }
     addConceptToAssignmentConcepts(e){
@@ -133,12 +132,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       })[0];
       if(!conceptInSelectedConcepts){
         const conceptToAddToAssignment = this.concepts.filter((concept)=>{
-          return concept.id === e.target.id
+          return concept.id === e.target.id;
         })[0];
         const newSelectedConcepts = [...(this.selectedConcepts || []), conceptToAddToAssignment]
-        this._fireLocalAction('selectedConcepts', newSelectedConcepts)
+        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
       }
-      console.log('conceptInSelectedConcepts', conceptInSelectedConcepts)
     }
     closeAssignmentConceptDialog(e){
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();

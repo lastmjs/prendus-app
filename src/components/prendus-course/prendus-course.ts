@@ -119,7 +119,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
       if(this.subjects){
-        this._fireLocalAction('subjects', null)
+        this._fireLocalAction('subjects', null);
       }
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
     }
