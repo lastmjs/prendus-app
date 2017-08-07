@@ -1,14 +1,14 @@
 {
   "name": "prendus-graphql-demo",
-  "version": "0.1.17",
+  "version": "0.2.2",
   "description": "Testing ground for the future of GraphQL with Prendus",
   "scripts": {
-    "start": "cd src && node_modules/.bin/zwitterion --ts-warning --watch-files",
+    "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --watch-files --ts-warning",
     "test": "xvfb-run -a electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "build-static": "cd src && zwitterion --build-static",
+    "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components",
     "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window"
   },
   "repository": {
@@ -24,6 +24,7 @@
   "devDependencies": {
     "guesswork": "^0.2.1",
     "oss-attribution-generator": "^1.2.0",
-    "scram-engine": "^0.6.10"
+    "scram-engine": "^0.6.10",
+    "graphcool": "^1.2.1"
   }
 }

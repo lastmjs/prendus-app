@@ -139,14 +139,14 @@
             <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]" data-path="../prendus-authenticate/prendus-authenticate.html"></prendus-authenticate>
             <prendus-scaphold-demo show="scapholdDemoView" data-path="../prendus-scaphold-demo/prendus-scaphold-demo.html"></prendus-scaphold-demo>
 
-            <div show="viewQuestionView" class="viewQuestionContainer" data-path="../../node_modules/prendus-question-elements/dist/prendus-view-question.html">
+            <div show="viewQuestionView" class="viewQuestionContainer" data-path="../../node_modules/prendus-question-elements/prendus-view-question.html">
                 <div class="viewQuestionWrapper">
                     <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
                 </div>
             </div>
-            <prendus-edit-question show="createQuestionView" user="[[user]]" user-token="[[userToken]]" data-path="../../node_modules/prendus-question-elements/dist/prendus-edit-question.html"></prendus-edit-question>
-            <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" data-path="../../node_modules/prendus-question-elements/dist/prendus-edit-question.html"></prendus-edit-question>
-            <prendus-edit-question show="editDemoQuestionView" question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save data-path="../../node_modules/prendus-question-elements/dist/prendus-edit-question.html"></prendus-edit-question>
+            <prendus-edit-question show="createQuestionView" user="[[user]]" user-token="[[userToken]]" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html"></prendus-edit-question>
+            <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html"></prendus-edit-question>
+            <prendus-edit-question show="editDemoQuestionView" question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html"></prendus-edit-question>
             <prendus-question-examples show="examplesQuestionView" data-path="../prendus-question-examples/prendus-question-examples.html"></prendus-question-examples>
 
             <prendus-courses class="app-window" show="coursesView" data-path="../prendus-courses/prendus-courses.html"></prendus-courses>
@@ -192,5 +192,5 @@
 
     </template>
 
-    <script src="prendus-app.ts"></script>
+    <script type="module" src="prendus-app.ts"></script>
 </dom-module>

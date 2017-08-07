@@ -1,7 +1,10 @@
 import {State} from '../typings/state';
 import {InitialState} from './initial-state';
 import {Action, SetPropertyAction, SetComponentPropertyAction} from '../typings/actions';
+import {generateMultipleChoice} from '../services/question-to-code-service';
+import {shuffleArray} from '../services/utilities-service';
 import {Reducer} from '../typings/reducer';
+import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
 export const RootReducer: Reducer = (state: State = InitialState, action: Action): State => {
     switch(action.type) {
@@ -29,9 +32,9 @@ export const RootReducer: Reducer = (state: State = InitialState, action: Action
             const convertedTextAndCode: {
                 text: string,
                 code: string
-            } = QuestionToCodeService.generateMultipleChoice({
+            } = generateMultipleChoice({
                 stem: state.currentQuestionScaffold.question,
-                answers: UtilitiesService.shuffleArray(Object.values(state.currentQuestionScaffold.answers).map((answer: QuestionScaffoldAnswer) => {
+                answers: shuffleArray(Object.values(state.currentQuestionScaffold.answers).map((answer: QuestionScaffoldAnswer) => {
                     return {
                         text: answer.text,
                         correct: answer.correct,

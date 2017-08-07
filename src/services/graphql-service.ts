@@ -119,7 +119,32 @@ export const GQLMutate = async (queryString: string, userToken: string | null, e
 
     return data;
 };
+export const GQLMutateWithVariables = async (queryString: string, userToken: string | null, variables: {} | null, errorCallback: GQLMutateErrorCallback) => {
+    //TODO to allow for good cacheing, we'll probably need to parse the queryString so that we can get all of the properties that we need
+    const response = await window.fetch(httpEndpoint, {
+        method: 'post',
+        headers: {
+            'content-type': 'application/json',
+            ...userToken && {
+                'Authorization': `Bearer ${userToken}`
+            } //TODO As far as I understand the syntax above will be standard and this TypeScript error might go away with the following: https://github.com/Microsoft/TypeScript/issues/10727
+        },
+        body: JSON.stringify({
+            query: queryString,
+            variables: variables
+        })
+    });
 
+    const responseJSON = await response.json();
+    const data = responseJSON.data;
+    const errors = responseJSON.errors;
+    (errors || []).forEach((error: any) => {
+      console.log('error', error)
+        // errorCallback(error);
+    });
+
+    return data;
+};
 //TODO potentially gaurd against multiple subscriptions
 export const GQLSubscribe = (queryString: string, id: string, callback: GQLSubscribeCallback) => {
     // we need to wait for the webSocket's connection to be open
