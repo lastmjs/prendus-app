@@ -25,11 +25,12 @@
         padding: 10px;
         border-radius: 15px 15px 0 0;
         border: none;
-        align-items: baseline;
+        align-items: start;
       }
 
       #table-header .table-cell {
         border: none;
+        font-size: 14px;
       }
 
       .column-header {
@@ -42,9 +43,8 @@
 
       .question-row {
         display: grid;
-        grid-template-rows: 2fr;
-        grid-auto-rows: 3fr;
-        grid-template-columns: 3fr;
+        grid-auto-rows: 4vw;
+        grid-template-columns: 5fr;
         grid-auto-columns: 1fr;
         grid-auto-flow: column;
         border-left: 1px solid;
@@ -60,7 +60,7 @@
       }
 
       .question-text {
-        justify-content: normal;
+        justify-content: normal !important;
       }
 
       [hidden] {

@@ -24,7 +24,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   categories: string[];
   assignmentId: string = 'ALL';
   conceptId: string = 'ALL';
-  sortField: string = 'overall';
+  sortField: string = 'Overall';
   sortAsc: boolean = false;
 
   static get is() { return 'prendus-course-question-ratings'; }
@@ -155,7 +155,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _barStats(ratings: Object[], category: string): Object[] {
-    return ratings.reduce((stats, rating) => {
+    return ratings.reduce((stats: number[], rating: Object) => {
       const i = rating[category];
       if (i !== NaN && i >=0) {
         while (i > stats.length - 1) stats.push(0);
@@ -210,7 +210,7 @@ function sum (sum: number, num: number): number {
 }
 
 function sumProp (arr: Object[], prop): number {
-  return arr.reduce((sum, obj) => sum + (Number(obj[prop]) || 0), 0)
+  return arr.reduce((sum: number, obj: Object) => sum + (Number(obj[prop]) || 0), 0)
 }
 
 function weightedSum (sum: number, num: number, i: number): number {
