@@ -151,7 +151,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _computeQuestionOverall(stats: Object): number {
     const vals = Object.values(stats);
-    return (vals.reduce(sum, 0) / vals.length).toPrecision(2) || 0;
+    return (vals.reduce(sum, 0) / vals.length * 5).toPrecision(2) || 0;
   }
 
   _barStats(ratings: Object[], category: string): Object[] {
