@@ -72,8 +72,9 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           const question: string = this.shadowRoot.querySelector('#question') ? this.shadowRoot.querySelector('#question').value : null;
           const answer: string = this.shadowRoot.querySelector('#answer') ? this.shadowRoot.querySelector('#answer').value : null;
+          const solution: string = this.shadowRoot.querySelector('#solution') ? this.shadowRoot.querySelector('#solution').value : null;
           const answers: string[] = getAnswers(this, answer);
-          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, question, null, answers, null)
+          this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, question, null, answers, solution)
         }
 
       function getAnswers(context: PrendusScaffoldNewQuestion, text: string): string[] {
@@ -82,6 +83,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
           'question0': {
             ...context.currentQuestionScaffold.answers['question0'],
             text,
+            comment: 'CORRECT',
             correct: true,
             id: 'true'
           }
@@ -97,6 +99,7 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
         const state: State = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
+        console.log('state.currentQuestionScaffold', state.currentQuestionScaffold)
     }
 }
 
