@@ -135,7 +135,12 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _questionOnly(text: string): string {
-    return parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', '');
+    return this._truncate(parse(text).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
+  }
+
+  _truncate(str: string): string {
+    if (str.length < 100) return str;
+    return str.substr(0, 100) + '...';
   }
 
   _prop(obj: Object, prop: string): any {
