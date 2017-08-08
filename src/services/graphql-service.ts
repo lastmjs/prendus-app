@@ -50,14 +50,14 @@ webSocket.onmessage = (event) => {
     }
 };
 
-export const GQLrequest = async (query: string, variables: {[key:string]: any}, userToken: string) => {
+export const GQLrequest = async (query: string, variables: {[key:string]: any}, userToken: string): Object => {
   const auth = userToken ? { 'Authorization': `Bearer ${userToken}` } : {};
   const headers = { 'Content-Type': 'application/json', ...auth };
-  const body = JSON.stringify({ query, variables ? variables : undefined }); 
+  const body = JSON.stringify({ query, variables ? variables : undefined });
   const opts = { method: 'POST', headers, body };
   const response = await window.fetch(httpEndpoint, opts);
   const data = await response.json();
-  return data.data;
+  return data.data || data.errors;
 }
 
 export const GQLQuery = async (queryString: string, userToken: string | null, dataCallback: GQLQueryDataCallback, errorCallback: GQLQueryErrorCallback) => {

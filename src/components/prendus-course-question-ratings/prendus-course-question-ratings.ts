@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLQuery, GQLSubscribe} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {rubric} from '../../typings/evaluation-rubric';
 import {User} from '../../typings/user';
@@ -60,6 +60,51 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     console.log('error', error);
   }
 
+  _subscribeToData() {
+    GQLSubscribe(`
+      subscription {
+        Assignment(
+          filter: {
+            node: {
+              course: {
+                id: "${this.courseId}"
+              }
+            }, mutation_in: [CREATED, DELETED]
+          }
+        ) {node { id }}
+      }`, this.componentId, this._updateData.bind(this));
+    GQLSubscribe(`
+      subscription {
+        Question(
+          filter: {
+            node: {
+              assignment: {
+                course: {
+                  id: "${this.courseId}"
+                }
+              }
+            }, mutation_in: [CREATED, DELETED]
+          }
+        ) {node {id}}
+      }`, this.componentId, this._updateData.bind(this));
+    GQLSubscribe(`
+      subscription {
+        QuestionRating(
+          filter: {
+            node: {
+              question: {
+                assignment: {
+                  course: {
+                    id: "${this.courseId}"
+                  }
+                }
+              }
+            }, mutation_in: [CREATED]
+          }
+        ) {node {id}}
+      }`, this.componentId, this._updateData.bind(this));
+  }
+
   async loadQuestions() {
     const data = await GQLQuery(`
         query {
@@ -92,6 +137,13 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   async _courseIdChanged() {
     this._fireLocalAction('courseId', this.courseId);
+    this._fireLocalAction('loaded', false);
+    await this.loadQuestions();
+    this._subscribeToData();
+    this._fireLocalAction('loaded', true);
+  }
+
+  async _updateData(data) {
     this._fireLocalAction('loaded', false);
     await this.loadQuestions();
     this._fireLocalAction('loaded', true);
@@ -148,8 +200,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _categoryScores(ratings: Object[]): Object {
-    return this.categories.reduce((scores, category) =>
-      const score = sumProp(ratings, category);
+    return this.categories.reduce((scores, category) => {
+      const score = sumProp(ratings, category) / ratings.length;
       return Object.assign(scores, {[category]: score});
     }, {});
   }
