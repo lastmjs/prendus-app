@@ -21,6 +21,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     learningStructure: any;
     subjects: Subject[];
     concepts: Concept[];
+    selectedConcepts: Concept[];
     assignmentType: AssignmentType;
     connected: boolean;
 
@@ -114,15 +115,34 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       }else{
         this.shadowRoot.querySelector('#assignmentConceptDialog').open();
       }
-
-
+    }
+    removeAssignmentConcept(e){
+      if(this.selectedConcepts.length === 1){
+        alert('The Assignment needs at least 1 Concept')
+      }else{
+        const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
+          return e.model.item.id !== concept.id;
+        })
+        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
+      }
+    }
+    addConceptToAssignmentConcepts(e){
+      const conceptInSelectedConcepts = this.selectedConcepts.filter((concept)=>{
+        return concept.id === e.target.id
+      })[0];
+      if(!conceptInSelectedConcepts){
+        const conceptToAddToAssignment = this.concepts.filter((concept)=>{
+          return concept.id === e.target.id;
+        })[0];
+        const newSelectedConcepts = [...(this.selectedConcepts || []), conceptToAddToAssignment]
+        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
+      }
     }
     closeAssignmentConceptDialog(e){
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        console.log('error')
         alert('Must enter a valid title for the new concept before adding it')
         return;
       }
@@ -135,6 +155,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             subjectId: "${this.assignment.course.subject.id}"
           ){
             id
+            title
             subject{
               concepts{
                 id
@@ -147,11 +168,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           console.log(error);
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
+      this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
       this.shadowRoot.querySelector('#custom-concept').value = '';
     }
     async updateAssignmentConcepts(e: any){
-      const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
-      const conceptIds = selectedConcepts.map((concept: Concept)=>{
+      // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
+      const conceptIds = this.selectedConcepts.map((concept: Concept)=>{
         return `"${concept.id}"`
       })
       const variableString = `{"conceptsIds": [${conceptIds}]}`
@@ -204,6 +226,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
+        this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
         this._fireLocalAction('courseId', data.Assignment.course.id)
     }
     async loadConcepts(subjectId: string){
@@ -269,6 +292,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentId')) this.assignmentId = state.components[this.componentId].assignmentId;
         if (Object.keys(state.components[this.componentId] || {}).includes('subjects')) this.subjects = state.components[this.componentId].subjects;
         if (Object.keys(state.components[this.componentId] || {}).includes('concepts')) this.concepts = state.components[this.componentId].concepts;
+        if (Object.keys(state.components[this.componentId] || {}).includes('selectedConcepts')) this.selectedConcepts = state.components[this.componentId].selectedConcepts;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentType')) this.assignmentType = state.components[this.componentId].assignmentType;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignment')) this.assignment = state.components[this.componentId].assignment;

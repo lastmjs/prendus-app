@@ -60,11 +60,24 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     async courseIdChanged() {
         this._fireLocalAction('courseId', this.courseId)
+        this.resetCourseProperties();
         this._fireLocalAction('loaded', false)
         await this.loadLearningStructure();
         await this.loadData();
         this._fireLocalAction('loaded', true)
     }
+    resetCourseProperties(){
+      this._fireLocalAction('assignments', null)
+      this._fireLocalAction('learningStructure', null)
+      this._fireLocalAction('course', null)
+      this._fireLocalAction('editingTitle', null)
+      this._fireLocalAction('subjects', null)
+      this._fireLocalAction('selectedDisciplineId', null)
+      this._fireLocalAction('customDiscipline', null)
+      this._fireLocalAction('customSubject', null)
+      this._fireLocalAction('selectedDisciplineId', null)
+    }
+
     isViewMode(mode: Mode) {
       this._fireLocalAction('loaded', true)
         return mode === 'view';
@@ -78,6 +91,17 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     openCreateDisciplineDialog(e){
       this.shadowRoot.querySelector('#create-discipline').open();
+    }
+    cancelDisciplineDialog(e){
+      //If I don't set it to null first, Polymer won't update the DOM. Anyone know why?
+      this._fireLocalAction('selectedDisciplineId', null)
+      this._fireLocalAction('selectedDisciplineId', this.course.discipline.id)
+      this.shadowRoot.querySelector('#create-discipline').close();
+    }
+    cancelSubjectDialog(e){
+      this._fireLocalAction('selectedSubjectId', null)
+      this._fireLocalAction('selectedSubjectId', this.course.subject.id)
+      this.shadowRoot.querySelector('#create-subject').close();
     }
     async createDiscipline(){
       const data = await GQLMutate(`
@@ -95,7 +119,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
       if(this.subjects){
-        this._fireLocalAction('subjects', null)
+        this._fireLocalAction('subjects', null);
       }
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
     }
@@ -106,13 +130,13 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             coursesCourseId: "${this.courseId}"
             disciplineDisciplineId: "${disciplineId}"
           ) {
-        		disciplineDiscipline{
+            coursesCourse{
               id
               title
-              approved
-              subjects{
+              discipline{
                 id
                 title
+                approved
               }
             }
           }
@@ -120,9 +144,30 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (error: any) => {
         console.log('error', error)
       });
+      if(this.course.subject){
+        await GQLMutate(`
+          mutation {
+            removeFromCourseSubject(
+              coursesCourseId: "${this.courseId}"
+              subjectSubjectId: "${this.course.subject.id}"
+            ) {
+              coursesCourse{
+                id
+              }
+            }
+          }
+        `, this.userToken, (error: any) => {
+          console.log('error', error)
+        });
+      }
       this._fireLocalAction('selectedDisciplineId', disciplineId)
+      this._fireLocalAction('course', {
+        ...this.course,
+        discipline: courseData.addToCourseDiscipline.coursesCourse.discipline,
+      })
+      this._fireLocalAction('selectedSubjectId', null)
       this._fireLocalAction('customSubject', false)
-      if(courseData.addToCourseDiscipline.disciplineDiscipline.approved !== "YES"){
+      if(courseData.addToCourseDiscipline.coursesCourse.discipline.approved !== "YES"){
         this._fireLocalAction('customDiscipline', true)
       }else{
         this._fireLocalAction('customDiscipline', null)
@@ -140,10 +185,14 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             coursesCourseId: "${this.courseId}"
             subjectSubjectId: "${subjectId}"
           ) {
-            subjectSubject{
+            coursesCourse{
               id
               title
-              approved
+              subject{
+                id
+                title
+                approved
+              }
             }
           }
         }
@@ -151,7 +200,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         console.log('error', error)
       });
       this._fireLocalAction('selectedSubjectId', subjectId)
-      if(courseData.addToCourseSubject.subjectSubject.approved !== "YES"){
+      this._fireLocalAction('course', {
+        ...this.course,
+        subject: courseData.addToCourseSubject.coursesCourse.subject,
+      })
+      if(courseData.addToCourseSubject.coursesCourse.subject.approved !== "YES"){
         this._fireLocalAction('customSubject', true)
       }else{
         this._fireLocalAction('customSubject', null)
@@ -160,8 +213,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
     }
-
-
     updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
@@ -194,33 +245,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       });
       // this.loadData()
       // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
+      this.saveSubjectToCourse(data.createSubject.id);
       const newSubjects = [...(this.subjects || []), data.createSubject];
-      this._fireLocalAction('subjects', newSubjects);
-      this._fireLocalAction('customSubject', true);
-      this._fireLocalAction('selectedSubjectId', data.createSubject.id);
+      this._fireLocalAction('subjects', newSubjects)
+      this._fireLocalAction('customSubject', true)
+      this._fireLocalAction('selectedSubjectId', data.createSubject.id)
       this.shadowRoot.querySelector('#create-subject').close();
-    }
-    async saveCourseSubject(e){
-      const data = await GQLMutate(`
-        mutation {
-          addToCourseSubject(
-            coursesCourseId: "${this.courseId}"
-            subjectSubjectId: "${e.target.id}"
-          ) {
-            subjectSubject{
-              title
-              concepts{
-                id
-                title
-              }
-            }
-          }
-        }
-      `, this.userToken, (error: any) => {
-        console.log('error', error)
-          alert(error);
-      });
-      this._fireLocalAction('selectedSubjectId', e.target.id)
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -228,6 +258,43 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     getEditIcon(editStatus: boolean): string {
   		return editStatus ? 'check' : 'create';
   	}
+    openCreateAssignmentModal(e){
+      this.shadowRoot.querySelector('#assignment-title').value = null;
+      this.shadowRoot.querySelector('#concept-title').value = null;
+      if(this.course.discipline && this.course.subject){
+        this.shadowRoot.querySelector('#create-assignment').open();
+      }else{
+        alert('Please select a discipline and subject before creating any assignments')
+      }
+    }
+    async createAssignment(e){
+      const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value;
+      const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
+      if(assignmentTitle && conceptTitle){
+        const data = await GQLMutate(`
+          mutation createAssignmentAndConcepts{
+            createAssignment(
+              title: "${assignmentTitle}"
+              authorId: "${this.user ? this.user.id : null}"
+              courseId: "${this.courseId}"
+              concepts: [{
+                title: "${conceptTitle}"
+                subjectId: "${this.course.subject.id}"
+              }]
+            ){
+              id
+            }
+          }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
+        this.shadowRoot.querySelector('#create-assignment').close();
+        navigate(`assignment/${data.createAssignment.id}/edit`)
+      }else{
+        alert('Please input required titles')
+      }
+      // href=""
+    }
     async deleteAssignment(e){
       const data = await GQLMutate(`
           mutation {

@@ -14,6 +14,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     loaded: boolean;
     userToken: string | null;
     user: User | null;
+    newCourseTitle: string | null;
 
     static get is() { return 'prendus-courses'; }
 
@@ -92,25 +93,32 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#confirm-delete-modal').close();
     }
     openCreateCourseDialog(){
+      this.shadowRoot.querySelector('#add-course-modal').value = null;
       this.shadowRoot.querySelector('#add-course-modal').open();
     }
     async createCourse(){
       const title = this.shadowRoot.querySelector('#titleInput').value;
-      const data = await GQLMutate(`
-          mutation {
-              createCourse(
-                title: "${title}"
-                authorId: "${this.user.id}"
-              ){
-                id
-                title
-              }
-          }
-      `, this.userToken, (error: any) => {
-          console.log(error);
-      });
-      this.shadowRoot.querySelector('#add-course-modal').close();
-      navigate(`/course/${data.createCourse.id}/edit`)
+      if(title){
+        const data = await GQLMutate(`
+            mutation {
+                createCourse(
+                  title: "${title}"
+                  authorId: "${this.user.id}"
+                ){
+                  id
+                  title
+                }
+            }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
+        this.shadowRoot.querySelector('#add-course-modal').value = null;
+        this.shadowRoot.querySelector('#add-course-modal').close();
+        navigate(`/course/${data.createCourse.id}/edit`)
+      }else{
+        alert('Add a title to continue')
+      }
+
     }
     subscribeToData() {
         GQLSubscribe(`
