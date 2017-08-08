@@ -22,9 +22,9 @@
   "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
   "dependencies": {},
   "devDependencies": {
-    "guesswork": "^0.2.1",
+    "graphcool": "^1.2.1",
+    "guesswork": "^0.2.4",
     "oss-attribution-generator": "^1.2.0",
-    "scram-engine": "^0.6.10",
-    "graphcool": "^1.2.1"
+    "scram-engine": "^0.6.14"
   }
 }
