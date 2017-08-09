@@ -57,11 +57,8 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     }
 
     disableNext(e: any): Promise<void> {
-      console.log('disableNext final')
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        console.log('here')
         this.action = setDisabledNext(false);
-        // checkForUserToken();
         const convertedQuestion = this.convertScaffoldToQuestion()
         const questionId = this.saveQuestion(convertedQuestion)
       }

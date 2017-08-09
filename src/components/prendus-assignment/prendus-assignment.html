@@ -14,6 +14,7 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
 <link rel="import" href="../prendus-question-review/prendus-question-review.html">
+<link rel="import" href="prendus-assignment-quiz.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-assignment">
@@ -78,6 +79,11 @@
                         <dom-if if="[[isReviewType(assignmentType)]]">
                             <template>
                                 <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review>
+                            </template>
+                        </dom-if>
+                        <dom-if if="[[isQuizType(assignmentType)]]">
+                            <template>
+                                <prendus-assignment-quiz assignment-id="[[assignmentId]]"></prendus-assignment-quiz>
                             </template>
                         </dom-if>
                     </template>

@@ -90,20 +90,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isReviewType(assignmentType: String) {
         return assignmentType === 'REVIEW';
     }
+    isQuizType(assignmentType: String) {
+        return assignmentType === 'QUIZ';
+    }
     openAssignmentConceptDialog(e: any){
-      //THIS WAS INTENDED TO SELECT THE CURRENT CONCEPTS. THERE IS A WEIRD ERROR THAT IF THE CONCEPTS ARE EDITED AND THEN THE MODAL IS OPENED AGAIN IT WONT SELECT THE CONCEPTS. LEAVING THIS HERE UNTIL WE CAN FIGURE IT OUT
-      // const conceptIds = this.assignment.concepts.map(function(concept:Concept){
-      //    return concept.id
-      // })
-      // const that = this;
-      // this.concepts.map(function(subjectConcept: Concept, index: number){
-      //   that.assignment.concepts.map(function(assignmentConcept: Concept){
-      //     if(subjectConcept.id === assignmentConcept.id){
-      //       that.shadowRoot.querySelector('#courseConcepts').selectIndex(index)
-      //     }
-      //   })
-      // })
-
       if(!this.assignment){
         if(this.shadowRoot.querySelector('#titleInput').value){
           this.shadowRoot.querySelector('#assignmentConceptDialog').open();
