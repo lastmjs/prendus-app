@@ -117,6 +117,9 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
               title
               questions {
                 id
+                author {
+                  email
+                }
                 text
                 concept {
                   id
@@ -173,14 +176,42 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const first: number = sortAsc ? 1 : 0;
     const last: number = first ? 0 : 1;
     return (a: QuestionRatingStats, b: QuestionRatingStats) => {
+      if (sortField === 'Student') {
+        if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
+        return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
+      }
+      if (a.stats[sortField] === b.stats[sortField]) return 0;
       return a.stats[sortField] > b.stats[sortField] ? first : last;
     };
   }
 
+  _findHeader(needle: string, haystack: any): any {
+    for (let i = 0; i < haystack.length; i++) {
+      if (haystack[i].innerHTML === needle)
+        return haystack[i];
+    }
+    return null;
+  }
+
   _toggleSort(e) {
-    const field = e.model ? e.model.item : e.target.innerHTML;
-    if (this.sortField !== field) this._fireLocalAction('sortField', field);
-    else this._fireLocalAction('sortAsc', !this.sortAsc);
+    const field = e.target.innerHTML;
+    const headers = this.shadowRoot.querySelectorAll('.sortable');
+    const oldField = this._findHeader(this.sortField, headers);
+    const newField = this._findHeader(field, headers);
+    if (this.sortField !== field) {
+      oldField && oldField.setAttribute('aria-sort', 'none');
+      newField && newField.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
+      this._fireLocalAction('sortField', field);
+    }
+    else {
+      newField && newField.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
+      this._fireLocalAction('sortAsc', !this.sortAsc);
+    }
+  }
+
+  _checkToggleSort(e) {
+    if (e.which === 13 || e.which === 32)
+      this._toggleSort(e);
   }
 
   _concepts(assignments: Assignment[]): Concept[] {
@@ -238,6 +269,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       return {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
+        student: question.author.email,
         text: question.text,
         ratings,
         stats

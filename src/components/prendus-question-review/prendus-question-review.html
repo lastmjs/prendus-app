@@ -21,7 +21,7 @@
             flex-wrap: wrap;
             justify-content: space-between;
           }
-          
+
           .rubric-category {
             flex-basis: 390px;
           }
@@ -45,7 +45,7 @@
                     <paper-dropdown-menu class="rubric-category" label="[[category.label]]" on-iron-select="_rubricScoreChanged">
                       <paper-listbox slot="dropdown-content">
                         <template is="dom-repeat" items="[[category.options]]" as="option" hidden>
-                          <paper-item id="[[_paperItemId(category, option)]]" value="[[option.points]]">[[option.label]]</paper-item>
+                          <paper-item id="[[_paperItemId(category, option)]]" value="[[option.points]]" aria-describedby$="label-[[_paperItemId(category, option)]]">[[option.label]]</paper-item>
                         </template>
                       </paper-listbox>
                     </paper-dropdown-menu>
@@ -53,7 +53,7 @@
                 </div>
                 <template is="dom-repeat" items="[[rubricCategories]]" as="category">
                   <template is="dom-repeat" items="[[category.options]]" as="option">
-                    <paper-tooltip position="top" for="[[_paperItemId(category, option)]]">[[option.description]]</paper-tooltip>
+                    <paper-tooltip id="label-[[_paperItemId(category, option)]]" position="top" for="[[_paperItemId(category, option)]]">[[option.description]]</paper-tooltip>
                   </template>
                 </template>
                 <div class="submit-button">

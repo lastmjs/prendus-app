@@ -45,7 +45,7 @@
     <div id="wrapper">
       <dom-repeat id="bars" items="[[data]]">
         <template>
-          <div id="bar-[[index]]" class="bar" style$="[[_computeWidth(data, item)]]"></div>
+          <div id="bar-[[index]]" class="bar" style$="[[_computeWidth(data, item)]]" aria-label$="Bar for score [[index]] with [[item]] ratings"></div>
         </template>
       </dom-repeat>
     </div>

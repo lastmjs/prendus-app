@@ -19,13 +19,11 @@
       }
 
       #table-header {
-        height: 40px;
         background: var(--prendus-primary-color);
         color: white;
-        padding: 10px;
         border-radius: 15px 15px 0 0;
         border: none;
-        align-items: start;
+        align-items: center;
       }
 
       #table-header .table-cell {
@@ -33,18 +31,18 @@
         font-size: 14px;
       }
 
-      .column-header {
+      .sortable {
         cursor: pointer;
       }
 
-      .column-header:hover {
+      .sortable:hover, .sortable:focus {
         text-decoration: underline;
       }
 
       .question-row {
         display: grid;
         grid-auto-rows: 4vw;
-        grid-template-columns: 5fr;
+        grid-template-columns: 5fr 3fr;
         grid-auto-columns: 1fr;
         grid-auto-flow: column;
         border-left: 1px solid;
@@ -60,7 +58,7 @@
         overflow: hidden;
       }
 
-      .question-text {
+      .question-meta {
         justify-content: normal !important;
       }
 
@@ -71,7 +69,7 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <div>
-      <h2>Questions: [[course.title]]</h2>
+      <h2 id="question-rating-table-header">Questions: [[course.title]]</h2>
       <label for="assignmentId">Assignment</label>
       <select id="assignmentId" on-change="_assignmentIdChanged">
         <option value="ALL">All</option>
@@ -87,23 +85,25 @@
             <option value="[[item.id]]">[[item.title]]</option>
           </template>
       </select>
-      <div id="questions">
-        <div id="table-header" class="question-row">
-          <div class="table-cell question-text">Question</div>
+      <div id="questions" role="grid" aria-readonly="true" aria-labelledby="question-rating-table-header">
+        <div id="table-header" class="question-row" role="row">
+          <div class="table-cell column-header question-meta" scope="col" role="columnheader" aria-sort="none">Question</div>
+          <div id="Student" class="table-cell column-header" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Student</span></div>
           <dom-repeat items="[[categories]]" hidden>
             <template>
-              <div class="column-header table-cell" on-click="_toggleSort">[[item]]</div>
+              <div class="column-header table-cell" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" role="button" on-keydown="_checkToggleSort" tabindex="0">[[item]]</span></div>
             </template>
           </dom-repeat>
-          <div class="table-cell column-header" on-click="_toggleSort">Overall</div>
+          <div id="Overall" class="table-cell column-header" scope="col" role="columnheader" aria-sort="descending"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Overall</span></div>
         </div>
         <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
           <template>
-            <div class="question-row">
-              <div class="table-cell question-text">[[_questionOnly(item.text)]]</div>
+            <div class="question-row" role="row">
+              <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
+              <div class="table-cell">[[item.student]]</div>
               <dom-repeat items="[[categories]]" as="category" hidden>
                 <template>
-                  <div class="table-cell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.ratings, category)]]"></prendus-stacked-bar></div>
+                  <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.ratings, category)]]"></prendus-stacked-bar></div>
                 </template>
               </dom-repeat>
               <div class="table-cell">[[item.stats.Overall]]</div>
