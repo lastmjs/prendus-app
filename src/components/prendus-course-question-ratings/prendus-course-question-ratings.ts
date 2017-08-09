@@ -199,12 +199,12 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     const oldField = this._findHeader(this.sortField, headers);
     const newField = this._findHeader(field, headers);
     if (this.sortField !== field) {
-      oldField && oldField.setAttribute('aria-sort', 'none');
-      newField && newField.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
+      oldField && oldField.parentNode.setAttribute('aria-sort', 'none');
+      newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
       this._fireLocalAction('sortField', field);
     }
     else {
-      newField && newField.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
+      newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
       this._fireLocalAction('sortAsc', !this.sortAsc);
     }
   }
