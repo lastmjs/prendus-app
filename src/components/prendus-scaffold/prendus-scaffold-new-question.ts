@@ -99,7 +99,6 @@ class PrendusScaffoldNewQuestion extends Polymer.Element implements ContainerEle
         const state: State = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.currentQuestionScaffold = state.currentQuestionScaffold;
-        console.log('state.currentQuestionScaffold', state.currentQuestionScaffold)
     }
 }
 

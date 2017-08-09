@@ -57,7 +57,9 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     }
 
     disableNext(e: any): Promise<void> {
+      console.log('disableNext final')
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
+        console.log('here')
         this.action = setDisabledNext(false);
         // checkForUserToken();
         const convertedQuestion = this.convertScaffoldToQuestion()
@@ -104,6 +106,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
 
     async saveQuestion(question: Question) {
       //have to do this because the code is a multi-line string. We need to parse it down to a single line so that Graph.cool will accept it.
+      console.log('saveQuestion');
       const code: string = question.code.replace(/\n/g, "");
       const data = await GQLMutate(`
         mutation {

@@ -46,7 +46,6 @@ class PrendusScaffoldComments extends Polymer.Element {
         };
     }
     createComment(index: number){
-      console.log(index)
       return index !== 0 ? 'Incorrect' : 'Correct'
     }
     enableNext(){
