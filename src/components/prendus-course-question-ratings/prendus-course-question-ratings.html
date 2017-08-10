@@ -42,7 +42,7 @@
       .question-row {
         display: grid;
         grid-auto-rows: 4vw;
-        grid-template-columns: 5fr 3fr;
+        grid-template-columns: 5fr; /* 3fr;*/
         grid-auto-columns: 1fr;
         grid-auto-flow: column;
         border-left: 1px solid;
@@ -88,7 +88,7 @@
       <div id="questions" role="grid" aria-readonly="true" aria-labelledby="question-rating-table-header">
         <div id="table-header" class="question-row" role="row">
           <div class="table-cell column-header question-meta" scope="col" role="columnheader" aria-sort="none">Question</div>
-          <div id="Student" class="table-cell column-header" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Student</span></div>
+          <!--div id="Student" class="table-cell column-header" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Student</span></div-->
           <dom-repeat items="[[categories]]" hidden>
             <template>
               <div class="column-header table-cell" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" role="button" on-keydown="_checkToggleSort" tabindex="0">[[item]]</span></div>
@@ -100,7 +100,7 @@
           <template>
             <div class="question-row" role="row">
               <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
-              <div class="table-cell">[[item.student]]</div>
+              <!--div class="table-cell">[[item.student]]</div-->
               <dom-repeat items="[[categories]]" as="category" hidden>
                 <template>
                   <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.ratings, category)]]"></prendus-stacked-bar></div>

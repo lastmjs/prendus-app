@@ -117,9 +117,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
               title
               questions {
                 id
-                author {
-                  email
-                }
                 text
                 concept {
                   id
@@ -269,7 +266,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       return {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
-        student: question.author.email,
+        student: '', //question.author.email,
         text: question.text,
         ratings,
         stats
