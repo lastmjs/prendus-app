@@ -256,8 +256,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
     }
     getEditIcon(editStatus: boolean): string {
-  		return editStatus ? 'check' : 'create';
-  	}
+      return editStatus ? 'check' : 'create';
+    }
+    _getAssignmentUrl(assignment: Assignment, assignmentType: string): string {
+      return assignment.questionType === 'MULTIPLE_CHOICE' ? ('view?assignmentType=' + assignmentType.toUpperCase()) : assignmentType;
+    }
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
       this.shadowRoot.querySelector('#concept-title').value = null;
@@ -317,6 +320,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }) {
                     id
                     title
+                    questionType
                 }
                 Course(id: "${this.courseId}") {
                     title

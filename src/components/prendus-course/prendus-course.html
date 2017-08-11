@@ -22,19 +22,19 @@
         <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
         <style include="prendus-styles">
         .edit-section {
-    			display: flex;
-    			align-items: center;
-    		}
-    		.edit-section .edit-input {
-    			flex-grow: 1;
-    		}
-    		.edit-input {
-    			min-width: 200px;
-    		}
-    		.edit-section .edit-button {
-    			align-self: flex-start;
-    			flex-shrink: 0;
-    		}
+          display: flex;
+          align-items: center;
+        }
+        .edit-section .edit-input {
+          flex-grow: 1;
+        }
+        .edit-input {
+          min-width: 200px;
+        }
+        .edit-section .edit-button {
+          align-self: flex-start;
+          flex-shrink: 0;
+        }
         #course-title {
           --paper-input-container-input: {
             font-size: 48px;
@@ -63,10 +63,10 @@
                 <template is="dom-if" if="[[isViewMode(mode)]]">
                   <h1>[[course.title]]</h1>
                 </template>
-						    <template is="dom-if" if="[[!isViewMode(mode)]]">
+                <template is="dom-if" if="[[!isViewMode(mode)]]">
                   <paper-input id="course-title" class="edit-input" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-change="titleChanged" required auto-validate error-message="Please enter a title."></paper-input>
-    						</template>
-    					</div>
+                </template>
+              </div>
               <paper-dropdown-menu label="Discipline">
                 <paper-listbox id="discipline-list" slot="dropdown-content" attr-for-selected="id" selected="[[selectedDisciplineId]]">
                   <dom-repeat items="[[learningStructure]]">
@@ -163,10 +163,10 @@
                             <a href="assignment/[[item.id]]/edit"><iron-icon id="edit-assignment[[item.id]]" class="prendus-icon-button" icon="create"></iron-icon></a>
                             <paper-tooltip for="edit-assignment[[item.id]]" offset="0" animation-delay="300">Edit Assignment</paper-tooltip>
                             <paper-icon-button id="LTI[[item.id]]" class="prendus-icon-button" icon="link" on-click="getLTILinks"></paper-icon-button>
-  			                    <paper-tooltip for="LTI[[item.id]]" offset="0" animation-delay="300">Get LTI Links</paper-tooltip>
-                            <a href="assignment/[[item.id]]/view?assignmentType=CREATE"><paper-icon-button id="create[[item.id]]" class="prendus-icon-button" icon="speaker-notes"></paper-icon-button></a>
+                            <paper-tooltip for="LTI[[item.id]]" offset="0" animation-delay="300">Get LTI Links</paper-tooltip>
+                            <a href="assignment/[[item.id]]/[[_getAssignmentUrl(item, 'create')]]"><paper-icon-button id="create[[item.id]]" class="prendus-icon-button" icon="speaker-notes"></paper-icon-button></a>
                             <paper-tooltip for="create[[item.id]]" offset="0" animation-delay="300">Launch Create Assignment</paper-tooltip>
-                            <a href="assignment/[[item.id]]/view?assignmentType=REVIEW"><paper-icon-button id="review[[item.id]]" class="prendus-icon-button" icon="feedback"></paper-icon-button></a>
+                            <a href="assignment/[[item.id]]/[[_getAssignmentUrl(item, 'review')]]"><paper-icon-button id="review[[item.id]]" class="prendus-icon-button" icon="feedback"></paper-icon-button></a>
                             <paper-tooltip for="review[[item.id]]" offset="0" animation-delay="300">Launch Review Assignment</paper-tooltip>
                             <paper-icon-button id="delete[[item.id]]" data="[[item.id]]" class="prendus-icon-button" icon="delete" on-click="deleteAssignment"></paper-icon-button>
                             <paper-tooltip for="delete[[item.id]]" offset="0" animation-delay="300">Delete Assignment</paper-tooltip>
