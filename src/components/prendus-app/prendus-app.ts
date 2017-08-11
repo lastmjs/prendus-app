@@ -27,7 +27,7 @@ class PrendusApp extends Polymer.Element {
         this.action = await getAndSetUser();
     }
 
-    getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
+    getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, createEssayRouteActive: any, reviewEssayRouteActive: any, gradeEssayRouteActive: any, takeEssayRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
         this.action = checkForUserToken();
         if (rootRouteActive){
           if(this.userToken){
@@ -50,6 +50,10 @@ class PrendusApp extends Polymer.Element {
 
         if (createAssignmentRouteActive) return 'createAssignmentView';
         if (viewAssignmentRouteActive) return 'viewAssignmentView';
+        if (createEssayRouteActive) return 'createEssayView';
+        if (reviewEssayRouteActive) return 'reviewEssayView';
+        if (gradeEssayRouteActive) return 'gradeEssayView';
+        if (takeEssayRouteActive) return 'takeEssayView';
         if (editAssignmentRouteActive) return 'editAssignmentView';
 
         if (learningStructureRouteActive) return 'learningStructureView';
@@ -92,7 +96,7 @@ class PrendusApp extends Polymer.Element {
      //
      //     const appLocation = this.shadowRoot.querySelector('#appLocation');
      //     const route = appLocation.route;
-     //     const routeData = appLocation.routeData;		
+     //     const routeData = appLocation.routeData;
     //     const queryParams = appLocation.queryParams;
     //
     //     this.action = {

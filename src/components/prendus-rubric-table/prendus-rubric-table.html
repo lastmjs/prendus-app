@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+
+<dom-module id="prendus-rubric-table">
+
+  <template>
+
+    <style include="prendus-styles">
+      .grid {
+        display: grid;
+        grid-auto-rows: 40px;
+        margin: 20px 0 20px 0;
+      }
+      .grid-row {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-columns: 2fr 1fr 3fr 1fr;
+        border-left: 1px solid grey;
+      }
+      .grid-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-right: 1px solid grey;
+        border-bottom: 1px solid grey;
+      }
+      .col-header {
+        border: none;
+        color: white;
+      }
+      .table-header {
+        background: var(--prendus-primary-color)
+      }
+      .grid-cell input {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        border: none;
+        border-bottom: 1px solid grey;
+      }
+      .grid-cell button {
+        border: none;
+        background: none;
+        font-size: large;
+        opacity: .7;
+        cursor: pointer;
+      }
+      .grid-cell button:hover {
+        opacity: .3;
+      }
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <div class="grid" role="grid">
+      <div class="grid-row table-header">
+        <div class="grid-cell col-header">Category</div>
+        <div class="grid-cell col-header">Scale</div>
+        <div class="grid-cell col-header">Description</div>
+        <div class="grid-cell col-header">Points</div>
+      </div>
+      <div id="templateRow" class="grid-row">
+        <div class="grid-cell"><input type="textarea" placeholder="Category..."></div>
+        <div class="grid-cell"><input type="textarea" placeholder="Scale..."></div>
+        <div class="grid-cell"><input type="textarea" placeholder="Description..."></div>
+        <div class="grid-cell"><input type="number" placeholder="Points..."></div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-cell"><button><iron-icon icon="add"></iron-icon>Category</button></div>
+        <div class="grid-cell"><button><iron-icon icon="add"></iron-icon>Scale</button></div>
+      </div>
+    </div>
+
+  </template>
+
+  <script type="module" src="prendus-rubric-table.ts"></script>
+
+</dom-module>
