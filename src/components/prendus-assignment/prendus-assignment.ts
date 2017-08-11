@@ -24,6 +24,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     selectedConcepts: Concept[];
     assignmentType: AssignmentType;
     connected: boolean;
+    questionTypes: any[] = [{label: 'Multiple Choice', value: 'MULTIPLE_CHOICE'}, {label: 'Essay', value: 'ESSAY'}];
 
     static get is() { return 'prendus-assignment'; }
     static get properties() {
@@ -208,6 +209,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             query {
                 Assignment(id: "${this.assignmentId}") {
                     title,
+                    questionType,
                     course {
                         id
                         subject{
@@ -248,12 +250,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createAssignment(){
       const title = this.shadowRoot.querySelector('#titleInput').value;
+      const questionType = 'MULTIPLE_CHOICE';
       const data = await GQLMutate(`
         mutation {
             createAssignment(
               title: "${title}"
               authorId: "${this.user ? this.user.id : null}"
               courseId: "${this.courseId}"
+              questionType: "${questionType}"
             ) {
                 id
             }
@@ -271,6 +275,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                 updateAssignment(
                   id: "${this.assignmentId}"
                   title: "${title}"
+                  questionType: ${this.assignment.questionType}
                 ) {
                     id
                 }
