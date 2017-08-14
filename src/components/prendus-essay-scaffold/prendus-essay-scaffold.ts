@@ -23,7 +23,10 @@ class PrendusEssayScaffold extends Polymer.Element {
   static properties() {
     return {
       assignment: Object,
-      cycle: Number,
+      cycle: {
+        type: Number,
+        value: 1
+      },
       valid: {
         type: Boolean,
         computed: '_valid(resource, conceptOption, questionText, rubric)'
