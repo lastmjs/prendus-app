@@ -59,8 +59,25 @@ class PrendusEssayScaffold extends Polymer.Element {
     }
   }
 
+  _validRubric(rubric: Object): boolean {
+    const notEmpty = (val) => val.toString().trim().length > 0;
+    const categories = rubric.map(category => category.name);
+    const scales = flatten(categories.map(category => rubric[category].scales.map(scale => scale.name)));
+    const descriptions = flatten(categories.map(category => rubric[category].scales.map(scale => scale.descriptions)));
+    const points = flatten(categories.map(category => rubric[category].scales.map(scale => Number(scale.points))));
+    return rubric != null
+      && categories.filter(notEmpty).length === categories.length
+      && scales.filter(notEmpty).length === scales.length
+      && descriptions.filter(notEmpty).length === descriptions.length
+      && points.filter(num => num != NaN && num > -1).length === points.length;
+  }
+
   _valid(resource: string, conceptOption: string, questionText: string, rubric: string): boolean {
-    return false;
+    return resource.trim().length > 0
+      && conceptOption != null
+      && this._conceptOptions(this.assignment).map(concept => concept.id).includes(conceptOption.value)
+      && questionText.trim().length > 0
+      && this._validRubric(rubric);
   }
 
   _showNext(step: number): boolean {
@@ -129,7 +146,10 @@ class PrendusEssayScaffold extends Polymer.Element {
         resource: $resource,
         conceptId: $conceptOption,
         text: $questionText,
-        rubric: $rubric
+        gradingRubric: {
+          categories: $rubric,
+          authorId: $userId,
+        }
       ) {
         id
       }
@@ -160,6 +180,12 @@ class PrendusEssayScaffold extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function flatten(arr: any[]): any[] {
+  return arr.reduce((acc, elem) => {
+    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
+  },[]);
 }
 
 window.customElements.define(PrendusEssayScaffold.is, PrendusEssayScaffold)
