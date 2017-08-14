@@ -15,7 +15,6 @@ class PrendusScaffoldComments extends Polymer.Element {
     user: User | null;
     selectedIndex: number;
     numberOfAnswers: number;
-    assignmentId: string;
     answers: QuestionScaffoldAnswer[];
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;

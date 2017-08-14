@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 
 <dom-module id="prendus-scaffold-concept">
@@ -12,15 +13,33 @@
         <dom-if if="[[loaded]]">
             <template>
               <div id ="concepts">
-                <paper-dropdown-menu label="Concept">
-                  <paper-listbox slot="dropdown-content" selected="1">
-                    <dom-repeat items="[[concepts]]">
-                      <template>
-                          <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
-                      </template>
-                    </dom-repeat>
-                  </paper-listbox>
-                </paper-dropdown-menu>
+                <dom-if if="[[concepts.length]]">
+                  <template>
+                    <paper-dropdown-menu label="Concept">
+                      <paper-listbox slot="dropdown-content" selected="1">
+                        <dom-repeat items="[[concepts]]">
+                          <template>
+                              <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
+                          </template>
+                        </dom-repeat>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                  </template>
+                </dom-if>
+                <dom-if if="[[!concepts.length]]">
+                  <template>
+                    <paper-input id="concept-input" label="Question Concept" on-input="enableNext"></paper-input>
+                    <!-- <paper-dropdown-menu label="Concept">
+                      <paper-listbox slot="dropdown-content" selected="1">
+                        <dom-repeat items="[[concepts]]">
+                          <template>
+                              <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
+                          </template>
+                        </dom-repeat>
+                      </paper-listbox>
+                    </paper-dropdown-menu> -->
+                  </template>
+                </dom-if>
               </div>
             </template>
         </dom-if>

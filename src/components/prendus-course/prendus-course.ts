@@ -260,7 +260,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
   	}
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
-      this.shadowRoot.querySelector('#concept-title').value = null;
       if(this.course.discipline && this.course.subject){
         this.shadowRoot.querySelector('#create-assignment').open();
       }else{
@@ -269,18 +268,14 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     async createAssignment(e){
       const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value;
-      const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
-      if(assignmentTitle && conceptTitle){
+      // const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
+      if(assignmentTitle){
         const data = await GQLMutate(`
-          mutation createAssignmentAndConcepts{
+          mutation{
             createAssignment(
               title: "${assignmentTitle}"
               authorId: "${this.user ? this.user.id : null}"
               courseId: "${this.courseId}"
-              concepts: [{
-                title: "${conceptTitle}"
-                subjectId: "${this.course.subject.id}"
-              }]
             ){
               id
             }
@@ -289,9 +284,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             console.log(error);
         });
         this.shadowRoot.querySelector('#create-assignment').close();
-        navigate(`assignment/${data.createAssignment.id}/edit`)
+        // navigate(`assignment/${data.createAssignment.id}/edit`)
       }else{
-        alert('Please input required titles')
+        alert('Please input a title to add Assignment')
       }
       // href=""
     }

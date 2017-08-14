@@ -8,6 +8,8 @@ import {shuffleArray} from '../../services/utilities-service';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Question} from '../../typings/question';
+import {Concept} from '../../typings/concept';
+import {Assignment} from '../../typings/assignment';
 import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
 
@@ -20,7 +22,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
     answers: QuestionScaffoldAnswer[];
-    assignmentId: string;
+    assignment: Assignment[];
     question: Question;
     questionScaffold: QuestionScaffold;
     questionId: string;
@@ -30,8 +32,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     static get is() { return 'prendus-scaffold-final-question'; }
     static get properties() {
         return {
-          assignmentId: {
-            type: String
+          assignment: {
           },
           myIndex: {
             type: Number
@@ -57,6 +58,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     }
 
     disableNext(e: any): Promise<void> {
+      console.log('disable next')
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
         this.action = setDisabledNext(false);
         const convertedQuestion = this.convertScaffoldToQuestion()
@@ -104,14 +106,18 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     async saveQuestion(question: Question) {
       //have to do this because the code is a multi-line string. We need to parse it down to a single line so that Graph.cool will accept it.
       console.log('saveQuestion');
+      console.log('question concept', question.concept)
+      console.log('assignment', this.assignment)
+      const conceptId = await this.getConceptId(question.concept)
+      console.log('conceptId', conceptId)
       const code: string = question.code.replace(/\n/g, "");
       const data = await GQLMutate(`
         mutation {
           createQuestion(
             authorId: "${this.user.id}"
-            assignmentId: "${this.assignmentId}"
+            assignmentId: "${this.assignment.id}"
             text: "${question.text}"
-            conceptId: "${question.concept.id}"
+            conceptId: "${conceptId}"
             explanation: "${question.explanation}"
             resource: "${question.resource}"
             code: "${code}"
@@ -150,6 +156,27 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
       });
 
       return data.createQuestion.id
+    }
+    async getConceptId(concept: Concept){
+      console.log('concept', concept)
+      if(!concept.id){
+        const conceptData = await GQLMutate(`
+          mutation {
+            createConcept(
+              title: "${concept}"
+              subjectId: "${this.assignment.course.subject.id}"
+            ) {
+              id
+            }
+          }
+        `, this.userToken, (error: any) => {
+            console.log(error);
+        });
+        console.log('concept Data concept', conceptData.createConcept)
+        return conceptData.createConcept.id
+      }else{
+        return concept.id
+      }
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;

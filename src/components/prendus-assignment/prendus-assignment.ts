@@ -197,7 +197,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         const data = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
-                    title,
+                    id
+                    title
                     course {
                         id
                         subject{
