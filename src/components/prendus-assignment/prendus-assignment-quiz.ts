@@ -50,7 +50,6 @@ class PrendusAssignmentQuiz extends Polymer.Element {
       };
     }
     async loadQuiz(){
-      console.log('load Quiz')
       await this.loadAssignmentQuestions();
       await this.generateQuiz();
     }
@@ -76,19 +75,9 @@ class PrendusAssignmentQuiz extends Polymer.Element {
         `, this.userToken, (key: string, value: Assignment) => {
             if(value){
               const quizQuestions = shuffleArray(value.questions).slice(0,10);
-              this.action = {
-                  type: 'SET_COMPONENT_PROPERTY',
-                  componentId: this.componentId,
-                  key: 'quizQuestions',
-                  value: quizQuestions
-              };
+              this._fireLocalAction('quizQuestions', quizQuestions)
             }else{
-              this.action = {
-                  type: 'SET_COMPONENT_PROPERTY',
-                  componentId: this.componentId,
-                  key: 'questions',
-                  value: null
-              };
+              this._fireLocalAction('questions', null)
             }
 
         }, (error: any) => {
@@ -96,7 +85,6 @@ class PrendusAssignmentQuiz extends Polymer.Element {
         });
     }
     async generateQuiz(){
-      console.log('this.questions', this.quizQuestions)
       const questionIds = this.quizQuestions.map(function(a) {return a.id;});
       const questionIdsString = `["${questionIds.join('","')}"]`;
       const data = await GQLMutate(`
@@ -112,12 +100,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
       `, this.userToken, (error: any) => {
           alert(error);
       });
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'quizId',
-          value: data.createQuiz.id
-      };
+      this._fireLocalAction('quizId', data.createQuiz.id)
     }
 
     submitQuiz(){
@@ -126,7 +109,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           mode: 'no-cors',
           credentials: 'include'
       });
-      alert('Congratulations! You have successfully completed the Assignment')
+      alert('Congratulations! You have successfully completed the Quiz')
     }
 
     stateChange(e: CustomEvent) {

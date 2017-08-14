@@ -94,17 +94,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         return assignmentType === 'QUIZ';
     }
     openAssignmentConceptDialog(e: any){
-      if(!this.assignment){
-        if(this.shadowRoot.querySelector('#assignment-title').value){
-          this.shadowRoot.querySelector('#assignmentConceptDialog').open();
-          this.createAssignment();
-        }else{
-          //Make this a notification once the notifications exist
-          alert('Enter a title for the assignment before adding concepts')
-        }
-      }else{
-        this.shadowRoot.querySelector('#assignmentConceptDialog').open();
-      }
+      this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     removeAssignmentConcept(e){
       if(this.selectedConcepts.length === 1){
@@ -237,28 +227,28 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }
-    async saveAssignment() {
-        const title = this.shadowRoot.querySelector('#titleInput').value;
-        if(this.assignmentId){
-          const data = await GQLMutate(`
-            mutation {
-                updateAssignment(
-                  id: "${this.assignmentId}"
-                  title: "${title}"
-                ) {
-                    id
-                }
-            }
-          `, this.userToken, (error: any) => {
-              console.log(error);
-          });
-        }else{
-          if(title){
-            this.createAssignment();
-          }
-        }
-        navigate(`/course/${this.courseId}/edit`)
-    }
+    // async saveAssignment() {
+    //     const title = this.shadowRoot.querySelector('#titleInput').value;
+    //     if(this.assignmentId){
+    //       const data = await GQLMutate(`
+    //         mutation {
+    //             updateAssignment(
+    //               id: "${this.assignmentId}"
+    //               title: "${title}"
+    //             ) {
+    //                 id
+    //             }
+    //         }
+    //       `, this.userToken, (error: any) => {
+    //           console.log(error);
+    //       });
+    //     }else{
+    //       if(title){
+    //         this.createAssignment();
+    //       }
+    //     }
+    //     navigate(`/course/${this.courseId}/edit`)
+    // }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
