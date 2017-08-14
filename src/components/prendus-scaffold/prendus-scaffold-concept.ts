@@ -71,13 +71,11 @@ class PrendusScaffoldConcept extends Polymer.Element {
       }
     }
     disableNext(): void {
-      console.log('concepts', this.concepts)
       try {
         if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
           // const concepts: string[] = getConcepts(this);
           // this.action = Actions.setDisabledNext(!UtilitiesService.isDefinedAndNotEmpty(comments));
           //If the concept is a new concept, wait until the question is submitted to create it
-          console.log('selectedConcept', this.selectedConcept)
           this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.selectedConcept, null, null, null, null, null);
         }
       } catch(error) {

@@ -15,8 +15,8 @@
               <div id ="concepts">
                 <dom-if if="[[concepts.length]]">
                   <template>
-                    <paper-dropdown-menu label="Concept">
-                      <paper-listbox slot="dropdown-content" selected="1">
+                    <paper-dropdown-menu label="Question Concept">
+                      <paper-listbox slot="dropdown-content">
                         <dom-repeat items="[[concepts]]">
                           <template>
                               <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
