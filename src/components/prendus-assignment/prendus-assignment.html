@@ -39,6 +39,11 @@
             height: 80%;
           }
         }
+        #assignment-title {
+          --paper-input-container-input: {
+            font-size: 3em;
+          };
+        }
         #dialogTitle{
           margin-top: 10px;
         }
@@ -91,11 +96,10 @@
 
                 <dom-if if="[[isEditMode(mode)]]">
                   <template>
-                    <h1>Edit Assignment</h1>
-                    <button class="prendus-button" on-click="saveAssignment">Save and Return to Course</button>
-                    <paper-input id="titleInput" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
-                      <!-- <input id="titleInput" type="text" value="[[assignment.title]]"> -->
-                    <h2>[[assignment.title]] Concepts</h2>
+                    <!-- <h1>Edit Assignment</h1> -->
+                    <a href="course/[[courseId]]/edit" class="prendus-button">Return to Course</a>
+                    <paper-input id="assignment-title" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
+                    <h2>Concepts</h2>
                     <dom-repeat items="[[assignment.concepts]]">
                       <template>
                           <h4>[[item.title]]</h4>
