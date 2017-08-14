@@ -12,7 +12,10 @@ class PrendusRubricTable extends Polymer.Element {
   static get is() { return 'prendus-rubric-table' }
   static get properties() {
     return {
-      editable: Boolean,
+      editable: {
+        type: Boolean,
+        value: false
+      },
       rubric: Array
     }
   }
@@ -20,6 +23,13 @@ class PrendusRubricTable extends Polymer.Element {
   constructor() {
     super();
     this.componentId = createUUID();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.rubric || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
+    this._fireLocalAction('loaded', true);
+    console.log(this.rubric, this.editable);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -50,14 +60,13 @@ class PrendusRubricTable extends Polymer.Element {
     ]
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.rubric || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
-    this._fireLocalAction('loaded', true);
-  }
-
   addCategory() {
     this._fireLocalAction('rubric', this.rubric.concat(this.templateRubric()));
+  }
+
+  removeCategory() {
+    const newRubric = this.rubric.length ? this.rubric.slice(0, this.rubric.length - 1) : this.rubric;
+    this._fireLocalAction('rubric', newRubric);
   }
 
   addScale(e) {
@@ -66,6 +75,18 @@ class PrendusRubricTable extends Polymer.Element {
         return {
           name: category.name,
           scales: category.scales.concat(this.templateScale())
+        }
+      return category;
+    });
+    this._fireLocalAction('rubric', newRubric);
+  }
+
+  removeScale(e) {
+    const newRubric = this.rubric.map((category, i) => {
+      if (i === e.model.itemsIndex)
+        return {
+          name: category.name,
+          scales: category.scales.length ? category.scales.slice(0, category.scales.length - 1) : category.scales
         }
       return category;
     });

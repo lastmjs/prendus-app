@@ -63,6 +63,31 @@ class PrendusEssayScaffold extends Polymer.Element {
     return step < this.$.ironPages.children.length - 1;
   }
 
+  exampleRubric(): Object[] {
+    return [
+      {
+        name: 'Language',
+        scales: [
+          {
+            name: 'Professional',
+            description: 'The language is of good academic quality in vocabulary and grammar',
+            points: 2
+          },
+          {
+            name: 'Casual',
+            description: 'The answer has a more conversational tone',
+            points: 1
+          },
+          {
+            name: 'Poor',
+            description: 'The answer contains grammar and spelling errors',
+            points: 0,
+          }
+        ]
+      }
+    ]
+  }
+
   back(): void {
     this._fireLocalAction('step', this.step - 1);
   }
