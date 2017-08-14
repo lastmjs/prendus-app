@@ -12,8 +12,9 @@ class PrendusEssayScaffold extends Polymer.Element {
   assignment: Assignment;
   resource: string;
   questionText: string;
-  rubricJson: string;
+  rubric: Object[] = [];
   conceptOption: string;
+  progress: number = 0;
   userToken: string | null;
   user: User;
 
@@ -22,9 +23,10 @@ class PrendusEssayScaffold extends Polymer.Element {
   static properties() {
     return {
       assignment: Object,
+      cycle: Number,
       valid: {
         type: Boolean,
-        computed: '_valid(resource, conceptOption, questionText, rubricJson)'
+        computed: '_valid(resource, conceptOption, questionText, rubric)'
       }
     }
   }
@@ -54,13 +56,22 @@ class PrendusEssayScaffold extends Polymer.Element {
     }
   }
 
-  _valid(resource: string, conceptOption: string, questionText: string, rubricJson: string): boolean {
+  _valid(resource: string, conceptOption: string, questionText: string, rubric: string): boolean {
     return false;
   }
 
   _showNext(step: number): boolean {
     console.log(this.$.ironPages.children);
     return step < this.$.ironPages.children.length - 1;
+  }
+
+  _handleSubmit(): void {
+    const progress = this.progress + 1;
+    this._fireLocalAction('progress', progress);
+    if (progress < this.cycle)
+      this.clear();
+    else
+      console.log('done!');
   }
 
   exampleRubric(): Object[] {
@@ -96,18 +107,26 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('step', this.step + 1);
   }
 
+  clear(): void {
+    this._fireLocalAction('resource', '');
+    this._fireLocalAction('conceptOption', null);
+    this._fireLocalAction('questionText', '');
+    this._fireLocalAction('rubric', '');
+    this._fireLocalAction('step', 0);
+  }
+
   submit(): void {
     if (!this.valid) {
       console.log('invalid!'); //TODO: jump to step with errors?
       return;
     }
-    const mutation = `mutation createQuestion($userId: ID!, $resource: String!, $conceptOption: ID!, $questionText: String!, $rubricJson: Json!) {
+    const mutation = `mutation createQuestion($userId: ID!, $resource: String!, $conceptOption: ID!, $questionText: String!, $rubric: Json!) {
       createQuestion (
         authorId: $userId,
         resource: $resource,
         conceptId: $conceptOption,
         text: $questionText,
-        rubric: $rubricJson
+        rubric: $rubric
       ) {
         id
       }
@@ -117,9 +136,11 @@ class PrendusEssayScaffold extends Polymer.Element {
       resource: this.resource,
       conceptOption: this.conceptOption.value,
       questionText: this.questionText,
-      rubricJson: this.rubricJson
+      rubric: this.rubric
     };
-    GQLrequest(mutation, variables, this.userToken);
+    GQLrequest(mutation, variables, this.userToken)
+    .then(this._handleSubmit.bind(this))
+    .catch(err => { console.error(err) });
   }
 
   stateChange(e: CustomEvent) {
@@ -128,6 +149,10 @@ class PrendusEssayScaffold extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('step')) this.step = componentState.step;
+    if (keys.includes('resource')) this.resource = componentState.resource;
+    if (keys.includes('questionText')) this.questionText = componentState.questionText;
+    if (keys.includes('rubric')) this.rubric= componentState.rubric;
+    if (keys.includes('progress')) this.progress = componentState.progress;
     this.userToken = state.userToken;
     this.user = state.user;
   }

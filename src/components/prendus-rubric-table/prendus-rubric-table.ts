@@ -16,7 +16,10 @@ class PrendusRubricTable extends Polymer.Element {
         type: Boolean,
         value: false
       },
-      rubric: Array
+      rubric: {
+        type: Array,
+        notify: true
+      }
     }
   }
 
@@ -27,7 +30,7 @@ class PrendusRubricTable extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.rubric || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
+    (this.rubric && this.rubric.length) || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
     this._fireLocalAction('loaded', true);
     console.log(this.rubric, this.editable);
   }
