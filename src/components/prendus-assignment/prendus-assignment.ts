@@ -237,23 +237,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }
-    // async createAssignment(){
-    //   const title = this.shadowRoot.querySelector('#titleInput').value;
-    //   const data = await GQLMutate(`
-    //     mutation {
-    //         createAssignment(
-    //           title: "${title}"
-    //           authorId: "${this.user ? this.user.id : null}"
-    //           courseId: "${this.courseId}"
-    //         ) {
-    //             id
-    //         }
-    //     }
-    //   `, this.userToken, (error: any) => {
-    //       console.log(error);
-    //   });
-    //   this._fireLocalAction('assignmentId', data.createAssignment.id)
-    // }
     async saveAssignment() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         if(this.assignmentId){
