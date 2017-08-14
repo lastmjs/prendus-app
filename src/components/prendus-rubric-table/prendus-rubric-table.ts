@@ -13,7 +13,7 @@ class PrendusRubricTable extends Polymer.Element {
   static get properties() {
     return {
       editable: Boolean,
-      rubric: String //JSON string
+      rubric: Array
     }
   }
 
