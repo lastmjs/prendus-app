@@ -69,6 +69,9 @@
           padding-left: 10px;
           padding-top: 10px;
         }
+        .assignment-variable{
+          max-width: 150px;
+        }
         </style>
         <dom-if if="[[loaded]]">
             <template>
@@ -106,6 +109,11 @@
                       </template>
                     </dom-repeat>
                     <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add or Remove Concepts</button>
+                    <h2>Settings</h2>
+                    <!-- Put this setting back in when Ben adds functionality to create multiple questions -->
+                    <!-- <paper-input class="assignment-variable" label="Questions to Create" type="number" min="1" value=[[assignment.create]]></paper-input> -->
+                    <paper-input class="assignment-variable" label="Questions to Review" type="number" min="1" value=[[assignment.review]]></paper-input>
+                    <paper-input class="assignment-variable" label="Questions to Take" type="number" min="1" value=[[assignment.take]]></paper-input>
                   </template>
                   <paper-dialog id="assignmentConceptDialog" modal>
                     <paper-dialog-scrollable>

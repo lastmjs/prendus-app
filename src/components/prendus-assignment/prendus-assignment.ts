@@ -189,12 +189,16 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                 Assignment(id: "${this.assignmentId}") {
                     id
                     title
+                    create
+                    review
+                    take
                     course {
                         id
                         subject{
                           id
                         }
                     }
+
                     concepts{
                       id
                       title
@@ -227,28 +231,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }
-    // async saveAssignment() {
-    //     const title = this.shadowRoot.querySelector('#titleInput').value;
-    //     if(this.assignmentId){
-    //       const data = await GQLMutate(`
-    //         mutation {
-    //             updateAssignment(
-    //               id: "${this.assignmentId}"
-    //               title: "${title}"
-    //             ) {
-    //                 id
-    //             }
-    //         }
-    //       `, this.userToken, (error: any) => {
-    //           console.log(error);
-    //       });
-    //     }else{
-    //       if(title){
-    //         this.createAssignment();
-    //       }
-    //     }
-    //     navigate(`/course/${this.courseId}/edit`)
-    // }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;

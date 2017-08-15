@@ -57,24 +57,25 @@ class PrendusAssignmentQuiz extends Polymer.Element {
         await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
-                    questions{
-                      id
-                      code
+                  questions{
+                    id
+                    code
+                    text
+                    explanation
+                    resource
+                    concept{
+                      title
+                    }
+                    answerComments{
                       text
-                      explanation
-                      resource
-                      concept{
-                        title
-                      }
-                      answerComments{
-                        text
-                      }
-                    },
+                    }
+                  },
+                  take
                 }
             }
         `, this.userToken, (key: string, value: Assignment) => {
             if(value){
-              const quizQuestions = shuffleArray(value.questions).slice(0,10);
+              const quizQuestions = shuffleArray(value.questions).slice(0, value.take);
               this._fireLocalAction('quizQuestions', quizQuestions)
             }else{
               this._fireLocalAction('questions', null)
