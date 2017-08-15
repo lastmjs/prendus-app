@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+
+<dom-module id="prendus-rubric-dropdowns">
+
+  <template>
+
+    <style include="prendus-styles">
+
+      .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+    </style>
+
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <div class="flex-container">
+      <dom-repeat items="[[categories]]" as="category" hidden>
+        <template>
+          <paper-dropdown-menu class="flex-item" label="[[category.name]]">
+            <paper-listbox slot="dropdown-content">
+              <dom-repeat items="[[category.options]]" as="option" hidden>
+                <template>
+                  <paper-item id="[[categoryId(category, option)]]" aria-label$="[[option.description]]" on-click="_scoreCategory">[[option.name]]</paper-item>
+                </template>
+              </dom-repeat>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </template>
+      </dom-repeat>
+      <dom-repeat items="[[categories]]" as="category" hidden>
+        <template>
+          <dom-repeat items="[[category.options]]" as="option" hidden>
+            <template>
+              <paper-tooltip for="[[categoryId(category, option)]]" animation-delay="300">[[option.description]]</paper-tooltip>
+            </template>
+          </dom-repeat>
+        </template>
+      </dom-repeat>
+    </div>
+
+  </template>
+
+  <script type="module" src="prendus-rubric-dropdowns.ts"></script>
+
+</dom-module>

@@ -1,0 +1,20 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-essay-review/prendus-essay-review.html">
+
+<dom-module id="prendus-review-assignment">
+
+  <template>
+
+    <style include="prendus-styles">
+
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <prendus-essay-review assignment="[[assignment]]"></prendus-essay-review>
+
+  </template>
+
+  <script type="module" src="prendus-review-assignment.ts"></script>
+
+</dom-module>

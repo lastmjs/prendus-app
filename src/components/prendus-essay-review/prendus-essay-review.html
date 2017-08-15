@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
+<link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
+
+<dom-module id="prendus-essay-review">
+
+  <template>
+
+    <style include="prendus-styles">
+
+      #submit-button {
+        margin-top: 20px;
+        float: right;
+      }
+
+    </style>
+
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <h2>[[assignment.title]] Review Assignment</h2>
+    <h3>Question [[_plusOne(progress)]]/[[quota]]</h3>
+    <br>
+    <h4>Question:</h4>
+    <p>[[_questionText(question.text)]]</p>
+    <h4>Rubric:</h4>
+    <prendus-rubric-table categories="[[question.gradingRubric.categories]]"></prendus-rubric-table>
+    <prendus-rubric-dropdowns id="rubricDropdowns" scores="{{ratings}}" categories="[[rubricCategories]]"></prendus-rubric-dropdowns>
+
+    <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="_submit">Submit Rating</button>
+
+  </template>
+
+  <script type="module" src="prendus-essay-review.ts"></script>
+
+</dom-module>
