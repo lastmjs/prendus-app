@@ -28,9 +28,7 @@ class PrendusScaffold extends Polymer.Element {
     static get is() { return 'prendus-scaffold'; }
     static get properties() {
       return {
-        concepts: {
-        },
-        assignmentId: {
+        assignment: {
         }
       };
     }
@@ -85,7 +83,7 @@ class PrendusScaffold extends Polymer.Element {
           key: 'disableNext',
           value: true
       };
-      if(this.selectedIndex === (this.shadowRoot.querySelector('#iron-pages').items.length - 2)) {
+      if(this.selectedIndex === (this.shadowRoot.querySelector('#iron-pages').items.length - 3) || this.selectedIndex === (this.shadowRoot.querySelector('#iron-pages').items.length - 2)) {
         // Reached the limit.
         this.action = {
             type: 'SET_PROPERTY',
