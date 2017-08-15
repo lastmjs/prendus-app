@@ -57,7 +57,7 @@ export const GQLrequest = async (query: string, variables: {[key:string]: any}, 
   const opts = { method: 'POST', headers, body };
   const response = await window.fetch(httpEndpoint, opts);
   const data = await response.json();
-  return data.data || data.errors;
+  return data.data || data;
 }
 
 export const GQLQuery = async (queryString: string, userToken: string | null, dataCallback: GQLQueryDataCallback, errorCallback: GQLQueryErrorCallback) => {
