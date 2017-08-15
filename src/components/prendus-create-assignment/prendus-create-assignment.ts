@@ -47,10 +47,11 @@ class PrendusCreateAssignment extends Polymer.Element {
   async loadAssignment(assignmentId: string): Assignment {
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
-        title,
-        questionType,
+        id
+        title
+        questionType
         concepts {
-          id,
+          id
           title
         }
       }
