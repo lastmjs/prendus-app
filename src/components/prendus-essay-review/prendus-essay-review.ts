@@ -70,14 +70,14 @@ class PrendusEssayReview extends Polymer.Element {
   _handleSubmit(data: Object) {
     if (data.errors) throw new Error("Error saving question rating");
     const progress = this.progress + 1;
-    this._fireLocalAction('progress', progress);
     if (progress == this.questions.length)
       console.log('Done!');
     else {
+      this._fireLocalAction('progress', progress);
       this._fireLocalAction('question', this.questions[progress]);
       //hack for now to clear rubric dropdown selections
       this._fireLocalAction('rubricCategories', null);
-      this._fireLocalAction('rubricCategories', this.assignment.evaluationRubric.categories);
+      setTimeout(() => { this._fireLocalAction('rubricCategories', this.assignment.evaluationRubric.categories) });
     }
   }
 
