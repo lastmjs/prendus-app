@@ -90,31 +90,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isReviewType(assignmentType: String) {
         return assignmentType === 'REVIEW';
     }
+    isQuizType(assignmentType: String) {
+        return assignmentType === 'QUIZ';
+    }
     openAssignmentConceptDialog(e: any){
-      //THIS WAS INTENDED TO SELECT THE CURRENT CONCEPTS. THERE IS A WEIRD ERROR THAT IF THE CONCEPTS ARE EDITED AND THEN THE MODAL IS OPENED AGAIN IT WONT SELECT THE CONCEPTS. LEAVING THIS HERE UNTIL WE CAN FIGURE IT OUT
-      // const conceptIds = this.assignment.concepts.map(function(concept:Concept){
-      //    return concept.id
-      // })
-      // const that = this;
-      // this.concepts.map(function(subjectConcept: Concept, index: number){
-      //   that.assignment.concepts.map(function(assignmentConcept: Concept){
-      //     if(subjectConcept.id === assignmentConcept.id){
-      //       that.shadowRoot.querySelector('#courseConcepts').selectIndex(index)
-      //     }
-      //   })
-      // })
-
-      if(!this.assignment){
-        if(this.shadowRoot.querySelector('#titleInput').value){
-          this.shadowRoot.querySelector('#assignmentConceptDialog').open();
-          this.createAssignment();
-        }else{
-          //Make this a notification once the notifications exist
-          alert('Enter a title for the assignment before adding concepts')
-        }
-      }else{
-        this.shadowRoot.querySelector('#assignmentConceptDialog').open();
-      }
+      this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     removeAssignmentConcept(e){
       if(this.selectedConcepts.length === 1){
@@ -207,13 +187,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         const data = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
-                    title,
+                    id
+                    title
+                    create
+                    review
+                    take
                     course {
                         id
                         subject{
                           id
                         }
                     }
+
                     concepts{
                       id
                       title
@@ -245,45 +230,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             console.log(error);
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
-    }
-    async createAssignment(){
-      const title = this.shadowRoot.querySelector('#titleInput').value;
-      const data = await GQLMutate(`
-        mutation {
-            createAssignment(
-              title: "${title}"
-              authorId: "${this.user ? this.user.id : null}"
-              courseId: "${this.courseId}"
-            ) {
-                id
-            }
-        }
-      `, this.userToken, (error: any) => {
-          console.log(error);
-      });
-      this._fireLocalAction('assignmentId', data.createAssignment.id)
-    }
-    async saveAssignment() {
-        const title = this.shadowRoot.querySelector('#titleInput').value;
-        if(this.assignmentId){
-          const data = await GQLMutate(`
-            mutation {
-                updateAssignment(
-                  id: "${this.assignmentId}"
-                  title: "${title}"
-                ) {
-                    id
-                }
-            }
-          `, this.userToken, (error: any) => {
-              console.log(error);
-          });
-        }else{
-          if(title){
-            this.createAssignment();
-          }
-        }
-        navigate(`/course/${this.courseId}/edit`)
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
