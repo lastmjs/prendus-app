@@ -19,16 +19,27 @@
 
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <h2>[[assignment.title]] Review Assignment</h2>
-    <h3>Question [[_plusOne(progress)]]/[[quota]]</h3>
-    <br>
-    <h4>Question:</h4>
-    <p>[[_questionText(question.text)]]</p>
-    <h4>Rubric:</h4>
-    <prendus-rubric-table categories="[[question.gradingRubric.categories]]"></prendus-rubric-table>
-    <prendus-rubric-dropdowns id="rubricDropdowns" scores="{{ratings}}" categories="[[rubricCategories]]"></prendus-rubric-dropdowns>
+    <dom-if if="[[!done]]">
+      <template>
+        <h2>[[assignment.title]] Review Assignment</h2>
+        <h3>Question [[_plusOne(progress)]]/[[quota]]</h3>
+        <br>
+        <h4>Question:</h4>
+        <p>[[_questionText(question.text)]]</p>
+        <h4>Rubric:</h4>
+        <prendus-rubric-table categories="[[question.gradingRubric.categories]]"></prendus-rubric-table>
+        <prendus-rubric-dropdowns id="rubricDropdowns" scores="{{ratings}}" categories="[[rubricCategories]]"></prendus-rubric-dropdowns>
 
-    <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="_submit">Submit Rating</button>
+        <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="_submit">Submit Rating</button>
+      </template>
+    </dom-if>
+
+    <dom-if if="[[done]]">
+      <template>
+        <h3>Done</h3>
+        <p>You have reviewed all of the questions required for this assignment</p>
+      </template>
+    </dom-if>
 
   </template>
 

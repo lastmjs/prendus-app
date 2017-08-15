@@ -10,6 +10,7 @@ class PrendusEssayReview extends Polymer.Element {
   componentId: string;
   progress: number = 0;
   quota: number = 3;
+  done: boolean = false;
   userToken: string | null;
   user: User;
 
@@ -71,7 +72,7 @@ class PrendusEssayReview extends Polymer.Element {
     if (data.errors) throw new Error("Error saving question rating");
     const progress = this.progress + 1;
     if (progress == this.questions.length)
-      console.log('Done!');
+      this._fireLocalAction('done', true);
     else {
       this._fireLocalAction('progress', progress);
       this._fireLocalAction('question', this.questions[progress]);
@@ -116,6 +117,7 @@ class PrendusEssayReview extends Polymer.Element {
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
+    if (keys.includes('done')) this.done = componentState.done;
     this.userToken = state.userToken;
     this.user = state.user;
   }
