@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
+
+<dom-module id="prendus-grade-assignment">
+
+  <template>
+
+    <style include="prendus-styles">
+
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <h2>[[assignment.title]] Grade Assignment</h2>
+    <br>
+    <h3>Question [[_plusOne(progress)]]/[[quota]]</h3>
+    <br>
+    <h4>Question</h4>
+    <p>[[_questionText(question.text)]]</p>
+    <h4>Response</h4>
+    <p>*Response*</p>
+    <prendus-rubric-dropdowns categories="[[rubricCategories]]" scores="{{grades}}"></prendus-rubric-dropdowns>
+
+  </template>
+
+  <script type="module" src="prendus-grade-assignment.ts"></script>
+
+</dom-module>
