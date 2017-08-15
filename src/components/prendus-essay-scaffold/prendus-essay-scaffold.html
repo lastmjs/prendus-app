@@ -169,9 +169,13 @@
             <prendus-rubric-table categories="[[exampleRubric()]]"></prendus-rubric-table>
             <prendus-rubric-table categories="{{rubric}}" editable></prendus-rubric-table>
           </div>
+          <div>
+            <h3>Done</h3>
+            <p>You have created all the questions required for this assignment</p>
+          </div>
         </iron-pages>
       </div>
-      <template is="dom-if" if="[[step]]">
+      <template is="dom-if" if="[[_showBack(step)]]">
         <div class="back">
           <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>
         </div>
@@ -181,7 +185,7 @@
           <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next">Next</button>
         </div>
       </template>
-      <template is="dom-if" if="[[!_showNext(step)]]">
+      <template is="dom-if" if="[[_showSubmit(step)]]">
         <div class="next">
           <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
         </div>

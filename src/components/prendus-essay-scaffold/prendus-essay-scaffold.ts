@@ -82,7 +82,15 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   _showNext(step: number): boolean {
-    return step < this.$.ironPages.children.length - 1;
+    return step < this.$.ironPages.children.length - 2; //because the last page is the 'done' page
+  }
+
+  _showSubmit(step: number): boolean {
+    return !this._showNext(step) && step < this.$.ironPages.children.length - 1;
+  }
+
+  _showBack(step: number): boolean {
+    return step > 0 && step < this.$.ironPages.children.length - 1;
   }
 
   _handleSubmit(data: Object): void {
@@ -92,7 +100,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (progress < 1)//this.assignment.createQuota)
       this.clear();
     else
-      console.log('done!');
+      this._fireLocalAction('step', this.$.ironPages.children.length - 1);
   }
 
   exampleRubric(): Object[] {
