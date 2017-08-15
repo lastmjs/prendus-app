@@ -7,7 +7,11 @@
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style>
         </style>
-        <prendus-quiz quiz-id="[[quizId]]" on-submit="submitQuiz"></prendus-quiz>
+        <dom-if if="[[loaded]]">
+            <template>
+              <prendus-quiz quiz-id="[[quizId]]" on-submit="submitQuiz"></prendus-quiz>
+            </template>
+        </dom-if>
         <dom-if if="[[!loaded]]">
             <template>
                 Loading...
