@@ -201,8 +201,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
-        }, (error: any) => {
+        `, this.userToken, (key: string, value: any) => {},
+          (error: any) => {
             console.log(error);
         });
         this.loadConcepts(data.Assignment.course.subject.id);
