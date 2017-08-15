@@ -280,6 +280,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               title: "${assignmentTitle}"
               authorId: "${this.user ? this.user.id : null}"
               courseId: "${this.courseId}"
+              questionType: MULTIPLE_CHOICE
+              evaluationRubricId: "cj6dyzdn0rx530120v2oa1jkl"
               concepts: [{
                 title: "${conceptTitle}"
                 subjectId: "${this.course.subject.id}"

@@ -16,9 +16,10 @@ class PrendusRubricTable extends Polymer.Element {
         type: Boolean,
         value: false
       },
-      rubric: {
+      categories: {
         type: Array,
-        notify: true
+        notify: true,
+        observer: '_categoriesChanged'
       }
     }
   }
@@ -30,7 +31,6 @@ class PrendusRubricTable extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    (this.rubric && this.rubric.length) || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
     this._fireLocalAction('loaded', true);
   }
 
@@ -43,16 +43,23 @@ class PrendusRubricTable extends Polymer.Element {
     };
   }
 
+  _categoriesChanged(categories: Object[]) {
+    if (!categories.length && this.editable)
+      this._fireLocalAction('categories', this.templateRubric());
+    else
+      this._fireLocalAction('categories', categories);
+  }
+
   templateRubric(): Object[] {
     return [
       {
         name: '',
-        options: this.templateScale()
+        options: this.templateOption()
       }
     ];
   }
 
-  templateScale(): Object[] {
+  templateOption(): Object[] {
     return [
       {
         name: '',
@@ -63,28 +70,28 @@ class PrendusRubricTable extends Polymer.Element {
   }
 
   addCategory() {
-    this._fireLocalAction('rubric', this.rubric.concat(this.templateRubric()));
+    this._fireLocalAction('categories', this.categories.concat(this.templateRubric()));
   }
 
   removeCategory() {
-    const newRubric = this.rubric.length ? this.rubric.slice(0, this.rubric.length - 1) : this.rubric;
-    this._fireLocalAction('rubric', newRubric);
+    const newRubric = this.categories.length ? this.categories.slice(0, this.categories.length - 1) : this.categories;
+    this._fireLocalAction('categories', newRubric);
   }
 
   addScale(e) {
-    const newRubric = this.rubric.map((category, i) => {
+    const newRubric = this.categories.map((category, i) => {
       if (i === e.model.itemsIndex)
         return {
           name: category.name,
-          options: category.options.concat(this.templateScale())
+          options: category.options.concat(this.templateOption())
         }
       return category;
     });
-    this._fireLocalAction('rubric', newRubric);
+    this._fireLocalAction('categories', newRubric);
   }
 
   removeScale(e) {
-    const newRubric = this.rubric.map((category, i) => {
+    const newRubric = this.categories.map((category, i) => {
       if (i === e.model.itemsIndex)
         return {
           name: category.name,
@@ -92,7 +99,7 @@ class PrendusRubricTable extends Polymer.Element {
         }
       return category;
     });
-    this._fireLocalAction('rubric', newRubric);
+    this._fireLocalAction('categories', newRubric);
   }
 
   stateChange(e: CustomEvent) {
@@ -100,7 +107,7 @@ class PrendusRubricTable extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('rubric')) this.rubric = componentState.rubric;
+    if (keys.includes('categories')) this.categories = componentState.categories;
     this.userToken = state.userToken;
     this.user = state.user;
   }

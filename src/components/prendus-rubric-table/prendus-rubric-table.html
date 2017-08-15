@@ -78,7 +78,7 @@
 
       <dom-if if="[[editable]]" hidden>
         <template>
-          <dom-repeat items="{{rubric}}" as="category" hidden>
+          <dom-repeat items="{{categories}}" as="category" hidden>
             <template>
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell"><input type="text" placeholder="Category..." value="{{category.name::change}}"></div>
@@ -113,7 +113,7 @@
 
       <dom-if if="[[!editable]]" hidden>
         <template>
-          <dom-repeat items="[[rubric]]" as="category" hidden>
+          <dom-repeat items="[[categories]]" as="category" hidden>
             <template>
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell">[[category.name]]</div>

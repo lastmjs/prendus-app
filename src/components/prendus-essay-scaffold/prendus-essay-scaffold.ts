@@ -141,9 +141,10 @@ class PrendusEssayScaffold extends Polymer.Element {
       console.log('invalid!'); //TODO: jump to step with errors?
       return;
     }
-    const mutation = `mutation createQuestion($userId: ID!, $resource: String!, $conceptId: ID!, $text: String!, $code: String!, $rubric: [RubriccategoriesRubricCategory!]!) {
+    const mutation = `mutation createQuestion($userId: ID!, $assignmentId: ID, $resource: String!, $conceptId: ID!, $text: String!, $code: String!, $rubric: [RubriccategoriesRubricCategory!]!) {
       createQuestion (
         authorId: $userId,
+        assignmentId: $assignmentId,
         resource: $resource,
         conceptId: $conceptId,
         text: $text,
@@ -160,6 +161,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     const rubric = this._convertPointsToInts(this.rubric);
     const variables = {
       userId: this.user.id,
+      assignmentId: this.assignment.id,
       resource: this.resource,
       conceptId: this.conceptId,
       text,
