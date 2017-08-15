@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-lazy-pages/iron-lazy-pages.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <!--Do not lazy load the open source component, we need it to comply-->
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
@@ -25,8 +26,9 @@
   			.app-window {
   				box-sizing: border-box;
   				margin: auto;
-  				margin: 20px 50px;
-  				max-width: 800px;
+  				margin: 20px;
+  				/*max-width: 800px;*/
+          max-width: 80%;
   				width: 100%;
   			}
 
@@ -187,6 +189,7 @@
           </footer>
         </app-toolbar>
 
+        <paper-toast id="termsToast" duration="10000" style="margin-top: 50px; margin-left: 50px" vertical-align="top" on-click="_termsClick"></paper-toast>
 
     </template>
 

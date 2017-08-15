@@ -37,7 +37,7 @@
     		}
         #course-title {
           --paper-input-container-input: {
-            font-size: 48px;
+            font-size: 3em;
           };
         }
         .prendus-margin{
@@ -48,8 +48,9 @@
           display: block;
         }
         .assignment-card{
-          width: 30%;
-          margin: 10px;
+          min-width: 300px;
+          margin-right: 20px;
+          margin-top: 20px;
           --paper-card-header-text: {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -146,7 +147,6 @@
                   <div class="content">
                     <h2 id ="dialog-header">Create New Assignment</h2>
                     <paper-input id="assignment-title" id="assignmentTitle" label="Assignment Title" required></paper-input>
-                    <paper-input id="concept-title" id="firstConcept" label="Concept (Add more at next step)" required></paper-input>
                   </div>
                   <div class="buttons">
                     <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
@@ -168,6 +168,8 @@
                             <paper-tooltip for="create[[item.id]]" offset="0" animation-delay="300">Launch Create Assignment</paper-tooltip>
                             <a href="assignment/[[item.id]]/view?assignmentType=REVIEW"><paper-icon-button id="review[[item.id]]" class="prendus-icon-button" icon="feedback"></paper-icon-button></a>
                             <paper-tooltip for="review[[item.id]]" offset="0" animation-delay="300">Launch Review Assignment</paper-tooltip>
+                            <a href="assignment/[[item.id]]/view?assignmentType=QUIZ"><paper-icon-button id="quiz[[item.id]]" class="prendus-icon-button" icon="assignment"></paper-icon-button></a>
+                            <paper-tooltip for="quiz[[item.id]]" offset="0" animation-delay="300">Launch Quiz</paper-tooltip>
                             <paper-icon-button id="delete[[item.id]]" data="[[item.id]]" class="prendus-icon-button" icon="delete" on-click="deleteAssignment"></paper-icon-button>
                             <paper-tooltip for="delete[[item.id]]" offset="0" animation-delay="300">Delete Assignment</paper-tooltip>
                           </div>
@@ -182,6 +184,10 @@
                             <div class="content">
                               <h5 class = "lti-title">Review Questions Link</h5>
                               <paper-textarea class="lti-link" id="ltiLinkIdreview" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/REVIEW"></paper-textarea>
+                            </div>
+                            <div class="content">
+                              <h5 class = "lti-title">Quiz Link</h5>
+                              <paper-textarea class="lti-link" id="ltiLinkIdreview" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/QUIZ"></paper-textarea>
                             </div>
                         </paper-dialog>
                       </template>

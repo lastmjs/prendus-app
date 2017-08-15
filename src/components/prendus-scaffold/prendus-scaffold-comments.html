@@ -42,17 +42,29 @@
         }
         </style>
         <div class="wrapper">
-          <div class="prendus-card question">
-            <h3>Question</h3>
-            [[currentQuestionScaffold.question]]
+          <div class="row">
+            <div class="left-column item-header">
+              <h3>Question</h3>
+            </div>
+            <div class="right-column item-header">
+              <h3>Question Hint</h3>
+            </div>
           </div>
-
+          <div class="row">
+            <div class="prendus-card left-column">
+              [[currentQuestionScaffold.question]]
+            </div>
+            <div class="prendus-card right-column">
+              <!-- Implement this when Jordan returns  -->
+              <paper-textarea id="questionHint" label="Question hint text (optional)"></paper-textarea>
+            </div>
+          </div>
           <div class="row">
             <div class="left-column answers-comments-header">
               <h3>Answers</h3>
             </div>
             <div class="right-column answers-comments-header">
-              <h3>Comments</h3>
+              <h3>Answer Comments</h3>
             </div>
           </div>
 
@@ -62,7 +74,7 @@
                 [[item.text]]
               </div>
               <div class="prendus-card right-column">
-                <paper-textarea id="comment[[index]]" label="Comment [[plusOne(index)]]" on-input="enableNext"></paper-textarea>
+                <paper-textarea id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[createComment(index)]]"></paper-textarea>
               </div>
             </div>
           </template>
