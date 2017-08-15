@@ -32,7 +32,6 @@ class PrendusRubricTable extends Polymer.Element {
     super.connectedCallback();
     (this.rubric && this.rubric.length) || this._fireLocalAction('rubric', this.editable ? this.templateRubric() : '');
     this._fireLocalAction('loaded', true);
-    console.log(this.rubric, this.editable);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -48,7 +47,7 @@ class PrendusRubricTable extends Polymer.Element {
     return [
       {
         name: '',
-        scales: this.templateScale()
+        options: this.templateScale()
       }
     ];
   }
@@ -77,7 +76,7 @@ class PrendusRubricTable extends Polymer.Element {
       if (i === e.model.itemsIndex)
         return {
           name: category.name,
-          scales: category.scales.concat(this.templateScale())
+          options: category.options.concat(this.templateScale())
         }
       return category;
     });
@@ -89,7 +88,7 @@ class PrendusRubricTable extends Polymer.Element {
       if (i === e.model.itemsIndex)
         return {
           name: category.name,
-          scales: category.scales.length ? category.scales.slice(0, category.scales.length - 1) : category.scales
+          options: category.options.length ? category.options.slice(0, category.options.length - 1) : category.options
         }
       return category;
     });

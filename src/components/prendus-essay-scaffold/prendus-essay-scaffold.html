@@ -110,11 +110,11 @@
                 </li>
               </ol>
             </div>
-            <paper-dropdown-menu label="Concept" selectedItem="{{conceptOption}}">
-              <paper-listbox slot="dropdown-content">
+            <paper-dropdown-menu label="Concept">
+              <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="{{conceptId}}">
                 <dom-repeat items="[[_conceptOptions(assignment)]]">
                   <template>
-                    <paper-item>[[item.label]]</paper-item>
+                    <paper-item id="[[item.id]]">[[item.label]]</paper-item>
                   </template>
                 </dom-repeat>
               </paper-listbox>

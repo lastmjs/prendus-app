@@ -83,12 +83,12 @@
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell"><input type="text" placeholder="Category..." value="{{category.name::change}}"></div>
                 <div class="grid">
-                  <dom-repeat items="{{category.scales}}" as="scale" hidden>
+                  <dom-repeat items="{{category.options}}" as="option" hidden>
                     <template>
                       <div class="grid-row grid-inner-row">
-                        <div class="grid-cell"><input type="text" placeholder="Scale..." value="{{scale.name::change}}"></div>
-                        <div class="grid-cell"><input type="text" placeholder="Description..." value="{{scale.description::change}}"></div>
-                        <div class="grid-cell"><input type="number" placeholder="Points..." value="{{scale.points::change}}"></div>
+                        <div class="grid-cell"><input type="text" placeholder="Scale..." value="{{option.name::change}}"></div>
+                        <div class="grid-cell"><input type="text" placeholder="Description..." value="{{option.description::change}}"></div>
+                        <div class="grid-cell"><input type="number" placeholder="Points..." value="{{option.points::change}}"></div>
                       </div>
                     </template>
                   </dom-repeat>
@@ -118,12 +118,12 @@
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell">[[category.name]]</div>
                 <div class="grid">
-                  <dom-repeat items="[[category.scales]]" as="scale" hidden>
+                  <dom-repeat items="[[category.options]]" as="option" hidden>
                     <template>
                       <div class="grid-row grid-inner-row">
-                        <div class="grid-cell">[[scale.name]]</div>
-                        <div class="grid-cell">[[scale.description]]</div>
-                        <div class="grid-cell">[[scale.points]]</div>
+                        <div class="grid-cell">[[option.name]]</div>
+                        <div class="grid-cell">[[option.description]]</div>
+                        <div class="grid-cell">[[option.points]]</div>
                       </div>
                     </template>
                   </dom-repeat>

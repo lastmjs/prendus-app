@@ -1,8 +1,10 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
+import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
+import {generateEssay} from '../../services/question-to-code-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
@@ -13,7 +15,7 @@ class PrendusEssayScaffold extends Polymer.Element {
   resource: string;
   questionText: string;
   rubric: Object[] = [];
-  conceptOption: string;
+  conceptId: string;
   progress: number = 0;
   userToken: string | null;
   user: User;
@@ -23,14 +25,6 @@ class PrendusEssayScaffold extends Polymer.Element {
   static properties() {
     return {
       assignment: Object,
-      cycle: {
-        type: Number,
-        value: 1
-      },
-      valid: {
-        type: Boolean,
-        computed: '_valid(resource, conceptOption, questionText, rubric)'
-      }
     }
   }
 
@@ -55,40 +49,47 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   _conceptOptions(assignment: Assignment): {[key: string]: string} {
     return assignment.concepts.map(concept => {
-      return { value: concept.id, label: concept.title };
+      return { id: concept.id, label: concept.title };
     }
   }
 
-  _validRubric(rubric: Object): boolean {
-    const notEmpty = (val) => val.toString().trim().length > 0;
-    const categories = rubric.map(category => category.name);
-    const scales = flatten(categories.map(category => rubric[category].scales.map(scale => scale.name)));
-    const descriptions = flatten(categories.map(category => rubric[category].scales.map(scale => scale.descriptions)));
-    const points = flatten(categories.map(category => rubric[category].scales.map(scale => Number(scale.points))));
-    return rubric != null
+  _valid(): boolean {
+    console.log(this.__data);
+    const notEmpty = (val) => val != undefined && val.toString().trim().length > 0;
+    const categories = this.rubric.map(category => category.name);
+    const options = flatten(this.rubric.map(category => category.options.map(scale => scale.name)));
+    const descriptions = flatten(this.rubric.map(category => category.options.map(scale => scale.description)));
+    const points = flatten(this.rubric.map(category => category.options.map(scale => Number(scale.points))));
+    return notEmpty(this.resource)
+      && this._conceptOptions(this.assignment).map(concept => concept.id).includes(this.conceptId)
+      && notEmpty(this.questionText)
+      && this.rubric != null
+      && this.rubric.length > 0
+      && this.rubric.filter(category => category.options.length > 1).length === this.rubric.length
       && categories.filter(notEmpty).length === categories.length
-      && scales.filter(notEmpty).length === scales.length
+      && options.filter(notEmpty).length === options.length
       && descriptions.filter(notEmpty).length === descriptions.length
       && points.filter(num => num != NaN && num > -1).length === points.length;
   }
 
-  _valid(resource: string, conceptOption: string, questionText: string, rubric: string): boolean {
-    return resource.trim().length > 0
-      && conceptOption != null
-      && this._conceptOptions(this.assignment).map(concept => concept.id).includes(conceptOption.value)
-      && questionText.trim().length > 0
-      && this._validRubric(rubric);
+  _convertPointsToInts(rubric: Object[]): Object[] {
+    return rubric.map(category => {
+      const options = category.options.map(option => {
+        return Object.assign(option, { points: Number(option.points) });
+      });
+      return Object.assign(category, { options });
+    });
   }
 
   _showNext(step: number): boolean {
-    console.log(this.$.ironPages.children);
     return step < this.$.ironPages.children.length - 1;
   }
 
-  _handleSubmit(): void {
+  _handleSubmit(data: Object): void {
+    if (data.errors) throw new Error(data.errors.map(err => err.message).join("\n"));
     const progress = this.progress + 1;
     this._fireLocalAction('progress', progress);
-    if (progress < this.cycle)
+    if (progress < 1)//this.assignment.createQuota)
       this.clear();
     else
       console.log('done!');
@@ -98,7 +99,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     return [
       {
         name: 'Language',
-        scales: [
+        options: [
           {
             name: 'Professional',
             description: 'The language is of good academic quality in vocabulary and grammar',
@@ -129,23 +130,24 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   clear(): void {
     this._fireLocalAction('resource', '');
-    this._fireLocalAction('conceptOption', null);
+    this._fireLocalAction('conceptId', '');
     this._fireLocalAction('questionText', '');
-    this._fireLocalAction('rubric', '');
+    this._fireLocalAction('rubric', []);
     this._fireLocalAction('step', 0);
   }
 
   submit(): void {
-    if (!this.valid) {
+    if (!this._valid()) {
       console.log('invalid!'); //TODO: jump to step with errors?
       return;
     }
-    const mutation = `mutation createQuestion($userId: ID!, $resource: String!, $conceptOption: ID!, $questionText: String!, $rubric: Json!) {
+    const mutation = `mutation createQuestion($userId: ID!, $resource: String!, $conceptId: ID!, $text: String!, $code: String!, $rubric: [RubriccategoriesRubricCategory!]!) {
       createQuestion (
         authorId: $userId,
         resource: $resource,
-        conceptId: $conceptOption,
-        text: $questionText,
+        conceptId: $conceptId,
+        text: $text,
+        code: $code,
         gradingRubric: {
           categories: $rubric,
           authorId: $userId,
@@ -154,13 +156,17 @@ class PrendusEssayScaffold extends Polymer.Element {
         id
       }
     }`;
+    const { text, code } = generateEssay({ stem: this.questionText });
+    const rubric = this._convertPointsToInts(this.rubric);
     const variables = {
       userId: this.user.id,
       resource: this.resource,
-      conceptOption: this.conceptOption.value,
-      questionText: this.questionText,
+      conceptId: this.conceptId,
+      text,
+      code,
       rubric: this.rubric
     };
+    console.log(variables);
     GQLrequest(mutation, variables, this.userToken)
     .then(this._handleSubmit.bind(this))
     .catch(err => { console.error(err) });
