@@ -70,13 +70,12 @@ class PrendusGradeAssignment extends Polymer.Element {
       }
     }`, {assignmentId}, this.userToken);
     const { assignment } = data;
-    const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.reviewQuota);
+    const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.gradeQuota);
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('quota', questions.length);
     this._fireLocalAction('progress', 0);
     this._fireLocalAction('questions', questions);
     this._fireLocalAction('question', questions[0]);
-    this._fireLocalAction('rubricCategories', questions[0].gradingRubric.categories);
   }
   _questionText(text: string): string {
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
@@ -101,9 +100,6 @@ class PrendusGradeAssignment extends Polymer.Element {
     else {
       this._fireLocalAction('progress', progress);
       this._fireLocalAction('question', this.questions[progress]);
-      //hack for now to clear rubric dropdown selections
-      this._fireLocalAction('rubricCategories', null);
-      setTimeout(() => { this._fireLocalAction('rubricCategories', this.assignment.evaluationRubric.categories) });
     }
   }
 
@@ -112,19 +108,19 @@ class PrendusGradeAssignment extends Polymer.Element {
       console.log('invalid!'); //TODO: display error
       return;
     }
-    const query = `mutation rateQuestion($questionId: ID!, $ratingJson: Json!, $raterId: ID!) {
-      createQuestionRating (
-        raterId: $raterId
+    const query = `mutation rateQuestion($questionId: ID!, $gradeJson: Json!, $graderId: ID!) {
+      createQuestionGrade (
+        graderId: $raterId
         questionId: $questionId
-        ratingJson: $ratingJson
+        gradeJson: $gradeJson
       ) {
         id
       }
     }`;
     const variables = {
       questionId: this.question.id,
-      ratingJson: JSON.stringify(this.ratings),
-      raterId: this.user.id
+      gradeJson: JSON.stringify(this.grades),
+      graderId: this.user.id
     };
     console.log(variables);
     /*GQLrequest(query, variables, this.userToken)
@@ -142,7 +138,6 @@ class PrendusGradeAssignment extends Polymer.Element {
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
     if (keys.includes('done')) this.done = componentState.done;
     this.userToken = state.userToken;
     this.user = state.user;
