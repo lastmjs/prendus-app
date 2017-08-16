@@ -4,6 +4,9 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-example.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="prendus-question-review-quiz.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -14,24 +17,13 @@
         <style include="prendus-styles">
           .wrapper {
             margin-top: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(1, 0fr);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
           }
 
-          .quality {
-            grid-column: 1;
-            grid-row: 1;
-          }
-
-          .difficulty {
-            grid-column: 2;
-            grid-row: 1;
-          }
-
-          .accuracy {
-            grid-column: 3;
-            grid-row: 1;
+          .rubric-category {
+            flex-basis: 390px;
           }
 
           .submit-button {
@@ -49,19 +41,21 @@
                 </div>
                 <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
                 <div class="wrapper">
-                    <div class="quality">
-                      Quality <paper-slider id="quality[[item.id]]" value="[[quality]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
-                    </div>
-                    <div class="difficulty">
-                      Difficulty<paper-slider id="difficulty[[item.id]]" value="[[difficulty]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
-                    </div>
-                    <div class="accuracy">
-                      Alignment<paper-slider id="accuracy[[item.id]]" value="[[accuracy]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
-                    </div>
-                    <div class="cheating">
-                      Authenticity<paper-slider id="authenticity[[item.id]]" value="[[authenticity]]" min="[[minSliderValue]]" max="[[maxSliderValue]]" pin></paper-slider>
-                    </div>
+                  <template is="dom-repeat" items="[[rubricCategories]]" as="category" hidden>
+                    <paper-dropdown-menu class="rubric-category" label="[[category.label]]" on-iron-select="_rubricScoreChanged">
+                      <paper-listbox slot="dropdown-content">
+                        <template is="dom-repeat" items="[[category.options]]" as="option" hidden>
+                          <paper-item id="[[_paperItemId(category, option)]]" value="[[option.points]]" aria-describedby$="label-[[_paperItemId(category, option)]]">[[option.label]]</paper-item>
+                        </template>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                  </template>
                 </div>
+                <template is="dom-repeat" items="[[rubricCategories]]" as="category">
+                  <template is="dom-repeat" items="[[category.options]]" as="option">
+                    <paper-tooltip id="label-[[_paperItemId(category, option)]]" position="top" for="[[_paperItemId(category, option)]]">[[option.description]]</paper-tooltip>
+                  </template>
+                </template>
                 <div class="submit-button">
                     <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
                 </div>
