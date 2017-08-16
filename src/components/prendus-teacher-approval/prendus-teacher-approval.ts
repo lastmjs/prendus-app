@@ -27,33 +27,40 @@ class PrendusTeacherApproval extends Polymer.Element {
     };
     await this.loadTeachers();
   }
+  _fireLocalAction(key: string, value: any) {
+    this.action = {
+        type: 'SET_COMPONENT_PROPERTY',
+      componentId: this.componentId,
+      key,
+      value
+    };
+  }
   async loadTeachers(){
     //TODO this needs to be paginated eventually. Or we need to put in a search to find specific users
-    await GQLQuery(`
+    const teacherData = await GQLQuery(`
         query {
           allUsers(
             first: 10
             orderBy:
             createdAt_DESC
-            filter:{
-              role: STUDENT
-          }) {
+          ) {
             id
             role
             email
           }
         }
-    `, this.userToken, (key: string, value: any) => {
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-          componentId: this.componentId,
-          key: 'unverifiedTeachers',
-          value
-      };
-    }, (error: any) => {
-      console.log('error', error)
+    `, this.userToken, (key: string, value: any) => {},
+      (error: any) => {
         alert(error);
     });
+    const unverifiedTeachers = teacherData.allUsers.filter((teacher: User)=>{
+      return teacher.role === "STUDENT"
+    })
+    const verifiedTeachers = teacherData.allUsers.filter((teacher: User)=>{
+      return teacher.role === "INSTRUCTOR"
+    })
+    this._fireLocalAction('unverifiedTeachers', unverifiedTeachers)
+    this._fireLocalAction('verifiedTeachers', verifiedTeachers)
   }
 	showUnverifiedTeachers(unverifiedTeachers: User[]): boolean {
 		return !!unverifiedTeachers.length;
@@ -72,6 +79,7 @@ class PrendusTeacherApproval extends Polymer.Element {
           ){
             id
             role
+            email
           }
         }
         `, this.userToken, (error: any) => {
@@ -80,12 +88,9 @@ class PrendusTeacherApproval extends Polymer.Element {
         const newUnverifiedTeachers = this.unverifiedTeachers.filter((teacher) => {
           if(teacher.id !== teacherData.updateUser.id){ return teacher }
         });
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'unverifiedTeachers',
-            value: newUnverifiedTeachers
-        };
+        const newVerifiedTeachers = [...this.verifiedTeachers, teacherData.updateUser]
+        this._fireLocalAction('unverifiedTeachers', newUnverifiedTeachers)
+        this._fireLocalAction('verifiedTeachers', newVerifiedTeachers)
 	}
 
 	async revokeTeacher(e: any): Promise<void> {
@@ -97,7 +102,7 @@ class PrendusTeacherApproval extends Polymer.Element {
   stateChange(e: CustomEvent) {
       const state = e.detail.state;
       if (Object.keys(state.components[this.componentId] || {}).includes('unverifiedTeachers')) this.unverifiedTeachers = state.components[this.componentId].unverifiedTeachers;
-      this.verifiedTeachers = state.verifiedTeachers;
+      if (Object.keys(state.components[this.componentId] || {}).includes('verifiedTeachers')) this.verifiedTeachers = state.components[this.componentId].verifiedTeachers;
       this.userToken = state.userToken;
   }
 

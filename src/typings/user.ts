@@ -11,4 +11,6 @@ export interface User {
     readonly assignments: Assignment[];
     readonly quizzes: Quiz[];
     readonly questions: Question[];
+    readonly role: string;
+
 }
