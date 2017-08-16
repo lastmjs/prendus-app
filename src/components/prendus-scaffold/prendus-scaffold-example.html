@@ -50,9 +50,20 @@
             </div>
           </div>
           <div class="row">
-            <div class="prendus-card left-column">
-              [[questionScaffold.concept.title]]
-            </div>
+            <dom-if if="[[questionScaffold.concept.title]]">
+              <template>
+                <div class="prendus-card left-column">
+                  [[questionScaffold.concept.title]]
+                </div>
+              </template>
+            </dom-if>
+            <dom-if if="[[!questionScaffold.concept.title]]">
+              <template>
+                <div class="prendus-card left-column">
+                  [[questionScaffold.concept]]
+                </div>
+              </template>
+            </dom-if>
             <div class="prendus-card right-column">
               [[questionScaffold.resource]]
             </div>
@@ -62,7 +73,7 @@
               <h3>Question</h3>
             </div>
             <div class="right-column item-header">
-              <h3>Explanation</h3>
+              <h3>Solution</h3>
             </div>
           </div>
           <div class="row">
