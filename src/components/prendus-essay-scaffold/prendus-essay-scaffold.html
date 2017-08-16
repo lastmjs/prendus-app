@@ -57,7 +57,7 @@
         --iron-icon-width: 50%;
       }
     </style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <redux-store id="store" action="[[action]]"></redux-store>
     <div class="content">
       <div class="page">
         <iron-pages id="ironPages" selected="[[step]]">
@@ -111,8 +111,8 @@
               </ol>
             </div>
             <paper-dropdown-menu label="Concept">
-              <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="{{conceptId}}">
-                <dom-repeat items="[[_conceptOptions(assignment)]]">
+              <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[question.conceptId]]" on-change="setConceptId">
+                <dom-repeat items="[[_conceptOptions(concepts)]]">
                   <template>
                     <paper-item id="[[item.id]]">[[item.label]]</paper-item>
                   </template>
@@ -135,7 +135,7 @@
                 </li>
               </ol>
             </div>
-            <paper-input id="resourceInput" type="text" value="{{resource}}"></paper-input>
+            <paper-input id="resourceInput" type="text" value="[[question.resource]]"></paper-input>
           </div>
           <div>
             <div class="prendus-card big">
@@ -150,7 +150,7 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" value="{{questionText}}"></paper-textarea>
+            <paper-textarea id="questionInput" type="text" value="[[question.text]]" on-change="setQuestionText"></paper-textarea>
           </div>
           <div>
             <div class="prendus-card big">
@@ -160,22 +160,18 @@
                   Create a rubric that will guide students in grading responses to your essay question. An example is shown
                 </li>
                 <li>
-                  Remember your question: <strong>[[questionText]]</strong>
+                  Remember your question: <strong>[[question.text]]</strong>
                 </li>
               </ol>
             </div>
             <br>
             <h3>Example rubric</h3>
-            <prendus-rubric-table categories="[[exampleRubric()]]"></prendus-rubric-table>
-            <prendus-rubric-table categories="{{rubric}}" editable></prendus-rubric-table>
-          </div>
-          <div>
-            <h3>Done</h3>
-            <p>You have created all the questions required for this assignment</p>
+            <prendus-rubric-table rubric="[[exampleRubric()]]"></prendus-rubric-table>
+            <prendus-rubric-table rubric="[[question.rubric]]" editable></prendus-rubric-table>
           </div>
         </iron-pages>
       </div>
-      <template is="dom-if" if="[[_showBack(step)]]">
+      <template is="dom-if" if="[[step]]">
         <div class="back">
           <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>
         </div>
@@ -185,7 +181,7 @@
           <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next">Next</button>
         </div>
       </template>
-      <template is="dom-if" if="[[_showSubmit(step)]]">
+      <template is="dom-if" if="[[!_showNext(step)]]">
         <div class="next">
           <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
         </div>

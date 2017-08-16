@@ -16,10 +16,9 @@ class PrendusRubricTable extends Polymer.Element {
         type: Boolean,
         value: false
       },
-      categories: {
-        type: Array,
-        notify: true,
-        observer: '_categoriesChanged'
+      rubric: {
+        type: Object,
+        observer: '_initCategories'
       }
     }
   }
@@ -43,7 +42,40 @@ class PrendusRubricTable extends Polymer.Element {
     };
   }
 
-  _categoriesChanged(categories: Object[]) {
+  _categoriesForHtml(rubric: Object): Object[] {
+    return Object.keys(rubric || {}).map(category => {
+      return {
+        name: category,
+        options: Object.keys(rubric[category]).map(option => {
+          return {
+            name: option,
+            ...rubric[category][option]
+          }
+        })
+      }
+    });
+  }
+
+  _makeRubric(categories: Object[]): Object {
+    return categories.reduce((rubric, category) => {
+      return Object.assign(
+        rubric,
+        {[category.name]: category.options.reduce((options, option) => {
+          return {
+            [option.name]: {description: option.description, points: Number(option.points)}
+          }
+        }, {})}
+      );
+    }, {});
+  }
+
+  _notify(rubric: Object) {
+    const evt = new CustomEvent('question-rubric-table', { bubbles: false, composed: true, detail: {rubric}});
+    this.dispatchEvent(evt);
+  }
+
+  _initCategories(rubric: Object) {
+    const categories = this._categoriesForHtml(rubric);
     if (!categories.length && this.editable)
       this._fireLocalAction('categories', this.templateRubric());
     else
@@ -102,12 +134,41 @@ class PrendusRubricTable extends Polymer.Element {
     this._fireLocalAction('categories', newRubric);
   }
 
+  setCategory(e) {
+    const newCategories = this.categories.slice();
+    newCategories[e.model.itemsIndex].name = e.target.value;
+    newCategories[e.model.itemsIndex].options.forEach(option => { option.category = e.target.value });
+    this._fireLocalAction('categories', newCategories);
+    this._notify(this._makeRubric(newCategories));
+  }
+
+  setOptionProp(e, prop) {
+    const i = this.shadowRoot.getElementById('categories').indexForElement(e.target);
+    const newCategories = this.categories.slice();
+    newCategories[i].options[e.model.itemsIndex][prop] = e.target.value;
+    this._fireLocalAction('categories', newCategories);
+    this._notify(this._makeRubric(newCategories));
+  }
+
+  setOption(e) {
+    this.setOptionProp(e, 'name');
+  }
+
+  setDescription(e) {
+    this.setOptionProp(e, 'description');
+  }
+
+  setPoints(e) {
+    this.setOptionProp(e, 'points');
+  }
+
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('categories')) this.categories = componentState.categories;
+    if (keys.includes('rubric')) this.rubric = componentState.rubric;
     this.userToken = state.userToken;
     this.user = state.user;
   }
