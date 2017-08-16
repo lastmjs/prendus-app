@@ -61,9 +61,10 @@ class PrendusRubricTable extends Polymer.Element {
       return Object.assign(
         rubric,
         {[category.name]: category.options.reduce((options, option) => {
-          return {
-            [option.name]: {description: option.description, points: Number(option.points)}
-          }
+          return Object.assign(
+            options,
+            {[option.name]: {description: option.description, points: Number(option.points)}}
+          );
         }, {})}
       );
     }, {});
