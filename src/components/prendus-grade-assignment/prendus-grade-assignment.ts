@@ -52,16 +52,6 @@ class PrendusGradeAssignment extends Polymer.Element {
         id
         title
         questionType
-        evaluationRubric {
-          categories {
-            name
-            options {
-              name
-              description
-              points
-            }
-          }
-        }
         questions {
           id
           text
@@ -86,7 +76,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     this._fireLocalAction('progress', 0);
     this._fireLocalAction('questions', questions);
     this._fireLocalAction('question', questions[0]);
-    this._fireLocalAction('rubricCategories', assignment.evaluationRubric.categories);
+    this._fireLocalAction('rubricCategories', questions[0].gradingRubric.categories);
   }
   _questionText(text: string): string {
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
