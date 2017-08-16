@@ -54,16 +54,15 @@ class PrendusEssayScaffold extends Polymer.Element {
     }
   }
 
-  _valid(): boolean {
+  _valid(question: Object): boolean {
     const notEmpty = (val) => val != undefined && val.toString().trim().length > 0;
-    const categories = Object.keys(this.question.rubric);
-    const options = flatten(categories.map(category => Object.keys(this.question.rubric[category])));
-    const descriptions = flatten(categories.map(category => Object.keys(this.question.rubric[category]).map(option => this.question.rubric[category][option].description)));
-    const points = flatten(categories.map(category => Object.keys(this.question.rubric[category]).map(option => this.question.rubric[category][option].points)));
-    return notEmpty(this.question.resource)
+    const categories = Object.keys(question.rubric);
+    const options = flatten(categories.map(category => Object.keys(question.rubric[category])));
+    const descriptions = flatten(categories.map(category => Object.keys(question.rubric[category]).map(option => question.rubric[category][option].description)));
+    const points = flatten(categories.map(category => Object.keys(question.rubric[category]).map(option => question.rubric[category][option].points)));
+    return notEmpty(question.resource)
       && this._conceptOptions(this.concepts).map(concept => concept.id).includes(this.question.conceptId)
-      && notEmpty(this.question.text)
-      && this.rubric != null
+      && notEmpty(question.text)
       && categories.length > 0
       && categories.filter(category => Object.keys(this.rubric[category]).length > 1).length === this.rubric.length
       && categories.filter(notEmpty).length === categories.length
@@ -72,13 +71,41 @@ class PrendusEssayScaffold extends Polymer.Element {
       && points.filter(num => num != NaN && num > -1).length === points.length;
   }
 
+  _saveQuestion(question: Object) {
+    const mutation = `mutation createQuestion($userId: ID!, $assignmentId: ID, $resource: String!, $conceptId: ID!, $text: String!, $code: String!) {
+      createQuestion (
+        authorId: $userId,
+        assignmentId: $assignmentId,
+        resource: $resource,
+        conceptId: $conceptId,
+        text: $text,
+        code: $code,
+      ) {
+        id
+      }
+    }`;
+    const { text, code } = generateEssay({stem: question.text}, question.rubric);
+    const variables = {
+      userId: this.user.id,
+      assignmentId: question.assignmentId,
+      resource: question.resource,
+      conceptId: question.conceptId,
+      text,
+      code
+    };
+    console.log(variables);
+    GQLrequest(mutation, variables, this.userToken)
+      .then(this._handleSubmit.bind(this))
+      .catch(err => { console.error(err) });
+  }
+
   _showNext(step: number): boolean {
     return step < this.$.ironPages.children.length - 1;
   }
 
   _handleSubmit(data: Object): void {
     if (data.errors) throw new Error(data.errors.map(err => err.message).join("\n"));
-    const evt = new Event('question-created', { bubbles: false });
+    const evt = new CustomEvent('question-created', { bubbles: false composed: true});
     this.dispatchEvent(evt);
   }
 
@@ -110,38 +137,11 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   submit(): void {
-    if (!this._valid()) {
+    if (!this._valid(this.question)) {
       console.log('invalid!'); //TODO: jump to step with errors?
       return;
     }
-    const mutation = `mutation createQuestion($userId: ID!, $assignmentId: ID, $resource: String!, $conceptId: ID!, $text: String!, $code: String!) {
-      createQuestion (
-        authorId: $userId,
-        assignmentId: $assignmentId,
-        resource: $resource,
-        conceptId: $conceptId,
-        text: $text,
-        code: $code,
-      ) {
-        id
-      }
-    }`;
-    const { text, code } = generateEssay({
-      stem: this.question.text,
-      code: `const gradingRubric = '${JSON.stringify(rubric)}';`
-    });
-    const variables = {
-      userId: this.user.id,
-      assignmentId: this.assignment.id,
-      resource: this.question.resource,
-      conceptId: this.question.conceptId,
-      text,
-      code
-    };
-    console.log(variables);
-    GQLrequest(mutation, variables, this.userToken)
-      .then(this._handleSubmit.bind(this))
-      .catch(err => { console.error(err) });
+    this._saveQuestion(this.question);
   }
 
   stateChange(e: CustomEvent) {
