@@ -50,11 +50,13 @@ class PrendusAssignmentQuiz extends Polymer.Element {
       };
     }
     async loadQuiz(){
+      this._fireLocalAction('loaded', false)
       await this.loadAssignmentQuestions();
       await this.generateQuiz();
+      this._fireLocalAction('loaded', true)
     }
     async loadAssignmentQuestions() {
-        await GQLQuery(`
+        const questionData = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
                     questions{
@@ -73,16 +75,15 @@ class PrendusAssignmentQuiz extends Polymer.Element {
                 }
             }
         `, this.userToken, (key: string, value: Assignment) => {
-            if(value){
-              const quizQuestions = shuffleArray(value.questions).slice(0,10);
-              this._fireLocalAction('quizQuestions', quizQuestions)
-            }else{
-              this._fireLocalAction('questions', null)
-            }
-
         }, (error: any) => {
             console.log(error);
         });
+        if(questionData.Assignment){
+          const quizQuestions = shuffleArray(questionData.Assignment.questions).slice(0,10);
+          this._fireLocalAction('quizQuestions', quizQuestions)
+        }else{
+          this._fireLocalAction('questions', null)
+        }
     }
     async generateQuiz(){
       const questionIds = this.quizQuestions.map(function(a) {return a.id;});

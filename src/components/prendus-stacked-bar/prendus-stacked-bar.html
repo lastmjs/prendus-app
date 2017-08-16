@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+
+<dom-module id="prendus-stacked-bar">
+
+  <template>
+
+    <style include="prendus-styles">
+      :host {
+        height: 100%;
+        width: 100%;
+      }
+      #wrapper {
+        display: flex;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        min-height: 20px;
+      }
+      .bar {
+        height: 50%;
+        align-self: center;
+        width: 0;
+      }
+      #bar-0 {
+        background: var(--prendus-stacked-bar-color-zero, #d20505);
+      }
+      #bar-1 {
+        background: var(--prendus-stacked-bar-color-one, #e8a323);
+      }
+      #bar-2 {
+        background: var(--prendus-stacked-bar-color-two, green);
+      }
+      #bar-3 {
+        background: var(--prendus-stacked-bar-color-three, red);
+      }
+      #bar-4 {
+        background: var(--prendus-stacked-bar-color-four, red);
+      }
+    </style>
+
+    <div id="wrapper">
+      <dom-repeat id="bars" items="[[data]]">
+        <template>
+          <div id="bar-[[index]]" class="bar" style$="[[_computeWidth(data, item)]]" aria-label$="Bar for score [[index]] with [[item]] ratings"></div>
+        </template>
+      </dom-repeat>
+    </div>
+    <dom-repeat items="[[data]]">
+      <template>
+        <paper-tooltip for="bar-[[index]]" animation-delay="200">[[item]] [[label]]</paper-tooltip>
+      </template>
+    </dom-repeat>
+
+  </template>
+
+  <script src="prendus-stacked-bar.ts"></script>
+
+</dom-module>
