@@ -8,7 +8,8 @@
     "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
-    "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components"
+    "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components",
+    "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   "dependencies": {},
   "devDependencies": {
     "graphcool": "^1.2.1",
-    "oss-attribution-generator": "^1.2.0"
+    "guesswork": "^0.2.4",
+    "oss-attribution-generator": "^1.2.0",
+    "scram-engine": "^0.6.14"
   }
 }
