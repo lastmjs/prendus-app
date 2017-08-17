@@ -4,6 +4,7 @@ import {createUUID} from '../../services/utilities-service';
 class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
+  scores: Object = {};
   componentId: string;
   userToken: string | null;
   user: User;
@@ -12,13 +13,9 @@ class PrendusRubricDropdowns extends Polymer.Element {
 
   static get properties() {
     return {
-      categories: {
-        type: Array,
-        observer: '_initScores'
-      },
-      scores: {
+      rubric: {
         type: Object,
-        notify: true
+        observer: '_initScores'
       }
     }
   }
@@ -38,21 +35,40 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   reset() {
-    const scores = (this.categories || []).reduce((result, category) => {
-      return Object.assign(result, { [category.name]: -1 }
+    const scores = Object.keys(this.rubric || {}).reduce((result, category) => {
+      return Object.assign(result, { [category]: -1 }
     }, {}));
     this._fireLocalAction('scores', scores);
   }
 
-  _initScores(categories: Object[]) {
+  _initScores(rubric: Object) {
     this.reset();
   }
 
+  _categories(rubric: Object): string[] {
+    return Object.keys(rubric || {});
+  }
+
+  _options(rubric: Object, category: string): string[] {
+    return Object.keys(rubric[category] || {});
+  }
+
+  _description(rubric: Object, category: string, option: string): string {
+    return rubric[category][option].description;
+  }
+
   _scoreCategory(e) {
+    console.log(e.model.category, e.model.option);
     const { name } = e.model.category;
     const { points } = e.model.option;
     const newScores = Object.assign(this.scores, { [name]: points });
     this._fireLocalAction('scores', newScores);
+    this._notfiy(newScores);
+  }
+
+  _notify(scores: Object) {
+    const evt = new CustomEvent('rubric-dropdowns', { bubbles: false, composed: true, detail: {scores} });
+    this.dispatchEvent(evt);
   }
 
   connectedCallback() {
@@ -60,8 +76,8 @@ class PrendusRubricDropdowns extends Polymer.Element {
     this._fireLocalAction('loaded', true);
   }
 
-  categoryId(category: Object, option: Object): string {
-    return category.name.replace(/\s/, '-') + option.name.replace(/\s/, '-');
+  categoryId(category: string, option: string): string {
+    return category.replace(/\s/, '-') + option.replace(/\s/, '-');
   }
 
   stateChange(e: CustomEvent) {

@@ -25,24 +25,24 @@
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <div class="flex-container">
-      <dom-repeat items="[[categories]]" as="category" hidden>
+      <dom-repeat id="categories" items="[[_categories(rubric)]]" as="category" hidden>
         <template>
-          <paper-dropdown-menu class="flex-item" label="[[category.name]]">
+          <paper-dropdown-menu class="flex-item" label="[[category]]">
             <paper-listbox slot="dropdown-content">
-              <dom-repeat items="[[category.options]]" as="option" hidden>
+              <dom-repeat items="[[_options(rubric, category)]]" as="option" hidden>
                 <template>
-                  <paper-item id="[[categoryId(category, option)]]" aria-label$="[[option.description]]" on-click="_scoreCategory">[[option.name]]</paper-item>
+                  <paper-item id="[[categoryId(category, option)]]" on-click="_scoreCategory">[[option]]</paper-item>
                 </template>
               </dom-repeat>
             </paper-listbox>
           </paper-dropdown-menu>
         </template>
       </dom-repeat>
-      <dom-repeat items="[[categories]]" as="category" hidden>
+      <dom-repeat items="[[_categories(rubric)]]" as="category" hidden>
         <template>
-          <dom-repeat items="[[category.options]]" as="option" hidden>
+          <dom-repeat items="[[_options(rubric, category)]]" as="option" hidden>
             <template>
-              <paper-tooltip for="[[categoryId(category, option)]]" animation-delay="300">[[option.description]]</paper-tooltip>
+              <paper-tooltip for="[[categoryId(category, option)]]" animation-delay="300">[[_description(rubric, category, option)]]</paper-tooltip>
             </template>
           </dom-repeat>
         </template>

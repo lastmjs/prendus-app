@@ -1,5 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
+import {rubric} from '../../typings/evaluation-rubric';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {parse} from '../../node_modules/assessml/assessml';
@@ -8,9 +9,6 @@ class PrendusEssayReview extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  progress: number = 0;
-  quota: number = 3;
-  done: boolean = false;
   userToken: string | null;
   user: User;
 
@@ -18,8 +16,8 @@ class PrendusEssayReview extends Polymer.Element {
 
   static get properties() {
     return {
-      assignment: {
-        type: Object,
+      questions: {
+        type: Array,
         observer: '_initQuestions'
       }
     }
@@ -33,6 +31,17 @@ class PrendusEssayReview extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+    this.addEventListener('rubric-dropdowns', (e) => {
+      this._fireLocalAction('ratings', e.detail.scores);
+    });
+    this.addEventListener('question-carousel', (e) => {
+      const { question } = e.detail;
+      if (this._valid(this.ratings) && this._submit(this.question, this.ratings)) {
+        this._storeQuestion(question);
+        this.$.carousel.nextQuestion();
+      } else if (question === this.questions[0])
+        this._storeQuestion(question);
+    });
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -44,49 +53,43 @@ class PrendusEssayReview extends Polymer.Element {
     };
   }
 
-  _initQuestions(assignment) {
-    const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.reviewQuota);
-    this._fireLocalAction('quota', questions.length);
+  _initQuestions(questions: Object[]) {
     this._fireLocalAction('questions', questions);
-    this._fireLocalAction('question', questions[0]);
-    this._fireLocalAction('rubricCategories', assignment.evaluationRubric.categories);
+  }
+
+  _storeQuestion(question: Object) {
+    this._fireLocalAction('question', question);
+    this._fireLocalAction('rubric', this._parseRubric(question.code, 'evaluationRubric'));
+  }
+
+  _parseRubric(code: string, variable: string): Object {
+    return rubric;
   }
 
   _questionText(text: string): string {
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
-  _plusOne(num: number): number {
-    return num + 1;
-  }
-
-  _valid() {
-    return this.ratings != undefined
-      && this.assignment.evaluationRubric.categories.reduce((bitAnd, category) => {
-        console.log(bitAnd, this.ratings[category.name]);
-        return bitAnd && this.ratings.hasOwnProperty(category.name) && this.ratings[category.name] > -1
+  _valid(ratings: Object): boolean {
+    return ratings != undefined
+      && Object.keys(this.rubric).reduce((bitAnd, category) => {
+        return bitAnd && ratings.hasOwnProperty(category) && ratings[category] > -1
       }, true);
   }
 
   _handleSubmit(data: Object) {
     if (data.errors) throw new Error("Error saving question rating");
-    const progress = this.progress + 1;
-    if (progress == this.questions.length)
-      this._fireLocalAction('done', true);
-    else {
-      this._fireLocalAction('progress', progress);
-      this._fireLocalAction('question', this.questions[progress]);
-      //hack for now to clear rubric dropdown selections
-      this._fireLocalAction('rubricCategories', null);
-      setTimeout(() => { this._fireLocalAction('rubricCategories', this.assignment.evaluationRubric.categories) });
-    }
+    //hack for now to clear rubric dropdown selections
+    this._fireLocalAction('rubric', null);
+    return true;
   }
 
-  _submit() {
-    if (!this._valid()) {
-      console.log('invalid!'); //TODO: display error
-      return;
-    }
+  _handleError(err) {
+    console.error(err);
+    return false;
+  }
+
+  _submit(question: Object, ratings: Object) {
     const query = `mutation rateQuestion($questionId: ID!, $ratingJson: Json!, $raterId: ID!) {
       createQuestionRating (
         raterId: $raterId
@@ -97,14 +100,14 @@ class PrendusEssayReview extends Polymer.Element {
       }
     }`;
     const variables = {
-      questionId: this.question.id,
-      ratingJson: JSON.stringify(this.ratings),
+      questionId: question.id,
+      ratingJson: JSON.stringify(ratings),
       raterId: this.user.id
     };
     console.log(variables);
-    GQLrequest(query, variables, this.userToken)
+    return GQLrequest(query, variables, this.userToken)
       .then(this._handleSubmit.bind(this))
-      .catch(err => { console.error(err) });
+      .catch(this._handleError);
   }
 
   stateChange(e: CustomEvent) {
@@ -112,12 +115,9 @@ class PrendusEssayReview extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('progress')) this.progress = componentState.progress;
-    if (keys.includes('quota')) this.quota = componentState.quota;
-    if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
-    if (keys.includes('done')) this.done = componentState.done;
+    if (keys.includes('questions')) this.questions = componentState.questions;
+    if (keys.includes('rubric')) this.rubric = componentState.rubric;
     this.userToken = state.userToken;
     this.user = state.user;
   }

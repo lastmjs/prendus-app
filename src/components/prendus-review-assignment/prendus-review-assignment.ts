@@ -1,8 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
-import {shuffleArray} from '../../services/utilities-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
@@ -17,7 +16,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     return {
       assignmentId: {
         type: String,
-        observer: '_assignmentIdChanged'
+        observer: 'loadAssignment'
       }
     }
   }
@@ -41,44 +40,21 @@ class PrendusReviewAssignment extends Polymer.Element {
     };
   }
 
-  _assignmentIdChanged(id: string): void {
-    this.loadAssignment(id);
-  }
-
   async loadAssignment(assignmentId: string): Assignment {
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
         questionType
-        evaluationRubric {
-          categories {
-            name
-            options {
-              name
-              description
-              points
-            }
-          }
-        }
         questions {
           id
           text
           code
-          gradingRubric {
-            categories {
-              name
-              options {
-                name
-                description
-                points
-              }
-            }
-          }
         }
       }
     }`, {assignmentId}, this.userToken);
     this._fireLocalAction('assignment', data.Assignment);
+    this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, 3));
   }
 
   stateChange(e: CustomEvent) {
@@ -87,6 +63,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
+    if (keys.includes('questions')) this.questions = componentState.questions;
     this.userToken = state.userToken;
     this.user = state.user;
   }
