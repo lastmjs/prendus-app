@@ -32,7 +32,6 @@ class PrendusEssayScaffold extends Polymer.Element {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
     this.addEventListener('question-rubric-table', (e) => {
-      console.log(e.detail);
       const { rubric } = e.detail;
       this._fireLocalAction('question', Object.assign({}, this.question, {rubric}));
     });
@@ -48,7 +47,6 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   _conceptOptions(concepts: Object[]): {[key: string]: string} {
-    return [];
     return concepts.map(concept => {
       return { id: concept.id, label: concept.title };
     }
@@ -64,7 +62,7 @@ class PrendusEssayScaffold extends Polymer.Element {
       && this._conceptOptions(this.concepts).map(concept => concept.id).includes(this.question.conceptId)
       && notEmpty(question.text)
       && categories.length > 0
-      && categories.filter(category => Object.keys(this.rubric[category]).length > 1).length === this.rubric.length
+      && categories.filter(category => Object.keys(question.rubric[category]).length > 1).length === categories.length
       && categories.filter(notEmpty).length === categories.length
       && options.filter(notEmpty).length === options.length
       && descriptions.filter(notEmpty).length === descriptions.length
@@ -126,6 +124,18 @@ class PrendusEssayScaffold extends Polymer.Element {
         }
       }
     }
+  }
+
+  setConceptId(e) {
+    this._fireLocalAction('question', Object.assign({}, this.question, {conceptId:e.detail.value.id}));
+  }
+
+  setQuestionText(e) {
+    this._fireLocalAction('question', Object.assign({}, this.question, {text:e.target.value}));
+  }
+
+  setResource(e) {
+    this._fireLocalAction('question', Object.assign({}, this.question, {resource: e.target.value}));
   }
 
   back(): void {

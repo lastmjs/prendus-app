@@ -57,7 +57,7 @@
         --iron-icon-width: 50%;
       }
     </style>
-    <redux-store id="store" action="[[action]]"></redux-store>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <div class="content">
       <div class="page">
         <iron-pages id="ironPages" selected="[[step]]">
@@ -110,8 +110,8 @@
                 </li>
               </ol>
             </div>
-            <paper-dropdown-menu label="Concept">
-              <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[question.conceptId]]" on-change="setConceptId">
+            <paper-dropdown-menu label="Concept" on-selected-item-changed="setConceptId">
+              <paper-listbox slot="dropdown-content">
                 <dom-repeat items="[[_conceptOptions(concepts)]]">
                   <template>
                     <paper-item id="[[item.id]]">[[item.label]]</paper-item>
@@ -135,7 +135,7 @@
                 </li>
               </ol>
             </div>
-            <paper-input id="resourceInput" type="text" value="[[question.resource]]"></paper-input>
+            <paper-input id="resourceInput" type="text" value="[[question.resource]]" on-change="setResource"></paper-input>
           </div>
           <div>
             <div class="prendus-card big">
@@ -150,7 +150,7 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" value="[[question.text]]" on-change="setQuestionText"></paper-textarea>
+            <paper-textarea id="questionInput" type="text" value="[[question.text]]" on-value-changed="setQuestionText"></paper-textarea>
           </div>
           <div>
             <div class="prendus-card big">
