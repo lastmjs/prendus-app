@@ -18,8 +18,7 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   static properties() {
     return {
-      question: Object,
-      concepts: Array
+      assignment: Object
     }
   }
 
@@ -31,9 +30,9 @@ class PrendusEssayScaffold extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+    this._fireLocalAction('rubric', {});
     this.addEventListener('question-rubric-table', (e) => {
-      const { rubric } = e.detail;
-      this._fireLocalAction('question', Object.assign({}, this.question, {rubric}));
+      this._fireLocalAction('rubric', e.detail.rubric);
     });
   }
 
@@ -52,24 +51,24 @@ class PrendusEssayScaffold extends Polymer.Element {
     }
   }
 
-  _valid(question: Object): boolean {
+  _valid(): boolean {
     const notEmpty = (val) => val != undefined && val.toString().trim().length > 0;
-    const categories = Object.keys(question.rubric);
-    const options = flatten(categories.map(category => Object.keys(question.rubric[category])));
-    const descriptions = flatten(categories.map(category => Object.keys(question.rubric[category]).map(option => question.rubric[category][option].description)));
-    const points = flatten(categories.map(category => Object.keys(question.rubric[category]).map(option => question.rubric[category][option].points)));
-    return notEmpty(question.resource)
-      && this._conceptOptions(this.concepts).map(concept => concept.id).includes(this.question.conceptId)
-      && notEmpty(question.text)
+    const categories = Object.keys(this.rubric);
+    const options = flatten(categories.map(category => Object.keys(this.rubric[category])));
+    const descriptions = flatten(categories.map(category => Object.keys(this.rubric[category]).map(option => this.rubric[category][option].description)));
+    const points = flatten(categories.map(category => Object.keys(this.rubric[category]).map(option => this.rubric[category][option].points)));
+    return notEmpty(this.resource)
+      && this._conceptOptions(this.assignment.concepts).map(concept => concept.id).includes(this.conceptId)
+      && notEmpty(this.questionText)
       && categories.length > 0
-      && categories.filter(category => Object.keys(question.rubric[category]).length > 1).length === categories.length
+      && categories.filter(category => Object.keys(this.rubric[category]).length > 1).length === categories.length
       && categories.filter(notEmpty).length === categories.length
       && options.filter(notEmpty).length === options.length
       && descriptions.filter(notEmpty).length === descriptions.length
       && points.filter(num => num != NaN && num > -1).length === points.length;
   }
 
-  _saveQuestion(question: Object) {
+  _saveQuestion(variables: Object) {
     const mutation = `mutation createQuestion($userId: ID!, $assignmentId: ID, $resource: String!, $conceptId: ID!, $text: String!, $code: String!) {
       createQuestion (
         authorId: $userId,
@@ -82,15 +81,6 @@ class PrendusEssayScaffold extends Polymer.Element {
         id
       }
     }`;
-    const { text, code } = generateEssay({stem: question.text}, question.rubric);
-    const variables = {
-      userId: this.user.id,
-      assignmentId: question.assignmentId,
-      resource: question.resource,
-      conceptId: question.conceptId,
-      text,
-      code
-    };
     console.log(variables);
     GQLrequest(mutation, variables, this.userToken)
       .then(this._handleSubmit.bind(this))
@@ -105,6 +95,12 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (data.errors) throw new Error(data.errors.map(err => err.message).join("\n"));
     const evt = new CustomEvent('question-created', { bubbles: false composed: true});
     this.dispatchEvent(evt);
+    this._fireLocalAction('step', 0);
+    this._fireLocalAction('resource', '');
+    this._fireLocalAction('questionText', '');
+    this._fireLocalAction('rubric', {});
+    this._fireLocalAction('conceptId', null);
+    this.$.ironPages.querySelector('#concepts').selected = null;
   }
 
   exampleRubric(): Object[] {
@@ -127,15 +123,16 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   setConceptId(e) {
-    this._fireLocalAction('question', Object.assign({}, this.question, {conceptId:e.detail.value.id}));
+    if (e.detail.value)
+      this._fireLocalAction('conceptId', e.detail.value.id);
   }
 
   setQuestionText(e) {
-    this._fireLocalAction('question', Object.assign({}, this.question, {text:e.target.value}));
+    this._fireLocalAction('questionText', e.target.value);
   }
 
   setResource(e) {
-    this._fireLocalAction('question', Object.assign({}, this.question, {resource: e.target.value}));
+    this._fireLocalAction('resource', e.target.value);
   }
 
   back(): void {
@@ -147,11 +144,20 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   submit(): void {
-    if (!this._valid(this.question)) {
+    if (!this._valid()) {
       console.log('invalid!'); //TODO: jump to step with errors?
       return;
     }
-    this._saveQuestion(this.question);
+    const { text, code } = generateEssay({stem: this.questionText}, this.rubric);
+    const variables = {
+      userId: this.user.id,
+      assignmentId: this.assignment.id,
+      resource: this.resource,
+      conceptId: this.conceptId,
+      text,
+      code
+    };
+    this._saveQuestion(variables);
   }
 
   stateChange(e: CustomEvent) {
@@ -160,7 +166,10 @@ class PrendusEssayScaffold extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('step')) this.step = componentState.step;
-    if (keys.includes('question')) this.question = componentState.question;
+    if (keys.includes('resource')) this.resource = componentState.resource;
+    if (keys.includes('questionText')) this.questionText = componentState.questionText;
+    if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
+    if (keys.includes('rubric')) this.rubric = componentState.rubric;
     this.userToken = state.userToken;
     this.user = state.user;
   }

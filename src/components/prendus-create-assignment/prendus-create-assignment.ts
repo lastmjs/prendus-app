@@ -16,7 +16,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     return {
       assignmentId: {
         type: String,
-        observer: '_assignmentIdChanged'
+        observer: 'loadAssignment'
       }
     }
   }
@@ -29,6 +29,12 @@ class PrendusCreateAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+    this.addEventListener('question-created', (e) => {
+      this.$.carousel.nextQuestion();
+    });
+    this.addEventListener('question-carousel', (e) => {
+      this._fireLocalAction('question', e.detail.question);
+    });
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -38,10 +44,6 @@ class PrendusCreateAssignment extends Polymer.Element {
       key,
       value
     };
-  }
-
-  _assignmentIdChanged(id: string): void {
-    this.loadAssignment(id);
   }
 
   async loadAssignment(assignmentId: string): Assignment {
@@ -56,15 +58,20 @@ class PrendusCreateAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId}, this.userToken);
+    const questions = [{}, {}]; //TODO: Fill array to match create quota
     this._fireLocalAction('assignment', data.Assignment);
+    this._fireLocalAction('questions', questions);
   }
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
+    const oldQuestion = this.question;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
+    if (keys.includes('questions')) this.questions = componentState.questions;
+    if (keys.includes('question')) this.question = componentState.question;
     this.userToken = state.userToken;
     this.user = state.user;
   }

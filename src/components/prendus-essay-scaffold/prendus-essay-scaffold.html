@@ -111,8 +111,8 @@
               </ol>
             </div>
             <paper-dropdown-menu label="Concept" on-selected-item-changed="setConceptId">
-              <paper-listbox slot="dropdown-content">
-                <dom-repeat items="[[_conceptOptions(concepts)]]">
+              <paper-listbox id="concepts" slot="dropdown-content">
+                <dom-repeat items="[[_conceptOptions(assignment.concepts)]]">
                   <template>
                     <paper-item id="[[item.id]]">[[item.label]]</paper-item>
                   </template>
@@ -135,7 +135,7 @@
                 </li>
               </ol>
             </div>
-            <paper-input id="resourceInput" type="text" value="[[question.resource]]" on-change="setResource"></paper-input>
+            <paper-input id="resourceInput" type="text" value="[[resource]]" on-change="setResource"></paper-input>
           </div>
           <div>
             <div class="prendus-card big">
@@ -150,7 +150,7 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" value="[[question.text]]" on-value-changed="setQuestionText"></paper-textarea>
+            <paper-textarea id="questionInput" type="text" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
           </div>
           <div>
             <div class="prendus-card big">
@@ -160,14 +160,14 @@
                   Create a rubric that will guide students in grading responses to your essay question. An example is shown
                 </li>
                 <li>
-                  Remember your question: <strong>[[question.text]]</strong>
+                  Remember your question: <strong>[[questionText]]</strong>
                 </li>
               </ol>
             </div>
             <br>
             <h3>Example rubric</h3>
             <prendus-rubric-table rubric="[[exampleRubric()]]"></prendus-rubric-table>
-            <prendus-rubric-table rubric="[[question.rubric]]" editable></prendus-rubric-table>
+            <prendus-rubric-table rubric="[[rubric]]" editable></prendus-rubric-table>
           </div>
         </iron-pages>
       </div>
