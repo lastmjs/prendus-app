@@ -7,6 +7,7 @@ import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
 import {AssignmentType} from '../../typings/assignment-type';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
@@ -59,6 +60,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         super.connectedCallback();
         this._fireLocalAction('connected', true)
         this._fireLocalAction('loaded', true)
+        console.log(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)
+        sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)
     }
 
     isViewMode(mode: string) {
