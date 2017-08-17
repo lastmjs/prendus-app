@@ -31,6 +31,9 @@
           max-width: 80%;
   				width: 100%;
   			}
+        .app-window-wide {
+          max-width: 1200px;
+        }
 
         .landing{
           max-width: 100%;
@@ -82,6 +85,7 @@
         <app-route route="[[route]]" pattern="/course/create" data="{{createCourseRouteData}}" active="{{createCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/view" data="{{viewCourseRouteData}}" active="{{viewCourseRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course/:courseId/edit" data="{{editCourseRouteData}}" active="{{editCourseRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/course/:courseId/question-ratings" data="{{courseQuestionRatingsRouteData}}" active="{{courseQuestionRatingsRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/assignment/create" data="{{createAssignmentRouteData}}" active="{{createAssignmentRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/view" data="{{viewAssignmentRouteData}}" active="{{viewAssignmentRouteActive}}"></app-route>
@@ -129,7 +133,7 @@
           <app-toolbar>
         </app-header>
 
-        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
+        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, viewAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
 
             <prendus-landing-page class="app-window landing" show="rootView" data-path="../prendus-landing-page/prendus-landing-page.html"></prendus-landing-page>
 
@@ -154,6 +158,7 @@
             <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create" data-path="../prendus-course/prendus-course.html"></prendus-course>
             <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view" data-path="../prendus-course/prendus-course.html"></prendus-course>
             <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit" data-path="../prendus-course/prendus-course.html"></prendus-course>
+            <prendus-course-question-ratings class="app-window app-window-wide" show="courseQuestionRatingsView" course-id="[[courseQuestionRatingsRouteData.courseId]]" data-path="../prendus-course-question-ratings/prendus-course-question-ratings.html"></prendus-course-question-ratings>
 
             <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
             <prendus-assignment class="app-window" show="viewAssignmentView" assignment-id="[[viewAssignmentRouteData.assignmentId]]" assignment-type="[[queryParams.assignmentType]]" mode="view" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
