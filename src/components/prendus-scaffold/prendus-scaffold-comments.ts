@@ -15,7 +15,6 @@ class PrendusScaffoldComments extends Polymer.Element {
     user: User | null;
     selectedIndex: number;
     numberOfAnswers: number;
-    assignmentId: string;
     answers: QuestionScaffoldAnswer[];
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
@@ -45,6 +44,9 @@ class PrendusScaffoldComments extends Polymer.Element {
             value: true
         };
     }
+    createComment(index: number){
+      return index !== 0 ? 'Incorrect' : 'Correct'
+    }
     enableNext(){
       const comments: string[] = this.getComments(this);
       if(isDefinedAndNotEmpty(comments)){
@@ -64,20 +66,18 @@ class PrendusScaffoldComments extends Polymer.Element {
     disableNext(): void {
       if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
         const comments: string[] = this.getComments(this);
-        this.action = setDisabledNext(!isDefinedAndNotEmpty(comments));
+        this.action = setDisabledNext(!isDefinedAndNotEmpty(comments)); //
         this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, comments, null, null);
       }
     }
     getComments(context: PrendusScaffoldComments): string[] {
       return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-        return context.shadowRoot.querySelector(`#comment${index}`) ? context.shadowRoot.querySelector(`#comment${index}`).value : null;
+        return context.shadowRoot.querySelector(`#comments${index}`) ? context.shadowRoot.querySelector(`#comments${index}`).value : null;
       });
     }
     plusOne(index: number): number {
       return index + 1;
     }
-
-
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;

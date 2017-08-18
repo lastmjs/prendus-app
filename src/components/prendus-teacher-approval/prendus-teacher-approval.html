@@ -34,7 +34,7 @@
 					<template>
 						<div class="teacher prendus-horizontal-container">
 							<span>[[item.email]]</span>
-							<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-tap="approveTeacher">Approve</button>
+							<button id="[[unverifiedTeacher.id]]" class="prendus-button prendus-button--recommended" on-click="approveTeacher">Approve</button>
 						</div>
 					</template>
 				</dom-repeat>
@@ -47,7 +47,7 @@
 					<template>
 						<div class="teacher prendus-horizontal-container">
 							<span>[[item.email]]</span>
-							<button class="prendus-button prendus-button--destructive" on-tap="revokeTeacher">Revoke</button>
+							<button class="prendus-button prendus-button--destructive" on-click="revokeTeacher">Revoke</button>
 						</div>
 					</template>
 				</dom-repeat>

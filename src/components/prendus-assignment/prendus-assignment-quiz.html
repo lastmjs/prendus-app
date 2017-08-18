@@ -1,0 +1,23 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-quiz/prendus-quiz.html">
+
+<dom-module id="prendus-assignment-quiz">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style>
+        </style>
+        <dom-if if="[[loaded]]">
+            <template>
+              <prendus-quiz quiz-id="[[quizId]]" on-submit="submitQuiz"></prendus-quiz>
+            </template>
+        </dom-if>
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+    </template>
+
+    <script type="module" src="prendus-assignment-quiz.ts"></script>
+</dom-module>

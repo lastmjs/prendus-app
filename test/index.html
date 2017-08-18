@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="import" href="../node_modules/guesswork/test-runner.html">
+  <link rel="import" href="src/components/prendus-course-question-ratings-test/prendus-course-question-ratings-test.html">
+</head>
+<body>
+  <test-runner id="testRunner">
+    <prendus-course-question-ratings-test></prendus-course-question-ratings-test>
+
+  </test-runner>
+
+  <script>
+    if (window.ELECTRON_CONSOLE_ARGUMENTS.autoRun) {
+      setTimeout(() => {
+        document.getElementById('testRunner').autoRun = true;
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
