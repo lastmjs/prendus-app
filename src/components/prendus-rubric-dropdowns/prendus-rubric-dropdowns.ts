@@ -50,20 +50,21 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   _options(rubric: Object, category: string): string[] {
+    if (!rubric) return [];
     return Object.keys(rubric[category] || {});
   }
 
   _description(rubric: Object, category: string, option: string): string {
+    if (!rubric) return [];
     return rubric[category][option].description;
   }
 
   _scoreCategory(e) {
-    console.log(e.model.category, e.model.option);
-    const { name } = e.model.category;
-    const { points } = e.model.option;
-    const newScores = Object.assign(this.scores, { [name]: points });
+    const { category, option } = e.model;
+    const { points } = this.rubric[category][option];
+    const newScores = Object.assign(this.scores, { [category]: points });
     this._fireLocalAction('scores', newScores);
-    this._notfiy(newScores);
+    this._notify(newScores);
   }
 
   _notify(scores: Object) {

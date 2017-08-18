@@ -2,6 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
+import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
@@ -29,6 +30,71 @@ class PrendusReviewAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+    this.addEventListener('rubric-dropdowns', this._handleRatings.bind(this));
+    this.addEventListener('question-carousel-next', this._handleNextRequest.bind(this));
+    this.addEventListener('question-carousel-question', this._handleNextQuestion.bind(this));
+  }
+
+  _handleNextRequest(e) {
+    if (this._valid(this.ratings) && this._submit(this.question, this.ratings))
+      this.$.carousel.nextQuestion();
+    else
+      console.log('Error!');
+  }
+
+  _handleNextQuestion(e) {
+    const { question } = e.detail;
+    this._fireLocalAction('question', question);
+    this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
+    setTimeout(() => {
+      this._fireLocalAction('rubric', this._parseRubric(question.code, 'evaluationRubric'));
+    });
+  }
+
+  _handleRatings(e) {
+    this._fireLocalAction('ratings', e.detail.scores);
+  }
+
+  _parseRubric(code: string, variable: string): Object {
+    return DEFAULT_EVALUATION_RUBRIC;
+  }
+
+  _valid(ratings: Object): boolean {
+    console.log(ratings);
+    return ratings != undefined
+      && Object.keys(this.rubric).reduce((bitAnd, category) => {
+        return bitAnd && ratings.hasOwnProperty(category) && ratings[category] > -1
+      }, true);
+  }
+
+  _handleSubmit(data: Object) {
+    if (data.errors) throw new Error("Error saving question rating");
+    return true;
+  }
+
+  _handleError(err) {
+    console.error(err);
+    return false;
+  }
+
+  _submit(question: Object, ratings: Object) {
+    const query = `mutation rateQuestion($questionId: ID!, $ratingJson: Json!, $raterId: ID!) {
+      createQuestionRating (
+        raterId: $raterId
+        questionId: $questionId
+        ratingJson: $ratingJson
+      ) {
+        id
+      }
+    }`;
+    const variables = {
+      questionId: question.id,
+      ratingJson: JSON.stringify(ratings),
+      raterId: this.user.id
+    };
+    return GQLrequest(query, variables, this.userToken)
+      .then(this._handleSubmit.bind(this))
+      .catch(this._handleError);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -64,6 +130,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
+    if (keys.includes('question')) this.question = componentState.question;
+    if (keys.includes('rubric')) this.rubric = componentState.rubric;
+    if (keys.includes('ratings')) this.ratings = componentState.ratings;
     this.userToken = state.userToken;
     this.user = state.user;
   }

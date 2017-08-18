@@ -5,6 +5,7 @@ import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {generateEssay} from '../../services/question-to-code-service';
+import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
@@ -104,22 +105,7 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   exampleRubric(): Object[] {
-    return {
-      Language: {
-        Professional: {
-          description: 'The language is of good academic quality in vocabulary and grammar',
-          points: 2
-        },
-        Casual: {
-          description: 'The answer has a more conversational tone',
-          points: 1
-        },
-        Poor: {
-          description: 'The answer contains grammar and spelling errors',
-          points: 0
-        }
-      }
-    }
+    return EXAMPLE_GRADING_RUBRIC;
   }
 
   setConceptId(e) {
@@ -145,7 +131,7 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   submit(): void {
     if (!this._valid()) {
-      console.log('invalid!'); //TODO: jump to step with errors?
+      console.log('invalid!'); //TODO: jump to step with errors or display error
       return;
     }
     const { text, code } = generateEssay({stem: this.questionText}, this.rubric);

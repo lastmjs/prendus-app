@@ -32,7 +32,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     this.addEventListener('question-created', (e) => {
       this.$.carousel.nextQuestion();
     });
-    this.addEventListener('question-carousel', (e) => {
+    this.addEventListener('question-carousel-question', (e) => {
       this._fireLocalAction('question', e.detail.question);
     });
   }

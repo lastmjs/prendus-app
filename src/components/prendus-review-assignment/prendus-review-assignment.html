@@ -13,7 +13,17 @@
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <h2>[[assignment.title]] Review Assignment</h2>
 
-    <prendus-essay-review questions="[[questions]]"></prendus-essay-review>
+    <prendus-question-carousel id="carousel" questions="[[questions]]">
+      <div hidden$="[[!question]]">
+        <prendus-essay-review question="[[question]]"></prendus-essay-review>
+        <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]"></prendus-rubric-dropdowns>
+      </div>
+      <div hidden$="[[question]]">
+        <h3>Done</h3>
+        <p>You have completed this assignment</p>
+      </div>
+    </prendus-question-carousel>
+
 
   </template>
 
