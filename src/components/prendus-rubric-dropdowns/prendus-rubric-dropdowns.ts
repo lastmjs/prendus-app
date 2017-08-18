@@ -68,7 +68,8 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   _notify(scores: Object) {
-    const evt = new CustomEvent('rubric-dropdowns', { bubbles: false, composed: true, detail: {scores} });
+    const formatted = Object.keys(scores).map(category => Object.assign({}, {category, score: Number(scores[category]})));
+    const evt = new CustomEvent('rubric-dropdowns', { bubbles: false, composed: true, detail: {scores: formatted} });
     this.dispatchEvent(evt);
   }
 

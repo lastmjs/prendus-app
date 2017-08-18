@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-question-carousel/prendus-question-carousel.html">
 
@@ -18,7 +18,8 @@
 
     <prendus-question-carousel id="carousel" next-text="Submit" hide-back questions="[[questions]]">
       <div hidden$="[[!question]]">
-        <prendus-view-question question="[[_guiQuestion(question)]]"></prendus-view-question>
+        <p>[[_questionText(question.text)]]</p>
+        <paper-textarea label="Response" on-value-changed="_storeResponse"></paper-textarea>
       </div>
       <div hidden$="[[question]]">
         <h3>Done</h3>

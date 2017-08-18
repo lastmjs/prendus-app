@@ -44,7 +44,8 @@ class PrendusEssayReview extends Polymer.Element {
 
   _initQuestion(question: Object) {
     this._fireLocalAction('question', question);
-    this._fireLocalAction('rubric', this._parseRubric(question.code));
+    if (question)
+      this._fireLocalAction('rubric', this._parseRubric(question.code));
   }
 
   _questionText(text: string): string {

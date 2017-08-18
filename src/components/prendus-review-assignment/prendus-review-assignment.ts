@@ -37,7 +37,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _handleNextRequest(e) {
-    if (this._valid(this.ratings) && this._submit(this.question, this.ratings))
+    if (this._valid(this.ratings, this.rubric) && this._submit(this.question, this.ratings))
       this.$.carousel.nextQuestion();
     else
       console.log('Error!');
@@ -61,11 +61,12 @@ class PrendusReviewAssignment extends Polymer.Element {
     return JSON.parse(evaluationRubric);
   }
 
-  _valid(ratings: Object): boolean {
+  _valid(ratings: Object[], rubric: Object): boolean {
     console.log(ratings);
-    return ratings != undefined
-      && Object.keys(this.rubric).reduce((bitAnd, category) => {
-        return bitAnd && ratings.hasOwnProperty(category) && ratings[category] > -1
+    return ratings
+      && ratings.length === Object.keys(rubric).length
+      && ratings.reduce((bitAnd, score) => {
+        return bitAnd && rubric.hasOwnProperty(score.category) && score.score > -1
       }, true);
   }
 
@@ -79,19 +80,19 @@ class PrendusReviewAssignment extends Polymer.Element {
     return false;
   }
 
-  _submit(question: Object, ratings: Object) {
-    const query = `mutation rateQuestion($questionId: ID!, $ratingJson: Json!, $raterId: ID!) {
+  _submit(question: Object, ratings: Object[]) {
+    const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
       createQuestionRating (
         raterId: $raterId
         questionId: $questionId
-        ratingJson: $ratingJson
+        scores: $ratings
       ) {
         id
       }
     }`;
     const variables = {
       questionId: question.id,
-      ratingJson: JSON.stringify(ratings),
+      ratings,
       raterId: this.user.id
     };
     return GQLrequest(query, variables, this.userToken)

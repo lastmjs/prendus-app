@@ -73,10 +73,20 @@ class PrendusGradeAssignment extends Polymer.Element {
         id
         title
         questionType
-        questions {
+        questions(filter: {
+          responses_some: {}
+        }) {
           id
           text
           code
+          responses {
+            id
+            responses {
+              type
+              name
+              value
+            }
+          }
         }
       }
     }`, {assignmentId}, this.userToken);
@@ -92,14 +102,15 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _valid(grades: Object, rubric: Object) {
-    return grades != undefined
-      && Object.keys(rubric).reduce((bitAnd, category) => {
-        return bitAnd && grades.hasOwnProperty(category) && grades[category] > -1
+    console.log(grades, rubric);
+    return grades
+      && grades.length === Object.keys(rubric).length
+      && grades.reduce((bitAnd, score) => {
+        return bitAnd && rubric.hasOwnProperty(score.category) && score.score > -1
       }, true);
   }
 
   _handleSubmit(data: Object) {
-    if (data.errors) throw new Error("Error saving question grade");
     return true;
   }
 
@@ -109,28 +120,29 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _submit(question: Object, grades: Object) {
-    //    if (!this._valid()) {
-    //      console.log('invalid!'); //TODO: display error
-    //      return;
-    //    }
-    //    const query = `mutation gradeQuestion($questionId: ID!, $gradeJson: Json!, $graderId: ID!) {
-    //      createQuestionGrade (
-    //        graderId: $raterId
-    //        questionId: $questionId
-    //        gradeJson: $gradeJson
-    //      ) {
-    //        id
-    //      }
-    //    }`;
-    //    const variables = {
-    //      questionId: question.id,
-    //      gradeJson: JSON.stringify(grades),
-    //      graderId: this.user.id
-    //    };
-    //    return GQLrequest(query, variables, this.userToken)
-    //      .then(this._handleSubmit.bind(this))
-    //      .catch(this._handleError);
-    return true;
+    return Promise.all(grades.map(this._createCategoryScore.bind({question, userToken: this.userToken})))
+      .then(this._handleSubmit.bind(this))
+      .catch(this._handleError);
+  }
+
+  _createCategoryScore(score: Object) {
+    const query = `mutation gradeResponse($responseId: ID!, $category: String!, $score: Int!) {
+      createCategoryScore (
+        questionResponseId: $responseId
+        category: $category
+        score: $score
+      ) {
+        id
+      }
+    }`;
+    const variables = {
+      responseId: this.question.responses[0].id,
+      category: score.category,
+      score: score.score
+    };
+    return GQLrequest(query, variables, this.userToken)
+      .then(this._handleSubmit)
+      .catch(this._handleError);
   }
 
   stateChange(e: CustomEvent) {

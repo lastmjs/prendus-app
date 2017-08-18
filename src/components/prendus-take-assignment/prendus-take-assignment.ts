@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {parse} from '../../node_modules/assessml/assessml';
 import {GQLrequest} from '../../services/graphql-service';
 
 class PrendusTakeAssignment extends Polymer.Element {
@@ -53,11 +54,9 @@ class PrendusTakeAssignment extends Polymer.Element {
     };
   }
 
-  _guiQuestion(question: Object): Object {
-    return {
-      text: question.text,
-      code: question.code
-    }
+  _questionText(text: string): string {
+    if (!text) return '';
+    return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
   async loadAssignment(assignmentId: string): Assignment {
@@ -74,13 +73,17 @@ class PrendusTakeAssignment extends Polymer.Element {
       }
     }`, {assignmentId}, this.userToken);
     const { assignment } = data;
-    const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.takeQuota);
+    const questions = shuffleArray(assignment.questions).slice(0, 1);//assignment.takeQuota);
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('questions', questions);
   }
 
   _valid(response: string): boolean {
     return response && response.length;
+  }
+
+  _storeResponse(e) {
+    this._fireLocalAction('response', e.target.value);
   }
 
   _handleSubmit(data: Object) {
@@ -94,28 +97,29 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   _submit(question: Object, response: string) {
-    //    if (!this._valid()) {
-    //      console.log('invalid!'); //TODO: display error
-    //      return;
-    //    }
-    //    const query = `mutation answerQuestion($questionId: ID!, $response: String!, $user: ID!) {
-    //      createQuestionRating (
-    //        author: $user
-    //        questionId: $questionId
-    //        response: $response
-    //      ) {
-    //        id
-    //      }
-    //    }`;
-    //    const variables = {
-    //      questionId: question.id,
-    //      response,
-    //      user: this.user.id
-    //    };
-    //    return GQLrequest(query, variables, this.userToken)
-    //      .then(this._handleSubmit.bind(this))
-    //      .catch(this._handleError);
-    return true;
+    const query = `mutation answerQuestion($questionId: ID!, $response: String!, $user: ID!) {
+      createQuestionResponse (
+        authorId: $user
+        questionId: $questionId
+        responses: [
+          {
+            type: INPUT
+            name: "essay1"
+            value: $response
+          }
+        ]
+      ) {
+        id
+      }
+    }`;
+    const variables = {
+      questionId: question.id,
+      response,
+      user: this.user.id
+    };
+    return GQLrequest(query, variables, this.userToken)
+      .then(this._handleSubmit.bind(this))
+      .catch(this._handleError);
   }
 
   stateChange(e: CustomEvent) {
