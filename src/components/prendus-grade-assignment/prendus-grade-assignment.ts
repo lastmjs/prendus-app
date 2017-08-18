@@ -7,7 +7,6 @@ import {parse} from '../../node_modules/assessml/assessml';
 class PrendusGradeAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
-  progress: number = 0;
   componentId: string;
   userToken: string | null;
   user: User;
@@ -18,7 +17,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     return {
       assignmentId: {
         type: String,
-        observer: '_assignmentIdChanged'
+        observer: 'loadAssignment'
       }
     }
   }
@@ -26,6 +25,14 @@ class PrendusGradeAssignment extends Polymer.Element {
   constructor() {
     super();
     this.componentId = createUUID();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._fireLocalAction('loaded', true);
+    this.addEventListener('rubric-dropdowns', this._handleGrades.bind(this));
+    this.addEventListener('question-carousel-next', this._handleNextRequest.bind(this));
+    this.addEventListener('question-carousel-question', this._handleNextQuestion.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -37,13 +44,25 @@ class PrendusGradeAssignment extends Polymer.Element {
     };
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._fireLocalAction('loaded', true);
+  _handleGrades(e) {
+    this._fireLocalAction('grades', e.detail.scores);
   }
 
-  _assignmentIdChanged(id: string): void {
-    this.loadAssignment(id);
+  _handleNextRequest(e) {
+    if (this._valid(this.grades, this.rubric) && this._submit(this.question, this.grades))
+      this.$.carousel.nextQuestion();
+    else
+      console.log('Error!');
+  }
+
+  _handleNextQuestion(e) {
+    const { question } = e.detail;
+    this._fireLocalAction('question', question);
+    this._fireLocalAction('rubric', this._parseRubric(question.code, 'gradingRubric'));
+  }
+
+  _parseRubric(code: string, variable: string) {
+    return {};
   }
 
   async loadAssignment(assignmentId: string): Assignment {
@@ -56,76 +75,60 @@ class PrendusGradeAssignment extends Polymer.Element {
           id
           text
           code
-          gradingRubric {
-            categories {
-              name
-              options {
-                name
-                description
-                points
-              }
-            }
-          }
         }
       }
     }`, {assignmentId}, this.userToken);
     const { assignment } = data;
     const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.gradeQuota);
     this._fireLocalAction('assignment', assignment);
-    this._fireLocalAction('quota', questions.length);
-    this._fireLocalAction('progress', 0);
     this._fireLocalAction('questions', questions);
-    this._fireLocalAction('question', questions[0]);
   }
+
   _questionText(text: string): string {
+    if (!text) return '';
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
-  _plusOne(num: number): number {
-    return num + 1;
-  }
-
-  _valid() {
-    return this.grades != undefined
-      && this.question.gradingRubric.categories.reduce((bitAnd, category) => {
-        return bitAnd && this.grades.hasOwnProperty(category.name) && this.grades[category.name] > -1
+  _valid(grades: Object, rubric: Object) {
+    return grades != undefined
+      && Object.keys(rubric).reduce((bitAnd, category) => {
+        return bitAnd && grades.hasOwnProperty(category) && grades[category] > -1
       }, true);
   }
 
   _handleSubmit(data: Object) {
-    if (data.errors) throw new Error("Error saving question rating");
-    const progress = this.progress + 1;
-    if (progress == this.questions.length)
-      this._fireLocalAction('done', true);
-    else {
-      this._fireLocalAction('progress', progress);
-      this._fireLocalAction('question', this.questions[progress]);
-    }
+    if (data.errors) throw new Error("Error saving question grade");
+    return true;
   }
 
-  _submit() {
-    if (!this._valid()) {
-      console.log('invalid!'); //TODO: display error
-      return;
-    }
-    const query = `mutation rateQuestion($questionId: ID!, $gradeJson: Json!, $graderId: ID!) {
-      createQuestionGrade (
-        graderId: $raterId
-        questionId: $questionId
-        gradeJson: $gradeJson
-      ) {
-        id
-      }
-    }`;
-    const variables = {
-      questionId: this.question.id,
-      gradeJson: JSON.stringify(this.grades),
-      graderId: this.user.id
-    };
-    console.log(variables);
-    /*GQLrequest(query, variables, this.userToken)
-      .then(this._handleSubmit.bind(this))
-      .catch(err => { console.error(err) });*/
+  _handleError(err) {
+    console.error(err);
+    return false;
+  }
+
+  _submit(question: Object, grades: Object) {
+    //    if (!this._valid()) {
+    //      console.log('invalid!'); //TODO: display error
+    //      return;
+    //    }
+    //    const query = `mutation gradeQuestion($questionId: ID!, $gradeJson: Json!, $graderId: ID!) {
+    //      createQuestionGrade (
+    //        graderId: $raterId
+    //        questionId: $questionId
+    //        gradeJson: $gradeJson
+    //      ) {
+    //        id
+    //      }
+    //    }`;
+    //    const variables = {
+    //      questionId: question.id,
+    //      gradeJson: JSON.stringify(grades),
+    //      graderId: this.user.id
+    //    };
+    //    return GQLrequest(query, variables, this.userToken)
+    //      .then(this._handleSubmit.bind(this))
+    //      .catch(this._handleError);
+    return true;
   }
 
   stateChange(e: CustomEvent) {
@@ -133,12 +136,11 @@ class PrendusGradeAssignment extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('progress')) this.progress = componentState.progress;
-    if (keys.includes('quota')) this.quota = componentState.quota;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('done')) this.done = componentState.done;
+    if (keys.includes('rubric')) this.rubric = componentState.rubric;
+    if (keys.includes('grades')) this.grades = componentState.grades;
     this.userToken = state.userToken;
     this.user = state.user;
   }
