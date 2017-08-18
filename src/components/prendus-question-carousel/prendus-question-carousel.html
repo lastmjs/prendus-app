@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+
+<dom-module id="prendus-question-carousel">
+
+  <template>
+
+    <style include="prendus-styles">
+      #back-button, #next-button {
+        margin-top: 20px;
+      }
+      #back-button {
+        float: left;
+      }
+      #next-button {
+        float: right;
+      }
+      [hidden] {
+        display: none;
+      }
+    </style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <dom-if if="[[!finished]]">
+      <template>
+        <h3>Question [[_plusOne(currentIndex)]]/[[questions.length]]</h3>
+      </template>
+    </dom-if>
+    <br>
+
+    <slot></slot>
+
+    <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]">[[backText]]</button>
+    <button id="next-button" class="prendus-button prendus-button--recommended" hidden$="[[hideNext]]" on-click="_notifyNext">[[nextText]]</button>
+  </template>
+
+  <script type="module" src="prendus-question-carousel.ts"></script>
+
+</dom-module>
