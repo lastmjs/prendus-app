@@ -2,6 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
+import {extractLiteralVariables} from '../../services/code-to-question-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
 class PrendusGradeAssignment extends Polymer.Element {
@@ -58,11 +59,12 @@ class PrendusGradeAssignment extends Polymer.Element {
   _handleNextQuestion(e) {
     const { question } = e.detail;
     this._fireLocalAction('question', question);
-    this._fireLocalAction('rubric', this._parseRubric(question.code, 'gradingRubric'));
+    this._fireLocalAction('rubric', this._parseRubric(question.code));
   }
 
-  _parseRubric(code: string, variable: string) {
-    return {};
+  _parseRubric(code: string): Object {
+    const { gradingRubric } = extractLiteralVariables(code);
+    return JSON.parse(gradingRubric);
   }
 
   async loadAssignment(assignmentId: string): Assignment {

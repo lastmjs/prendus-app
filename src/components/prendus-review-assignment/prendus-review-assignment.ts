@@ -2,6 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
+import {extractLiteralVariables} from '../../services/code-to-question-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
@@ -47,7 +48,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     this._fireLocalAction('question', question);
     this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
     setTimeout(() => {
-      this._fireLocalAction('rubric', this._parseRubric(question.code, 'evaluationRubric'));
+      this._fireLocalAction('rubric', this._parseRubric(question.code));
     });
   }
 
@@ -55,8 +56,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     this._fireLocalAction('ratings', e.detail.scores);
   }
 
-  _parseRubric(code: string, variable: string): Object {
-    return DEFAULT_EVALUATION_RUBRIC;
+  _parseRubric(code: string): Object {
+    const { evaluationRubric } = extractLiteralVariables(code);
+    return JSON.parse(evaluationRubric);
   }
 
   _valid(ratings: Object): boolean {

@@ -2,6 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
+import {extractLiteralVariables} from '../../services/code-to-question-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
 class PrendusEssayReview extends Polymer.Element {
@@ -43,7 +44,7 @@ class PrendusEssayReview extends Polymer.Element {
 
   _initQuestion(question: Object) {
     this._fireLocalAction('question', question);
-    this._fireLocalAction('rubric', this._parseRubric(question.code, 'gradingRubric'));
+    this._fireLocalAction('rubric', this._parseRubric(question.code));
   }
 
   _questionText(text: string): string {
@@ -51,8 +52,9 @@ class PrendusEssayReview extends Polymer.Element {
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
-  _parseRubric(code: string, variable: string): Object {
-    return {};
+  _parseRubric(code: string): Object {
+    const { gradingRubric } = extractLiteralVariables(code);
+    return JSON.parse(gradingRubric);
   }
 
   stateChange(e: CustomEvent) {

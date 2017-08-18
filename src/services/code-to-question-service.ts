@@ -45,3 +45,21 @@ export function compileToGuiQuestion(text: string, code: string): GuiQuestion {
         answers: [answer1, answer2, answer3, answer4]
     };
 }
+
+export function extractLiteralVariables(code: string): Object {
+  const ast = esprima.parse(code);
+  return ast.body.filter(isLiteralVariable).reduce((vars, node) => {
+    return Object.assign(vars, {[node.expression.left.name]: node.expression.right.value});
+  }, {});
+}
+
+function isLiteralVariable(node: Object): boolean {
+  return node.type === 'ExpressionStatement'
+    && node.expression
+    && node.expression.type === 'AssignmentExpression'
+    && node.expression.left
+    && node.expression.left.type === 'Identifier'
+    && node.expression.right
+    && node.expression.right.type === 'Literal'
+}
+

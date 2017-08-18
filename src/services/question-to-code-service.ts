@@ -28,9 +28,12 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   };
 };
 
-export const generateEssay = (guiQuestion: GuiQuestion, rubric: Object): { text: string, code: string } => {
+export const generateEssay = (guiQuestion: GuiQuestion, gradingRubric: Object, evaluationRubric): { text: string, code: string } => {
   const text: string = `<p>${guiQuestion.stem}</p><p>[essay]</p>`;
-  const code: string = `const gradingRubric = '${JSON.stringify(rubric)}'`;
+  const code: string = `
+    gradingRubric = '${JSON.stringify(gradingRubric)}'
+    evaluationRubric = '${JSON.stringify(evaluationRubric)}'
+  `;
   return {
     text,
     code

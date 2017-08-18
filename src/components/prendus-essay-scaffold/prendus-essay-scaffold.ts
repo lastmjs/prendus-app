@@ -134,7 +134,7 @@ class PrendusEssayScaffold extends Polymer.Element {
       console.log('invalid!'); //TODO: jump to step with errors or display error
       return;
     }
-    const { text, code } = generateEssay({stem: this.questionText}, this.rubric);
+    const { text, code } = generateEssay({stem: this.questionText}, this.rubric, DEFAULT_EVALUATION_RUBRIC);
     const variables = {
       userId: this.user.id,
       assignmentId: this.assignment.id,
