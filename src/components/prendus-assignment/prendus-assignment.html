@@ -107,11 +107,11 @@
                     </dom-repeat>
                     <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add or Remove Concepts</button>
                     <div id="assignment-options">
-                      <paper-dropdown-menu label="Question Type">
-                        <paper-listbox slot="dropdown-content" selected="{{assignment.questionType}}" attr-for-selected="val">
+                      <paper-dropdown-menu label="Question Type" on-selected-item-changed="setQuestionType">
+                        <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[questionType]]">
                           <dom-repeat items="[[questionTypes]]">
                             <template>
-                              <paper-item val="[[item.value]]">[[item.label]]</paper-item>
+                              <paper-item id="[[item.value]]">[[item.label]]</paper-item>
                             </template>
                           </dom-repeat>
                         </paper-listbox>

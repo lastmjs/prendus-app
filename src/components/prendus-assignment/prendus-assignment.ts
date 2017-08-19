@@ -94,6 +94,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isQuizType(assignmentType: String) {
         return assignmentType === 'QUIZ';
     }
+
+    setQuestionType(e) {
+      if (e.detail.value)
+        this._fireLocalAction('questionType', e.detail.value.id);
+    }
+
     openAssignmentConceptDialog(e: any){
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
@@ -211,6 +217,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         this._fireLocalAction('assignment', data.Assignment)
         this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
         this._fireLocalAction('courseId', data.Assignment.course.id)
+        this._fireLocalAction('questionType', data.Assignment.questionType);
     }
     async loadConcepts(subjectId: string){
         const conceptData = await GQLQuery(`
@@ -261,6 +268,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedConcepts')) this.selectedConcepts = state.components[this.componentId].selectedConcepts;
         if (Object.keys(state.components[this.componentId] || {}).includes('learningStructure')) this.learningStructure = state.components[this.componentId].learningStructure;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignmentType')) this.assignmentType = state.components[this.componentId].assignmentType;
+        if (Object.keys(state.components[this.componentId] || {}).includes('questionType')) this.questionType = state.components[this.componentId].questionType;
         if (Object.keys(state.components[this.componentId] || {}).includes('assignment')) this.assignment = state.components[this.componentId].assignment;
         if (Object.keys(state.components[this.componentId] || {}).includes('courseId')) this.courseId = state.components[this.componentId].courseId;
         this.userToken = state.userToken;

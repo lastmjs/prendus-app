@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="prendus-question-review-quiz.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
 
 <dom-module id="prendus-question-review">
     <template>
@@ -40,22 +41,7 @@
                   <!--TODO fix this description -->
                 </div>
                 <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
-                <div class="wrapper">
-                  <template is="dom-repeat" items="[[rubricCategories]]" as="category" hidden>
-                    <paper-dropdown-menu class="rubric-category" label="[[category.label]]" on-iron-select="_rubricScoreChanged">
-                      <paper-listbox slot="dropdown-content">
-                        <template is="dom-repeat" items="[[category.options]]" as="option" hidden>
-                          <paper-item id="[[_paperItemId(category, option)]]" value="[[option.points]]" aria-describedby$="label-[[_paperItemId(category, option)]]">[[option.label]]</paper-item>
-                        </template>
-                      </paper-listbox>
-                    </paper-dropdown-menu>
-                  </template>
-                </div>
-                <template is="dom-repeat" items="[[rubricCategories]]" as="category">
-                  <template is="dom-repeat" items="[[category.options]]" as="option">
-                    <paper-tooltip id="label-[[_paperItemId(category, option)]]" position="top" for="[[_paperItemId(category, option)]]">[[option.description]]</paper-tooltip>
-                  </template>
-                </template>
+                <prendus-rubric-dropdowns rubric="[[rubric]]"></prendus-rubric-dropdowns>
                 <div class="submit-button">
                     <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
                 </div>

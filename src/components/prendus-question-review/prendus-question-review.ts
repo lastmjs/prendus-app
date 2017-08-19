@@ -10,7 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {compileToGuiQuestion} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
-import {rubric} from '../../typings/evaluation-rubric';
+import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 
 class PrendusQuestionReview extends Polymer.Element {
@@ -39,8 +39,6 @@ class PrendusQuestionReview extends Polymer.Element {
     accuracy: number;
     querySelector: any;
     questionReviewNumber: number;
-    rubricCategories: string[];
-    rubricScores: { [key: string]: number };
 
     static get is() { return 'prendus-question-review'; }
 
@@ -63,13 +61,17 @@ class PrendusQuestionReview extends Polymer.Element {
         value
       };
     }
+    _handleRatings(e) {
+      this._fireLocalAction('ratings', e.detail.scores);
+    }
     async connectedCallback() {
         super.connectedCallback();
         this._fireLocalAction('loaded', true);
-        this._fireLocalAction('rubricCategories', this._makeRubricCategories(rubric));
+        this._fireLocalAction('rubric', DEFAULT_EVALUATION_RUBRIC);
         this._fireLocalAction('numberOfAnswers', 4);
         this._fireLocalAction('selectedIndex', 0);
         this._fireLocalAction('questionReviewNumber', 1);
+        this.addEventListener('rubric-dropdowns', this._handleRatings.bind(this));
     }
     async getInfoForQuestionScaffolds(){
       await this.loadAssignmentQuestions();
@@ -81,41 +83,14 @@ class PrendusQuestionReview extends Polymer.Element {
     }
     next(): void {
       this._fireLocalAction('selectedIndex', ++this.selectedIndex)
+      this._fireLocalAction('rubric', null);
+      setTimeout(() => {
+        this._fireLocalAction('rubric', DEFAULT_EVALUATION_RUBRIC);
+      });
       if(this.selectedIndex === this.querySelector('#iron-pages').items.length - 1) {
         // Reached the limit.
         this.action = setDisabledNext(true);
       }
-    }
-
-    _makeRubricCategories(rubric: Object): Object[] {
-      const categories = Object.keys(rubric);
-      return categories.map(category => {
-        return {
-          label: category,
-          options: this._makeRubricOptions(rubric[category])
-        };
-      };
-    }
-
-    _makeRubricOptions(options: Object): Object[] {
-      const labels = Object.keys(options);
-      return labels.map(label => {
-        return {
-          label,
-          ...options[label]
-        }
-      });
-    }
-
-    _paperItemId(category: Object, option: Object) {
-      return category.label.replace(/\s/, '') + '-' + option.label;
-    }
-
-    _rubricScoreChanged(e) {
-      const changed = { [e.model.category.label]: e.detail.item.value };
-      this.rubricScores || this.rubricScores = {};
-      const newRubricScores = {...this.rubricScores, ...changed};
-      this._fireLocalAction('rubricScores', newRubricScores);
     }
 
     async loadAssignmentQuestions() {
@@ -185,18 +160,17 @@ class PrendusQuestionReview extends Polymer.Element {
     async submit(e: any): Promise<void> {
       try {
         const variables = {
-          json: JSON.stringify(this.rubricScores),
+          ratings: this.ratings,
           rater: this.user.id,
           question: e.target.id
         };
-        const mutation = `mutation submitRating($json: Json!, $rater: ID!, $question: ID!) {
+        const mutation = `mutation submitRating($ratings: [QuestionRatingscoresCategoryScore!]!, $rater: ID!, $question: ID!) {
             createQuestionRating(
-              ratingJson: $json
+              scores: $ratings
               raterId: $rater
               questionId: $question
             ) {
               id
-              ratingJson
             }
           }`;
         GQLrequest(mutation, variables, this.userToken);
@@ -226,8 +200,8 @@ class PrendusQuestionReview extends Polymer.Element {
         if (keys.includes('questions')) this.questions = componentState.questions;
         if (keys.includes('quizQuestions')) this.quizQuestions = componentState.quizQuestions;
         if (keys.includes('questionScaffoldsToRate')) this.questionScaffoldsToRate = componentState.questionScaffoldsToRate;
-        if (keys.includes('rubricCategories')) this.rubricCategories = componentState.rubricCategories;
-        if (keys.includes('rubricScores')) this.rubricScores = componentState.rubricScores;
+        if (keys.includes('rubric')) this.rubric= componentState.rubric;
+        if (keys.includes('ratings')) this.ratings = componentState.ratings;
         // this.questions = state[`questionsInAssignment`];
         this.userToken = state.userToken;
         this.user = state.user;
