@@ -11,7 +11,8 @@ import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {Assignment} from '../../typings/assignment';
 import {AnswerTypes} from '../../typings/answer-types';
-import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
+import {createUUID, getPrendusLTIServerOrigin, } from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;
@@ -22,7 +23,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
     myIndex: number;
     currentQuestionScaffold: QuestionScaffold;
     answers: QuestionScaffoldAnswer[];
-    assignment: Assignment[];
+    assignment: Assignment;
     question: Question;
     questionScaffold: QuestionScaffold;
     questionId: string;
@@ -143,7 +144,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           key: 'questionId',
           value: data.createQuestion.id
       };
-
+      sendStatement(this.user.id, this.assignment.id, "ASSIGNMENT", "SUBMITTED", "CREATE")
       window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',

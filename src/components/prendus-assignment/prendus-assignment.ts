@@ -60,8 +60,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         super.connectedCallback();
         this._fireLocalAction('connected', true)
         this._fireLocalAction('loaded', true)
-        console.log(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)
-        sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)
     }
 
     isViewMode(mode: string) {
@@ -87,13 +85,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     isCreateType(assignmentType: String) {
+        this.action = checkForUserToken();
+        if (assignmentType === 'CREATE'){ sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)}
         return assignmentType === 'CREATE';
     }
 
     isReviewType(assignmentType: String) {
+        this.action = checkForUserToken();
+        if (assignmentType === 'REVIEW'){ sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)}
         return assignmentType === 'REVIEW';
     }
     isQuizType(assignmentType: String) {
+        if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)}
         return assignmentType === 'QUIZ';
     }
     openAssignmentConceptDialog(e: any){
