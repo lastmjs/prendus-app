@@ -1,5 +1,5 @@
-# projectId: cj36de9q4dem00134bhkwm44r
-# version: 264
+# project: cj36de9q4dem00134bhkwm44r
+# version: 272
 
 type File implements Node {
   id: ID! @isUnique
@@ -28,7 +28,7 @@ type User implements Node {
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
-  userAnalytics: PrendusAnalytics @relation(name: "UserOnPrendusAnalytics")
+  userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
 }
 
 type Course implements Node {
@@ -156,7 +156,7 @@ type LTIUser implements Node {
 }
 
 type PrendusAnalytics implements Node {
-  user: User! @relation(name: "UserOnPrendusAnalytics")
+  user: User @relation(name: "UserOnPrendusAnalytics")
   contextId: String!
   contextType: String!
   verb: String!
@@ -164,4 +164,16 @@ type PrendusAnalytics implements Node {
   createdAt: DateTime!
   id: ID! @isUnique
   updatedAt: DateTime!
+}
+
+enum UserRole {
+  INSTRUCTOR
+  STUDENT
+  ADMIN
+}
+
+enum PrendusApproved {
+  YES
+  NO
+  TBD
 }
