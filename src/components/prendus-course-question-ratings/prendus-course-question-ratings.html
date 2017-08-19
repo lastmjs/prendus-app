@@ -103,10 +103,10 @@
               <!--div class="table-cell">[[item.student]]</div-->
               <dom-repeat items="[[categories]]" as="category" hidden>
                 <template>
-                  <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.ratings, category)]]"></prendus-stacked-bar></div>
+                  <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.stats, category)]]"></prendus-stacked-bar></div>
                 </template>
               </dom-repeat>
-              <div class="table-cell">[[item.stats.Overall]]</div>
+              <div class="table-cell">[[item.overall]]</div>
             </div>
           </template>
         </dom-repeat>

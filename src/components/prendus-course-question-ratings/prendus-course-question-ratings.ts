@@ -123,7 +123,10 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
                   title
                 }
                 ratings {
-                  ratingJson
+                  scores {
+                    category
+                    score
+                  }
                 }
               }
             }
@@ -170,15 +173,22 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
-    const first: number = sortAsc ? 1 : 0;
-    const last: number = first ? 0 : 1;
+    const first: number = sortAsc ? 1 : -1;
+    const last: number = first > 0 ? -1 : 1;
+    console.log(first, last);
     return (a: QuestionRatingStats, b: QuestionRatingStats) => {
       if (sortField === 'Student') {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
         return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
       }
-      if (a.stats[sortField] === b.stats[sortField]) return 0;
-      return a.stats[sortField] > b.stats[sortField] ? first : last;
+      if (sortField === 'Overall') {
+        if (Number(a.overall) === Number(b.overall)) return 0;
+        return Number(a.overall) > Number(b.overall) ? first : last;
+      }
+      const aStats = a.stats[sortField] ? a.stats[sortField].reduce(weightedSum, 0) : 0;
+      const bStats = b.stats[sortField] ? b.stats[sortField].reduce(weightedSum, 0) : 0;
+      if (aStats === bStats) return 0;
+      return aStats > bStats ? first : last;
     };
   }
 
@@ -228,47 +238,32 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return obj[prop];
   }
 
-  _categoryScores(ratings: Object[]): Object {
-    return this.categories.reduce((scores, category) => {
-      const score = sumProp(ratings, category) / ratings.length;
-      return Object.assign(scores, {[category]: score});
-    }, {});
+  _barStats(stats: Object, category: string): number[] {
+    return stats[category] || [];
   }
 
-  _computeQuestionOverall(stats: Object): number {
-    const vals = Object.values(stats);
-    return (vals.reduce(sum, 0) / vals.length * 5).toPrecision(2) || 0;
-  }
-
-  _barStats(ratings: Object[], category: string): Object[] {
-    return ratings.reduce((stats: number[], rating: Object) => {
-      const i = rating[category];
-      if (i !== NaN && i >=0) {
-        while (i > stats.length - 1) stats.push(0);
-        stats[i]++;
-      }
-      return stats;
-    }, []);
-  }
-
-  _computeRatingStats(ratings: Object[]): Object {
-    const categoryScores = this._categoryScores(ratings);
-    return {
-      Overall: this._computeQuestionOverall(categoryScores),
-      ...categoryScores,
-    };
+  _overallScore(ratings): number {
+    const score = (Object.values(ratings).reduce((total, scores) => {
+      return total + scores.reduce(weightedSum, 0) / scores.reduce(sum, 0);
+    }, 0) / Object.values(ratings).length * 5) || 0;
+    return score.toPrecision(2);
   }
 
   _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
     return flatten(assignments.map(assignment => assignment.questions.map(question => {
-      const ratings = question.ratings.map(rating => JSON.parse(rating.ratingJson)).filter(rating => rating != null);
-      const stats = this._computeRatingStats(ratings);
+      const stats = flatten(question.ratings.map(rating => rating.scores)).reduce((result, rating) => {
+        if (!result.hasOwnProperty(rating.category)) result[rating.category] = [];
+        while (rating.score > result[rating.category].length - 1) result[rating.category].push(0);
+        result[rating.category][rating.score]++;
+        return result;
+      }, {});
+      const overall = this._overallScore(stats);
       return {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
         student: '', //question.author.email,
         text: question.text,
-        ratings,
+        overall,
         stats
       }
     })));
@@ -296,8 +291,8 @@ function sum (sum: number, num: number): number {
   return sum + (Number(num) || 0);
 }
 
-function sumProp (arr: Object[], prop): number {
-  return arr.reduce((sum: number, obj: Object) => sum + (Number(obj[prop]) || 0), 0)
+function weightedSum (sum: number, num: number, i: number): number {
+  return sum + num * i;
 }
 
 function flatten(arr: any[]): any[] {
