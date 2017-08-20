@@ -96,6 +96,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         return assignmentType === 'REVIEW';
     }
     isQuizType(assignmentType: String) {
+        this.action = checkForUserToken();
         if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "STARTED", this.assignmentType)}
         return assignmentType === 'QUIZ';
     }
