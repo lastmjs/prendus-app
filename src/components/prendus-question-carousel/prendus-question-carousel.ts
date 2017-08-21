@@ -1,16 +1,16 @@
 import {SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID} from '../../services/utilities-service';
 
-class PrendusQuestionCarousel extends Polymer.Element {
+class PrendusCarousel extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
   finished: boolean = false;
 
-  static get is() { return 'prendus-question-carousel' }
+  static get is() { return 'prendus-carousel' }
 
   static get properties() {
     return {
-      questions: {
+      data: {
         type: Array,
         observer: '_initCarousel'
       },
@@ -56,51 +56,51 @@ class PrendusQuestionCarousel extends Polymer.Element {
     };
   }
 
-  _initCarousel(questions: Object[]) {
+  _initCarousel(data: Object[]) {
     this._fireLocalAction('currentIndex', 0);
     this._fireLocalAction('finished', false);
-    this._notifyNextQuestion(questions.length ? questions[0] : null);
+    this._notifyNextData(data.length ? data[0] : null);
   }
 
   _plusOne(num: number): number {
     return num + 1;
   }
 
-  nextQuestion() {
-    if (this.currentIndex < this.questions.length) {
+  nextData() {
+    if (this.currentIndex < this.data.length) {
       const index = this.currentIndex + 1;
       this._fireLocalAction('currentIndex', index);
-      if (index < this.questions.length)
-        this._notifyNextQuestion(this.questions[index]);
+      if (index < this.data.length)
+        this._notifyNextData(this.data[index]);
       else {
         this._fireLocalAction('finished', true);
-        this._notifyNextQuestion(null);
+        this._notifyNextData(null);
       }
     }
   }
 
-  previousQuestion() {
+  previousData() {
     this._fireLocalAction('finished', false);
     if (this.currentIndex > 0) {
       const index = this.currentIndex - 1;
       this._fireLocalAction('currentIndex', index);
-      this._notifyNextQuestion(this.questions[index]);
+      this._notifyNextQuestion(this.data[index]);
     }
   }
 
   _notifyNext() {
-    const evt = new Event('question-carousel-next', {
+    const evt = new Event('carousel-next', {
       bubbles: false,
       composed: true,
     });
     this.dispatchEvent(evt);
   }
 
-  _notifyNextQuestion(question: Object) {
-    const evt = new CustomEvent('question-carousel-question', {
+  _notifyNextData(data: Object) {
+    const evt = new CustomEvent('carousel-data', {
       bubbles: false,
       composed: true,
-      detail: {question}
+      detail: {data}
     });
     this.dispatchEvent(evt);
   }
@@ -110,8 +110,8 @@ class PrendusQuestionCarousel extends Polymer.Element {
     const keys = Object.keys(componentState || {});
     if (keys.includes('currentIndex')) this.currentIndex = componentState.currentIndex;
     if (keys.includes('finished')) this.finished = componentState.finished;
-    if (keys.includes('question')) this.question = componentState.question;
+    if (keys.includes('current')) this.current = componentState.current;
   }
 }
 
-window.customElements.define(PrendusQuestionCarousel.is, PrendusQuestionCarousel)
+window.customElements.define(PrendusCarousel.is, PrendusCarousel)

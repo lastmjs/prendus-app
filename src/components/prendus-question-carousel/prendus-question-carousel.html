@@ -3,7 +3,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 
-<dom-module id="prendus-question-carousel">
+<dom-module id="prendus-carousel">
 
   <template>
 
@@ -25,7 +25,7 @@
 
     <dom-if if="[[!finished]]">
       <template>
-        <h3>Question [[_plusOne(currentIndex)]]/[[questions.length]]</h3>
+        <h3>Question [[_plusOne(currentIndex)]]/[[data.length]]</h3>
       </template>
     </dom-if>
     <br>
