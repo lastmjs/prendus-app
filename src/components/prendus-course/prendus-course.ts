@@ -258,9 +258,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     getEditIcon(editStatus: boolean): string {
       return editStatus ? 'check' : 'create';
     }
-    _getAssignmentUrl(assignment: Assignment, assignmentType: string): string {
-      return assignment.questionType === 'MULTIPLE_CHOICE' ? ('view?assignmentType=' + assignmentType.toUpperCase()) : assignmentType;
-    }
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
       if(this.course.discipline && this.course.subject){
