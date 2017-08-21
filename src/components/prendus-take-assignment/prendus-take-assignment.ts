@@ -30,19 +30,19 @@ class PrendusTakeAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('question-carousel-next', this._handleNextRequest.bind(this));
-    this.addEventListener('question-carousel-question', this._handleNextQuestion.bind(this));
+    this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
+    this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
   }
 
   _handleNextRequest(e) {
     if (this._valid(this.response) && this._submit(this.question, this.response))
-      this.$.carousel.nextQuestion();
+      this.$.carousel.nextData();
     else
       console.log('Error!');
   }
 
   _handleNextQuestion(e) {
-    this._fireLocalAction('question', e.detail.question);
+    this._fireLocalAction('question', e.detail.data);
   }
 
   _fireLocalAction(key: string, value: any) {

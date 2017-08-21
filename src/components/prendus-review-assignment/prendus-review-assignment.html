@@ -2,6 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-essay-review/prendus-essay-review.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-review-assignment">
 
@@ -13,7 +14,7 @@
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <h2>[[assignment.title]] Review Assignment</h2>
 
-    <prendus-question-carousel id="carousel" questions="[[questions]]">
+    <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]">
       <div hidden$="[[!question]]">
         <prendus-essay-review question="[[question]]"></prendus-essay-review>
         <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]"></prendus-rubric-dropdowns>
@@ -22,7 +23,7 @@
         <h3>Done</h3>
         <p>You have completed this assignment</p>
       </div>
-    </prendus-question-carousel>
+    </prendus-carousel>
 
 
   </template>

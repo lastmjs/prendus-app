@@ -3,7 +3,7 @@
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-question-carousel/prendus-question-carousel.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-grade-assignment">
 
@@ -21,7 +21,7 @@
 
     <h2>[[assignment.title]] Grade Assignment</h2>
     <br>
-    <prendus-question-carousel id="carousel" hide-back next-text="Submit" questions="[[questions]]">
+    <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]">
       <div hidden$="[[!question]]">
         <h4>Question</h4>
         <p>[[_questionText(question.text)]]</p>
@@ -33,7 +33,7 @@
         <h3>Done</h3>
         <p>You have finished all the questions for this assignment</p>
       </div>
-    </prendus-question-carousel>
+    </prendus-carousel>
 
   </template>
 

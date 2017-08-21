@@ -32,8 +32,8 @@ class PrendusGradeAssignment extends Polymer.Element {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
     this.addEventListener('rubric-dropdowns', this._handleGrades.bind(this));
-    this.addEventListener('question-carousel-next', this._handleNextRequest.bind(this));
-    this.addEventListener('question-carousel-question', this._handleNextQuestion.bind(this));
+    this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
+    this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -51,15 +51,15 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   _handleNextRequest(e) {
     if (this._valid(this.grades, this.rubric) && this._submit(this.question, this.grades))
-      this.$.carousel.nextQuestion();
+      this.$.carousel.nextData();
     else
       console.log('Error!');
   }
 
   _handleNextQuestion(e) {
-    const { question } = e.detail;
-    this._fireLocalAction('question', question);
-    this._fireLocalAction('rubric', this._parseRubric(question.code));
+    const { data } = e.detail;
+    this._fireLocalAction('question', data);
+    this._fireLocalAction('rubric', this._parseRubric(data.code));
   }
 
   _parseRubric(code: string): Object {
