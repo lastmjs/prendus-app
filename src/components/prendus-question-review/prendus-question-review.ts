@@ -12,6 +12,7 @@ import {compileToGuiQuestion} from '../../services/code-to-question-service'
 import {QuestionRating} from '../../typings/question-rating';
 import {rubric} from '../../typings/evaluation-rubric';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
@@ -205,8 +206,10 @@ class PrendusQuestionReview extends Polymer.Element {
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);
+      sendStatement(this.user.id, e.target.id, "QUESTION", "EVALUATED", "QUESTION");
 
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
+        sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "SUBMITTED", "REVIEW");
         this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       }
     }

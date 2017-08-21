@@ -11,6 +11,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin, shuffleArray} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
 
 class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
@@ -105,6 +106,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
     }
 
     submitQuiz(){
+      sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "SUBMITTED", "QUIZ")
       window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',

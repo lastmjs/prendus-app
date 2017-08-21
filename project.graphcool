@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 259
+# version: 272
 
 type File implements Node {
   id: ID! @isUnique
@@ -28,6 +28,7 @@ type User implements Node {
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
+  userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
 }
 
 type Course implements Node {
@@ -64,6 +65,9 @@ type Assignment implements Node {
   questions: [Question!]! @relation(name: "AssignmentQuestions")
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
+  create: Int! @defaultValue(value: 1)
+  review: Int! @defaultValue(value: 3)
+  take: Int! @defaultValue(value: 10)
 }
 
 type Quiz implements Node {
@@ -98,6 +102,7 @@ type QuestionRating implements Node {
   difficulty: Int
   alignment: Int
   rater: User! @relation(name: "RaterOnQuestionRating")
+  ratingJson: Json!
   question: Question! @relation(name: "QuestionOnQuestionRating")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -148,6 +153,17 @@ type LTIUser implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User! @relation(name: "UserOnLTIUser")
+}
+
+type PrendusAnalytics implements Node {
+  user: User @relation(name: "UserOnPrendusAnalytics")
+  contextId: String!
+  contextType: String!
+  verb: String!
+  object: String!
+  createdAt: DateTime!
+  id: ID! @isUnique
+  updatedAt: DateTime!
 }
 
 enum UserRole {
