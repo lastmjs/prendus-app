@@ -16,59 +16,8 @@
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style include="prendus-styles">
-          .wrapper {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-          }
-
-          .rubric-category {
-            flex-basis: 390px;
-          }
-
-          .submit-button {
-            justify-self: right;
-            grid-column: 4;
-            grid-row: 1;
-          }
         </style>
-        <iron-pages id="iron-pages" selected="[[selectedIndex]]">
-            <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
-              <div>
-                <div class="prendus-card centered">
-                  <h2> Rate question [[questionReviewNumber]]</h2>
-                  <!--TODO fix this description -->
-                </div>
-                <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
-                <prendus-rubric-dropdowns rubric="[[rubric]]"></prendus-rubric-dropdowns>
-                <div class="submit-button">
-                    <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
-                </div>
-              </div>
-            </template>
-            <div>
-              Congratulations you have finished the review of the questions. You will now take 5 questions.
-              <div class="submit-button">
-                  <button class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
-              </div>
-            </div>
-            <dom-if if="[[hasQuestions(quizQuestions)]]">
-              <template>
-                <prendus-question-review-quiz questions="[[quizQuestions]]" user="[[user]]"></prendus-question-review-quiz>
-              </template>
-            </dom-if>
-        </iron-pages>
-        <dom-if if="[[!hasQuestions(quizQuestions)]]">
-            <template>
-              <p>No Questions have been made yet for this assignment</p>
-            </template>
-        </dom-if>
-        <dom-if if="[[!loaded]]">
-            <template>
-                Loading...
-            </template>
-        </dom-if>
+        <prendus-scaffold-example question-scaffold="[[_scaffold(question)]]"></prendus-scaffold-example>
     </template>
 
     <script type="module" src="prendus-question-review.ts"></script>

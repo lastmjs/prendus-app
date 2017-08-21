@@ -1,6 +1,7 @@
 import {Question} from '../typings/question';
 import {GuiQuestion} from '../typings/gui-question';
 import {GuiAnswer} from '../typings/gui-answer';
+import {DEFAULT_EVALUATION_RUBRIC} from '../services/constants-service';
 
 // generates code for a multiple choice question
 export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string, code: string } => {
@@ -13,7 +14,7 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
     return prevText + `<p>[*]${answer.text}[*]</p>`;
   }, '');
   // define code string with answers
-  const code: string = answers.reduce((prevCode, answer, index) => {
+  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'\n" + answers.reduce((prevCode, answer, index) => {
         if (index === answers.length - 1) {
             return `${prevCode} radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
         }

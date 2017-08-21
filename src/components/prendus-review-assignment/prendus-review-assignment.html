@@ -2,6 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-essay-review/prendus-essay-review.html">
+<link rel="import" href="../prendus-question-review/prendus-question-review.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-review-assignment">
@@ -16,7 +17,16 @@
 
     <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]">
       <div hidden$="[[!question]]">
-        <prendus-essay-review question="[[question]]"></prendus-essay-review>
+        <dom-if if="[[isEssayType(assignment.questionType)]]">
+          <template>
+            <prendus-essay-review question="[[question]]"></prendus-essay-review>
+          </template>
+        </dom-if>
+        <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
+          <template>
+            <prendus-question-review question="[[question]]"></prendus-question-review>
+          </template>
+        </dom-if>
         <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]"></prendus-rubric-dropdowns>
       </div>
       <div hidden$="[[question]]">

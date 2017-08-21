@@ -59,7 +59,9 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   _parseRubric(code: string): Object {
     const { evaluationRubric } = extractLiteralVariables(code);
-    return JSON.parse(evaluationRubric);
+    if (evaluationRubric)
+      return JSON.parse(evaluationRubric);
+    return DEFAULT_EVALUATION_RUBRIC;
   }
 
   _valid(ratings: Object[], rubric: Object): boolean {
@@ -120,11 +122,27 @@ class PrendusReviewAssignment extends Polymer.Element {
           id
           text
           code
+          explanation
+          concept {
+            title
+          }
+          resource
+          answerComments {
+            text
+          }
         }
       }
     }`, {assignmentId}, this.userToken);
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, 3));
+  }
+
+  isEssayType(questionType: string): boolean {
+    return questionType === 'ESSAY';
+  }
+
+  isMultipleChoiceType(questionType: string): boolean {
+    return questionType === 'MULTIPLE_CHOICE';
   }
 
   stateChange(e: CustomEvent) {
