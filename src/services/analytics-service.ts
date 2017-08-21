@@ -15,7 +15,6 @@ export async function sendStatement(userId: string, contextId: string, contextTy
     `, this.userToken, (error: any) => {
         console.log(error);
   });
-  console.log('createStatement', createStatement.createPrendusAnalytics.id)
   const data = await GQLMutate(`
     mutation {
       addToUserOnPrendusAnalytics(
@@ -33,5 +32,4 @@ export async function sendStatement(userId: string, contextId: string, contextTy
     `, this.userToken, (error: any) => {
         console.log(error);
   });
-  console.log('data', data)
 }
