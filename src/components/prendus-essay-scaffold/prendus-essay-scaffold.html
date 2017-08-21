@@ -13,6 +13,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
+<link rel="import" href="../prendus-scaffold-concept/prendus-scaffold-concept.html">
 
 <dom-module id="prendus-essay-scaffold">
 
@@ -110,15 +111,7 @@
                 </li>
               </ol>
             </div>
-            <paper-dropdown-menu label="Concept" on-selected-item-changed="setConceptId">
-              <paper-listbox id="concepts" slot="dropdown-content">
-                <dom-repeat items="[[_conceptOptions(assignment.concepts)]]">
-                  <template>
-                    <paper-item id="[[item.id]]">[[item.label]]</paper-item>
-                  </template>
-                </dom-repeat>
-              </paper-listbox>
-            </paper-dropdown-menu>
+            <prendus-scaffold-concept assignment="[[assignment]]"></prendus-scaffold-concept>
           </div>
           <div>
             <div class="prendus-card big">

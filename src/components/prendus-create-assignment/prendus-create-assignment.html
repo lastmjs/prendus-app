@@ -2,7 +2,8 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-essay-scaffold/prendus-essay-scaffold.html">
-<link rel="import" href="../prendus-question-carousel/prendus-question-carousel.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-create-assignment">
 
@@ -16,13 +17,24 @@
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <h2>[[assignment.title]] Create Assignment</h2>
     <br>
-    <prendus-question-carousel id="carousel" hide-back hide-next questions="[[questions]]">
-      <prendus-essay-scaffold id="scaffold" assignment="[[assignment]]" hidden$="[[!question]]"></prendus-essay-scaffold>
+    <prendus-carousel id="carousel" hide-back hide-next data="[[questions]]">
+      <div hidden$="[[!question]]">
+        <dom-if if="[[isEssayType(assignment.questionType)]]">
+          <template>
+            <prendus-essay-scaffold id="scaffold" assignment="[[assignment]]"></prendus-essay-scaffold>
+          </template>
+        </dom-if>
+        <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
+          <template>
+            <prendus-scaffold assignment="[[assignment]]"></prendus-scaffold>
+          </template>
+        </dom-if>
+      </div>
       <div hidden$="[[question]]">
         <h3>Done</h3>
         <p>You have completed this assignment</p>
       </div>
-    </prendus-question-carousel>
+    </prendus-carousel>
 
   </template>
 

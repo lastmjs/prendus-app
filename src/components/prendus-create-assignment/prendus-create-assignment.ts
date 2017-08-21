@@ -29,12 +29,10 @@ class PrendusCreateAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('question-created', (e) => {
-      this.$.carousel.nextQuestion();
+    this.addEventListener('carousel-data', (e) => {
+      this._fireLocalAction('question', e.detail.data);
     });
-    this.addEventListener('question-carousel-question', (e) => {
-      this._fireLocalAction('question', e.detail.question);
-    });
+    this.addEventListener('question-created', this._handleQuestion.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -44,6 +42,25 @@ class PrendusCreateAssignment extends Polymer.Element {
       key,
       value
     };
+  }
+
+  async _handleQuestion(e) {
+    const { question } = e.detail;
+    const { answerComments ...questionVars } = question;
+    const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
+    console.log(question);
+    const questionId = await save(questionVars);
+    if (answerComments)
+      answerComments.forEach(comment => { this.saveAnswerComment({ text: comment, questionId }) });
+    this.$.carousel.nextData();
+  }
+
+  isEssayType(questionType: string): boolean {
+    return questionType === 'ESSAY';
+  }
+
+  isMultipleChoiceType(questionType: string): boolean {
+    return questionType === 'MULTIPLE_CHOICE';
   }
 
   async loadAssignment(assignmentId: string): Assignment {
@@ -56,11 +73,64 @@ class PrendusCreateAssignment extends Polymer.Element {
           id
           title
         }
+        course {
+          subject {
+            id
+          }
+        }
       }
     }`, {assignmentId}, this.userToken);
-    const questions = [{}, {}]; //TODO: Fill array to match create quota
+    const questions = [{}]; //TODO: Fill array to match create quota
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', questions);
+  }
+
+  async saveQuestion(variables): Promise<Object> {
+    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!) {
+      createQuestion(
+        authorId: $authorId,
+        conceptId: $conceptId,
+        resource: $resource,
+        text: $text,
+        code: $code
+      ) {
+        id
+      }
+    }`, variables, this.userToken);
+    return data.createQuestion.id;
+  }
+
+  async saveQuestionAndConcept(variables): Promise<Object> {
+    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!) {
+      createQuestion(
+        authorId: $authorId,
+        concept: $concept,
+        resource: $resource,
+        text: $text,
+        code: $code
+      ) {
+        id
+      }
+    }`, variables, this.userToken);
+    return data.createQuestion.id;
+  }
+
+  async saveConcept(variables: Object): Promise<Object> {
+    const data = await GQLrequest(`mutation newConcept($title: String!, $subjectId: ID!) {
+      createConcept(title: $title, subjectId: $subjectId) {
+        id
+      }
+    }`, variables, this.userToken);
+    return data.createConcept.id;
+  }
+
+  async saveAnswerComment(variables: Object): Promise<Object> {
+    const data = await GQLrequest(`mutation newAnswerComment($text: String!, $questionId: ID!) {
+      createAnswerComment(text: $text, questionId: $questionId) {
+        id
+      }
+    }`, variables, this.userToken);
+    return data.createAnswerComment.id;
   }
 
   stateChange(e: CustomEvent) {

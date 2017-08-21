@@ -1,89 +1,83 @@
-import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
-import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
 import {createUUID} from '../../services/utilities-service';
 
+/*
+ * This component takes a question and an array of answers, assuming the first is the correct answer.
+ * It displays a text input for each answer as a place for the user to provide comments and/or hints for that answer
+ * It fires an event `hints-changed` whenever the data changes
+ * Intended use: the parent component will consume the event and use these to create answer comments for new questions.
+ * In the future this component should probably take an array of answer objects that can be correct or incorrect in any order
+ */
 class PrendusScaffoldComments extends Polymer.Element {
-    componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
-    loaded: boolean;
-    userToken: string | null;
-    user: User | null;
-    selectedIndex: number;
-    numberOfAnswers: number;
-    answers: QuestionScaffoldAnswer[];
-    myIndex: number;
-    currentQuestionScaffold: QuestionScaffold;
+  componentId: string;
+  action: SetPropertyAction | SetComponentPropertyAction;
+  loaded: boolean;
 
-    static get is() { return 'prendus-scaffold-comments'; }
-    static get properties() {
-        return {
-          myIndex: {
-            type: Number
-          },
-          selectedIndex: {
-            type: Number,
-            observer: 'disableNext'
-          }
-        };
-    }
-    constructor() {
-        super();
-        this.componentId = createUUID();
-    }
-    connectedCallback() {
-        super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-    }
-    createComment(index: number){
-      return index !== 0 ? 'Incorrect' : 'Correct'
-    }
-    enableNext(){
-      const comments: string[] = this.getComments(this);
-      if(isDefinedAndNotEmpty(comments)){
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: 'disableNext',
-            value: false
-        };
-      }else{
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: 'disableNext',
-            value: true
-        };
+  static get is() { return 'prendus-scaffold-comments'; }
+  static get properties() {
+    return {
+      question: String,
+      answers: {
+        type: Array,
+        observer: '_initHints'
       }
-    }
-    disableNext(): void {
-      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        const comments: string[] = this.getComments(this);
-        this.action = setDisabledNext(!isDefinedAndNotEmpty(comments)); //
-        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, comments, null, null);
-      }
-    }
-    getComments(context: PrendusScaffoldComments): string[] {
-      return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-        return context.shadowRoot.querySelector(`#comments${index}`) ? context.shadowRoot.querySelector(`#comments${index}`).value : null;
-      });
-    }
-    plusOne(index: number): number {
-      return index + 1;
-    }
-    stateChange(e: CustomEvent) {
-        const state = e.detail.state;
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.currentQuestionScaffold = state.currentQuestionScaffold;
-        this.answers = state.currentQuestionScaffold ? getQuestionScaffoldAnswers(state.currentQuestionScaffold) : this.answers;
-    }
+    };
+  }
+
+  constructor() {
+    super();
+    this.componentId = createUUID();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._fireLocalAction('loaded', true);
+  }
+
+  _fireLocalAction(key: string, value: any) {
+    this.action = {
+      type: 'SET_COMPONENT_PROPERTY',
+      componentId: this.componentId,
+      key,
+      value
+    };
+  }
+
+  _initHints(answers: string[]) {
+    //assuming first answer is correct
+    const hints = ['Correct'].concat(answers.slice(1, answers.length).map(answer => 'Incorrect'));
+    this._fireLocalAction('hints' hints);
+    this._notify(hints);
+  }
+
+  _notify(hints: string[]) {
+    const evt = new CustomEvent('hints-changed', {bubbles: false, composed: true, detail: {hints}});
+    this.dispatchEvent(evt);
+  }
+
+  _hintsChanged(e) {
+    const hints = this.hints.slice();
+    hints[e.model.itemsIndex] = e.target.value;
+    this._fireLocalAction('hints', hints);
+    this._notify(hints);
+  }
+
+  createComment(index: number){
+    return index !== 0 ? 'Incorrect' : 'Correct'
+  }
+
+  plusOne(index: number): number {
+    return index + 1;
+  }
+
+  stateChange(e: CustomEvent) {
+    const state = e.detail.state;
+    const componentState = state.components[this.componentId] || {};
+    const keys = Object.keys(componentState);
+    if (keys.includes('loaded')) this.loaded = componentState.loaded;
+    if (keys.includes('hints')) this.hints = componentState.hints;
+  }
 }
 
 window.customElements.define(PrendusScaffoldComments.is, PrendusScaffoldComments);

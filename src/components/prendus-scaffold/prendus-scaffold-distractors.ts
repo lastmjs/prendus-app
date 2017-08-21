@@ -1,98 +1,72 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
-import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {isDefinedAndNotEmpty} from '../../services/utilities-service';
-import {ContainerElement} from '../../typings/container-element';
 import {createUUID} from '../../services/utilities-service';
 
+/*
+ * This component takes a question and answer and displays text inputs to type incorrect answers.
+ * Every time the array of incorrect answers changes, the component fires and event `distractors-changed`
+ * Intended use: the parent component can consume the event and use the distractors in creating a question.
+ * In the future, this component could take a type attribute: radio or checkbox and could allow the user
+ * to create as many correct and incorrect answers that they wanted
+ */
 class PrendusScaffoldDistractors extends Polymer.Element {
-    componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
-    loaded: boolean;
-    selectedIndex: number;
-    numberOfAnswers: number;
-    currentQuestionScaffold: QuestionScaffold;
-    distractors: any[];
-    answer: string;
-    myIndex: number;
+  componentId: string;
+  action: SetPropertyAction | SetComponentPropertyAction;
+  loaded: boolean;
+  distractors: any[];
+  answer: string;
 
-    static get is() { return 'prendus-scaffold-distractors'; }
+  static get is() { return 'prendus-scaffold-distractors'; }
 
-    static get properties() {
-        return {
-          selectedIndex: {
-            type: Number,
-            observer: 'disableNext'
-          },
-          myIndex: {
-            type: Number
-          },
-          numberOfAnswers: {
-            type: Number,
-            observer: 'numberOfAnswersSet'
-          },
-        };
+  static get properties() {
+    return {
+      question: String,
+      answer: String
     }
-    constructor() {
-        super();
-        this.componentId = createUUID();
+  }
+
+  constructor() {
+    super();
+    this.componentId = createUUID();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._fireLocalAction('distractors', Array(3));
+  }
+
+  _fireLocalAction(key: string, value: any) {
+    this.action = {
+      type: 'SET_COMPONENT_PROPERTY',
+      componentId: this.componentId,
+      key,
+      value
     }
-    connectedCallback() {
-        super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'distractors',
-            value: Array(3)
-        };
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-    }
-    enableNext(){
-      const distractors: string[] = this.getDistractors(this);
-      if(isDefinedAndNotEmpty(distractors)){
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: 'disableNext',
-            value: false
-        };
-      }else{
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: 'disableNext',
-            value: true
-        };
-      }
-    }
-    disableNext(): void {
-      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        const distractors: string[] = this.getDistractors(this);
-        this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.currentQuestionScaffold.concept, this.currentQuestionScaffold.resource, null, null, distractors, null);
-      }
-    }
-    getDistractors(context: PrendusScaffoldDistractors): string[] {
-      return Object.keys(context.currentQuestionScaffold ? context.currentQuestionScaffold.answers : {}).map((key: string, index: number) => {
-        const id: string = `#distractor${index}`;
-        return context.shadowRoot.querySelector(id) ? context.shadowRoot.querySelector(id).value : null;
-      });
-    }
-    plusOne(index: number): number {
-      return index + 1;
-    }
-    stateChange(e: CustomEvent) {
-        const state = e.detail.state;
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        if (Object.keys(state.components[this.componentId] || {}).includes('distractors')) this.distractors = state.components[this.componentId].distractors;
-        this.loaded = state.components[this.componentId] ? state.components[this.componentId].loaded : this.loaded;
-        this.currentQuestionScaffold = state.currentQuestionScaffold;
-        this.answer = state.currentQuestionScaffold && state.currentQuestionScaffold.answers && state.currentQuestionScaffold.answers['question0'] ? state.currentQuestionScaffold.answers['question0'].text : this.answer;
-    }
+  }
+
+  _notify(distractors: string[]) {
+    const evt = new CustomEvent('distractors-changed', {bubbles: false, composed: true, detail: {distractors}});
+    this.dispatchEvent(evt);
+  }
+
+  _distractorsChanged(e) {
+    const distractors = this.distractors.slice();
+    distractors[e.model.itemsIndex] = e.target.value;
+    this._fireLocalAction('distractors', distractors);
+    this._notify(distractors);
+  }
+
+  plusOne(num: number): number {
+    return num + 1;
+  }
+
+  stateChange(e: CustomEvent) {
+    const state = e.detail.state;
+    const componentState = state.components[this.componentId] || {};
+    const keys = Object.keys(componentState);
+    if (keys.includes('loaded')) this.loaded = componentState.loaded;
+    if (keys.includes('distractors')) this.distractors = componentState.distractors;
+  }
 }
 
 window.customElements.define(PrendusScaffoldDistractors.is, PrendusScaffoldDistractors);

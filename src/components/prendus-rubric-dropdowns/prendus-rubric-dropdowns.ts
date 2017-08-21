@@ -39,6 +39,7 @@ class PrendusRubricDropdowns extends Polymer.Element {
       return Object.assign(result, { [category]: -1 }
     }, {}));
     this._fireLocalAction('scores', scores);
+    this._notify(scores);
   }
 
   _initScores(rubric: Object) {

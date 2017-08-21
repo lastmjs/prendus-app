@@ -13,22 +13,22 @@
         <dom-if if="[[loaded]]">
             <template>
               <div id ="concepts">
-                <dom-if if="[[concepts.length]]">
+                <dom-if if="[[assignment.concepts.length]]">
                   <template>
                     <paper-dropdown-menu label="Question Concept">
                       <paper-listbox slot="dropdown-content">
-                        <dom-repeat items="[[concepts]]">
+                        <dom-repeat items="[[assignment.concepts]]">
                           <template>
-                              <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
+                              <paper-item on-click="saveConcept">[[item.title]]</paper-item>
                           </template>
                         </dom-repeat>
                       </paper-listbox>
                     </paper-dropdown-menu>
                   </template>
                 </dom-if>
-                <dom-if if="[[!concepts.length]]">
+                <dom-if if="[[!assignment.concepts.length]]">
                   <template>
-                    <paper-input id="concept-input" label="Question Concept" on-input="enableNext"></paper-input>
+                    <paper-input id="concept-input" label="Question Concept" on-change="createConcept"></paper-input>
                     <!-- <paper-dropdown-menu label="Concept">
                       <paper-listbox slot="dropdown-content" selected="1">
                         <dom-repeat items="[[concepts]]">

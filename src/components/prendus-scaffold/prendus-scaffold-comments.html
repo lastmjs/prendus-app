@@ -52,7 +52,7 @@
           </div>
           <div class="row">
             <div class="prendus-card left-column">
-              [[currentQuestionScaffold.question]]
+              [[question]]
             </div>
             <div class="prendus-card right-column">
               <!-- Implement this when Jordan returns  -->
@@ -71,10 +71,10 @@
           <template is="dom-repeat" items="[[answers]]">
             <div class="row">
               <div class="prendus-card left-column answer-card">
-                [[item.text]]
+                [[item]]
               </div>
               <div class="prendus-card right-column">
-                <paper-textarea id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[createComment(index)]]"></paper-textarea>
+                <paper-textarea id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[createComment(index)]]" on-value-changed="_hintsChanged"></paper-textarea>
               </div>
             </div>
           </template>
