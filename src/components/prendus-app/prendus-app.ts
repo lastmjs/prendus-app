@@ -12,7 +12,8 @@ class PrendusApp extends Polymer.Element {
     user: User | null;
     action: SetPropertyAction | DefaultAction;
     userToken: string | null;
-
+    notificationMessage: string | null;
+    notificationType: string | null;
     static get is() { return 'prendus-app'; }
 
     constructor() {
@@ -25,13 +26,6 @@ class PrendusApp extends Polymer.Element {
 
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-
-        this.shadowRoot.querySelector('#termsToast').open();
-        this.shadowRoot.querySelector('#termsToast').text = 'Our Terms of Use and Privacy Policy are changing. Click to see the changes.';
-    }
-
-    _termsClick() {
-        window.location.href = 'https://github.com/Prendus/content/pull/3/files';
     }
 
     getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
@@ -124,7 +118,6 @@ class PrendusApp extends Polymer.Element {
      //
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
         this.user = state.user;
         this.userToken = state.userToken;
 

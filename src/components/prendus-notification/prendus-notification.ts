@@ -5,25 +5,27 @@ class PrendusNotification extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetComponentPropertyAction | SetPropertyAction | DefaultAction;
     userToken: string;
-    static get is() { return 'prendus-notification'; }
+    message: string;
 
+    static get is() { return 'prendus-notification'; }
+    static get properties() {
+      return {
+        message: {
+          type: String,
+          observer: "openNotification"
+        }
+      };
+    }
     constructor() {
         super();
     }
 
     connectedCallback() {
         super.connectedCallback();
-        this.shadowRoot.querySelector('#toast').open();
-        this.shadowRoot.querySelector('#toast').text = 'WAHOOOO';
-
         this.openNotification();
     }
     openNotification(){
-      setTimeout(() => {
-        console.log(this.shadowRoot.querySelector('#toast'));
-        this.shadowRoot.querySelector('#toast').open;
-      }, 12000);
-
+      this.shadowRoot.querySelector('#toast').open();
     }
 
     stateChange(e: CustomEvent) {
