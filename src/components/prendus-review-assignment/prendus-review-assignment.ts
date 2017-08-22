@@ -9,6 +9,8 @@ class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
+  ratings: object[] = [];
+  rubric: object = {};
   userToken: string | null;
   user: User;
 
@@ -37,10 +39,14 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _handleNextRequest(e) {
-    if (this._valid(this.ratings, this.rubric) && this._submit(this.question, this.ratings))
+    try {
+      this._validate(this.ratings, this.rubric);
+      this._submit(this.question, this.ratings)
       this.$.carousel.nextData();
-    else
-      console.log('Error!');
+    } catch (e) {
+      this._fireLocalAction('error', e);
+      return;
+    }
   }
 
   _handleNextQuestion(e) {
@@ -64,23 +70,16 @@ class PrendusReviewAssignment extends Polymer.Element {
     return DEFAULT_EVALUATION_RUBRIC;
   }
 
-  _valid(ratings: Object[], rubric: Object): boolean {
+  _validate(ratings: Object[], rubric: Object): boolean {
     console.log(ratings);
-    return ratings
-      && ratings.length === Object.keys(rubric).length
-      && ratings.reduce((bitAnd, score) => {
-        return bitAnd && rubric.hasOwnProperty(score.category) && score.score > -1
-      }, true);
+    if (!ratings) throw new Error('You must rate the question');
+    if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
+    if (ratings.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
+      throw new Error('You must rate each category');
   }
 
   _handleSubmit(data: Object) {
     if (data.errors) throw new Error("Error saving question rating");
-    return true;
-  }
-
-  _handleError(err) {
-    console.error(err);
-    return false;
   }
 
   _submit(question: Object, ratings: Object[]) {
@@ -100,7 +99,6 @@ class PrendusReviewAssignment extends Polymer.Element {
     };
     return GQLrequest(query, variables, this.userToken)
       .then(this._handleSubmit.bind(this))
-      .catch(this._handleError);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -155,6 +153,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('ratings')) this.ratings = componentState.ratings;
+    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }
