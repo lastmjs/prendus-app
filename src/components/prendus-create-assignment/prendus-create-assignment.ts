@@ -86,10 +86,11 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async saveQuestion(variables): Promise<Object> {
-    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!) {
+    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
         conceptId: $conceptId,
+        assignmentId: $assignmentId,
         resource: $resource,
         text: $text,
         code: $code
@@ -101,9 +102,10 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async saveQuestionAndConcept(variables): Promise<Object> {
-    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!) {
+    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
+        assignmentId: $assignmentId,
         concept: $concept,
         resource: $resource,
         text: $text,
