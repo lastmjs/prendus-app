@@ -88,6 +88,10 @@ class PrendusCarousel extends Polymer.Element {
     }
   }
 
+  _hideNext(hideNext: boolean, finished: boolean) {
+    return hideNext || finished;
+  }
+
   _notifyNext() {
     const evt = new Event('carousel-next', {
       bubbles: false,
