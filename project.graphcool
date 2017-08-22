@@ -132,7 +132,7 @@ type UserCheck implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  checked: Bool!
+  checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserChecksOnQuestionResponse")
 }
 
@@ -141,7 +141,7 @@ type UserRadio implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  checked: Bool!
+  checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
 }
 
