@@ -56,9 +56,9 @@ class PrendusCarousel extends Polymer.Element {
     };
   }
 
-  _initCarousel(data: Object[]) {
+  _initCarousel(data: any[]) {
     this._fireLocalAction('currentIndex', 0);
-    this._fireLocalAction('finished', false);
+    this._fireLocalAction('finished', data.length === 0);
     this._notifyNextData(data.length ? data[0] : null);
   }
 
