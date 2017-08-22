@@ -111,7 +111,7 @@ type Response implements Node {
   updatedAt: DateTime!
   type: ResponseType!
   name: String!
-  value: !
+  value: String!
   questionResponse: QuestionResponse! @relation("ResponsePartsOnQuestionResponse")
 }
 
