@@ -116,6 +116,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         id
         title
         questionType
+        review
         questions(filter: {
           author: {
             id_not: $userId
@@ -136,7 +137,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       }
     }`, {assignmentId, userId: this.user.id}, this.userToken);
     this._fireLocalAction('assignment', data.Assignment);
-    this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, 3));
+    this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.review));
   }
 
   isEssayType(questionType: string): boolean {

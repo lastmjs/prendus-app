@@ -68,6 +68,7 @@ class PrendusCreateAssignment extends Polymer.Element {
       Assignment(id: $assignmentId) {
         id
         title
+        create
         questionType
         concepts {
           id
@@ -80,7 +81,7 @@ class PrendusCreateAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId}, this.userToken);
-    const questions = [{}]; //TODO: Fill array to match create quota
+    const questions = Array(data.Assignment.create).fill({});
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', questions);
   }
