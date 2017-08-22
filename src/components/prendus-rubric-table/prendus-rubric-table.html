@@ -88,7 +88,7 @@
                       <div class="grid-row grid-inner-row">
                         <div class="grid-cell"><input type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
                         <div class="grid-cell"><input type="text" placeholder="Description..." value="[[option.description]]" on-change="setDescription"></div>
-                        <div class="grid-cell"><input type="number" placeholder="Points..." value="[[option.points]]" on-change="setPoints"></div>
+                        <div class="grid-cell"><input type="number" placeholder="Points..." value="[[option.points]]" min="0" on-change="setPoints"></div>
                       </div>
                     </template>
                   </dom-repeat>
