@@ -1,7 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLSubscribe} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {rubric} from '../../typings/evaluation-rubric';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
@@ -10,6 +9,7 @@ import {QuestionRatingStats} from '../../typings/question-rating-stats';
 import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {createUUID} from '../../services/utilities-service';
+import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
 class PrendusCourseQuestionRatings extends Polymer.Element {
@@ -135,7 +135,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     `, this.userToken,
       (key: string, value: any) => { this._fireLocalAction(key, value) },
       this._handleError);
-    this._fireLocalAction('categories', Object.keys(rubric));
+    this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
     this._fireLocalAction('questionStats', this._computeQuestionStats(data.course.assignments));
   }
 
