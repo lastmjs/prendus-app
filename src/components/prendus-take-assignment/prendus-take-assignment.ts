@@ -1,7 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
-import {parse} from '../../node_modules/assessml/assessml';
 import {GQLrequest} from '../../services/graphql-service';
 
 class PrendusTakeAssignment extends Polymer.Element {
@@ -30,15 +29,24 @@ class PrendusTakeAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
     this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
+    this.addEventListener('response-submitted', this._handleResponse.bind(this));
   }
 
-  _handleNextRequest(e) {
-    if (this._valid(this.response) && this._submit(this.question, this.response))
-      this.$.carousel.nextData();
-    else
-      console.log('Error!');
+  _handleResponse(e) {
+    const variables = {
+      ...e.detail,
+      questionId: this.question.id,
+      authorId: this.user.id
+    };
+    try {
+      this._validate(variables);
+      this._submit(variables);
+    } catch (err) {
+      this._fireLocalAction('error' err);
+      return;
+    }
+    this.$.carousel.nextData();
   }
 
   _handleNextQuestion(e) {
@@ -52,11 +60,6 @@ class PrendusTakeAssignment extends Polymer.Element {
       key,
       value
     };
-  }
-
-  _questionText(text: string): string {
-    if (!text) return '';
-    return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
   async loadAssignment(assignmentId: string): Assignment {
@@ -73,53 +76,41 @@ class PrendusTakeAssignment extends Polymer.Element {
       }
     }`, {assignmentId}, this.userToken);
     const { assignment } = data;
-    const questions = shuffleArray(assignment.questions).slice(0, 1);//assignment.takeQuota);
+    const quota = assignment.questionType === 'ESSAY' ? 1 : 10;
+    const questions = shuffleArray(assignment.questions).slice(0, quota);//assignment.takeQuota);
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('questions', questions);
   }
 
-  _valid(response: string): boolean {
-    return response && response.length;
-  }
-
-  _storeResponse(e) {
-    this._fireLocalAction('response', e.target.value);
+  _validate(variables: object) {
   }
 
   _handleSubmit(data: Object) {
     if (data.errors) throw new Error("Error saving question rating");
-    return true;
+    return data.createQuestionResponse.id;
   }
 
-  _handleError(err) {
-    console.error(err);
-    return false;
-  }
-
-  _submit(question: Object, response: string) {
-    const query = `mutation answerQuestion($questionId: ID!, $response: String!, $user: ID!) {
+  async _saveResponse(variables: object) {
+    const query = `mutation answerQuestion(
+        $questionId: ID!,
+        $userInputs: [QuestionResponseuserInputsUserInput!]!,
+        $userVariables: [QuestionResponseuserVariablesUserVariable!]!,
+        $userChecks: [QuestionResponseuserChecksUserCheck!]!,
+        $userRadios: [QuestionResponseuserRadiosUserRadio!]!,
+        $user: ID!
+      ) {
       createQuestionResponse (
         authorId: $user
         questionId: $questionId
-        responses: [
-          {
-            type: INPUT
-            name: "essay1"
-            value: $response
-          }
-        ]
+        userInputs: $userInputs
+        userVariables: $userVariables
+        userRadios: $userRadios
+        userChecks: $userChecks
       ) {
         id
       }
     }`;
-    const variables = {
-      questionId: question.id,
-      response,
-      user: this.user.id
-    };
-    return GQLrequest(query, variables, this.userToken)
-      .then(this._handleSubmit.bind(this))
-      .catch(this._handleError);
+    return GQLrequest(query, variables, this.userToken).then(this._handleSubmit.bind(this))
   }
 
   stateChange(e: CustomEvent) {
@@ -130,7 +121,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('response')) this.response = componentState.response;
+    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }
