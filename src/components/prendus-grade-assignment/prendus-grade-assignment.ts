@@ -33,7 +33,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     this._fireLocalAction('loaded', true);
     this.addEventListener('rubric-dropdowns', this._handleGrades.bind(this));
     this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
-    this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
+    this.addEventListener('carousel-data', this._handleNextResponse.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -50,50 +50,59 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _handleNextRequest(e) {
-    if (this._valid(this.grades, this.rubric) && this._submit(this.question, this.grades))
-      this.$.carousel.nextData();
-    else
-      console.log('Error!');
+    try {
+      this._validate();
+      this._submit();
+    } catch (err) {
+      this._fireLocalAction('error', e);
+      return;
+    }
+    this.$.carousel.nextData();
   }
 
-  _handleNextQuestion(e) {
-    const { data } = e.detail;
-    this._fireLocalAction('question', data);
-    this._fireLocalAction('rubric', this._parseRubric(data.code));
+  _handleNextResponse(e) {
+    this._fireLocalAction('response', e.detail.data);
   }
 
   _parseRubric(code: string): Object {
     const { gradingRubric } = extractLiteralVariables(code);
+    if (!gradingRubric) return {};
     return JSON.parse(gradingRubric);
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
+    const data = await GQLrequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         questionType
-        questions(filter: {
-          responses_some: {}
-        }) {
-          id
-          text
-          code
-          responses {
-            id
-            responses {
-              type
-              name
-              value
+      }
+      essays: allUserInputs(filter: {
+        questionResponse: {
+          author: {
+            id_not: $userId
+          }
+          question: {
+            assignment: {
+              id: $assignmentId
             }
           }
         }
+      }) {
+        value
+        questionResponse {
+          id
+          question {
+            text
+            code
+          }
+        }
       }
-    }`, {assignmentId}, this.userToken);
-    const { assignment } = data;
-    const questions = shuffleArray(assignment.questions).slice(0, 3);//assignment.gradeQuota);
+    }`, {assignmentId, userId: this.user.id}, this.userToken);
+    const { assignment, essays } = data;
+    const responses = essays ? shuffleArray(essays).slice(0, 3): [];//assignment.gradeQuota);
     this._fireLocalAction('assignment', assignment);
-    this._fireLocalAction('questions', questions);
+    this._fireLocalAction('responses', responses);
   }
 
   _questionText(text: string): string {
@@ -101,31 +110,20 @@ class PrendusGradeAssignment extends Polymer.Element {
     return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
   }
 
-  _valid(grades: Object, rubric: Object) {
-    console.log(grades, rubric);
-    return grades
-      && grades.length === Object.keys(rubric).length
-      && grades.reduce((bitAnd, score) => {
-        return bitAnd && rubric.hasOwnProperty(score.category) && score.score > -1
-      }, true);
+  _validate() {
   }
 
-  _handleSubmit(data: Object) {
-    return true;
+  _handleSubmit(data: object) {
+    return data;
   }
 
-  _handleError(err) {
-    console.error(err);
-    return false;
+  _submit() {
+    return Promise.all(this.grades.map(grade => {
+      return this._createCategoryScore(grade);
+    })).then(this._handleSubmit.bind(this))
   }
 
-  _submit(question: Object, grades: Object) {
-    return Promise.all(grades.map(this._createCategoryScore.bind({question, userToken: this.userToken})))
-      .then(this._handleSubmit.bind(this))
-      .catch(this._handleError);
-  }
-
-  _createCategoryScore(score: Object) {
+  _createCategoryScore(grade: object) {
     const query = `mutation gradeResponse($responseId: ID!, $category: String!, $score: Int!) {
       createCategoryScore (
         questionResponseId: $responseId
@@ -136,13 +134,11 @@ class PrendusGradeAssignment extends Polymer.Element {
       }
     }`;
     const variables = {
-      responseId: this.question.responses[0].id,
-      category: score.category,
-      score: score.score
+      responseId: this.response.id,
+      category: grade.category,
+      score: grade.score
     };
     return GQLrequest(query, variables, this.userToken)
-      .then(this._handleSubmit)
-      .catch(this._handleError);
   }
 
   stateChange(e: CustomEvent) {
@@ -151,10 +147,11 @@ class PrendusGradeAssignment extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
-    if (keys.includes('questions')) this.questions = componentState.questions;
-    if (keys.includes('question')) this.question = componentState.question;
+    if (keys.includes('responses')) this.responses = componentState.responses;
+    if (keys.includes('response')) this.response = componentState.response;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('grades')) this.grades = componentState.grades;
+    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }

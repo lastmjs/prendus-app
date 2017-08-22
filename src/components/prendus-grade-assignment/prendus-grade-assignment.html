@@ -21,17 +21,17 @@
 
     <h2>[[assignment.title]] Grade Assignment</h2>
     <br>
-    <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]">
-      <div hidden$="[[!question]]">
+    <prendus-carousel id="carousel" hide-back next-text="Submit" label="Response" data="[[responses]]">
+      <div hidden$="[[!response]]">
         <h4>Question</h4>
-        <p>[[_questionText(question.text)]]</p>
+        <p>[[_questionText(response.questionResponse.question.text)]]</p>
         <h4>Response</h4>
-        <p>[[question.responses.0.responses.0.value]]</p>
-        <prendus-rubric-dropdowns rubric="[[rubric]]"></prendus-rubric-dropdowns>
+        <p>[[response.value]]</p>
+        <prendus-rubric-dropdowns rubric="[[_parseRubric(response.questionResponse.question.code)]]"></prendus-rubric-dropdowns>
       </div>
-      <div hidden$="[[question]]">
+      <div hidden$="[[response]]">
         <h3>Done</h3>
-        <p>You have finished all the questions for this assignment</p>
+        <p>You have finished all the responses for this grading assignment</p>
       </div>
     </prendus-carousel>
 

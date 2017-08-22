@@ -14,6 +14,10 @@ class PrendusCarousel extends Polymer.Element {
         type: Array,
         observer: '_initCarousel'
       },
+      label: {
+        type: String,
+        value: 'Question'
+      }
       currentIndex: {
         type: Number,
         value: 0
