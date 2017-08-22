@@ -47,30 +47,37 @@ class PrendusScaffold extends Polymer.Element {
   }
 
   _handleConcept(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('concept', e.detail.concept);
   }
 
   _handleResource(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('resource', e.target.value);
   }
 
   _handleQuestion(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('question', e.target.value);
   }
 
   _handleAnswer(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('answer', e.target.value);
   }
 
   _handleSolution(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('solution', e.target.value);
   }
 
   _handleDistractors(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('distractors', e.detail.distractors);
   }
 
   _handleHints(e) {
+    this._fireLocalAction('error', null);
     this._fireLocalAction('hints', e.detail.hints);
   }
 
@@ -94,7 +101,17 @@ class PrendusScaffold extends Polymer.Element {
     return [mChoice(answer, hints[0], true)].concat(distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false)));
   }
 
-  _valid(): boolean {
+  _validate(): boolean {
+    const empty = str => str == undefined || str.toString().trim() === '';
+    const someEmpty = (bitOr, str) => bitOr || empty(str);
+    if (empty(this.concept.id) && empty(this.concept.title)) throw new Error('Concept must be entered or selected');
+    if (empty(this.resource)) throw new Error('Resource must not be empty');
+    if (empty(this.question)) throw new Error('Question text must not be empty');
+    if (empty(this.answer)) throw new Error('You must provide a correct answer');
+    if (this.distractors.length !== 3 || this.distractors.reduce(someEmpty, false))
+      throw new Error('Incorrect answers must not be empty');
+    if (this.hints.length !== 4 || this.hints.reduce(someEmpty, false))
+      throw new Error('Answer comments must not be empty');
     return true;
   }
 
@@ -122,8 +139,10 @@ class PrendusScaffold extends Polymer.Element {
   }
 
   submit(): void {
-    if (!this._valid()) {
-      console.log('Invalid!');
+    try {
+      this._validate();
+    } catch (e) {
+      this._fireLocalAction('error', e);
       return;
     }
     const answers = shuffleArray(this._scaffoldAnswers(this.answer, this.distractors, this.hints));
@@ -141,7 +160,6 @@ class PrendusScaffold extends Polymer.Element {
     };
     const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
     this.dispatchEvent(evt);
-    this.clear();
   }
 
   stateChange(e: CustomEvent) {
@@ -157,6 +175,7 @@ class PrendusScaffold extends Polymer.Element {
     if (keys.includes('solution')) this.solution = componentState.solution;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
     if (keys.includes('hints')) this.hints = componentState.hints;
+    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }

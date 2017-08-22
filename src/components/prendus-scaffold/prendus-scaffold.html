@@ -5,14 +5,12 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="prendus-scaffold-new-question.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
 <link rel="import" href="prendus-scaffold-comments.html">
-<link rel="import" href="prendus-scaffold-explanation.html">
 <link rel="import" href="prendus-scaffold-example.html">
-<link rel="import" href="prendus-scaffold-resource.html">
 <link rel="import" href="prendus-scaffold-concept.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-error/prendus-error.html">
 
 <dom-module id="prendus-scaffold">
     <template>
@@ -219,6 +217,7 @@
             </div>
           </template>
         </div>
+        <prendus-error error="[[error]]"></prendus-error>
     </template>
 
     <script type="module" src="prendus-scaffold.ts"></script>
