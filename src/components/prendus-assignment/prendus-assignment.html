@@ -12,9 +12,6 @@
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
-<link rel="import" href="../prendus-question-review/prendus-question-review.html">
-<link rel="import" href="prendus-assignment-quiz.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-assignment">
@@ -69,55 +66,50 @@
           padding-left: 10px;
           padding-top: 10px;
         }
+        .grid {
+          display: grid;
+          grid-auto-flow: column;
+          grid-template-columns: 1fr 1fr;
+          grid-gap: 10px;
+        }
         </style>
         <dom-if if="[[loaded]]">
             <template>
-                <dom-if if="[[isViewMode(mode)]]">
-                    <template>
-                        <dom-if if="[[isCreateType(assignmentType)]]">
-                            <template>
-                                <!--TODO just pass in an assignment object to prendus-scaffold, then we can get rid of the concepts property-->
-                                <prendus-scaffold assignment="[[assignment]]"></prendus-scaffold>
-                            </template>
-                        </dom-if>
-
-                        <dom-if if="[[isReviewType(assignmentType)]]">
-                            <template>
-                                <prendus-question-review assignment-id="[[assignmentId]]"></prendus-question-review>
-                            </template>
-                        </dom-if>
-                        <dom-if if="[[isQuizType(assignmentType)]]">
-                            <template>
-                                <prendus-assignment-quiz assignment-id="[[assignmentId]]"></prendus-assignment-quiz>
-                            </template>
-                        </dom-if>
-                    </template>
-                </dom-if>
-
-                <dom-if if="[[isEditMode(mode)]]">
-                  <template>
-                    <!-- <h1>Edit Assignment</h1> -->
-                    <a href="course/[[courseId]]/edit" class="prendus-button">Return to Course</a>
-                    <paper-input id="assignment-title" class="edit-input" name="title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
-                    <h2>Concepts</h2>
-                    <dom-repeat items="[[assignment.concepts]]">
-                      <template>
-                          <h4>[[item.title]]</h4>
-                      </template>
-                    </dom-repeat>
-                    <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add or Remove Concepts</button>
-                    <div id="assignment-options">
-                      <paper-dropdown-menu label="Question Type" on-selected-item-changed="setQuestionType">
-                        <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[questionType]]">
+                  <!-- <h1>Edit Assignment</h1> -->
+                  <a href="course/[[courseId]]/edit" class="prendus-button">Return to Course</a>
+                  <paper-input id="assignment-title" class="edit-input" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
+                  <br>
+                  <div class="grid">
+                    <div class="grid-cell">
+                      <h2>Concepts</h2>
+                      <dom-repeat items="[[assignment.concepts]]">
+                        <template>
+                            <h4>[[item.title]]</h4>
+                        </template>
+                      </dom-repeat>
+                      <button class="prendus-button prendus-button--recommended" on-click="openAssignmentConceptDialog">Add or Remove Concepts</button>
+                    </div>
+                    <div class="grid-cell">
+                      <h2>Options</h2>
+                      <paper-dropdown-menu id="questionTypes" label="Question Type" on-selected-item-changed="saveData">
+                        <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[assignment.questionType]]">
                           <dom-repeat items="[[questionTypes]]">
                             <template>
-                              <paper-item id="[[item.value]]">[[item.label]]</paper-item>
+                              <paper-item id="[[item]]">[[item]]</paper-item>
                             </template>
                           </dom-repeat>
                         </paper-listbox>
-                      </prendus-dropdown>
+                      </paper-dropdown-menu>
+                      <paper-input id="create" type="number" min="1" label="# Questions for Create Assignment" value="[[assignment.create]]" on-change="saveData"></paper-input>
+                      <paper-input id="review" type="number" min="1" label="# Questions for Review Assignment" value="[[assignment.review]]" on-change="saveData"></paper-input>
+                      <dom-if if="[[isEssayType(assignment.questionType)]]">
+                        <template>
+                          <paper-input id="grade" type="number" min="1" label="# Responses for Grade Assignment" value="[[assignment.grade]]" on-change="saveData"></paper-input>
+                        </template>
+                      </dom-if>
+                      <paper-input id="take" type="number" min="1" label="# Questions for Take Assignment" value="[[assignment.take]]" on-change="saveData"></paper-input>
                     </div>
-                  </template>
+                  </div>
                   <paper-dialog id="assignmentConceptDialog" modal>
                     <paper-dialog-scrollable>
                       <div id="conceptsDialog">
