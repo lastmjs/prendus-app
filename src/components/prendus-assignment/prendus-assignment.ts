@@ -5,7 +5,7 @@ import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 import {AssignmentType} from '../../typings/assignment-type';
 
@@ -145,7 +145,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+          setNotification(error.message, "error")
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
@@ -178,7 +178,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, variableString, (error: any) => {
-          console.log(error);
+          setNotification(error.message, "error")
       });
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
@@ -203,7 +203,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {},
           (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
@@ -223,7 +223,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }

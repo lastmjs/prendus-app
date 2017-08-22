@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate, GQLrequest} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext} from '../../redux/actions'
+import {setDisabledNext, setNotification} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
@@ -148,7 +148,7 @@ class PrendusQuestionReview extends Polymer.Element {
             }
 
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
     }
     generateQuestionScaffolds(){
@@ -201,7 +201,7 @@ class PrendusQuestionReview extends Polymer.Element {
           }`;
         GQLrequest(mutation, variables, this.userToken);
       } catch(error) {
-        console.error(error);
+        setNotification(error.message, "error")
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);

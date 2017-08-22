@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext, checkForUserToken} from '../../redux/actions'
+import {setDisabledNext, checkForUserToken, setNotification} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
 import {Question} from '../../typings/question';
@@ -76,7 +76,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Assignment) => {
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         if(questionData.Assignment){
           const quizQuestions = shuffleArray(questionData.Assignment.questions).slice(0,10);
@@ -99,7 +99,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-          alert(error);
+          setNotification(error.message, "error")
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }

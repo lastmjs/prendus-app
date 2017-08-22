@@ -7,7 +7,7 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
@@ -114,7 +114,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+          setNotification(error.message, "error")
       });
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
@@ -142,7 +142,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+          setNotification(error.message, "error")
       });
       if(this.course.subject){
         await GQLMutate(`
@@ -157,7 +157,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-          console.log('error', error)
+            setNotification(error.message, "error")
         });
       }
       this._fireLocalAction('selectedDisciplineId', disciplineId)
@@ -197,7 +197,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+        setNotification(error.message, "error")
       });
       this._fireLocalAction('selectedSubjectId', subjectId)
       this._fireLocalAction('course', {
@@ -240,7 +240,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+          setNotification(error.message, "error")
           alert(error);
       });
       // this.loadData()
@@ -281,7 +281,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         this.shadowRoot.querySelector('#create-assignment').close();
         // navigate(`assignment/${data.createAssignment.id}/edit`)
@@ -298,7 +298,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-          console.log(error);
+          setNotification(error.message, "error")
       });
       this.loadData();
     }
@@ -329,7 +329,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         this._fireLocalAction('assignments', data.allAssignments)
         this._fireLocalAction('course', data.Course)
@@ -403,7 +403,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (key: string, value: any) => {
         this._fireLocalAction('learningStructure', value)
       }, (error: any) => {
-          console.log(error);
+          setNotification(error.message, "error")
       });
     }
     stateChange(e: CustomEvent) {

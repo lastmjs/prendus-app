@@ -2,7 +2,7 @@ import {ContainerElement} from '../../typings/container-element';
 import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions';
 import {GQLQuery} from '../../services/graphql-service';
 import {Quiz} from '../../typings/quiz';
-import {checkForUserToken} from '../../redux/actions';
+import {checkForUserToken, setNotification} from '../../redux/actions';
 import {createUUID} from '../../services/utilities-service';
 import {Question} from '../../typings/question';
 
@@ -151,7 +151,7 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
     }
 
@@ -200,7 +200,6 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
-
         if (Object.keys(state.components[this.componentId] || {}).includes('quizId')) this.quizId = state.components[this.componentId].quizId;
         if (Object.keys(state.components[this.componentId] || {}).includes('random')) this.random = state.components[this.componentId].random;
         if (Object.keys(state.components[this.componentId] || {}).includes('numberOfQuestions')) this.numberOfQuestions = state.components[this.componentId].numberOfQuestions;

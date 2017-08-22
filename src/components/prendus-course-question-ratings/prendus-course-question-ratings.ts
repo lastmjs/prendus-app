@@ -11,6 +11,7 @@ import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {createUUID} from '../../services/utilities-service';
 import {parse} from '../../node_modules/assessml/assessml';
+import {setNotification} from '../../redux/actions'
 
 class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
@@ -58,7 +59,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _handleError(error: any) {
     //TODO: use notification service when finished
-    console.log('error', error);
+    setNotification(error.message, "error")
   }
 
   _subscribeToData() {

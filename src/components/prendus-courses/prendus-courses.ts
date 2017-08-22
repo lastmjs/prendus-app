@@ -4,7 +4,7 @@ import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {State} from '../../typings/state';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
@@ -68,7 +68,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
     }
     async openDeleteModal(e: any): void {
@@ -83,7 +83,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+          setNotification(error.message, "error")
       });
       this.loadData()
 			// this.shadowRoot.querySelector('#confirm-delete-modal').open();
@@ -110,13 +110,13 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (error: any) => {
-            console.log(error);
+            setNotification(error.message, "error")
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;
         this.shadowRoot.querySelector('#add-course-modal').close();
         navigate(`/course/${data.createCourse.id}/edit`)
       }else{
-        alert('Add a title to continue')
+        setNotification("Add a title to continue", "error")
       }
 
     }
@@ -140,7 +140,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
 
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.courses = state[`coursesFromUser${this.user ? this.user.id : null}`];
         this.userToken = state.userToken;

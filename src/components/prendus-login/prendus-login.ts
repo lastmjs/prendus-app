@@ -3,7 +3,7 @@ import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {persistUserToken} from '../../redux/actions';
+import {persistUserToken, setNotification} from '../../redux/actions';
 import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service';
 import {EMAIL_REGEX} from '../../services/constants-service';
 
@@ -27,27 +27,17 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     constructor() {
         super();
-
         this.componentId = createUUID();
     }
 
     async connectedCallback() {
         super.connectedCallback();
-
         this.action = {
             type: 'SET_COMPONENT_PROPERTY',
             componentId: this.componentId,
             key: 'loaded',
             value: true
         };
-    }
-
-    loadData() {
-
-    }
-
-    subscribeToData() {
-
     }
     hardValidateEmail(): void {
   		const emailElement: any = this.shadowRoot.querySelector('#email');
@@ -59,9 +49,11 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
   		if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
   	}
 
-  	enableLogIn(email: string, password: string): boolean {
-  		return 	email.match(EMAIL_REGEX) !== null
-  				&&	password.length >= 6;
+  	enableLogIn(email: string, password: string){
+      if(email && password){
+        return 	email.match(EMAIL_REGEX) !== null
+            &&	password.length >= 6;
+      }
   	}
 
   	loginOnEnter(e: any) {
@@ -83,37 +75,26 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     	// 	}
     	// }
     async loginClick() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
-        };
-
+        //need to scope this so that we can access it to log errors
+        const that = this;
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const data = await signinUser(email, password, this.userToken);
-        const gqlUser = await getUser(email, password, data.signinUser.token)
-        const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
-        const ownedCourses = gqlUser.User.ownedCourses;
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: coursesRedux,
-            value: ownedCourses
-        };
-        this.action = persistUserToken(data.signinUser.token);
-        this.action = setUserInRedux(gqlUser.User);
-        await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
-        navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
-        deleteCookie('redirectUrl');
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-
+        if(data){
+          const gqlUser = await getUser(email, password, data.signinUser.token)
+          const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
+          const ownedCourses = gqlUser.User.ownedCourses;
+          this.action = {
+              type: 'SET_PROPERTY',
+              key: coursesRedux,
+              value: ownedCourses
+          };
+          this.action = persistUserToken(data.signinUser.token);
+          this.action = setUserInRedux(gqlUser.User);
+          await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
+          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
+          deleteCookie('redirectUrl');
+        }
         async function signinUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLMutate(`
@@ -126,7 +107,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                console.log(error);
+              that.action = setNotification(error.message, "error")
             });
             return data;
         }
@@ -142,13 +123,14 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                console.log(error);
+              that.action = setNotification(error.message, "error")
             });
             return data;
         }
 
         async function getUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
+            const that = this;
             const data = await GQLQuery(`
               query {
                 User(email:"${email}") {
@@ -162,7 +144,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
               }
             `, userToken, (key: string, value: any) => {
             }, (error: any) => {
-                alert(error);
+            that.action = setNotification(error.message, "error")
             });
             return data;
         }

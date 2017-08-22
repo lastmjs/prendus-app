@@ -10,8 +10,18 @@
           :host{
             display: block;
           }
+          .error{
+            background-color: red;
+          }
+          .success{
+            background-color: green;
+          }
+          #toast{
+            margin-left: 30px;
+            margin-bottom: 30px;
+          }
         </style>
-        <paper-toast id="toast" text="[[message]]"></paper-toast>
+        <paper-toast id="toast" text="[[notificationMessage]]" duration="[[duration]]"></paper-toast>
     </template>
 
     <script type="module" src="prendus-notification.ts"></script>

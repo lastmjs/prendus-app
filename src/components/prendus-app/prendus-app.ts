@@ -4,6 +4,7 @@ import {navigate} from '../../services/utilities-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';
+import {Notification} from '../../typings/notification';
 import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
 import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
@@ -12,8 +13,7 @@ class PrendusApp extends Polymer.Element {
     user: User | null;
     action: SetPropertyAction | DefaultAction;
     userToken: string | null;
-    notificationMessage: string | null;
-    notificationType: string | null;
+    notification: Notification | null;
     static get is() { return 'prendus-app'; }
 
     constructor() {
@@ -120,7 +120,7 @@ class PrendusApp extends Polymer.Element {
         const state: State = e.detail.state;
         this.user = state.user;
         this.userToken = state.userToken;
-
+        this.notification = state.notification;
     }
 }
 
