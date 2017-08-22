@@ -1,14 +1,12 @@
-import {GQLQuery, GQLMutate, GQLMutateWithVariables, GQLrequest} from '../../services/graphql-service';
+import {GQLrequest} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {createUUID} from '../../services/utilities-service';
 import {QUESTION_TYPES} from '../../services/constants-service';
-import {AssignmentType} from '../../typings/assignment-type';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
   componentId: string;
@@ -99,13 +97,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       alert('Must enter a valid title for the new concept before adding it')
       return;
     }
-    const newConcept = e.target;
-    const customConcept = this.shadowRoot.querySelector('#custom-concept').value;
-    const data = await GQLMutate(`
-      mutation{
+    const title = this.shadowRoot.querySelector('#custom-concept').value;
+    const data = await GQLrequest(`
+      mutation concept($title: String!, $subjectId: ID!) {
         createConcept(
-          title: "${customConcept}"
-          subjectId: "${this.assignment.course.subject.id}"
+          title: $title
+          subjectId: $subjectId
         ){
           id
           title
@@ -117,9 +114,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, this.userToken, (error: any) => {
-        console.log(error);
-    });
+    `, {title, subjectId: this.assignment.course.subject.id}, this.userToken);
     this._fireLocalAction('concepts', data.createConcept.subject.concepts)
     this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
     this.shadowRoot.querySelector('#custom-concept').value = '';
@@ -127,14 +122,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
   async updateAssignmentConcepts(e: any){
     // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
-    const conceptIds = this.selectedConcepts.map((concept: Concept)=>{
-      return `"${concept.id}"`
-    })
-    const variableString = `{"conceptsIds": [${conceptIds}]}`
-    const data = await GQLMutateWithVariables(`
-      mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!]) {
+    const conceptsIds = this.selectedConcepts.map(concept => concept.id);
+    const data = await GQLrequest(`
+      mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!], $id: ID!) {
         updateAssignment(
-          id: "${this.assignmentId}"
+          id: $id
           conceptsIds: $conceptsIds
         ) {
           id
@@ -151,17 +143,15 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, this.userToken, variableString, (error: any) => {
-        console.log(error);
-    });
+    `, {conceptsIds, id: this.assignmentId}, this.userToken);
     this._fireLocalAction('assignment', data.updateAssignment)
     this.shadowRoot.querySelector('#assignmentConceptDialog').close();
   }
 
   async loadData() {
-    const data = await GQLQuery(`
-      query {
-        Assignment(id: "${this.assignmentId}") {
+    const data = await GQLrequest(`
+      query assignment($id: ID!) {
+        Assignment(id: $id) {
           id
           title
           questionType
@@ -181,10 +171,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, this.userToken, (key: string, value: any) => {},
-      (error: any) => {
-        console.log(error);
-    });
+    `, {id: this.assignmentId}, this.userToken);
     this.loadConcepts(data.Assignment.course.subject.id);
     this._fireLocalAction('assignment', data.Assignment)
     this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
@@ -192,9 +179,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   }
 
   async loadConcepts(subjectId: string){
-    const conceptData = await GQLQuery(`
-      query {
-        Subject(id:"${subjectId}"){
+    const conceptData = await GQLrequest(`
+      query subject($subjectId: ID!) {
+        Subject(id: $subjectId){
           id
           concepts{
             id
@@ -202,10 +189,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, this.userToken, (key: string, value: any) => {
-    }, (error: any) => {
-      console.log(error);
-    });
+    `, {subjectId}, this.userToken);
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
   }
 
