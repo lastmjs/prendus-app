@@ -97,14 +97,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     removeAssignmentConcept(e){
-      if(this.selectedConcepts.length === 1){
-        alert('The Assignment needs at least 1 Concept')
-      }else{
-        const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
-          return e.model.item.id !== concept.id;
-        })
-        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
-      }
+      const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
+        return e.model.item.id !== concept.id;
+      })
+      this._fireLocalAction('selectedConcepts', newSelectedConcepts);
     }
     addConceptToAssignmentConcepts(e){
       const conceptInSelectedConcepts = this.selectedConcepts.filter((concept)=>{
@@ -123,7 +119,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        alert('Must enter a valid title for the new concept before adding it')
+        setNotification("Must enter a valid title for the new concept before adding it", "error")
         return;
       }
       const newConcept = e.target;
