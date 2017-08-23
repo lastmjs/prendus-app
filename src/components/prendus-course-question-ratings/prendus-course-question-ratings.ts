@@ -175,7 +175,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
     const first: number = sortAsc ? 1 : -1;
     const last: number = first > 0 ? -1 : 1;
-    console.log(first, last);
     return (a: QuestionRatingStats, b: QuestionRatingStats) => {
       if (sortField === 'Student') {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
@@ -250,12 +249,21 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
+    // Here we need to make an array for each category for each question.
+    // The array will be assigned to an object where the key is the rubric category name
+    // The arrays values will represent the number of students who rated the question with
+    // a certain score in that category where the score is the index in the array
+    // So if 1 student gave a score of 0 in a category and 2 others gave a score of 1 then the
+    // category for that question: CategoryName: [1, 2]. We use that for the bar chart and the overall score
     return flatten(assignments.map(assignment => assignment.questions.map(question => {
       const stats = flatten(question.ratings.map(rating => rating.scores)).reduce((result, rating) => {
-        if (!result.hasOwnProperty(rating.category)) result[rating.category] = [];
-        while (rating.score > result[rating.category].length - 1) result[rating.category].push(0);
-        result[rating.category][rating.score]++;
-        return result;
+        const existent = result[rating.category] || [];
+        const tailLen = rating.score + 1 - existent.length;
+        const data = tailLen > 0
+          ? [...existent, ...Array(tailLen).fill(0)]
+          : existent;
+        data[rating.score]++;
+        return {...result, [rating.category]: data};
       }, {});
       const overall = this._overallScore(stats);
       return {
