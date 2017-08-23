@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 274
+# version: 275
 
 type File implements Node {
   id: ID! @isUnique
@@ -189,7 +189,7 @@ type LTIUser implements Node {
 type PrendusAnalytics implements Node {
   user: User @relation(name: "UserOnPrendusAnalytics")
   contextId: String!
-  contextType: String!
+  contextType: ContextType!
   verb: String!
   object: String!
   createdAt: DateTime!
@@ -207,6 +207,13 @@ enum PrendusApproved {
   YES
   NO
   TBD
+}
+
+enum ContextType {
+  QUESTION
+  ASSIGNMENT
+  QUIZ
+  COURSE
 }
 
 enum ResponseType {
