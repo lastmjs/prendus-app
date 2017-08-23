@@ -48,11 +48,10 @@ class PrendusCreateAssignment extends Polymer.Element {
     const { question } = e.detail;
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
-    console.log(question);
     const questionId = await save(questionVars);
     if (answerComments)
       answerComments.forEach(comment => { this.saveAnswerComment({ text: comment, questionId }) });
-    this.$.carousel.nextData();
+    this.shadowRoot.querySelector('#carousel').nextData();
   }
 
   isEssayType(questionType: string): boolean {
@@ -81,7 +80,9 @@ class PrendusCreateAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId}, this.userToken);
-    const questions = Array(data.Assignment.create).fill({});
+    // Create array of "questions" just to create carousel events to create multiple questions
+    // avoid 0 because question is evaluated as a boolean
+    const questions = Array(data.Assignment.create).fill(null).map((dummy, i) => i+1);
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', questions);
   }

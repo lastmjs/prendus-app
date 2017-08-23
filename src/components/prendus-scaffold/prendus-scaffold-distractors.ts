@@ -21,7 +21,11 @@ class PrendusScaffoldDistractors extends Polymer.Element {
   static get properties() {
     return {
       question: String,
-      answer: String
+      answer: String,
+      init: {
+        type: Array,
+        observer: '_init'
+      }
     }
   }
 
@@ -32,7 +36,6 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('distractors', Array(3));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -44,8 +47,12 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     }
   }
 
+  _init(init: string[]) {
+    this._fireLocalAction('distractors', init);
+  }
+
   _notify(distractors: string[]) {
-    const evt = new CustomEvent('distractors-changed', {bubbles: false, composed: true, detail: {distractors}});
+    const evt = new CustomEvent('distractors-changed', {composed: true, detail: {distractors}});
     this.dispatchEvent(evt);
   }
 

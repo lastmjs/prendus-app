@@ -131,7 +131,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-concept assignment="[[assignment]]"></prendus-scaffold-concept>
+                <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]"></prendus-scaffold-concept>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -148,7 +148,7 @@
                     </li>
                   </ol>
                 </div>
-                <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" on-change="_handleResource"></paper-input>
+                <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-change="_handleResource"></paper-input>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -164,13 +164,13 @@
                   </ol>
                 </div>
                   <div>
-                    <paper-textarea id="question" on-value-changed="_handleQuestion" label="Question"></paper-textarea>
+                    <paper-textarea id="question" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
                   </div>
                   <div>
-                    <paper-textarea id="answer" on-value-changed="_handleAnswer" label="Correct Answer"></paper-textarea>
+                    <paper-textarea id="answer" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
                   </div>
                   <div>
-                    <paper-textarea id="solution" on-value-changed="_handleSolution" label="Solution (Optional)"></paper-textarea>
+                    <paper-textarea id="solution" on-value-changed="_handleSolution" value="[[solution]]" label="Solution (Optional)"></paper-textarea>
                   </div>
               </div>
               <div>
@@ -179,19 +179,19 @@
                   thinking about common misconceptions students may have
                   about the content area of your question.
                 </div>
-                <prendus-scaffold-distractors question="[[question]]" answer="[[answer]]"></prendus-scaffold-distractors>
+                <prendus-scaffold-distractors question="[[questionText]]" answer="[[answer]]" init="[[distractors]]"></prendus-scaffold-distractors>
               </div>
               <div>
                 <div class="prendus-card big">
                   Add comments to the question and answers that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
-                <prendus-scaffold-comments question="[[question]]" answers="[[_answers(answer, distractors)]]"></prendus-scaffold-comments>
+                <prendus-scaffold-comments question="[[questionText]]" answers="[[_scaffoldAnswers(answer, distractors, hints)]]"></prendus-scaffold-comments>
               </div>
               <div>
                 <div class="prendus-card centered">
                   <h3>Final Question</h3>
                 </div>
-                <prendus-scaffold-example question-scaffold="[[_scaffold(concept, resource, question, solution, answer, distractors, hints)]]"></prendus-scaffold-example>
+                <prendus-scaffold-example question-scaffold="[[_scaffold(concept, resource, questionText, solution, answer, distractors, hints)]]"></prendus-scaffold-example>
               </div>
             </iron-pages>
           </div>

@@ -71,10 +71,10 @@
           <template is="dom-repeat" items="[[answers]]">
             <div class="row">
               <div class="prendus-card left-column answer-card">
-                [[item]]
+                [[item.text]]
               </div>
               <div class="prendus-card right-column">
-                <paper-textarea id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[createComment(index)]]" on-value-changed="_hintsChanged"></paper-textarea>
+                <paper-textarea always-float-label id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[item.comment]]" on-value-changed="_commentsChanged"></paper-textarea>
               </div>
             </div>
           </template>

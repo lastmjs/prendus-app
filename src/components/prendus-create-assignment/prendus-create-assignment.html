@@ -21,12 +21,12 @@
       <div hidden$="[[!question]]">
         <dom-if if="[[isEssayType(assignment.questionType)]]">
           <template>
-            <prendus-essay-scaffold id="scaffold" assignment="[[assignment]]"></prendus-essay-scaffold>
+            <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]"></prendus-essay-scaffold>
           </template>
         </dom-if>
         <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
           <template>
-            <prendus-multiple-choice-scaffold assignment="[[assignment]]"></prendus-multiple-choice-scaffold>
+            <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]"></prendus-multiple-choice-scaffold>
           </template>
         </dom-if>
       </div>

@@ -21,7 +21,8 @@ class PrendusScaffoldConcept extends Polymer.Element {
   static get is() { return 'prendus-scaffold-concept'; }
   static get properties() {
     return {
-      assignment: Object
+      assignment: Object,
+      selectedConcept: Object
     };
   }
 

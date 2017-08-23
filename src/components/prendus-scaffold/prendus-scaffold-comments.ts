@@ -5,7 +5,7 @@ import {createUUID} from '../../services/utilities-service';
 /*
  * This component takes a question and an array of answers, assuming the first is the correct answer.
  * It displays a text input for each answer as a place for the user to provide comments and/or hints for that answer
- * It fires an event `hints-changed` whenever the data changes
+ * It fires an event `comments-changed` whenever the data changes
  * Intended use: the parent component will consume the event and use these to create answer comments for new questions.
  * In the future this component should probably take an array of answer objects that can be correct or incorrect in any order
  */
@@ -18,10 +18,7 @@ class PrendusScaffoldComments extends Polymer.Element {
   static get properties() {
     return {
       question: String,
-      answers: {
-        type: Array,
-        observer: '_initHints'
-      }
+      answers: Array
     };
   }
 
@@ -44,27 +41,16 @@ class PrendusScaffoldComments extends Polymer.Element {
     };
   }
 
-  _initHints(answers: string[]) {
-    //assuming first answer is correct
-    const hints = ['Correct'].concat(answers.slice(1, answers.length).map(answer => 'Incorrect'));
-    this._fireLocalAction('hints' hints);
-    this._notify(hints);
-  }
-
-  _notify(hints: string[]) {
-    const evt = new CustomEvent('hints-changed', {bubbles: false, composed: true, detail: {hints}});
+  _notify(comments: string[]) {
+    const evt = new CustomEvent('comments-changed', {bubbles: false, composed: true, detail: {comments}});
     this.dispatchEvent(evt);
   }
 
-  _hintsChanged(e) {
-    const hints = this.hints.slice();
-    hints[e.model.itemsIndex] = e.target.value;
-    this._fireLocalAction('hints', hints);
-    this._notify(hints);
-  }
-
-  createComment(index: number){
-    return index !== 0 ? 'Incorrect' : 'Correct'
+  _commentsChanged(e) {
+    const comments = this.answers.map(answer => answer.comment);
+    comments[e.model.itemsIndex] = e.target.value;
+    this._fireLocalAction('comments', comments);
+    this._notify(comments);
   }
 
   plusOne(index: number): number {
@@ -76,7 +62,7 @@ class PrendusScaffoldComments extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('hints')) this.hints = componentState.hints;
+    if (keys.includes('comments')) this.comments = componentState.comments;
   }
 }
 
