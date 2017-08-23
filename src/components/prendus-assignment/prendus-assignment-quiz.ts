@@ -101,17 +101,23 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           }
       `, this.userToken, (error: any) => {
           alert(error);
+          console.log('error', error)
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }
 
-    submitQuiz(){
-      sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "SUBMITTED", "QUIZ")
-      window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
+    async submitQuiz(){
+      const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
           credentials: 'include'
       });
+      if(LTIResponse.ok === true){
+        sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "SUBMITTED", "QUIZ")
+      }else{
+        //TODO input a notication error message here once the notifications are merged.
+      }
+
       alert('Congratulations! You have successfully completed the Quiz')
     }
 

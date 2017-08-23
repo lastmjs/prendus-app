@@ -5,7 +5,7 @@ export async function sendStatement(userId: string, contextId: string, contextTy
     mutation{
       createPrendusAnalytics(
         contextId: "${contextId}"
-        contextType: "${contextType}"
+        contextType: ${contextType}
         verb: "${verb}"
         object: "${object}"
       ){
