@@ -67,6 +67,10 @@ type Assignment implements Node {
   questionType: QuestionType! @migrationValue(value: MULTIPLE_CHOICE)
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
+  numCreateQuestions: Int! @defaultValue(value: 1)
+  numReviewQuestions: Int! @defaultValue(value: 3)
+  numGradeResponses: Int! @defaultValue(value: 3)
+  numResponseQuestions: Int! @defaultValue(value: 10)
 }
 
 type Quiz implements Node {
