@@ -21,9 +21,13 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   static get is() { return 'prendus-essay-scaffold' }
 
-  static properties() {
+  static get properties() {
     return {
-      assignment: Object
+      assignment: Object,
+      question: {
+        type: Number,
+        observer: '_initScaffold'
+      }
     }
   }
 
@@ -35,7 +39,6 @@ class PrendusEssayScaffold extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this._fireLocalAction('rubric', {});
     this.addEventListener('question-rubric-table', this._handleRubric.bind(this));
     this.addEventListener('concept-selected', this._handleConcept.bind(this));
   }
@@ -76,12 +79,13 @@ class PrendusEssayScaffold extends Polymer.Element {
     return step < this.$.ironPages.children.length - 1;
   }
 
-  clear() {
+  _initScaffold(question) {
+    console.log('questionchanged');
     this._fireLocalAction('step', 0);
     this._fireLocalAction('resource', '');
     this._fireLocalAction('questionText', '');
     this._fireLocalAction('rubric', {});
-    this._fireLocalAction('concept', {});
+    this._fireLocalAction('concept', null);
   }
 
   _handleConcept(e) {
@@ -133,9 +137,8 @@ class PrendusEssayScaffold extends Polymer.Element {
       text,
       code
     };
-    const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
+    const evt = new CustomEvent('question-created', {composed: true, detail: {question}});
     this.dispatchEvent(evt);
-    this.clear();
   }
 
   stateChange(e: CustomEvent) {
