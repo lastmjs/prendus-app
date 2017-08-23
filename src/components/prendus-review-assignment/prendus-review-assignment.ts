@@ -111,13 +111,17 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
+    const data = await GQLrequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
         questionType
         review
-        questions {
+        questions(filter: {
+          author: {
+            id_not: $userId
+          }
+        }) {
           id
           text
           code
@@ -131,7 +135,7 @@ class PrendusReviewAssignment extends Polymer.Element {
           }
         }
       }
-    }`, {assignmentId}, this.userToken);
+    }`, {assignmentId, userId: this.user.id}, this.userToken);
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.review));
   }
