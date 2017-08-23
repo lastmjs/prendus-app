@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {checkForUserToken, setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold} from '../../redux/actions';
+import {checkForUserToken, setDisabledNext, initCurrentQuestionScaffold, updateCurrentQuestionScaffold, setNotification} from '../../redux/actions';
 import {User} from '../../typings/user';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
@@ -13,7 +13,7 @@ import {Assignment} from '../../typings/assignment';
 import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID, getPrendusLTIServerOrigin, } from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;
@@ -123,7 +123,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       Object.keys(question.answerComments).forEach((key) => {
           GQLMutate(`
@@ -136,7 +136,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
               }
             }
           `, this.userToken, (error: any) => {
-              console.log(error);
+              this.action = setNotification(error.message, NotificationType.ERROR)
           });
       });
       this.action = {
@@ -166,7 +166,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             }
           }
         `, this.userToken, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         return conceptData.createConcept.id
       }else{

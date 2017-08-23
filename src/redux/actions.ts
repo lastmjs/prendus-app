@@ -89,7 +89,16 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
       value: disableNext
   };
 };
-
+export function setNotification(message: string, type: string): SetPropertyAction {
+  return {
+      type: 'SET_PROPERTY',
+      key: 'notification',
+      value: {
+        message,
+        type
+      }
+  };
+};
 export function updateCurrentQuestionScaffold (currentQuestionScaffold: QuestionScaffold, concept: Concept, resource: string, questionStem: string | null, comments: string[], answers: string[], explanation: string | null): SetPropertyAction {
   const answersObj: { [questionScaffoldAnswerId: string]: QuestionScaffoldAnswer } = getAnswers(currentQuestionScaffold, answers, comments);
   return {

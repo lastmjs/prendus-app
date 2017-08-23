@@ -1,7 +1,6 @@
 import {GQLMutate} from '../services/graphql-service';
-import {ContextType} from '../services/constants-service'
 
-export async function sendStatement(userId: string, contextId: string, contextType: ContextType, verb: string, object: string): Promise<void> {
+export async function sendStatement(userId: string, contextId: string, contextType: string, verb: string, object: string): Promise<void> {
   const createStatement = await GQLMutate(`
     mutation{
       createPrendusAnalytics(

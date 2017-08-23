@@ -5,11 +5,11 @@ import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {AssignmentType} from '../../typings/assignment-type';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -105,14 +105,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     removeAssignmentConcept(e){
-      if(this.selectedConcepts.length === 1){
-        alert('The Assignment needs at least 1 Concept')
-      }else{
-        const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
-          return e.model.item.id !== concept.id;
-        })
-        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
-      }
+      const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
+        return e.model.item.id !== concept.id;
+      })
+      this._fireLocalAction('selectedConcepts', newSelectedConcepts);
     }
     addConceptToAssignmentConcepts(e){
       const conceptInSelectedConcepts = this.selectedConcepts.filter((concept)=>{
@@ -131,7 +127,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        alert('Must enter a valid title for the new concept before adding it')
+        this.action = setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
         return;
       }
       const newConcept = e.target;
@@ -153,7 +149,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
@@ -186,7 +182,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, variableString, (error: any) => {
-          console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
@@ -211,7 +207,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {},
           (error: any) => {
-            console.log(error);
+            this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
@@ -231,7 +227,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            console.log(error);
+          this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }

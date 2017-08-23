@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {updateCurrentQuestionScaffold} from '../../redux/actions';
+import {updateCurrentQuestionScaffold, setNotification} from '../../redux/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {QuestionScaffold} from '../../typings/question-scaffold';
@@ -79,7 +79,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
           this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.selectedConcept, null, null, null, null, null);
         }
       } catch(error) {
-        console.error(error);
+        setNotification(error, NotificationType.ERROR)
       }
     }
     plusOne(index: number): number {

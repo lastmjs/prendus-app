@@ -2,10 +2,12 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     disciplineId: string;
@@ -100,7 +102,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 
@@ -118,7 +120,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                alert(error);
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
@@ -132,7 +134,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 }
             `, this.userToken, (error: any) => {
               console.log('error', error)
-                alert(error);
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             this.action = {
