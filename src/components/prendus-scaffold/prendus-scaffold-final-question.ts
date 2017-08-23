@@ -13,7 +13,7 @@ import {Assignment} from '../../typings/assignment';
 import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID, getPrendusLTIServerOrigin, } from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ASSIGNMENT} from '../../services/constants-service';
+import {ContextType} from '../../services/constants-service';
 
 class PrendusScaffoldFinalQuestion extends Polymer.Element {
     componentId: string;
@@ -145,7 +145,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           key: 'questionId',
           value: data.createQuestion.id
       };
-      sendStatement(this.user.id, this.assignment.id, ASSIGNMENT, "SUBMITTED", "CREATE")
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
       window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',

@@ -9,7 +9,7 @@ import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {AssignmentType} from '../../typings/assignment-type';
-import {ASSIGNMENT} from '../../services/constants-service';
+import {ContextType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -87,18 +87,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     isCreateType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'CREATE'){ sendStatement(this.user.id, this.assignmentId, ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'CREATE'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'CREATE';
     }
 
     isReviewType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'REVIEW'){ sendStatement(this.user.id, this.assignmentId, ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'REVIEW'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'REVIEW';
     }
     isQuizType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'QUIZ';
     }
     openAssignmentConceptDialog(e: any){

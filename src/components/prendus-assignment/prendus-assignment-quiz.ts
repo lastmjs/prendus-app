@@ -12,6 +12,7 @@ import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
+import {ContextType} from '../../services/constants-service';
 
 class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
@@ -113,7 +114,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           credentials: 'include'
       });
       if(LTIResponse.ok === true){
-        sendStatement(this.user.id, this.assignmentId, "ASSIGNMENT", "SUBMITTED", "QUIZ")
+        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
       }else{
         //TODO input a notication error message here once the notifications are merged.
       }
