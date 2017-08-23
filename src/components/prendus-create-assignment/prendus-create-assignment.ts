@@ -149,7 +149,6 @@ class PrendusCreateAssignment extends Polymer.Element {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
-    const oldQuestion = this.question;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
