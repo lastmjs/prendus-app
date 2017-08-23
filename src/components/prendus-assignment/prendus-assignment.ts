@@ -127,7 +127,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
+        this.action = setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
         return;
       }
       const newConcept = e.target;
@@ -135,7 +135,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       const data = await GQLMutate(`
         mutation{
           createConcept(
-            title: "${customConcepteadfas}"
+            title: "${customConcept}"
             subjectId: "${this.assignment.course.subject.id}"
           ){
             id
@@ -182,7 +182,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, variableString, (error: any) => {
-          setNotification(error.message, NotificationType.ERROR)
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();

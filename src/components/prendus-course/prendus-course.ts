@@ -115,7 +115,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-        setNotification(error.message, NotificationType.ERROR)
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
@@ -214,7 +214,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadLearningStructure();
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
-      this.action = setNotification("Subject selected for course", NotificationType.success)
+      this.action = setNotification("Subject selected for course", NotificationType.SUCCESS)
     }
     updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
@@ -251,7 +251,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('customSubject', true)
       this._fireLocalAction('selectedSubjectId', data.createSubject.id)
       this.shadowRoot.querySelector('#create-subject').close();
-      this.action = setNotification("Subject created", NotificationType.success)
+      this.action = setNotification("Subject created", NotificationType.SUCCESS)
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -265,7 +265,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       if(this.course.discipline && this.course.subject){
         this.shadowRoot.querySelector('#create-assignment').open();
       }else{
-        this.action = setNotification("Select a discipline and subject before creating any assignments", NotificationType.warning)
+        this.action = setNotification("Select a discipline and subject before creating any assignments", NotificationType.WARNING)
       }
     }
     async createAssignment(e){

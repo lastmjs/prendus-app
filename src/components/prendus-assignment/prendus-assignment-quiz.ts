@@ -78,7 +78,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Assignment) => {
         }, (error: any) => {
-            setNotification(error.message, NotificationType.ERROR)
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         if(questionData.Assignment){
           const quizQuestions = shuffleArray(questionData.Assignment.questions).slice(0,10);
@@ -101,7 +101,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, NotificationType.ERROR)
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }
