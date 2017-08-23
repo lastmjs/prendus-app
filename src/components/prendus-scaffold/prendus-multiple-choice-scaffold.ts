@@ -4,7 +4,7 @@ import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {AnswerTypes} from '../../typings/answer-types';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
 
-class PrendusScaffold extends Polymer.Element {
+class PrendusMultipleChoiceScaffold extends Polymer.Element {
   componentId: string;
   action: SetPropertyAction | SetComponentPropertyAction;
   loaded: boolean;
@@ -17,7 +17,7 @@ class PrendusScaffold extends Polymer.Element {
   distractors: string[] = [];
   hints: string[] = [];
 
-  static get is() { return 'prendus-scaffold'; }
+  static get is() { return 'prendus-multiple-choice-scaffold'; }
   static get properties() {
     return {
       assignment: Object
@@ -181,4 +181,4 @@ class PrendusScaffold extends Polymer.Element {
   }
 }
 
-window.customElements.define(PrendusScaffold.is, PrendusScaffold);
+window.customElements.define(PrendusMultipleChoiceScaffold.is, PrendusMultipleChoiceScaffold);

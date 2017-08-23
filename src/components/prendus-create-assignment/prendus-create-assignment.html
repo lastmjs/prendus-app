@@ -1,8 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
-<link rel="import" href="../prendus-essay-scaffold/prendus-essay-scaffold.html">
-<link rel="import" href="../prendus-scaffold/prendus-scaffold.html">
+<link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html">
+<link rel="import" href="../prendus-scaffold/prendus-multiple-choice-scaffold.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-create-assignment">
@@ -26,7 +26,7 @@
         </dom-if>
         <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
           <template>
-            <prendus-scaffold assignment="[[assignment]]"></prendus-scaffold>
+            <prendus-multiple-choice-scaffold assignment="[[assignment]]"></prendus-multiple-choice-scaffold>
           </template>
         </dom-if>
       </div>
