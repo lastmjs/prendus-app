@@ -50,6 +50,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
+        const that = this;
         await GQLQuery(`
             query {
                 coursesFromUser${this.user ? this.user.id : null}: allCourses(filter: {
@@ -68,7 +69,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            setNotification(error.message, "error")
+          that.action = setNotification(error.message, "error")
         });
     }
     async openDeleteModal(e: any): void {

@@ -45,8 +45,6 @@ class PrendusNotification extends Polymer.Element implements ContainerElement {
         const notificationDuration = Math.min(((this.notification.message.length * 50) + 400), 3000)
         this._fireLocalAction("notificationMessage", this.notification.message)
         this._fireLocalAction("duration", notificationDuration)
-
-        this.shadowRoot.querySelector('#toast').className = `${this.notification.type}`;
         //this._fireLocalAction("notificationType", this.notification.type)
         this.shadowRoot.querySelector('#toast').open();
       }

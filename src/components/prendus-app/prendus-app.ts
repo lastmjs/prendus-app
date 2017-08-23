@@ -13,7 +13,7 @@ class PrendusApp extends Polymer.Element {
     user: User | null;
     action: SetPropertyAction | DefaultAction;
     userToken: string | null;
-    notification: Notification | null;
+    notification: Notification;
     static get is() { return 'prendus-app'; }
 
     constructor() {
