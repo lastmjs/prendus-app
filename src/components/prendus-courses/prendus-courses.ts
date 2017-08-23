@@ -50,7 +50,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
-        const that = this;
         await GQLQuery(`
             query {
                 coursesFromUser${this.user ? this.user.id : null}: allCourses(filter: {
@@ -69,7 +68,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-          that.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
         });
     }
     async openDeleteModal(e: any): void {
@@ -84,7 +83,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, "error")
+        this.action =  setNotification(error.message, "error")
       });
       this.loadData()
 			// this.shadowRoot.querySelector('#confirm-delete-modal').open();
@@ -111,13 +110,13 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (error: any) => {
-            setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;
         this.shadowRoot.querySelector('#add-course-modal').close();
         navigate(`/course/${data.createCourse.id}/edit`)
       }else{
-        setNotification("Add a title to continue", "error")
+        this.action = setNotification("Add a title to continue", "error")
       }
 
     }

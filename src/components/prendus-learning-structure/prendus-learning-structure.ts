@@ -2,6 +2,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
@@ -73,7 +74,7 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
                 value
             };
         }, (error: any) => {
-            alert(error);
+            this.action = setNotification(error.message, "error")
         });
     }
 

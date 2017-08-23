@@ -2,6 +2,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
@@ -110,7 +111,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+            this.action = setNotification(error.message, "error")
         });
     }
 
@@ -129,7 +130,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                alert(error);
+                this.action = setNotification(error.message, "error")
             });
         }
         else {
@@ -144,7 +145,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                 }
             `, this.userToken, (error: any) => {
               console.log('error', error)
-                alert(error);
+                this.action = setNotification(error.message, "error")
             });
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',

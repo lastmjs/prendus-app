@@ -58,7 +58,7 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, "error")
+        this.action =  setNotification(error.message, "error")
       });
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',

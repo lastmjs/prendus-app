@@ -131,7 +131,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         }
                 }
             `, userToken, (error: any) => {
-                setNotification(error.message, "error")
+                this.action = setNotification(error.message, "error")
             });
 
             return data;
@@ -148,7 +148,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                setNotification(error.message, "error")
+                this.action = setNotification(error.message, "error")
             });
 
             return data;

@@ -52,7 +52,7 @@ class PrendusTeacherApproval extends Polymer.Element {
         }
     `, this.userToken, (key: string, value: any) => {},
       (error: any) => {
-        setNotification(error.message, "error")
+        this.action = setNotification(error.message, "error")
     });
     const unverifiedTeachers = teacherData.allUsers.filter((teacher: User)=>{
       return teacher.role === "STUDENT"
@@ -84,7 +84,7 @@ class PrendusTeacherApproval extends Polymer.Element {
           }
         }
         `, this.userToken, (error: any) => {
-            setNotification(error.message, "error")
+            this.action = setNotification(error.message, "error")
         });
         const newUnverifiedTeachers = this.unverifiedTeachers.filter((teacher) => {
           if(teacher.id !== teacherData.updateUser.id){ return teacher }

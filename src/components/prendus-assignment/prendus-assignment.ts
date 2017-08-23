@@ -149,7 +149,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, "error")
+        this.action = setNotification(error.message, "error")
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
@@ -207,7 +207,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {},
           (error: any) => {
-            setNotification(error.message, "error")
+            this.action =  setNotification(error.message, "error")
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
@@ -227,7 +227,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            setNotification(error.message, "error")
+          this.action =  setNotification(error.message, "error")
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }

@@ -112,7 +112,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             return data;
         }
 
-        async function addLtiJwtToUser(user: User | null, userToken: string | null) {
+        async function addLtiJwtToUser(user: User | null, userToken: string | null)  {
             const data = await GQLMutate(`
                 mutation {
                     updateUser(

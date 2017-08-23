@@ -151,7 +151,7 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            setNotification(error.message, "error")
+              this.action = setNotification(error.message, "error")
         });
     }
 

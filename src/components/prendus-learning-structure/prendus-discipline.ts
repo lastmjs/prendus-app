@@ -2,6 +2,7 @@ import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service'
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
@@ -100,7 +101,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            alert(error);
+          this.action = setNotification(error.message, "error")
         });
     }
 
@@ -118,7 +119,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                alert(error);
+                this.action = setNotification(error.message, "error")
             });
         }
         else {
@@ -132,7 +133,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 }
             `, this.userToken, (error: any) => {
               console.log('error', error)
-                alert(error);
+                this.action = setNotification(error.message, "error")
             });
 
             this.action = {

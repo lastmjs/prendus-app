@@ -123,7 +123,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           }
         }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
       });
       Object.keys(question.answerComments).forEach((key) => {
           GQLMutate(`
@@ -136,7 +136,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
               }
             }
           `, this.userToken, (error: any) => {
-              setNotification(error.message, "error")
+              this.action = setNotification(error.message, "error")
           });
       });
       this.action = {
@@ -166,7 +166,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
             }
           }
         `, this.userToken, (error: any) => {
-            setNotification(error.message, "error")
+            this.action = setNotification(error.message, "error")
         });
         return conceptData.createConcept.id
       }else{

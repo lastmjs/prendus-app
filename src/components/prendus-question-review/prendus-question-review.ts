@@ -150,7 +150,7 @@ class PrendusQuestionReview extends Polymer.Element {
             }
 
         }, (error: any) => {
-            setNotification(error.message, "error")
+            this.action = setNotification(error.message, "error")
         });
     }
     generateQuestionScaffolds(){
@@ -184,7 +184,7 @@ class PrendusQuestionReview extends Polymer.Element {
     hasQuestions(item: any) {
       return item;
     }
-    async submit(e: any): Promise<void> {
+    async submit(e: any): Promise<void>{
       try {
         const variables = {
           json: JSON.stringify(this.rubricScores),
@@ -203,7 +203,7 @@ class PrendusQuestionReview extends Polymer.Element {
           }`;
         GQLrequest(mutation, variables, this.userToken);
       } catch(error) {
-        setNotification(error.message, "error")
+        this.action = setNotification(error.message, "error")
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);

@@ -125,7 +125,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.action = setNotification("Discipline created", "success")
     }
     async saveDisciplineToCourse(disciplineId: string){
-      const that = this;
       const courseData = await GQLMutate(`
         mutation {
           addToCourseDiscipline(
@@ -144,7 +143,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          that.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
       });
       if(this.course.subject){
         await GQLMutate(`
@@ -159,7 +158,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-          that.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
         });
       }
       this._fireLocalAction('selectedDisciplineId', disciplineId)
@@ -182,7 +181,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async saveSubjectToCourse(subjectId: string){
-      const that = this;
       const courseData = await GQLMutate(`
         mutation {
           addToCourseSubject(
@@ -201,7 +199,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        that.action = setNotification(error.message, "error")
+        this.action = setNotification(error.message, "error")
       });
       this._fireLocalAction('selectedSubjectId', subjectId)
       this._fireLocalAction('course', {
@@ -234,7 +232,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('selectedSubjectId', e.target.id)
     }
     async createSubject(){
-      const that = this;
       const data = await GQLMutate(`
           mutation {
               createSubject(
@@ -246,11 +243,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-          that.action = setNotification(error.message, "error")
-          alert(error);
+          this.action = setNotification(error.message, "error")
       });
-      // this.loadData()
-      // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
       this.saveSubjectToCourse(data.createSubject.id);
       const newSubjects = [...(this.subjects || []), data.createSubject];
       this._fireLocalAction('subjects', newSubjects)
@@ -275,7 +269,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     async createAssignment(e){
       const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value;
-      const that = this;
       // const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
       if(assignmentTitle){
         const data = await GQLMutate(`
@@ -289,7 +282,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-            that.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, "error")
         });
         this.shadowRoot.querySelector('#create-assignment').close();
         // navigate(`assignment/${data.createAssignment.id}/edit`)
@@ -299,7 +292,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       // href=""
     }
     async deleteAssignment(e){
-      const that = this;
       const data = await GQLMutate(`
           mutation {
               deleteAssignment(id: "${e.model.item.id}"){
@@ -307,12 +299,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-          that.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, "error")
       });
       this.loadData();
     }
     async loadData() {
-        const that = this;
         const data = await GQLQuery(`
             query {
                 allAssignments(filter: {
@@ -339,7 +330,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            that.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, "error")
         });
         this._fireLocalAction('assignments', data.allAssignments)
         this._fireLocalAction('course', data.Course)
