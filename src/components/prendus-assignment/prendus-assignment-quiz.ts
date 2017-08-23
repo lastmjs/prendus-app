@@ -11,6 +11,8 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin, shuffleArray} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
+import {ContextType} from '../../services/constants-service';
 
 class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
@@ -100,16 +102,23 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           }
       `, this.userToken, (error: any) => {
           alert(error);
+          console.log('error', error)
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }
 
-    submitQuiz(){
-      window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
+    async submitQuiz(){
+      const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
           credentials: 'include'
       });
+      if(LTIResponse.ok === true){
+        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
+      }else{
+        //TODO input a notication error message here once the notifications are merged.
+      }
+
       alert('Congratulations! You have successfully completed the Quiz')
     }
 
