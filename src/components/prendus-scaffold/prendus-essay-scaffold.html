@@ -112,7 +112,7 @@
                 </li>
               </ol>
             </div>
-            <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]"></prendus-scaffold-concept>
+            <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]" on-concept-selected="_handleConcept"></prendus-scaffold-concept>
           </div>
           <div>
             <div class="prendus-card big">
@@ -129,7 +129,7 @@
                 </li>
               </ol>
             </div>
-            <paper-input id="resourceInput" type="text" value="[[resource]]" on-change="setResource"></paper-input>
+            <paper-input id="resourceInput" type="text" label="Resource (e.g., Textbook Pg. 100)" value="[[resource]]" on-change="setResource"></paper-input>
           </div>
           <div>
             <div class="prendus-card big">
@@ -144,7 +144,7 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
+            <paper-textarea id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
           </div>
           <div>
             <div class="prendus-card big">
@@ -161,7 +161,7 @@
             <br>
             <h3>Example rubric</h3>
             <prendus-rubric-table rubric="[[exampleRubric()]]"></prendus-rubric-table>
-            <prendus-rubric-table rubric="[[rubric]]" editable></prendus-rubric-table>
+            <prendus-rubric-table rubric="[[rubric]]" editable on-rubric-changed="_handleRubric"></prendus-rubric-table>
           </div>
         </iron-pages>
       </div>

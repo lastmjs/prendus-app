@@ -2,15 +2,15 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
-import {extractLiteralVariables} from '../../services/code-to-question-service';
+import {extractVariables} from '../../services/code-to-question-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  ratings: object[] = [];
-  rubric: object = {};
+  ratings: CategoryScore[] = [];
+  rubric: Rubric = {};
   userToken: string | null;
   user: User;
 
@@ -33,23 +33,20 @@ class PrendusReviewAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('rubric-dropdowns', this._handleRatings.bind(this));
-    this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
-    this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
   }
 
-  _handleNextRequest(e) {
+  _handleNextRequest(e: CustomEvent) {
     try {
-      this._validate(this.ratings, this.rubric);
+      validate(this.rubric, this.ratings);
       this._submit(this.question, this.ratings)
       this.$.carousel.nextData();
-    } catch (e) {
-      this._fireLocalAction('error', e);
+    } catch (err) {
+      this._fireLocalAction('error', err);
       return;
     }
   }
 
-  _handleNextQuestion(e) {
+  _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
@@ -59,30 +56,22 @@ class PrendusReviewAssignment extends Polymer.Element {
     });
   }
 
-  _handleRatings(e) {
+  _handleRatings(e: CustomEvent) {
     this._fireLocalAction('ratings', e.detail.scores);
   }
 
-  _parseRubric(code: string): Object {
-    const { evaluationRubric } = extractLiteralVariables(code);
+  _parseRubric(code: string): Rubric {
+    const { evaluationRubric } = extractVariables(code);
     if (evaluationRubric)
-      return JSON.parse(evaluationRubric);
+      return JSON.parse(evaluationRubric.value);
     return DEFAULT_EVALUATION_RUBRIC;
   }
 
-  _validate(ratings: Object[], rubric: Object): boolean {
-    console.log(ratings);
-    if (!ratings) throw new Error('You must rate the question');
-    if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
-    if (ratings.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
-      throw new Error('You must rate each category');
-  }
-
-  _handleSubmit(data: Object) {
+  _handleSubmit(data: object) {
     if (data.errors) throw new Error("Error saving question rating");
   }
 
-  _submit(question: Object, ratings: Object[]) {
+  _submit(question: Question, ratings: CategoryScore[]) {
     const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
       createQuestionRating (
         raterId: $raterId
@@ -119,7 +108,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         review
         questions(filter: {
           author: {
-            id_not: $userId
+            id: $userId
           }
         }) {
           id
@@ -163,6 +152,13 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function validate(rubric: Rubric, ratings: CategoryScore[]) {
+  if (!ratings) throw new Error('You must rate the question');
+  if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
+  if (ratings.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
+    throw new Error('You must rate each category');
 }
 
 window.customElements.define(PrendusReviewAssignment.is, PrendusReviewAssignment)

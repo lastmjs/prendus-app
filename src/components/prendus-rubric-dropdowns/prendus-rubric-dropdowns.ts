@@ -4,7 +4,7 @@ import {createUUID} from '../../services/utilities-service';
 class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
-  scores: Object = {};
+  scores: object = {};
   componentId: string;
   userToken: string | null;
   user: User;
@@ -36,26 +36,26 @@ class PrendusRubricDropdowns extends Polymer.Element {
 
   reset() {
     const scores = Object.keys(this.rubric || {}).reduce((result, category) => {
-      return Object.assign(result, { [category]: -1 }
-    }, {}));
+      return {...result, [category]: -1 }
+    }, {});
     this._fireLocalAction('scores', scores);
     this._notify(scores);
   }
 
-  _initScores(rubric: Object) {
+  _initScores(rubric: Rubric) {
     this.reset();
   }
 
-  _categories(rubric: Object): string[] {
+  _categories(rubric: Rubric): string[] {
     return Object.keys(rubric || {});
   }
 
-  _options(rubric: Object, category: string): string[] {
+  _options(rubric: Rubric, category: string): string[] {
     if (!rubric) return [];
     return Object.keys(rubric[category] || {});
   }
 
-  _description(rubric: Object, category: string, option: string): string {
+  _description(rubric: Rubric, category: string, option: string): string {
     if (!rubric) return [];
     return rubric[category][option].description;
   }
@@ -63,14 +63,16 @@ class PrendusRubricDropdowns extends Polymer.Element {
   _scoreCategory(e) {
     const { category, option } = e.model;
     const { points } = this.rubric[category][option];
-    const newScores = Object.assign(this.scores, { [category]: points });
+    const newScores = {...this.scores, [category]: points };
     this._fireLocalAction('scores', newScores);
     this._notify(newScores);
   }
 
-  _notify(scores: Object) {
-    const formatted = Object.keys(scores).map(category => Object.assign({}, {category, score: Number(scores[category]})));
-    const evt = new CustomEvent('rubric-dropdowns', { bubbles: false, composed: true, detail: {scores: formatted} });
+  _notify(scores: object) {
+    const formatted = Object.keys(scores).map(category => {
+      return {category, score: Number(scores[category]}
+    }));
+    const evt = new CustomEvent('scores-changed', {composed: true, detail: {scores: formatted}});
     this.dispatchEvent(evt);
   }
 
@@ -80,7 +82,7 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   categoryId(category: string, option: string): string {
-    return category.replace(/\s/, '-') + option.replace(/\s/, '-');
+    return category.replace(/\s/g, '-') + option.replace(/\s/, '-');
   }
 
   stateChange(e: CustomEvent) {

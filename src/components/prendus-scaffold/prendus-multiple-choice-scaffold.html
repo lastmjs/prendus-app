@@ -131,7 +131,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]"></prendus-scaffold-concept>
+                <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]" on-concept-selected="_handleConcept"></prendus-scaffold-concept>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -179,13 +179,13 @@
                   thinking about common misconceptions students may have
                   about the content area of your question.
                 </div>
-                <prendus-scaffold-distractors question="[[questionText]]" answer="[[answer]]" init="[[distractors]]"></prendus-scaffold-distractors>
+                <prendus-scaffold-distractors question="[[questionText]]" answer="[[answer]]" init="[[distractors]]" on-distractors-changed="_handleDistractors"></prendus-scaffold-distractors>
               </div>
               <div>
                 <div class="prendus-card big">
                   Add comments to the question and answers that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
-                <prendus-scaffold-comments question="[[questionText]]" answers="[[_scaffoldAnswers(answer, distractors, hints)]]"></prendus-scaffold-comments>
+                <prendus-scaffold-comments question="[[questionText]]" answers="[[_scaffoldAnswers(answer, distractors, hints)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
               </div>
               <div>
                 <div class="prendus-card centered">

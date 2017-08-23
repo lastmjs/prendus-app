@@ -14,7 +14,7 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
     return prevText + `<p>[*]${answer.text}[*]</p>`;
   }, '');
   // define code string with answers
-  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'\n" + answers.reduce((prevCode, answer, index) => {
+  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'; " + answers.reduce((prevCode, answer, index) => {
         if (index === answers.length - 1) {
             return `${prevCode} radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
         }

@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
+import {Concept} from '../../typings/concept';
 import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
@@ -12,10 +13,10 @@ class PrendusEssayScaffold extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
   step: number = 0;
-  concept: object = {};
+  concept: Concept = {};
   questionText: string = '';
   resource: string = '';
-  rubric: object = {};
+  rubric: Rubric = {};
   userToken: string | null;
   user: User;
 
@@ -39,8 +40,6 @@ class PrendusEssayScaffold extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('question-rubric-table', this._handleRubric.bind(this));
-    this.addEventListener('concept-selected', this._handleConcept.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -52,35 +51,11 @@ class PrendusEssayScaffold extends Polymer.Element {
     };
   }
 
-  _validate(): boolean {
-    const empty = (val) => val == undefined || val.toString().trim().length === 0;
-    const categories = Object.keys(this.rubric);
-    const options = flatten(categories.map(category => Object.keys(this.rubric[category])));
-    const descriptions = flatten(categories.map(category => Object.keys(this.rubric[category]).map(option => this.rubric[category][option].description)));
-    const points = flatten(categories.map(category => Object.keys(this.rubric[category]).map(option => this.rubric[category][option].points)));
-    if (empty(this.resource)) throw new Error('Resource must not be empty');
-    if (empty(this.concept.id) && empty(this.concept.title)) throw new Error('Concept must be selected or entered');
-    if (empty(this.questionText)) throw new Error('Question must not be empty');
-    if (categories.length === 0) throw new Error('Rubric must have at least one category');
-    if (categories.filter(category => Object.keys(this.rubric[category]).length < 2).length)
-      throw new Error('All rubric categories must have at least two scales');
-    if (categories.filter(empty).length)
-      throw new Error('All rubric categories must have non-empty names');
-    if (options.filter(empty).length)
-      throw new Error('All rubric scales must have non-empty names');
-    if (descriptions.filter(empty).length)
-      throw new Error('All rubric descriptions must be non-empty');
-    if (points.filter(num => num != NaN && num < 0).length)
-      throw new Error('All rubric scores must be non-negative');
-    return true;
-  }
-
   _showNext(step: number): boolean {
     return step < this.$.ironPages.children.length - 1;
   }
 
   _initScaffold(question) {
-    console.log('questionchanged');
     this._fireLocalAction('step', 0);
     this._fireLocalAction('resource', '');
     this._fireLocalAction('questionText', '');
@@ -88,12 +63,12 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('concept', null);
   }
 
-  _handleConcept(e) {
+  _handleConcept(e: CustomEvent) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('concept', e.detail.concept);
   }
 
-  _handleRubric(e) {
+  _handleRubric(e: CustomEvent) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('rubric', e.detail.rubric);
   }
@@ -102,12 +77,12 @@ class PrendusEssayScaffold extends Polymer.Element {
     return EXAMPLE_GRADING_RUBRIC;
   }
 
-  setQuestionText(e) {
+  setQuestionText(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('questionText', e.target.value);
   }
 
-  setResource(e) {
+  setResource(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('resource', e.target.value);
   }
@@ -122,7 +97,7 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   submit(): void {
     try {
-      this._validate();
+      validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
       this._fireLocalAction('error', e);
       return;
@@ -156,6 +131,28 @@ class PrendusEssayScaffold extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function validate(concept: Concept, resource: string, questionText: string, rubric: Rubric) {
+  const empty = (val) => val == undefined || val.toString().trim().length === 0;
+  const categories = Object.keys(rubric);
+  const options = flatten(categories.map(category => Object.keys(rubric[category])));
+  const descriptions = flatten(categories.map(category => Object.keys(rubric[category]).map(option => rubric[category][option].description)));
+  const points = flatten(categories.map(category => Object.keys(rubric[category]).map(option => rubric[category][option].points)));
+  if (empty(resource)) throw new Error('Resource must not be empty');
+  if (empty(concept.id) && empty(concept.title)) throw new Error('Concept must be selected or entered');
+  if (empty(questionText)) throw new Error('Question must not be empty');
+  if (categories.length === 0) throw new Error('Rubric must have at least one category');
+  if (categories.filter(category => Object.keys(rubric[category]).length < 2).length)
+    throw new Error('All rubric categories must have at least two scales');
+  if (categories.filter(empty).length)
+    throw new Error('All rubric categories must have non-empty names');
+  if (options.filter(empty).length)
+    throw new Error('All rubric scales must have non-empty names');
+  if (descriptions.filter(empty).length)
+    throw new Error('All rubric descriptions must be non-empty');
+  if (points.filter(num => num != NaN && num < 0).length)
+    throw new Error('All rubric scores must be non-negative');
 }
 
 function flatten(arr: any[]): any[] {

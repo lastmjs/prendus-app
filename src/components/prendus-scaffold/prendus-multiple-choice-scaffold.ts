@@ -36,9 +36,6 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('concept-selected', this._handleConcept.bind(this));
-    this.addEventListener('distractors-changed', this._handleDistractors.bind(this));
-    this.addEventListener('comments-changed', this._handleHints.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -50,42 +47,42 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     };
   }
 
-  _handleConcept(e) {
+  _handleConcept(e: CustomEvent) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('concept', e.detail.concept);
   }
 
-  _handleResource(e) {
+  _handleResource(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('resource', e.target.value);
   }
 
-  _handleQuestion(e) {
+  _handleQuestion(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('questionText', e.target.value);
   }
 
-  _handleAnswer(e) {
+  _handleAnswer(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('answer', e.target.value);
   }
 
-  _handleSolution(e) {
+  _handleSolution(e: Event) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('solution', e.target.value);
   }
 
-  _handleDistractors(e) {
+  _handleDistractors(e: CustomEvent) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('distractors', e.detail.distractors);
   }
 
-  _handleHints(e) {
+  _handleHints(e: CustomEvent) {
     this._fireLocalAction('error', null);
     this._fireLocalAction('hints', e.detail.comments);
   }
 
-  _initScaffold(question) {
+  _initScaffold(question: number) {
     this._fireLocalAction('concept', null)
     this._fireLocalAction('resource', '');
     this._fireLocalAction('questionText', '');
@@ -96,7 +93,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('selectedIndex', 0);
   }
 
-  _scaffold(concept: Object, resource: string, questionText: string, solution: string, answer: string, distractors: string[], hints: string[]): QuestionScaffold {
+  _scaffold(concept: Concept, resource: string, questionText: string, solution: string, answer: string, distractors: string[], hints: string[]): QuestionScaffold {
     const answers = this._scaffoldAnswers(answer, distractors, hints);
     return {
       concept,
@@ -110,20 +107,6 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   _scaffoldAnswers(answer: string, distractors: string[], hints: string[]): QuestionScaffoldAnswer[] {
     const mChoice = (text, comment, correct) => Object.assign({}, {text, comment, correct, type: AnswerTypes.MultipleChoice});
     return [mChoice(answer, hints[0], true)].concat(distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false)));
-  }
-
-  _validate(): boolean {
-    const empty = str => str == undefined || str.toString().trim() === '';
-    const someEmpty = (bitOr, str) => bitOr || empty(str);
-    if (empty(this.concept.id) && empty(this.concept.title)) throw new Error('Concept must be entered or selected');
-    if (empty(this.resource)) throw new Error('Resource must not be empty');
-    if (empty(this.questionText)) throw new Error('Question text must not be empty');
-    if (empty(this.answer)) throw new Error('You must provide a correct answer');
-    if (this.distractors.length !== 3 || this.distractors.reduce(someEmpty, false))
-      throw new Error('Incorrect answers must not be empty');
-    if (this.hints.length !== 4 || this.hints.reduce(someEmpty, false))
-      throw new Error('Answer comments must not be empty');
-    return true;
   }
 
   showNext(i: number): boolean {
@@ -140,7 +123,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   submit(): void {
     try {
-      this._validate();
+      validate(this.concept, this.resource, this.questionText, this.answer, this.distractors, this.hints);
     } catch (e) {
       this._fireLocalAction('error', e);
       return;
@@ -179,6 +162,19 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this.userToken = state.userToken;
     this.user = state.user;
   }
+}
+
+function validate(concept: Concept, resource: string, questionText: string, answer: string, distractors: string[], hints: string[]) {
+    const empty = str => str == undefined || str.toString().trim() === '';
+    const someEmpty = (bitOr, str) => bitOr || empty(str);
+    if (empty(concept.id) && empty(concept.title)) throw new Error('Concept must be entered or selected');
+    if (empty(resource)) throw new Error('Resource must not be empty');
+    if (empty(questionText)) throw new Error('Question text must not be empty');
+    if (empty(answer)) throw new Error('You must provide a correct answer');
+    if (distractors.length !== 3 || distractors.reduce(someEmpty, false))
+      throw new Error('Incorrect answers must not be empty');
+    if (hints.length !== 4 || hints.reduce(someEmpty, false))
+      throw new Error('Answer comments must not be empty');
 }
 
 window.customElements.define(PrendusMultipleChoiceScaffold.is, PrendusMultipleChoiceScaffold);

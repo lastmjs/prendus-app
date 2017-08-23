@@ -1,12 +1,18 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, asyncForEach} from '../../services/utilities-service';
 import {User} from '../../typings/user';
+import {Question} from '../../typings/question';
+import {Assignment} from '../../typings/assignment';
 import {GQLrequest} from '../../services/graphql-service';
+import {GQLVariables} from '../../typings/gql-variables';
 
 class PrendusCreateAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
+  assignment: Assignment;
+  questions: Question[];
+  question: Question;
   userToken: string | null;
   user: User;
 
@@ -29,10 +35,6 @@ class PrendusCreateAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('carousel-data', (e) => {
-      this._fireLocalAction('question', e.detail.data);
-    });
-    this.addEventListener('question-created', this._handleQuestion.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -44,13 +46,19 @@ class PrendusCreateAssignment extends Polymer.Element {
     };
   }
 
-  async _handleQuestion(e) {
+  _handleNextQuestion(e: CustomEvent) {
+    this._fireLocalAction('question', e.detail.data);
+  }
+
+  async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(questionVars);
     if (answerComments)
-      answerComments.forEach(comment => { this.saveAnswerComment({ text: comment, questionId }) });
+      asyncForEach(answerComments.map(text => {
+        return { text, questionId }
+      }), this.saveAnswerComment);
     this.shadowRoot.querySelector('#carousel').nextData();
   }
 
@@ -62,7 +70,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     return questionType === 'MULTIPLE_CHOICE';
   }
 
-  async loadAssignment(assignmentId: string): Assignment {
+  async loadAssignment(assignmentId: string) {
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id
@@ -87,7 +95,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     this._fireLocalAction('questions', questions);
   }
 
-  async saveQuestion(variables): Promise<Object> {
+  async saveQuestion(variables: GQLVariables): Promise<string> {
     const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
@@ -103,7 +111,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     return data.createQuestion.id;
   }
 
-  async saveQuestionAndConcept(variables): Promise<Object> {
+  async saveQuestionAndConcept(variables: GQLVariables): Promise<string> {
     const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
@@ -119,7 +127,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     return data.createQuestion.id;
   }
 
-  async saveConcept(variables: Object): Promise<Object> {
+  async saveConcept(variables: GQLVariables): Promise<string> {
     const data = await GQLrequest(`mutation newConcept($title: String!, $subjectId: ID!) {
       createConcept(title: $title, subjectId: $subjectId) {
         id
@@ -128,12 +136,12 @@ class PrendusCreateAssignment extends Polymer.Element {
     return data.createConcept.id;
   }
 
-  async saveAnswerComment(variables: Object): Promise<Object> {
+  async saveAnswerComment(variables: GQLVariables): Promise<string> {
     const data = await GQLrequest(`mutation newAnswerComment($text: String!, $questionId: ID!) {
       createAnswerComment(text: $text, questionId: $questionId) {
         id
       }
-    }`, variables, this.userToken);
+    }`, variables);
     return data.createAnswerComment.id;
   }
 
