@@ -90,6 +90,7 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
   };
 };
 export function setNotification(message: string, type: string): SetPropertyAction {
+  console.log('in the actions')
   return {
       type: 'SET_PROPERTY',
       key: 'notification',
