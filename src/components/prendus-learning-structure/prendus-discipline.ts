@@ -7,6 +7,7 @@ import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusDiscipline extends Polymer.Element implements ContainerElement {
     disciplineId: string;
@@ -101,7 +102,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-          this.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 
@@ -119,7 +120,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                this.action = setNotification(error.message, "error")
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
@@ -133,7 +134,7 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
                 }
             `, this.userToken, (error: any) => {
               console.log('error', error)
-                this.action = setNotification(error.message, "error")
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             this.action = {

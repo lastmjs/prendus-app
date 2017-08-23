@@ -6,6 +6,7 @@ import {setNotification} from '../../redux/actions';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusConcept extends Polymer.Element implements ContainerElement {
     conceptId: string;
@@ -91,7 +92,7 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            this.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 
@@ -109,7 +110,7 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                this.action = setNotification(error.message, "error")
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
@@ -123,7 +124,7 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-              this.action = setNotification(error.message, "error")
+              this.action = setNotification(error.message, NotificationType.ERROR)
             });
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',

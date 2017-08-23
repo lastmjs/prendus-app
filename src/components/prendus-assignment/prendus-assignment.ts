@@ -9,7 +9,7 @@ import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/act
 import {createUUID, navigate} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {AssignmentType} from '../../typings/assignment-type';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -127,7 +127,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        setNotification("Must enter a valid title for the new concept before adding it", "error")
+        setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
         return;
       }
       const newConcept = e.target;
@@ -135,7 +135,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       const data = await GQLMutate(`
         mutation{
           createConcept(
-            title: "${customConcept}"
+            title: "${customConcepteadfas}"
             subjectId: "${this.assignment.course.subject.id}"
           ){
             id
@@ -149,7 +149,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        this.action = setNotification(error.message, "error")
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
@@ -182,7 +182,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, variableString, (error: any) => {
-          setNotification(error.message, "error")
+          setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
@@ -207,7 +207,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {},
           (error: any) => {
-            this.action =  setNotification(error.message, "error")
+            this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
@@ -227,7 +227,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-          this.action =  setNotification(error.message, "error")
+          this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }

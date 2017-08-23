@@ -13,7 +13,7 @@ import {QuestionRating} from '../../typings/question-rating';
 import {rubric} from '../../typings/evaluation-rubric';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
@@ -150,7 +150,7 @@ class PrendusQuestionReview extends Polymer.Element {
             }
 
         }, (error: any) => {
-            this.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
     generateQuestionScaffolds(){
@@ -203,7 +203,7 @@ class PrendusQuestionReview extends Polymer.Element {
           }`;
         GQLrequest(mutation, variables, this.userToken);
       } catch(error) {
-        this.action = setNotification(error.message, "error")
+        this.action = setNotification(error.message, NotificationType.ERROR)
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);

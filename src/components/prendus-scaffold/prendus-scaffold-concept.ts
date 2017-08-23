@@ -79,7 +79,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
           this.action = updateCurrentQuestionScaffold(this.currentQuestionScaffold, this.selectedConcept, null, null, null, null, null);
         }
       } catch(error) {
-        setNotification(error, "error")
+        setNotification(error, NotificationType.ERROR)
       }
     }
     plusOne(index: number): number {

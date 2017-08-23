@@ -5,7 +5,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {persistUserToken, setNotification} from '../../redux/actions';
 import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service';
-import {EMAIL_REGEX} from '../../services/constants-service';
+import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -107,7 +107,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-              that.action = setNotification(error.message, "error")
+              that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
         }
@@ -123,7 +123,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-              that.action = setNotification(error.message, "error")
+              that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
         }
@@ -144,7 +144,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
               }
             `, userToken, (key: string, value: any) => {
             }, (error: any) => {
-            that.action = setNotification(error.message, "error")
+            that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
         }

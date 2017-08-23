@@ -12,7 +12,7 @@ import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
@@ -78,7 +78,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Assignment) => {
         }, (error: any) => {
-            setNotification(error.message, "error")
+            setNotification(error.message, NotificationType.ERROR)
         });
         if(questionData.Assignment){
           const quizQuestions = shuffleArray(questionData.Assignment.questions).slice(0,10);
@@ -101,7 +101,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-          setNotification(error.message, "error")
+          setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }

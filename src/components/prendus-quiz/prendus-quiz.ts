@@ -5,6 +5,7 @@ import {Quiz} from '../../typings/quiz';
 import {checkForUserToken, setNotification} from '../../redux/actions';
 import {createUUID} from '../../services/utilities-service';
 import {Question} from '../../typings/question';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusQuiz extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -151,7 +152,7 @@ class PrendusQuiz extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-              this.action = setNotification(error.message, "error")
+              this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 

@@ -6,6 +6,7 @@ import {User} from '../../typings/user';
 import {State} from '../../typings/state';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];
@@ -68,7 +69,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-          this.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
     async openDeleteModal(e: any): void {
@@ -83,7 +84,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        this.action =  setNotification(error.message, "error")
+        this.action =  setNotification(error.message, NotificationType.ERROR)
       });
       this.loadData()
 			// this.shadowRoot.querySelector('#confirm-delete-modal').open();
@@ -110,13 +111,13 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (error: any) => {
-          this.action = setNotification(error.message, "error")
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;
         this.shadowRoot.querySelector('#add-course-modal').close();
         navigate(`/course/${data.createCourse.id}/edit`)
       }else{
-        this.action = setNotification("Add a title to continue", "error")
+        this.action = setNotification("Add a title to continue", NotificationType.ERROR)
       }
 
     }

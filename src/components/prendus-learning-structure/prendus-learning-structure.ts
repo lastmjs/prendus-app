@@ -7,6 +7,7 @@ import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusLearningStructure extends Polymer.Element implements ContainerElement {
     disciplines: Discipline[];
@@ -74,7 +75,7 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
                 value
             };
         }, (error: any) => {
-            this.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 

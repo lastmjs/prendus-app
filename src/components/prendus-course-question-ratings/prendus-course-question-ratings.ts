@@ -59,7 +59,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _handleError(error: any) {
     //TODO: use notification service when finished
-    setNotification(error.message, "error")
+    setNotification(error.message, NotificationType.ERROR)
   }
 
   _subscribeToData() {

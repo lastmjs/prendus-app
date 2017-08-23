@@ -8,3 +8,8 @@ export const ContextType = {
   QUIZ: "QUIZ",
   COURSE: "COURSE"
 };
+export const NotificationType = {
+  ERROR: "error",
+  SUCCESS: "success",
+  WARNING: "warning"
+};

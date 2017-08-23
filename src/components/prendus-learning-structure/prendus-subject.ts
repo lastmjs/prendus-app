@@ -7,6 +7,7 @@ import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusSubject extends Polymer.Element implements ContainerElement {
     subjectId: string;
@@ -111,7 +112,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            this.action = setNotification(error.message, "error")
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
 
@@ -130,7 +131,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, this.userToken, (error: any) => {
-                this.action = setNotification(error.message, "error")
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
@@ -145,7 +146,7 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
                 }
             `, this.userToken, (error: any) => {
               console.log('error', error)
-                this.action = setNotification(error.message, "error")
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
             this.action = {
                 type: 'SET_COMPONENT_PROPERTY',

@@ -10,6 +10,7 @@ import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusQuestionReviewQuiz extends Polymer.Element {
     componentId: string;
@@ -58,7 +59,7 @@ class PrendusQuestionReviewQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-        this.action =  setNotification(error.message, "error")
+        this.action =  setNotification(error.message, NotificationType.ERROR)
       });
       this.action = {
           type: 'SET_COMPONENT_PROPERTY',
