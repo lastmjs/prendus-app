@@ -4,6 +4,8 @@ import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-servi
 import {GQLrequest} from '../../services/graphql-service';
 import {QuestionType, NotificationType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
+import {sendStatement} from '../../services/analytics-service';
+import {LTIPassback} from '../../services/lti-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
@@ -69,12 +71,8 @@ class PrendusGradeAssignment extends Polymer.Element {
         this._fireLocalAction('rubric', this._parseRubric(response.questionResponse.question.code));
       });
     } else {
-      this._finish();
+      LTIPassback(this.user.id, this.assignment.id, 'GRADE');
     }
-  }
-
-  _finish() {
-
   }
 
   _parseRubric(code: string): Rubric {
@@ -122,6 +120,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     const responses = essays ? shuffleArray(essays).slice(0, assignment.grade): [];
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('responses', responses);
+    sendStatement(this.user.id, assignment.id, 'STARTED', 'GRADE');
   }
 
   _questionText(text: string): string {

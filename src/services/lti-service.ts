@@ -5,7 +5,7 @@ import {SetPropertyAction} from '../typings/actions';
 import {getPrendusLTIServerOrigin} from 'utilities-service';
 import {NotificationType} from 'constants-service';
 
-export async function LTIPassback(userId: string, assignmentId: string): SetPropertyAction {
+export async function LTIPassback(userId: string, assignmentId: string, assignmentType: string): SetPropertyAction {
   const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
     method: 'post',
     mode: 'no-cors',
@@ -13,7 +13,7 @@ export async function LTIPassback(userId: string, assignmentId: string): SetProp
   });
 
   if (LTIResponse.ok === true) {
-    sendStatement(userId, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ");
+    sendStatement(userId, assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", assignmentType);
     return setNotification('Assignment submitted', NotificationType.SUCCESS);
   } else {
     return setNotification('LTI error', NotificationType.ERROR);

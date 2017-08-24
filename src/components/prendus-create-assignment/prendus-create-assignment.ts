@@ -3,6 +3,7 @@ import {createUUID, asyncForEach} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
+import {LTIPassback} from '../../services/lti-service';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {Assignment} from '../../typings/assignment';
@@ -54,16 +55,11 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async _handleQuestion(e: CustomEvent) {
+    LTIPassback(this.user.id, this.assignment.id, 'CREATE');
     const { question } = e.detail;
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(questionVars);
-    //sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
-    //window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
-    //    method: 'post',
-    //    mode: 'no-cors',
-    //    credentials: 'include'
-    //});
     if (answerComments)
       asyncForEach(answerComments.map(text => {
         return { text, questionId }
@@ -101,6 +97,7 @@ class PrendusCreateAssignment extends Polymer.Element {
       this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
       return;
     }
+    sendStatement(this.user.id, data.Assignment.id, 'STARTED', 'CREATE');
     // Create array of "questions" just to create carousel events to create multiple questions
     // avoid 0 because question is evaluated as a boolean
     const questions = Array(data.Assignment.create).fill(null).map((dummy, i) => i+1);

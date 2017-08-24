@@ -1,10 +1,12 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {NotificationType, QuestionType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
+import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
@@ -50,11 +52,14 @@ class PrendusReviewAssignment extends Polymer.Element {
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
-    this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
-    setTimeout(() => {
-      if (data)
+    if (data) {
+      this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
+      setTimeout(() => {
         this._fireLocalAction('rubric', this._parseRubric(data.code));
-    });
+      });
+    } else {
+      LTIPassback(this.user.id, this.assignment.id, 'REVIEW');
+    }
   }
 
   _handleRatings(e: CustomEvent) {
@@ -126,6 +131,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
       return;
     }
+    sendStatement(this.user.id, data.Assignment.id, 'STARTED', 'REVIEW');
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.review));
   }

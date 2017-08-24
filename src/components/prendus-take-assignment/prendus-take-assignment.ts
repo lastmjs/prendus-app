@@ -4,6 +4,8 @@ import {GQLVariables} from '../../typings/gql-variables';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
+import {LTIPassback} from '../../services/lti-service';
+import {sendStatement} from '../../services/analytics-service';
 import {GQLrequest} from '../../services/graphql-service';
 
 class PrendusTakeAssignment extends Polymer.Element {
@@ -54,20 +56,7 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   _handleNextQuestion(e: CustomEvent) {
     this._fireLocalAction('question', e.detail.data);
-    if (!e.detail.data) this._finish();
-  }
-
-  _finish() {
-    //const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
-    //  method: 'post',
-    //  mode: 'no-cors',
-    //  credentials: 'include'
-    //});
-    //if (LTIResponse.ok) {
-    //  sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
-    //} else {
-    //  this.action = setNotification('LTI Error', NotificationType.ERROR);
-    //}
+    if (!e.detail.data) LTIPassback(this.user.id, this.assignment.id, 'QUIZ');
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -100,6 +89,7 @@ class PrendusTakeAssignment extends Polymer.Element {
       .slice(0, assignment.take)
       .map(question => question.id);
     const questions = await this.createQuiz(questionIds, this.user.id);
+    sendStatement(this.user.id, assignment.id, 'STARTED', 'QUIZ');
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('questions', questions);
   }
