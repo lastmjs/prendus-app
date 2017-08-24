@@ -3,7 +3,7 @@ import {User} from '../../typings/user';
 import {GQLVariables} from '../../typings/gql-variables';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType} from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLrequest} from '../../services/graphql-service';
@@ -21,7 +21,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     return {
       assignmentId: {
         type: String,
-        observer: 'loadAssignment'
+        observer: 'generateQuiz'
       }
     }
   }
@@ -68,7 +68,17 @@ class PrendusTakeAssignment extends Polymer.Element {
     };
   }
 
-  async loadAssignment(assignmentId: string): Assignment {
+  async generateQuiz(assignmentId: string) {
+    sendStatement(this.user.id, assignmentId, 'STARTED', 'QUIZ');
+    this.action = await getAndSetUser();
+    const assignment = await this._assignment(assignmentId);
+    this._fireLocalAction('assignment', assignment);
+    const questionIds = shuffleArray(assignment.questions).slice(0, assignment.take).map(question => question.id);
+    const questions = await this._createQuiz(questionIds, this.user.id);
+    this._fireLocalAction('questions', questions);
+  }
+
+  async _assignment(assignmentId: string): Promise<Assignment> {
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
@@ -84,17 +94,10 @@ class PrendusTakeAssignment extends Polymer.Element {
       this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
       return;
     }
-    const { assignment } = data;
-    const questionIds = shuffleArray(assignment.questions)
-      .slice(0, assignment.take)
-      .map(question => question.id);
-    const questions = await this.createQuiz(questionIds, this.user.id);
-    sendStatement(this.user.id, assignment.id, 'STARTED', 'QUIZ');
-    this._fireLocalAction('assignment', assignment);
-    this._fireLocalAction('questions', questions);
+    return data.assignment;
   }
 
-  async createQuiz(questionIds: string[], userId: string): Promise<Question[]> {
+  async _createQuiz(questionIds: string[], userId: string): Promise<Question[]> {
     const data = await GQLrequest(`
       mutation quiz($userId: ID!, $questionIds: [ID!]!){
         createQuiz(
