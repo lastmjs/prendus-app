@@ -185,9 +185,17 @@
                               <h5 class = "lti-title">Review Questions Link</h5>
                               <paper-textarea class="lti-link" id="ltiLinkIdreview" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/REVIEW"></paper-textarea>
                             </div>
+                            <dom-if if="[[isEssayType(item.questionType)]]">
+                              <template>
+                                <div class="content">
+                                  <h5 class = "lti-title">Grade Question Responses Link</h5>
+                                  <paper-textarea class="lti-link" id="ltiLinkIdgrade" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/GRADE"></paper-textarea>
+                                </div>
+                              </template>
+                            </dom-if>
                             <div class="content">
                               <h5 class = "lti-title">Quiz Link</h5>
-                              <paper-textarea class="lti-link" id="ltiLinkIdreview" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/QUIZ"></paper-textarea>
+                              <paper-textarea class="lti-link" id="ltiLinkIdrequiz" value="https://api.prendus.com/lti/assignment/[[item.id]]/assignment-type/QUIZ"></paper-textarea>
                             </div>
                         </paper-dialog>
                       </template>

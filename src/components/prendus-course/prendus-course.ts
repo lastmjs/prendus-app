@@ -9,7 +9,7 @@ import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
-import {NotificationType} from '../../services/constants-service';
+import {NotificationType, QuestionType} from '../../services/constants-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -80,8 +80,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     isViewMode(mode: Mode) {
-      this._fireLocalAction('loaded', true)
+        this._fireLocalAction('loaded', true)
         return mode === 'view';
+    }
+
+    isEssayType(questionType: string): boolean {
+      return questionType === QuestionType.ESSAY;
     }
 
     isEditMode(mode: Mode) {
