@@ -108,17 +108,27 @@ type QuestionResponse implements Node {
   author: User! @relation(name: "AuthorOnQuestionResponse")
   userVariables: [UserVariable!]! @relation(name: "UserVariablesOnQuestionResponse")
   userInputs: [UserInput!]! @relation(name: "UserInputsOnQuestionResponse")
+  userEssays: [UserEssay!]! @relation(name: "UserEssaysOnQuestionResponse")
   userChecks: [UserCheck!]! @relation(name: "UserChecksOnQuestionResponse")
   userRadio: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
   ratings: [QuestionResponseRating!]! @relation(name: "RatingsOnQuestionResponse")
   question: Question! @relation("QuestionOnQuestionResponse")
 }
 
+type UserEssay implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  value: String!
+  questionResponse: QuestionResponse! @relation(name: "UserEssaysOnQuestionResponse")
+}
+
 type UserVariable implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
+  varName: String!
   value: String!
   questionResponse: QuestionResponse! @relation(name: "UserVariablesOnQuestionResponse")
 }
@@ -127,7 +137,7 @@ type UserInput implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
+  varName: String!
   value: String!
   questionResponse: QuestionResponse! @relation(name: "UserInputsOnQuestionResponse")
 }
@@ -136,7 +146,7 @@ type UserCheck implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
+  varName: String!
   checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserChecksOnQuestionResponse")
 }
@@ -145,7 +155,7 @@ type UserRadio implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  name: String!
+  varName: String!
   checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
 }
