@@ -76,11 +76,12 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string) {
+    sendStatement(this.user.id, assignmentId, 'STARTED', 'CREATE');
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
-        create
+        numCreateQuestions
         questionType
         concepts {
           id
@@ -97,10 +98,9 @@ class PrendusCreateAssignment extends Polymer.Element {
       this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
       return;
     }
-    sendStatement(this.user.id, data.Assignment.id, 'STARTED', 'CREATE');
     // Create array of "questions" just to create carousel events to create multiple questions
     // avoid 0 because question is evaluated as a boolean
-    const questions = Array(data.Assignment.create).fill(null).map((dummy, i) => i+1);
+    const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', questions);
   }

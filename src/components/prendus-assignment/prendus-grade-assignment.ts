@@ -83,12 +83,13 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   async loadAssignment(assignmentId: string) {
     this.action = await getAndSetUser();
+    sendStatement(this.user.id, assignmentId, 'STARTED', 'GRADE');
     const data = await GQLrequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         questionType
-        grade
+        numGradeResponses
       }
       essays: allUserEssays(filter: {
         questionResponse: {
@@ -117,10 +118,9 @@ class PrendusGradeAssignment extends Polymer.Element {
       return;
     }
     const { assignment, essays } = data;
-    const responses = essays ? shuffleArray(essays).slice(0, assignment.grade): [];
+    const responses = essays ? shuffleArray(essays).slice(0, assignment.numGradeResponses): [];
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('responses', responses);
-    sendStatement(this.user.id, assignment.id, 'STARTED', 'GRADE');
   }
 
   _questionText(text: string): string {

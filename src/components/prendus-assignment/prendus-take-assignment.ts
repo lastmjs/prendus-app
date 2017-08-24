@@ -74,7 +74,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     this.action = await getAndSetUser();
     const assignment = await this._assignment(assignmentId);
     this._fireLocalAction('assignment', assignment);
-    const questionIds = shuffleArray(assignment.questions).slice(0, assignment.take).map(question => question.id);
+    const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
     const questions = await this._createQuiz(questionIds, this.user.id);
     this._fireLocalAction('questions', questions);
   }
@@ -84,7 +84,7 @@ class PrendusTakeAssignment extends Polymer.Element {
       assignment: Assignment(id: $assignmentId) {
         id
         title
-        take
+        numResponseQuestions
         questionType
         questions {
           id
