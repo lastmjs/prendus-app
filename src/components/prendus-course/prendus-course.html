@@ -168,7 +168,13 @@
                             <paper-tooltip for="create[[item.id]]" offset="0" animation-delay="300">Launch Create Assignment</paper-tooltip>
                             <a href="assignment/[[item.id]]/review"><paper-icon-button id="review[[item.id]]" class="prendus-icon-button" icon="feedback"></paper-icon-button></a>
                             <paper-tooltip for="review[[item.id]]" offset="0" animation-delay="300">Launch Review Assignment</paper-tooltip>
-                            <a href="assignment/[[item.id]]/view?assignmentType=QUIZ"><paper-icon-button id="quiz[[item.id]]" class="prendus-icon-button" icon="assignment"></paper-icon-button></a>
+                            <dom-if if="[[isEssayType(item.questionType)]]">
+                              <template>
+                                <a href="assignment/[[item.id]]/grade"><paper-icon-button id="grade[[item.id]]" class="prendus-icon-button" icon="book"></paper-icon-button></a>
+                                <paper-tooltip for="grade[[item.id]]" offset="0" animation-delay="300">Launch Grade Assignment</paper-tooltip>
+                              </template>
+                            </dom-if>
+                            <a href="assignment/[[item.id]]/quiz"><paper-icon-button id="quiz[[item.id]]" class="prendus-icon-button" icon="assignment"></paper-icon-button></a>
                             <paper-tooltip for="quiz[[item.id]]" offset="0" animation-delay="300">Launch Quiz</paper-tooltip>
                             <paper-icon-button id="delete[[item.id]]" data="[[item.id]]" class="prendus-icon-button" icon="delete" on-click="deleteAssignment"></paper-icon-button>
                             <paper-tooltip for="delete[[item.id]]" offset="0" animation-delay="300">Delete Assignment</paper-tooltip>

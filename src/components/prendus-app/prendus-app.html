@@ -18,10 +18,10 @@
     <template>
       <style include ="prendus-styles">
         #app-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          position: relative;
+  				display: flex;
+  				flex-direction: column;
+  				align-items: center;
+  				position: relative;
           min-height: calc(100vh - 150px);
   			}
   			.app-window {
@@ -42,30 +42,30 @@
           padding:0;
         }
 
-        .loading-spinner {
-          position: fixed;
-          left: calc(50% - 30px);
-          bottom: calc(50% - 30px);
-          width: 60px;
-          height: 60px;
-        }
+  			.loading-spinner {
+  				position: fixed;
+  				left: calc(50% - 30px);
+  				bottom: calc(50% - 30px);
+  				width: 60px;
+  				height: 60px;
+  			}
         .footer-items {
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+  	      width: 100%;
+  	      display: flex;
+  	      justify-content: space-between;
+  	      align-items: center;
           font-size: 15px;
-        }
+  	    }
 
         /*The code below wasn't actually doing anything because the viewport meta tag had not been added in the header of the index.html file. I added the viewport meta tag
           in order to get media queries working for the landing page which also caused the media query below to kick in. It looked super awkard and caused the page to offset
           and it wasn't even working before so i just commented it out. --- using media query below isn't neccessary, the same result can be achieved using css flexbox and/or css grid.
 
-        @media (max-width: 768px) {
-          .app-window {
-            padding: 10px 20px;
-          }
-        }
+  			@media (max-width: 768px) {
+  				.app-window {
+  					padding: 10px 20px;
+  				}
+  			}
         */
       </style>
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
@@ -90,9 +90,9 @@
 
         <app-route route="[[route]]" pattern="/assignment/create" data="{{createAssignmentRouteData}}" active="{{createAssignmentRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/create" data="{{assignmentCreateRouteData}}" active="{{assignmentCreateRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/assignment/:assignmentId/review" data="{{reviewAssignmentRouteData}}" active="{{reviewAssignmentRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/assignment/:assignmentId/grade" data="{{gradeAssignmentRouteData}}" active="{{gradeAssignmentRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/assignment/:assignmentId/take" data="{{takeAssignmentRouteData}}" active="{{takeAssignmentRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/assignment/:assignmentId/review" data="{{assignmentReviewRouteData}}" active="{{assignmentReviewRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/assignment/:assignmentId/grade" data="{{assignmentGradeRouteData}}" active="{{assignmentGradeRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/assignment/:assignmentId/quiz" data="{{assignmentQuizRouteData}}" active="{{assignmentQuizRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/edit" data="{{editAssignmentRouteData}}" active="{{editAssignmentRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/learning-structure" data="{{learningStructureRouteData}}" active="{{learningStructureRouteActive}}"></app-route>
@@ -137,7 +137,7 @@
           <app-toolbar>
         </app-header>
 
-        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, reviewAssignmentRouteActive, gradeAssignmentRouteActive, takeAssignmentRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
+        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
 
             <prendus-landing-page class="app-window landing" show="rootView" data-path="../prendus-landing-page/prendus-landing-page.html"></prendus-landing-page>
 
@@ -165,11 +165,11 @@
             <prendus-course-question-ratings class="app-window app-window-wide" show="courseQuestionRatingsView" course-id="[[courseQuestionRatingsRouteData.courseId]]" data-path="../prendus-course-question-ratings/prendus-course-question-ratings.html"></prendus-course-question-ratings>
 
             <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
+            <prendus-create-assignment class="app-window" show="assignmentCreateView" assignment-id="[[assignmentCreateRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-create-assignment.html"></prendus-create-assignment>
+            <prendus-review-assignment class="app-window" show="assignmentReviewView" assignment-id="[[assignmentReviewRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-review-assignment.html"></prendus-review-assignment>
+            <prendus-grade-assignment class="app-window" show="assignmentGradeView" assignment-id="[[assignmentGradeRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-grade-assignment.html"></prendus-grade-assignment>
+            <prendus-take-assignment class="app-window" show="assignmentQuizView" assignment-id="[[assignmentQuizRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-take-assignment.html"></prendus-take-assignment>
             <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
-            <prendus-create-assignment class="app-window" show="assignmentCreateView" assignment-id="[[assignmentCreateRouteData.assignmentId]]" data-path="../prendus-create-assignment/prendus-create-assignment.html"></prendus-create-assignment>
-            <prendus-review-assignment class="app-window" show="reviewAssignmentView" assignment-id="[[reviewAssignmentRouteData.assignmentId]]" data-path="../prendus-review-assignment/prendus-review-assignment.html"></prendus-review-assignment>
-            <prendus-grade-assignment class="app-window" show="gradeAssignmentView" assignment-id="[[gradeAssignmentRouteData.assignmentId]]" data-path="../prendus-grade-assignment/prendus-grade-assignment.html"></prendus-grade-assignment>
-            <prendus-take-assignment class="app-window" show="takeAssignmentView" assignment-id="[[takeAssignmentRouteData.assignmentId]]" data-path="../prendus-take-assignment/prendus-take-assignment.html"></prendus-take-assignment>
 
             <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>
 

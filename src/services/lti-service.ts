@@ -1,9 +1,9 @@
-import {GQLrequest} from 'graphql-service';
-import {sendStatement} from 'analytics-service';
+import {GQLrequest} from './graphql-service';
+import {sendStatement} from './analytics-service';
 import {setNotification} from '../redux/actions';
 import {SetPropertyAction} from '../typings/actions';
-import {getPrendusLTIServerOrigin} from 'utilities-service';
-import {NotificationType} from 'constants-service';
+import {getPrendusLTIServerOrigin} from './utilities-service';
+import {NotificationType, ContextType} from './constants-service';
 
 export async function LTIPassback(userId: string, assignmentId: string, assignmentType: string): SetPropertyAction {
   const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
