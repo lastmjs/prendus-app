@@ -93,9 +93,9 @@
                       <h2>Options</h2>
                       <paper-dropdown-menu id="questionTypes" label="Question Type" on-selected-item-changed="saveData">
                         <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[assignment.questionType]]">
-                          <dom-repeat items="[[questionTypes]]">
+                          <dom-repeat items="[[_questionTypes()]]">
                             <template>
-                              <paper-item id="[[item]]">[[item]]</paper-item>
+                              <paper-item id="[[item.id]]">[[item.value]]</paper-item>
                             </template>
                           </dom-repeat>
                         </paper-listbox>

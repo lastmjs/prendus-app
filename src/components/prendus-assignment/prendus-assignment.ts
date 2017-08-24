@@ -6,9 +6,8 @@ import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
-import {QUESTION_TYPES} from '../../services/constants-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType, NotificationType} from '../../services/constants-service';
+import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
   componentId: string;
@@ -23,7 +22,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   subjects: Subject[];
   concepts: Concept[];
   selectedConcepts: Concept[];
-  questionTypes: any[] = QUESTION_TYPES;
 
   static get is() { return 'prendus-assignment'; }
   static get properties() {
@@ -60,6 +58,12 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
   isEssayType(questionType: string): boolean {
     return questionType === 'ESSAY';
+  }
+
+  _questionTypes() {
+    return Object.keys(QuestionType).map(key => {
+      return {id: key, value: QuestionType[key]}
+    })
   }
 
   openAssignmentConceptDialog(e: any){
@@ -196,8 +200,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {subjectId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    if (conceptData.errors) {
+      this.action = setNotification(conceptData.errors[0].message, NotificationType.ERROR);
       return;
     }
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
