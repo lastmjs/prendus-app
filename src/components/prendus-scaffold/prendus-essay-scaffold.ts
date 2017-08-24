@@ -6,6 +6,8 @@ import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {generateEssay} from '../../services/question-to-code-service';
+import {NotificationType} from '../../services/constants-service';
+import {setNotification} from '../../redux/actions';
 import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
@@ -60,16 +62,14 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('resource', '');
     this._fireLocalAction('questionText', '');
     this._fireLocalAction('rubric', {});
-    this._fireLocalAction('concept', null);
+    this._fireLocalAction('concept', {});
   }
 
   _handleConcept(e: CustomEvent) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('concept', e.detail.concept);
   }
 
   _handleRubric(e: CustomEvent) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('rubric', e.detail.rubric);
   }
 
@@ -78,12 +78,10 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   setQuestionText(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('questionText', e.target.value);
   }
 
   setResource(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('resource', e.target.value);
   }
 
@@ -99,7 +97,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
-      this._fireLocalAction('error', e);
+      this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
     const { text, code } = generateEssay({stem: this.questionText}, this.rubric, DEFAULT_EVALUATION_RUBRIC);
@@ -126,7 +124,6 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (keys.includes('questionText')) this.questionText = componentState.questionText;
     if (keys.includes('concept')) this.concept = componentState.concept;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
-    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }

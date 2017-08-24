@@ -2,6 +2,8 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {Concept} from '../../typings/concept';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {AnswerTypes} from '../../typings/answer-types';
+import {NotificationType} from '../../services/constants-service';
+import {setNotification} from '../../redux/actions';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
 
 class PrendusMultipleChoiceScaffold extends Polymer.Element {
@@ -48,37 +50,30 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   }
 
   _handleConcept(e: CustomEvent) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('concept', e.detail.concept);
   }
 
   _handleResource(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('resource', e.target.value);
   }
 
   _handleQuestion(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('questionText', e.target.value);
   }
 
   _handleAnswer(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('answer', e.target.value);
   }
 
   _handleSolution(e: Event) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('solution', e.target.value);
   }
 
   _handleDistractors(e: CustomEvent) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('distractors', e.detail.distractors);
   }
 
   _handleHints(e: CustomEvent) {
-    this._fireLocalAction('error', null);
     this._fireLocalAction('hints', e.detail.comments);
   }
 
@@ -125,7 +120,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionText, this.answer, this.distractors, this.hints);
     } catch (e) {
-      this._fireLocalAction('error', e);
+      this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
     const answers = shuffleArray(this._scaffoldAnswers(this.answer, this.distractors, this.hints));
@@ -158,7 +153,6 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (keys.includes('solution')) this.solution = componentState.solution;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
     if (keys.includes('hints')) this.hints = componentState.hints;
-    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }

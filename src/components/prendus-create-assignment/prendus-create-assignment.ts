@@ -1,5 +1,8 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID, asyncForEach} from '../../services/utilities-service';
+import {sendStatement} from '../../services/analytics-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
+import {setNotification} from '../../redux/actions';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {Assignment} from '../../typings/assignment';
@@ -55,6 +58,12 @@ class PrendusCreateAssignment extends Polymer.Element {
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(questionVars);
+    sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
+    //window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
+    //    method: 'post',
+    //    mode: 'no-cors',
+    //    credentials: 'include'
+    //});
     if (answerComments)
       asyncForEach(answerComments.map(text => {
         return { text, questionId }
@@ -88,6 +97,10 @@ class PrendusCreateAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     // Create array of "questions" just to create carousel events to create multiple questions
     // avoid 0 because question is evaluated as a boolean
     const questions = Array(data.Assignment.create).fill(null).map((dummy, i) => i+1);
@@ -95,7 +108,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     this._fireLocalAction('questions', questions);
   }
 
-  async saveQuestion(variables: GQLVariables): Promise<string> {
+  async saveQuestion(variables: GQLVariables): Promise<string|null> {
     const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
@@ -108,10 +121,14 @@ class PrendusCreateAssignment extends Polymer.Element {
         id
       }
     }`, variables, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return null;
+    }
     return data.createQuestion.id;
   }
 
-  async saveQuestionAndConcept(variables: GQLVariables): Promise<string> {
+  async saveQuestionAndConcept(variables: GQLVariables): Promise<string|null> {
     const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
       createQuestion(
         authorId: $authorId,
@@ -124,24 +141,23 @@ class PrendusCreateAssignment extends Polymer.Element {
         id
       }
     }`, variables, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return null;
+    }
     return data.createQuestion.id;
   }
 
-  async saveConcept(variables: GQLVariables): Promise<string> {
-    const data = await GQLrequest(`mutation newConcept($title: String!, $subjectId: ID!) {
-      createConcept(title: $title, subjectId: $subjectId) {
-        id
-      }
-    }`, variables, this.userToken);
-    return data.createConcept.id;
-  }
-
-  async saveAnswerComment(variables: GQLVariables): Promise<string> {
+  async saveAnswerComment(variables: GQLVariables): Promise<string|null> {
     const data = await GQLrequest(`mutation newAnswerComment($text: String!, $questionId: ID!) {
       createAnswerComment(text: $text, questionId: $questionId) {
         id
       }
     }`, variables);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return null;
+    }
     return data.createAnswerComment.id;
   }
 

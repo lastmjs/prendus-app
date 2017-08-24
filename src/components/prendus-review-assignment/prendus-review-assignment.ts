@@ -3,6 +3,8 @@ import {User} from '../../typings/user';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
+import {NotificationType, QuestionType} from '../../services/constants-service';
+import {setNotification} from '../../redux/actions';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
@@ -41,8 +43,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       this._submit(this.question, this.ratings)
       this.$.carousel.nextData();
     } catch (err) {
-      this._fireLocalAction('error', err);
-      return;
+      this.action = setNotification(err.message, NotificationType.ERROR);
     }
   }
 
@@ -67,11 +68,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     return DEFAULT_EVALUATION_RUBRIC;
   }
 
-  _handleSubmit(data: object) {
-    if (data.errors) throw new Error("Error saving question rating");
-  }
-
-  _submit(question: Question, ratings: CategoryScore[]) {
+  async _submit(question: Question, ratings: CategoryScore[]) {
     const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
       createQuestionRating (
         raterId: $raterId
@@ -86,8 +83,8 @@ class PrendusReviewAssignment extends Polymer.Element {
       ratings,
       raterId: this.user.id
     };
-    return GQLrequest(query, variables, this.userToken)
-      .then(this._handleSubmit.bind(this))
+    const data = await GQLrequest(query, variables, this.userToken);
+    if (data.errors) this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -125,16 +122,20 @@ class PrendusReviewAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId, userId: this.user.id}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     this._fireLocalAction('assignment', data.Assignment);
     this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.review));
   }
 
   isEssayType(questionType: string): boolean {
-    return questionType === 'ESSAY';
+    return questionType === QuestionType.ESSAY;
   }
 
   isMultipleChoiceType(questionType: string): boolean {
-    return questionType === 'MULTIPLE_CHOICE';
+    return questionType === QuestionType.MULTIPLE_CHOICE;
   }
 
   stateChange(e: CustomEvent) {
@@ -147,7 +148,6 @@ class PrendusReviewAssignment extends Polymer.Element {
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('ratings')) this.ratings = componentState.ratings;
-    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }
