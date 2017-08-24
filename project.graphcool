@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 259
+# version: 275
 
 type File implements Node {
   id: ID! @isUnique
@@ -30,6 +30,7 @@ type User implements Node {
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
+  userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
 }
 
 type Course implements Node {
@@ -64,7 +65,7 @@ type Assignment implements Node {
   author: User! @relation(name: "AuthorOnAssignment")
   students: [User!]! @relation(name: "StudentsAndAssignments")
   questions: [Question!]! @relation(name: "AssignmentQuestions")
-  questionType: QuestionType! @migrationValue(value: MULTIPLE_CHOICE)
+  questionType: QuestionType! @defaultValue(value: MULTIPLE_CHOICE)
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
   numCreateQuestions: Int! @defaultValue(value: 1)
@@ -162,6 +163,7 @@ type QuestionRating implements Node {
   id: ID! @isUnique
   scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionRating")
   rater: User! @relation(name: "RaterOnQuestionRating")
+  ratingJson: Json!
   question: Question! @relation(name: "QuestionOnQuestionRating")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -224,6 +226,17 @@ type LTIUser implements Node {
   user: User! @relation(name: "UserOnLTIUser")
 }
 
+type PrendusAnalytics implements Node {
+  user: User @relation(name: "UserOnPrendusAnalytics")
+  contextId: String!
+  contextType: ContextType!
+  verb: String!
+  object: String!
+  createdAt: DateTime!
+  id: ID! @isUnique
+  updatedAt: DateTime!
+}
+
 enum UserRole {
   INSTRUCTOR
   STUDENT
@@ -234,6 +247,20 @@ enum PrendusApproved {
   YES
   NO
   TBD
+}
+
+enum ContextType {
+  QUESTION
+  ASSIGNMENT
+  QUIZ
+  COURSE
+}
+
+enum ResponseType {
+  VARIABLE
+  INPUT
+  CHECK
+  RADIO
 }
 
 enum QuestionType {

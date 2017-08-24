@@ -7,8 +7,9 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -114,14 +115,14 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       //TODO combine this with the creatediscipline above
       this.saveDisciplineToCourse(data.createDiscipline.id);
       if(this.subjects){
         this._fireLocalAction('subjects', null);
       }
-      // this.shadowRoot.querySelector('#subject-list').disabled = false;
+      this.action = setNotification("Discipline created", NotificationType.SUCCESS)
     }
     async saveDisciplineToCourse(disciplineId: string){
       const courseData = await GQLMutate(`
@@ -142,7 +143,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       if(this.course.subject){
         await GQLMutate(`
@@ -157,7 +158,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-          console.log('error', error)
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
       }
       this._fireLocalAction('selectedDisciplineId', disciplineId)
@@ -176,6 +177,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadLearningStructure();
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
+      this.action = setNotification("Discipline selected for course", NotificationType.SUCCESS)
     }
 
     async saveSubjectToCourse(subjectId: string){
@@ -197,7 +199,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('selectedSubjectId', subjectId)
       this._fireLocalAction('course', {
@@ -212,6 +214,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadLearningStructure();
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
+      this.action = setNotification("Subject selected for course", NotificationType.SUCCESS)
     }
     updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
@@ -240,17 +243,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-        console.log('error', error)
-          alert(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
-      // this.loadData()
-      // this._fireLocalAction('subjects', [`${data.createSubject.id}`])
       this.saveSubjectToCourse(data.createSubject.id);
       const newSubjects = [...(this.subjects || []), data.createSubject];
       this._fireLocalAction('subjects', newSubjects)
       this._fireLocalAction('customSubject', true)
       this._fireLocalAction('selectedSubjectId', data.createSubject.id)
       this.shadowRoot.querySelector('#create-subject').close();
+      this.action = setNotification("Subject created", NotificationType.SUCCESS)
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -260,10 +261,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
+      console.log('this.course.discipline', this.course.discipline,  this.course.subject)
       if(this.course.discipline && this.course.subject){
         this.shadowRoot.querySelector('#create-assignment').open();
       }else{
-        alert('Please select a discipline and subject before creating any assignments')
+        this.action = setNotification("Select a discipline and subject before creating any assignments", NotificationType.WARNING)
       }
     }
     async createAssignment(e){
@@ -282,12 +284,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         `, this.userToken, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#create-assignment').close();
         // navigate(`assignment/${data.createAssignment.id}/edit`)
       }else{
-        alert('Please input a title to add Assignment')
+        setNotification("Input a title to add Assignment", NotificationType.WARNING)
       }
       // href=""
     }
@@ -299,7 +301,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               }
           }
       `, this.userToken, (error: any) => {
-          console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this.loadData();
     }
@@ -331,7 +333,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this._fireLocalAction('assignments', data.allAssignments)
         this._fireLocalAction('course', data.Course)
@@ -405,7 +407,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, this.userToken, (key: string, value: any) => {
         this._fireLocalAction('learningStructure', value)
       }, (error: any) => {
-          console.log(error);
+          setNotification(error.message, NotificationType.ERROR)
       });
     }
     stateChange(e: CustomEvent) {

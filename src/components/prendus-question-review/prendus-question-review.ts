@@ -50,7 +50,6 @@ class PrendusQuestionReview extends Polymer.Element {
         id: `question$[i]`
       }
     });
-    console.log(question, gui, answers);
     return {
       id: question.id,
       answers,

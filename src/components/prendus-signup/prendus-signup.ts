@@ -2,9 +2,10 @@ import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
-import {persistUserToken, getAndSetUser} from '../../redux/actions';
+import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate, getCookie, deleteCookie} from '../../services/utilities-service';
 import {EMAIL_REGEX} from '../../services/constants-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -131,7 +132,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         }
                 }
             `, userToken, (error: any) => {
-                console.log(error);
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
@@ -148,7 +149,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, userToken, (error: any) => {
-                console.log(error);
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;

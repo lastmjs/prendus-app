@@ -3,6 +3,8 @@ import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
+import {setNotification} from '../../redux/actions'
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusTeacherApproval extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;
@@ -51,7 +53,7 @@ class PrendusTeacherApproval extends Polymer.Element {
         }
     `, this.userToken, (key: string, value: any) => {},
       (error: any) => {
-        alert(error);
+        this.action = setNotification(error.message, NotificationType.ERROR)
     });
     const unverifiedTeachers = teacherData.allUsers.filter((teacher: User)=>{
       return teacher.role === "STUDENT"
@@ -83,7 +85,7 @@ class PrendusTeacherApproval extends Polymer.Element {
           }
         }
         `, this.userToken, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         const newUnverifiedTeachers = this.unverifiedTeachers.filter((teacher) => {
           if(teacher.id !== teacherData.updateUser.id){ return teacher }

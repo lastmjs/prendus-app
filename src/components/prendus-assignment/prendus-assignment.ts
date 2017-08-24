@@ -7,6 +7,8 @@ import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {createUUID} from '../../services/utilities-service';
 import {QUESTION_TYPES} from '../../services/constants-service';
+import {sendStatement} from '../../services/analytics-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
   componentId: string;
@@ -94,7 +96,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
   async createConcept(e){
     if(!this.shadowRoot.querySelector('#custom-concept').value){
-      alert('Must enter a valid title for the new concept before adding it')
+      this.action = setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
       return;
     }
     const title = this.shadowRoot.querySelector('#custom-concept').value;
@@ -172,6 +174,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {id: this.assignmentId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     this.loadConcepts(data.Assignment.course.subject.id);
     this._fireLocalAction('assignment', data.Assignment)
     this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
@@ -190,6 +196,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {subjectId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
   }
 
@@ -242,7 +252,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       {questionType, create, review, grade, take, title, id: this.assignment.id},
       this.userToken
     );
-    if (data.errors) return; //TODO: notify user of errors
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     this.loadConcepts(data.updateAssignment.course.subject.id);
     this._fireLocalAction('assignment', data.updateAssignment);
     this._fireLocalAction('selectedConcepts', data.updateAssignment.concepts);

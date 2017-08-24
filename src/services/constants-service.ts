@@ -6,6 +6,17 @@ export const QUESTION_TYPES = [
   'MULTIPLE_CHOICE',
   'ESSAY'
 ];
+export const ContextType = {
+  QUESTION: "QUESTION",
+  ASSIGNMENT: "ASSIGNMENT",
+  QUIZ: "QUIZ",
+  COURSE: "COURSE"
+};
+export const NotificationType = {
+  ERROR: "error",
+  SUCCESS: "success",
+  WARNING: "warning"
+};
 export const DEFAULT_EVALUATION_RUBRIC = {
   Language: {
     Professional: {
@@ -107,4 +118,3 @@ export const EXAMPLE_GRADING_RUBRIC = {
       points: 0
     }
   }
-};

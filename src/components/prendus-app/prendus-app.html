@@ -10,6 +10,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <!--Do not lazy load the open source component, we need it to comply-->
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 
@@ -199,9 +200,7 @@
             <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
           </footer>
         </app-toolbar>
-
-        <paper-toast id="termsToast" duration="10000" style="margin-top: 50px; margin-left: 50px; z-index: 1000" vertical-align="top" on-click="_termsClick"></paper-toast>
-
+        <prendus-notification notification="[[notification]]"></prendus-notification>
     </template>
 
     <script type="module" src="prendus-app.ts"></script>
