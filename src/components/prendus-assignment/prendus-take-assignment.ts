@@ -69,6 +69,7 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   async generateQuiz(assignmentId: string) {
+    //TODO: this seems to be getting called twice...
     sendStatement(this.user.id, assignmentId, 'STARTED', 'QUIZ');
     this.action = await getAndSetUser();
     const assignment = await this._assignment(assignmentId);
