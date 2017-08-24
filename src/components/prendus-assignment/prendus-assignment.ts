@@ -238,10 +238,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             id
             title
             questionType
-            create
-            review
-            grade
-            take
+            numCreateQuestions
+            numReviewQuestions
+            numGradeResponses
+            numResponseQuestions
             course {
                 id
                 subject{
