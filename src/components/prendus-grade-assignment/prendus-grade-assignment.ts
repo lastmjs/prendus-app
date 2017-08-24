@@ -1,8 +1,10 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
-import {extractLiteralVariables} from '../../services/code-to-question-service';
+import {QuestionType, NotificationType} from '../../services/constants-service';
+import {setNotification, getAndSetUser} from '../../redux/actions';
+import {extractVariables} from '../../services/code-to-question-service';
 import {parse} from '../../node_modules/assessml/assessml';
 
 class PrendusGradeAssignment extends Polymer.Element {
@@ -31,9 +33,6 @@ class PrendusGradeAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('rubric-dropdowns', this._handleGrades.bind(this));
-    this.addEventListener('carousel-next', this._handleNextRequest.bind(this));
-    this.addEventListener('carousel-data', this._handleNextResponse.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -45,42 +44,58 @@ class PrendusGradeAssignment extends Polymer.Element {
     };
   }
 
-  _handleGrades(e) {
+  _handleGrades(e: CustomEvent) {
     this._fireLocalAction('grades', e.detail.scores);
   }
 
-  _handleNextRequest(e) {
+  _handleNextRequest(e: CustomEvent) {
     try {
-      this._validate();
-      this._submit();
+      validate(this.rubric, this.grades);
+      this._submit(this.grades, this.response.questionResponse.id, this.user.id);
     } catch (err) {
-      this._fireLocalAction('error', e);
+      this.action = setNotification(err.message, NotificationType.ERROR);
       return;
     }
     this.$.carousel.nextData();
   }
 
-  _handleNextResponse(e) {
-    this._fireLocalAction('response', e.detail.data);
+  _handleNextResponse(e: CustomEvent) {
+    const response = e.detail.data;
+    this._fireLocalAction('response', response);
+    if (response) {
+      //force rubric dropdowns to reset
+      this._fireLocalAction('rubric', null);
+      setTimeout(() => {
+        this._fireLocalAction('rubric', this._parseRubric(response.questionResponse.question.code));
+      });
+    } else {
+      this._finish();
+    }
   }
 
-  _parseRubric(code: string): Object {
-    const { gradingRubric } = extractLiteralVariables(code);
+  _finish() {
+
+  }
+
+  _parseRubric(code: string): Rubric {
+    const { gradingRubric } = extractVariables(code);
     if (!gradingRubric) return {};
-    return JSON.parse(gradingRubric);
+    return JSON.parse(gradingRubric.value);
   }
 
-  async loadAssignment(assignmentId: string): Assignment {
+  async loadAssignment(assignmentId: string) {
+    this.action = await getAndSetUser();
     const data = await GQLrequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         questionType
+        grade
       }
-      essays: allUserInputs(filter: {
+      essays: allUserEssays(filter: {
         questionResponse: {
           author: {
-            id_not: $userId
+            id: $userId
           }
           question: {
             assignment: {
@@ -99,8 +114,12 @@ class PrendusGradeAssignment extends Polymer.Element {
         }
       }
     }`, {assignmentId, userId: this.user.id}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
     const { assignment, essays } = data;
-    const responses = essays ? shuffleArray(essays).slice(0, 3): [];//assignment.gradeQuota);
+    const responses = essays ? shuffleArray(essays).slice(0, assignment.grade): [];
     this._fireLocalAction('assignment', assignment);
     this._fireLocalAction('responses', responses);
   }
@@ -110,35 +129,19 @@ class PrendusGradeAssignment extends Polymer.Element {
     return parse(text, null).ast[0].content.replace(/&lt;p&gt;|&lt;\/p&gt;&lt;p&gt;/g, '');
   }
 
-  _validate() {
-  }
-
-  _handleSubmit(data: object) {
-    return data;
-  }
-
-  _submit() {
-    return Promise.all(this.grades.map(grade => {
-      return this._createCategoryScore(grade);
-    })).then(this._handleSubmit.bind(this))
-  }
-
-  _createCategoryScore(grade: object) {
-    const query = `mutation gradeResponse($responseId: ID!, $category: String!, $score: Int!) {
-      createCategoryScore (
-        questionResponseId: $responseId
-        category: $category
-        score: $score
+  async _submit(grades: CategoryScore[], responseId: string, userId: string): Promise<boolean> {
+    const data = await GQLrequest(`mutation gradeResponse($grades: [QuestionResponseRatingscoresCategoryScore!]!, $responseId: ID!, $userId: ID!) {
+      createQuestionResponseRating(
+        raterId: $userId,
+        questionResponseId: $responseId,
+        scores: $grades
       ) {
         id
       }
-    }`;
-    const variables = {
-      responseId: this.response.id,
-      category: grade.category,
-      score: grade.score
-    };
-    return GQLrequest(query, variables, this.userToken)
+    }`, {grades, responseId, userId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }
   }
 
   stateChange(e: CustomEvent) {
@@ -151,11 +154,17 @@ class PrendusGradeAssignment extends Polymer.Element {
     if (keys.includes('response')) this.response = componentState.response;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('grades')) this.grades = componentState.grades;
-    if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }
 
+}
+
+function validate(rubric: Rubric, grades: CategoryScore[]) {
+  if (!grades) throw new Error('You must rate the question');
+  if (grades.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
+  if (grades.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
+    throw new Error('You must rate each category');
 }
 
 window.customElements.define(PrendusGradeAssignment.is, PrendusGradeAssignment)

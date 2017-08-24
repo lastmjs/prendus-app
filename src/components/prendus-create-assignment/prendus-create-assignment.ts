@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID, asyncForEach} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType, NotificationType} from '../../services/constants-service';
+import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
@@ -58,7 +58,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(questionVars);
-    sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
+    //sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
     //window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
     //    method: 'post',
     //    mode: 'no-cors',
@@ -72,11 +72,11 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   isEssayType(questionType: string): boolean {
-    return questionType === 'ESSAY';
+    return questionType === QuestionType.ESSAY;
   }
 
   isMultipleChoiceType(questionType: string): boolean {
-    return questionType === 'MULTIPLE_CHOICE';
+    return questionType === QuestionType.MULTIPLE_CHOICE;
   }
 
   async loadAssignment(assignmentId: string) {

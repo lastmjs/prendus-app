@@ -56,8 +56,8 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   _description(rubric: Rubric, category: string, option: string): string {
-    if (!rubric) return [];
-    return rubric[category][option].description;
+    if (!rubric || !rubric[category] || !rubric[category][option]) return '';
+    return rubric[category][option].description || '';
   }
 
   _scoreCategory(e) {

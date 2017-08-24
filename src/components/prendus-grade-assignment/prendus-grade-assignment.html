@@ -10,24 +10,18 @@
   <template>
 
     <style include="prendus-styles">
-
-      #submit-button {
-        float: right;
-        margin-top: 20px;
-      }
-
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <h2>[[assignment.title]] Grade Assignment</h2>
     <br>
-    <prendus-carousel id="carousel" hide-back next-text="Submit" label="Response" data="[[responses]]">
+    <prendus-carousel id="carousel" hide-back next-text="Submit" label="Response" data="[[responses]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextResponse">
       <div hidden$="[[!response]]">
         <h4>Question</h4>
         <p>[[_questionText(response.questionResponse.question.text)]]</p>
         <h4>Response</h4>
         <p>[[response.value]]</p>
-        <prendus-rubric-dropdowns rubric="[[_parseRubric(response.questionResponse.question.code)]]"></prendus-rubric-dropdowns>
+        <prendus-rubric-dropdowns rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
       </div>
       <div hidden$="[[response]]">
         <h3>Done</h3>
