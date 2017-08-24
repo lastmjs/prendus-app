@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
+import {parse} from '../../node_modules/assessml/assessml';
 import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
@@ -27,6 +28,11 @@ class PrendusScaffoldExample extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+  }
+
+  _questionText(text: string): string {
+    if (!text) return '';
+    return parse(text, null).ast[0].content.replace(/&lt;p&gt;|&lt;\/p&gt;&lt;p&gt;/g, '');
   }
 
   _fireLocalAction(key: string, value: any) {

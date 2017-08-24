@@ -107,7 +107,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   _questionText(text: string): string {
     if (!text) return '';
-    return parse(text, null).ast[0].content.replace('<p>', '').replace('</p><p>', ''));
+    return parse(text, null).ast[0].content.replace(/&lt;p&gt;|&lt;\/p&gt;&lt;p&gt;/g, '');
   }
 
   _validate() {

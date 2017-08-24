@@ -108,7 +108,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         review
         questions(filter: {
           author: {
-            id: $userId
+            id_not: $userId
           }
         }) {
           id
