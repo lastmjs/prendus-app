@@ -4,6 +4,7 @@
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
 
 <dom-module id="prendus-take-assignment">
 
@@ -13,9 +14,9 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-carousel id="carousel" hide-next hide-back data="[[questions]]">
+    <prendus-carousel id="carousel" hide-next hide-back data="[[questions]]" on-carousel-data="_handleNextQuestion">
       <div hidden$="[[!question]]">
-        <prendus-view-question question="[[question]]"></prendus-view-question>
+        <prendus-view-question question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
       </div>
       <div hidden$="[[question]]">
         <h3>Done</h3>

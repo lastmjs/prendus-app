@@ -1,6 +1,9 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
+import {GQLVariables} from '../../typings/gql-variables';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {QuestionType, NotificationType} from '../../services/constants-service';
+import {setNotification} from '../../redux/actions';
 import {GQLrequest} from '../../services/graphql-service';
 
 class PrendusTakeAssignment extends Polymer.Element {
@@ -29,28 +32,42 @@ class PrendusTakeAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
-    this.addEventListener('carousel-data', this._handleNextQuestion.bind(this));
-    this.addEventListener('response-submitted', this._handleResponse.bind(this));
   }
 
-  _handleResponse(e) {
-    const variables = {
-      ...e.detail,
-      questionId: this.question.id,
-      authorId: this.user.id
-    };
+  _handleResponse(e: CustomEvent) {
     try {
-      this._validate(variables);
-      this._submit(variables);
+      if (this.assignment.questionType === QuestionType.ESSAY)
+        validateEssay(e.detail.userEssays);
+      else if (this.assignment.questionType === QuestionType.MULTIPLE_CHOICE)
+        validateMultipleChoice(e.detail.userRadios);
+      this._saveResponse({
+        ...e.detail,
+        questionId: this.question.id,
+        authorId: this.user.id
+      });
     } catch (err) {
-      this._fireLocalAction('error' err);
+      alert(err.message);
       return;
     }
     this.$.carousel.nextData();
   }
 
-  _handleNextQuestion(e) {
+  _handleNextQuestion(e: CustomEvent) {
     this._fireLocalAction('question', e.detail.data);
+    if (!e.detail.data) this._finish();
+  }
+
+  _finish() {
+    //const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
+    //  method: 'post',
+    //  mode: 'no-cors',
+    //  credentials: 'include'
+    //});
+    //if (LTIResponse.ok) {
+    //  sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
+    //} else {
+    //  this.action = setNotification('LTI Error', NotificationType.ERROR);
+    //}
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -67,42 +84,63 @@ class PrendusTakeAssignment extends Polymer.Element {
       assignment: Assignment(id: $assignmentId) {
         id
         title
+        take
         questionType
+        questions {
+          id
+        }
+      }
+    }`, {assignmentId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return;
+    }
+    const { assignment } = data;
+    const questionIds = shuffleArray(assignment.questions)
+      .slice(0, assignment.take)
+      .map(question => question.id);
+    const questions = await this.createQuiz(questionIds, this.user.id);
+    this._fireLocalAction('assignment', assignment);
+    this._fireLocalAction('questions', questions);
+  }
+
+  async createQuiz(questionIds: string[], userId: string): Promise<Question[]> {
+    const data = await GQLrequest(`
+      mutation quiz($userId: ID!, $questionIds: [ID!]!){
+        createQuiz(
+          authorId: $userId
+          title: "Assignment Quiz"
+          questionsIds: $questionIds
+        ) {
         questions {
           id
           text
           code
         }
       }
-    }`, {assignmentId}, this.userToken);
-    const { assignment } = data;
-    const quota = assignment.questionType === 'ESSAY' ? 1 : 10;
-    const questions = shuffleArray(assignment.questions).slice(0, quota);//assignment.takeQuota);
-    this._fireLocalAction('assignment', assignment);
-    this._fireLocalAction('questions', questions);
+    }`, {questionIds, userId}, this.userToken);
+    if (data.errors) {
+      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+      return [];
+    }
+    return data.createQuiz.questions;
   }
 
-  _validate(variables: object) {
-  }
-
-  _handleSubmit(data: Object) {
-    if (data.errors) throw new Error("Error saving question rating");
-    return data.createQuestionResponse.id;
-  }
-
-  async _saveResponse(variables: object) {
+  async _saveResponse(variables: GQLVariables) {
     const query = `mutation answerQuestion(
         $questionId: ID!,
         $userInputs: [QuestionResponseuserInputsUserInput!]!,
+        $userEssays: [QuestionResponseuserEssaysUserEssay!]!,
         $userVariables: [QuestionResponseuserVariablesUserVariable!]!,
         $userChecks: [QuestionResponseuserChecksUserCheck!]!,
         $userRadios: [QuestionResponseuserRadiosUserRadio!]!,
-        $user: ID!
+        $authorId: ID!
       ) {
       createQuestionResponse (
-        authorId: $user
+        authorId: $authorId
         questionId: $questionId
         userInputs: $userInputs
+        userEssays: $userEssays
         userVariables: $userVariables
         userRadios: $userRadios
         userChecks: $userChecks
@@ -110,7 +148,7 @@ class PrendusTakeAssignment extends Polymer.Element {
         id
       }
     }`;
-    return GQLrequest(query, variables, this.userToken).then(this._handleSubmit.bind(this))
+    return GQLrequest(query, variables, this.userToken);
   }
 
   stateChange(e: CustomEvent) {
@@ -126,6 +164,16 @@ class PrendusTakeAssignment extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function validateEssay(essays: UserEssay[]) {
+  if (!essays.length || !essays[0].value || !essays[0].value.trim().length)
+    throw new Error('Your essay response is empty');
+}
+
+function validateMultipleChoice(radios: UserRadio[]) {
+  if (!radios.length || !radios.reduce((bitOr, radio) => bitOr || radio.checked, false))
+    throw new Error('You must select an answer');
 }
 
 window.customElements.define(PrendusTakeAssignment.is, PrendusTakeAssignment)
