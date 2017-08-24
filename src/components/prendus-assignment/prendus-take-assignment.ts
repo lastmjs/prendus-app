@@ -68,10 +68,10 @@ class PrendusTakeAssignment extends Polymer.Element {
     };
   }
 
+  //TODO: this seems to be getting called twice...
   async generateQuiz(assignmentId: string) {
-    //TODO: this seems to be getting called twice...
-    sendStatement(this.user.id, assignmentId, 'STARTED', 'QUIZ');
     this.action = await getAndSetUser();
+    sendStatement(this.user.id, assignmentId, 'STARTED', 'QUIZ');
     const assignment = await this._assignment(assignmentId);
     this._fireLocalAction('assignment', assignment);
     const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);

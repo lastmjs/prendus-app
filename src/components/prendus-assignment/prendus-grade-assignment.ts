@@ -94,7 +94,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       essays: allUserEssays(filter: {
         questionResponse: {
           author: {
-            id: $userId
+            id_not: $userId
           }
           question: {
             assignment: {

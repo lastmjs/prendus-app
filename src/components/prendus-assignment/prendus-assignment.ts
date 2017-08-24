@@ -1,5 +1,6 @@
 import {GQLrequest} from '../../services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {setNotification} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
 import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
@@ -161,10 +162,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           id
           title
           questionType
-          create
-          review
-          grade
-          take
+          numCreateQuestions
+          numReviewQuestions
+          numGradeResponses
+          numResponseQuestions
           course {
               id
               subject{
@@ -228,10 +229,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           updateAssignment(
             id: $id
             questionType: $questionType
-            create: $create
-            review: $review
-            grade: $grade
-            take: $take
+            numCreateQuestions: $create
+            numReviewQuestions: $review
+            numGradeResponses: $grade
+            numResponseQuestions: $take
             title: $title
           ) {
             id
