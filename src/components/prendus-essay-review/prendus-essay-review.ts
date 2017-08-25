@@ -50,7 +50,7 @@ class PrendusEssayReview extends Polymer.Element {
 
   _questionText(text: string): string {
     if (!text) return '';
-    return parse(text, null).ast[0].content.replace(/&lt;p&gt;|&lt;\/p&gt;&lt;p&gt;/g, '');
+    return parse(text, null).ast[0].content.replace(/<p>|<\/p>/g, '');
   }
 
   _parseRubric(code: string): Rubric {

@@ -51,11 +51,17 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   _handleNextQuestion(e: CustomEvent) {
-    this._fireLocalAction('question', e.detail.data);
+    const { data } = e.detail;
+    this._fireLocalAction('question', data);
+    if (data && data === this.questions[0]) //first round started
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'CREATE');
+    else //subsequent rounds mean a question was created
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'CREATED', 'CREATE');
+    if (!data) //last round
+      LTIPassback(this.user.id, this.assignment.id, 'CREATE');
   }
 
   async _handleQuestion(e: CustomEvent) {
-    LTIPassback(this.user.id, this.assignment.id, 'CREATE');
     const { question } = e.detail;
     const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
@@ -76,7 +82,6 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string) {
-    sendStatement(this.user.id, assignmentId, 'STARTED', 'CREATE');
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id

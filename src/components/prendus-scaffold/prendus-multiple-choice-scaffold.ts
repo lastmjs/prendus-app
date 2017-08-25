@@ -101,7 +101,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   _scaffoldAnswers(answer: string, distractors: string[], hints: string[]): QuestionScaffoldAnswer[] {
     const mChoice = (text, comment, correct) => Object.assign({}, {text, comment, correct, type: AnswerTypes.MultipleChoice});
-    return [mChoice(answer, hints[0], true)].concat(distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false)));
+    return [mChoice(answer, hints[0], true), ...distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false))];
   }
 
   showNext(i: number): boolean {

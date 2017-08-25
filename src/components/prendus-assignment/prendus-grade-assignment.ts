@@ -2,7 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-service';
 import {GQLrequest} from '../../services/graphql-service';
-import {QuestionType, NotificationType} from '../../services/constants-service';
+import {QuestionType, NotificationType, ContextType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {sendStatement} from '../../services/analytics-service';
 import {LTIPassback} from '../../services/lti-service';
@@ -64,6 +64,10 @@ class PrendusGradeAssignment extends Polymer.Element {
   _handleNextResponse(e: CustomEvent) {
     const response = e.detail.data;
     this._fireLocalAction('response', response);
+    if (response && response === this.responses[0])
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'GRADE');
+    else
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'GRADED', 'GRADE');
     if (response) {
       //force rubric dropdowns to reset
       this._fireLocalAction('rubric', null);
@@ -83,7 +87,6 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   async loadAssignment(assignmentId: string) {
     this.action = await getAndSetUser();
-    sendStatement(this.user.id, assignmentId, 'STARTED', 'GRADE');
     const data = await GQLrequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
@@ -125,7 +128,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   _questionText(text: string): string {
     if (!text) return '';
-    return parse(text, null).ast[0].content.replace(/&lt;p&gt;|&lt;\/p&gt;&lt;p&gt;/g, '');
+    return parse(text, null).ast[0].content.replace(/<p>|<\/p>/g, '');
   }
 
   async _submit(grades: CategoryScore[], responseId: string, userId: string): Promise<boolean> {

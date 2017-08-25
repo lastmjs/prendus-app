@@ -130,7 +130,7 @@ class PrendusRubricTable extends Polymer.Element {
   }
 
   setCategory(e: Event) {
-    const newCategories = this.categories.slice();
+    const newCategories = [...this.categories];
     newCategories[e.model.itemsIndex].name = e.target.value;
     this._fireLocalAction('categories', newCategories);
     this._notify(this._makeRubric(newCategories));
@@ -138,7 +138,7 @@ class PrendusRubricTable extends Polymer.Element {
 
   setOptionProp(e: Event, prop) {
     const i = this.shadowRoot.getElementById('categories').indexForElement(e.target);
-    const newCategories = this.categories.slice();
+    const newCategories = [...this.categories];
     newCategories[i].options[e.model.itemsIndex][prop] = e.target.value;
     this._fireLocalAction('categories', newCategories);
     this._notify(this._makeRubric(newCategories));

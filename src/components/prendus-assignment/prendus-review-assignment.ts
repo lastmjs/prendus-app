@@ -4,7 +4,7 @@ import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLrequest} from '../../services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
-import {NotificationType, QuestionType} from '../../services/constants-service';
+import {NotificationType, QuestionType, ContextType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
@@ -52,6 +52,10 @@ class PrendusReviewAssignment extends Polymer.Element {
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
+    if (data && data === this.questions[0])
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'REVIEW');
+    else
+      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'REVIEWED', 'REVIEW');
     if (data) {
       this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
       setTimeout(() => {
@@ -102,7 +106,6 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    sendStatement(this.user.id, assignmentId, 'STARTED', 'REVIEW');
     const data = await GQLrequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
       Assignment(id: $assignmentId) {
         id

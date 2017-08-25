@@ -2,7 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {GQLVariables} from '../../typings/gql-variables';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
-import {QuestionType, NotificationType} from '../../services/constants-service';
+import {QuestionType, NotificationType, ContextType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
@@ -55,8 +55,14 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   _handleNextQuestion(e: CustomEvent) {
-    this._fireLocalAction('question', e.detail.data);
-    if (!e.detail.data) LTIPassback(this.user.id, this.assignment.id, 'QUIZ');
+    const { data } = e.detail;
+    this._fireLocalAction('question', data);
+    if (data && data === this.questions[0])
+      sendStatement(this.user.id, assignmentId, ContextType.QUIZ, 'STARTED');
+    else
+      sendStatement(this.user.id, assignmentId, ContextType.QUIZ, 'RESPONDED');
+    if (!data)
+      LTIPassback(this.user.id, this.assignment.id, ContextType.QUIZ);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -70,13 +76,14 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   //TODO: this seems to be getting called twice...
   async generateQuiz(assignmentId: string) {
+    this._fireLocalAction('loaded', false);
     this.action = await getAndSetUser();
-    sendStatement(this.user.id, assignmentId, 'STARTED', 'QUIZ');
     const assignment = await this._assignment(assignmentId);
     this._fireLocalAction('assignment', assignment);
     const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
     const questions = await this._createQuiz(questionIds, this.user.id);
     this._fireLocalAction('questions', questions);
+    this._fireLocalAction('loaded', true);
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {

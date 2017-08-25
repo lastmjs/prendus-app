@@ -4,7 +4,7 @@ import {createUUID} from '../../services/utilities-service';
 class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
-  scores: object = {};
+  scores: {[key: string]: number};
   componentId: string;
   userToken: string | null;
   user: User;
@@ -82,7 +82,7 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   categoryId(category: string, option: string): string {
-    return category.replace(/\s/g, '-') + option.replace(/\s/, '-');
+    return category.replace(/\s/g, '-') + option.replace(/\s/g, '-');
   }
 
   stateChange(e: CustomEvent) {
