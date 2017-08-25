@@ -124,14 +124,8 @@ class PrendusRubricTable extends Polymer.Element {
   }
 
   removeScale(e: Event) {
-    const newRubric = this.categories.map((category, i) => {
-      if (i === e.model.itemsIndex)
-        return {
-          name: category.name,
-          options: category.options.length ? category.options.slice(0, category.options.length - 1) : category.options
-        }
-      return category;
-    });
+    const newRubric = [...this.categories];
+    newRubric[e.model.itemsIndex].options = newRubric[e.model.itemsIndex].options.slice(0, -1);
     this._fireLocalAction('categories', newRubric);
   }
 

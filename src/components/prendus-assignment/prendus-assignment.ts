@@ -210,29 +210,29 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
   async saveData(e) {
     const questionType = this.shadowRoot.querySelector('#questionTypes').querySelector('paper-listbox').selected;
-    const create = Number(this.shadowRoot.querySelector('#create').value);
-    const review = Number(this.shadowRoot.querySelector('#review').value);
-    const grade = this.assignment.questionType === 'ESSAY'
+    const numCreateQuestions = Number(this.shadowRoot.querySelector('#create').value);
+    const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
+    const numGradeResponses = this.assignment.questionType === 'ESSAY'
       ? Number(this.shadowRoot.querySelector('#review').value)
       : this.assignment.grade;
-    const take = Number(this.shadowRoot.querySelector('#take').value);
+    const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
     const title = this.shadowRoot.querySelector('#assignment-title').value;
     const data = await GQLrequest(`mutation saveAssignment(
         $questionType: QuestionType!
-        $create: Int!
-        $review: Int!
-        $grade: Int!
-        $take: Int!
+        $numCreateQuestions: Int!
+        $numReviewQuestions: Int!
+        $numGradeResponses: Int!
+        $numResponseQuestions: Int!
         $title: String!
         $id: ID!
       ) {
           updateAssignment(
             id: $id
             questionType: $questionType
-            numCreateQuestions: $create
-            numReviewQuestions: $review
-            numGradeResponses: $grade
-            numResponseQuestions: $take
+            numCreateQuestions: $numCreateQuestions
+            numReviewQuestions: $numReviewQuestions
+            numGradeResponses: $numGradeResponses
+            numResponseQuestions: $numResponseQuestions
             title: $title
           ) {
             id
@@ -254,7 +254,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
           }
       }`,
-      {questionType, create, review, grade, take, title, id: this.assignment.id},
+      {questionType, numCreateQuestions, numReviewQuestions, numGradeResponses, numResponseQuestions, title, id: this.assignment.id},
       this.userToken
     );
     if (data.errors) {

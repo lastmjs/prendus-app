@@ -57,7 +57,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
   }
 
   _distractorsChanged(e) {
-    const distractors = this.distractors.slice();
+    const distractors = [...this.distractors];
     distractors[e.model.itemsIndex] = e.target.value;
     this._fireLocalAction('distractors', distractors);
     this._notify(distractors);

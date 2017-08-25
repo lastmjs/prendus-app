@@ -110,7 +110,7 @@ type QuestionResponse implements Node {
   userInputs: [UserInput!]! @relation(name: "UserInputsOnQuestionResponse")
   userEssays: [UserEssay!]! @relation(name: "UserEssaysOnQuestionResponse")
   userChecks: [UserCheck!]! @relation(name: "UserChecksOnQuestionResponse")
-  userRadio: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
+  userRadios: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
   ratings: [QuestionResponseRating!]! @relation(name: "RatingsOnQuestionResponse")
   question: Question! @relation("QuestionOnQuestionResponse")
 }
@@ -129,7 +129,7 @@ type UserVariable implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   varName: String!
-  value: String!
+  value: Float!
   questionResponse: QuestionResponse! @relation(name: "UserVariablesOnQuestionResponse")
 }
 

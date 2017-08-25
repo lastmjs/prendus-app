@@ -13,8 +13,8 @@ class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  ratings: CategoryScore[] = [];
-  rubric: Rubric = {};
+  ratings: CategoryScore[];
+  rubric: Rubric;
   userToken: string | null;
   user: User;
 
