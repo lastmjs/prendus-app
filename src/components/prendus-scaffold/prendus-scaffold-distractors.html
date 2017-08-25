@@ -74,6 +74,7 @@
               <template is="dom-repeat" items="[[distractors]]">
                 <div class="prendus-card distractor-card">
                   <paper-textarea id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" value="[[item]]" on-value-changed="_distractorsChanged"></paper-textarea>
+                  <label for="distractor-picture[[index]]">Picture: </label><input id="distractor-picture[[index]]" type="file" accept="image/*" on-change="_handlePicture">
                 </div>
               </template>
             </div>

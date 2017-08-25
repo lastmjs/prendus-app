@@ -10,6 +10,7 @@ type File implements Node {
   secret: String! @isUnique
   size: Int!
   url: String! @isUnique
+  question: Question @relation(name: "ImagesOnQuestions")
 }
 
 type User implements Node {
@@ -99,6 +100,7 @@ type Question implements Node {
   ratings: [QuestionRating!]! @relation(name: "QuestionOnQuestionRating")
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
+  images: [File!]! @relation(name: "ImagesOnQuestions")
 }
 
 type QuestionResponse implements Node {

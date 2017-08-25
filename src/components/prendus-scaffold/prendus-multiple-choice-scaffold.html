@@ -164,9 +164,11 @@
                 </div>
                   <div>
                     <paper-textarea id="question" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
+                    <label for="question-picture">Picture: </label><input id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
                   </div>
                   <div>
                     <paper-textarea id="answer" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
+                    <label for="answer-picture">Picture: </label><input id="answer-picture" type="file" accept="image/*" on-change="_handleAnswerPicture">
                   </div>
                   <div>
                     <paper-textarea id="solution" on-value-changed="_handleSolution" value="[[solution]]" label="Solution (Optional)"></paper-textarea>

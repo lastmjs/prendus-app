@@ -43,7 +43,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     try {
       validate(this.rubric, this.ratings);
       this._submit(this.question, this.ratings)
-      this.$.carousel.nextData();
+      this.shadowRoot.querySelector('#carousel').nextData();
     } catch (err) {
       this.action = setNotification(err.message, NotificationType.ERROR);
     }

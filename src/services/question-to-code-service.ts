@@ -29,11 +29,14 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   };
 };
 
-export const generateEssay = (guiQuestion: GuiQuestion, gradingRubric: Object, evaluationRubric): { text: string, code: string } => {
-  const text: string = `<p>${guiQuestion.stem}</p><p>[essay]</p>`;
+export const generateEssay = (guiQuestion: GuiQuestion): { text: string, code: string } => {
+  const { stem, gradingRubric, evaluationRubric, imageUrls } = guiQuestion;
+  const text: string = `<p>${stem}</p>`
+    + (imageUrls.length ? `<p><img src="${imageUrls[0]}"/></p>` : '')
+    + `<p>[essay]</p>`;
   const code: string = `
-    gradingRubric = '${JSON.stringify(gradingRubric)}'
-    evaluationRubric = '${JSON.stringify(evaluationRubric)}'
+    gradingRubric = '${JSON.stringify(gradingRubric)}';
+    evaluationRubric = '${JSON.stringify(evaluationRubric)}';
   `;
   return {
     text,
