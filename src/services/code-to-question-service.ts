@@ -46,7 +46,7 @@ export function compileToGuiQuestion(text: string, code: string): GuiQuestion {
     };
 }
 
-export function extractVariables(code: string): object {
+export function extractVariables(code: string): {[key: string]: any} {
   const ast = esprima.parse(code);
   return ast.body.filter(isVariable).reduce((vars, node) => {
     return {...vars, [node.expression.left.name]: node.expression.right};
