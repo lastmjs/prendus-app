@@ -58,7 +58,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       this.action = setNotification(err.message, NotificationType.ERROR);
       return;
     }
-    this.$.carousel.nextData();
+    this.shadowRoot.querySelector('#carousel').nextData();
   }
 
   _handleNextResponse(e: CustomEvent) {

@@ -51,16 +51,16 @@ class PrendusTakeAssignment extends Polymer.Element {
       alert(err.message);
       return;
     }
-    this.$.carousel.nextData();
+    this.shadowRoot.querySelector('#carousel').nextData();
   }
 
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0])
-      sendStatement(this.user.id, assignmentId, ContextType.QUIZ, 'STARTED');
+      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'STARTED');
     else
-      sendStatement(this.user.id, assignmentId, ContextType.QUIZ, 'RESPONDED');
+      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'RESPONDED');
     if (!data)
       LTIPassback(this.user.id, this.assignment.id, ContextType.QUIZ);
   }
