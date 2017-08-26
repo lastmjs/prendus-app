@@ -105,7 +105,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
 
         if (!userPaidForCourse) {
-            navigate(`/assignment/${this.assignmentId}/payment`);
+            navigate(`/course/${this.assignment.course.id}/payment`);
             return;
         }
         //TODO place this code in each assignment component
