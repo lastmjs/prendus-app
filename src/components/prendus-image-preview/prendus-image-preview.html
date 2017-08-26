@@ -1,0 +1,22 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+
+<dom-module id="prendus-image-preview">
+
+  <template>
+
+    <style include="prendus-styles">
+      img {
+        max-height: 200px;
+        max-width: 200px;
+      }
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <img src$="[[src]]">
+
+  </template>
+
+  <script type="module" src="prendus-image-preview.ts"></script>
+
+</dom-module>
