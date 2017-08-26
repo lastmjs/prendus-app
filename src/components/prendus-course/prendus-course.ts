@@ -9,7 +9,7 @@ import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
-import {NotificationType} from '../../services/constants-service';
+import {NotificationType, QuestionType} from '../../services/constants-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -80,8 +80,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     isViewMode(mode: Mode) {
-      this._fireLocalAction('loaded', true)
+        this._fireLocalAction('loaded', true)
         return mode === 'view';
+    }
+
+    isEssayType(questionType: string): boolean {
+      return questionType === QuestionType.ESSAY;
     }
 
     isEditMode(mode: Mode) {
@@ -257,8 +261,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
     }
     getEditIcon(editStatus: boolean): string {
-  		return editStatus ? 'check' : 'create';
-  	}
+      return editStatus ? 'check' : 'create';
+    }
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
       console.log('this.course.discipline', this.course.discipline,  this.course.subject)
@@ -278,6 +282,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
               title: "${assignmentTitle}"
               authorId: "${this.user ? this.user.id : null}"
               courseId: "${this.courseId}"
+              questionType: MULTIPLE_CHOICE
             ){
               id
             }
@@ -314,6 +319,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }) {
                     id
                     title
+                    questionType
                 }
                 Course(id: "${this.courseId}") {
                     title

@@ -52,7 +52,7 @@
         <div class="wrapper">
           <div class="prendus-card question">
             <h3>Question</h3>
-            [[currentQuestionScaffold.question]]
+            [[question]]
           </div>
 
           <div class="row">
@@ -73,7 +73,7 @@
               </div>
               <template is="dom-repeat" items="[[distractors]]">
                 <div class="prendus-card distractor-card">
-                  <paper-textarea id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" on-input="enableNext"></paper-textarea>
+                  <paper-textarea id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" value="[[item]]" on-value-changed="_distractorsChanged"></paper-textarea>
                 </div>
               </template>
             </div>

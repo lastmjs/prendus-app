@@ -8,81 +8,15 @@
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="prendus-question-review-quiz.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
 
 <dom-module id="prendus-question-review">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style include="prendus-styles">
-          .wrapper {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-          }
-
-          .rubric-category {
-            flex-basis: 390px;
-          }
-
-          .submit-button {
-            justify-self: right;
-            grid-column: 4;
-            grid-row: 1;
-          }
         </style>
-        <iron-pages id="iron-pages" selected="[[selectedIndex]]">
-            <template is="dom-repeat" items="[[questionScaffoldsToRate]]">
-              <div>
-                <div class="prendus-card centered">
-                  <h2> Rate question [[questionReviewNumber]]</h2>
-                  <!--TODO fix this description -->
-                </div>
-                <prendus-scaffold-example question-scaffold="[[item]]"></prendus-scaffold-example>
-                <div class="wrapper">
-                  <template is="dom-repeat" items="[[rubricCategories]]" as="category" hidden>
-                    <paper-dropdown-menu class="rubric-category" label="[[category.label]]" on-iron-select="_rubricScoreChanged">
-                      <paper-listbox slot="dropdown-content">
-                        <template is="dom-repeat" items="[[category.options]]" as="option" hidden>
-                          <paper-item id="[[_paperItemId(category, option)]]" value="[[option.points]]" aria-describedby$="label-[[_paperItemId(category, option)]]">[[option.label]]</paper-item>
-                        </template>
-                      </paper-listbox>
-                    </paper-dropdown-menu>
-                  </template>
-                </div>
-                <template is="dom-repeat" items="[[rubricCategories]]" as="category">
-                  <template is="dom-repeat" items="[[category.options]]" as="option">
-                    <paper-tooltip id="label-[[_paperItemId(category, option)]]" position="top" for="[[_paperItemId(category, option)]]">[[option.description]]</paper-tooltip>
-                  </template>
-                </template>
-                <div class="submit-button">
-                    <button id="[[item.id]]" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
-                </div>
-              </div>
-            </template>
-            <div>
-              Congratulations you have finished the review of the questions. You will now take 5 questions.
-              <div class="submit-button">
-                  <button class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
-              </div>
-            </div>
-            <dom-if if="[[hasQuestions(quizQuestions)]]">
-              <template>
-                <prendus-question-review-quiz questions="[[quizQuestions]]" user="[[user]]"></prendus-question-review-quiz>
-              </template>
-            </dom-if>
-        </iron-pages>
-        <dom-if if="[[!hasQuestions(quizQuestions)]]">
-            <template>
-              <p>No Questions have been made yet for this assignment</p>
-            </template>
-        </dom-if>
-        <dom-if if="[[!loaded]]">
-            <template>
-                Loading...
-            </template>
-        </dom-if>
+        <prendus-scaffold-example question-scaffold="[[_scaffold(question)]]"></prendus-scaffold-example>
     </template>
 
     <script type="module" src="prendus-question-review.ts"></script>

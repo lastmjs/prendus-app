@@ -1,0 +1,189 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
+<link rel="import" href="../prendus-scaffold-concept/prendus-scaffold-concept.html">
+
+<dom-module id="prendus-essay-scaffold">
+
+  <template>
+
+    <style include="prendus-styles">
+      .content {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 50% 50%;
+      }
+      .page {
+        grid-row: 1;
+        grid-column: 1/3;
+      }
+      .back, .next {
+        margin-top: 10px;
+      }
+      .back {
+        grid-row: 2;
+        grid-column: 1;
+      }
+      .next {
+        grid-row: 2;
+        grid-column: 2;
+        justify-self: end;
+      }
+      .centered {
+        text-align: center;
+      }
+
+      .big {
+        font-size: 22px;
+      }
+      #process {
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        margin-top: 20px;
+      }
+      .bigIcon{
+        --iron-icon-height: 50%;
+        --iron-icon-width: 50%;
+      }
+    </style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <div class="content">
+      <div class="page">
+        <iron-pages id="ironPages" selected="[[step]]">
+          <div>
+            <div class="prendus-card big">
+              For this assignment you will create an exam level
+              essay question. We will guide you through the question creation process.
+            </div>
+            <div class="prendus-card" id="process">
+              <div>
+                <center>
+                    <h2>Step 1</h2>
+                    <iron-icon class="bigIcon" icon="dns"></iron-icon>
+                    <h3>Tag Concept</h3>
+                    <p>Select learning outcome</p>
+                </center>
+              </div>
+              <div>
+                <center>
+                    <h2>Step 2</h2>
+                    <iron-icon class="bigIcon" icon="chrome-reader-mode"></iron-icon>
+                    <h3>Prepare Materials</h3>
+                    <p>Add links to materials</p>
+                </center>
+              </div>
+              <div>
+                <center>
+                    <h2>Step 3</h2>
+                    <iron-icon class="bigIcon" icon="create"></iron-icon>
+                    <h3>Create Question</h3>
+                    <p>Write the question stem</p>
+                </center>
+              </div>
+              <div>
+                <center>
+                  <h2>Step 4</h2>
+                  <iron-icon class="bigIcon" icon="question-answer"></iron-icon>
+                  <h3>Create rubric</h3>
+                  <p>Add a grading rubric</p>
+                </center>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="prendus-card big">
+              <h3>Guidelines for Adding a Concept</h3>
+              <ol>
+                <li>
+                  Select the concept that best aligns with the course.
+                </li>
+              </ol>
+            </div>
+            <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]" on-concept-selected="_handleConcept"></prendus-scaffold-concept>
+          </div>
+          <div>
+            <div class="prendus-card big">
+              <h3>Guidelines for Adding a Resource</h3>
+              <ol>
+                <li>
+                  Make sure the resource aligns with a concept
+                </li>
+                <li>
+                  Use any resource pertinent to the class or online - a textbook, youtube link, Wikipedia article.
+                </li>
+                <li>
+                  Do not copy material from the resource. Anything plaigarized will be removed and your instructor will be notified.
+                </li>
+              </ol>
+            </div>
+            <paper-input id="resourceInput" type="text" label="Resource (e.g., Textbook Pg. 100)" value="[[resource]]" on-change="setResource"></paper-input>
+          </div>
+          <div>
+            <div class="prendus-card big">
+              <h3>Guidelines for Creating a Question</h3>
+              <ol>
+                <li>
+                  Remember these will be used as <span class="bold">essay questions</span> for the class,
+                  so try to create a question that prompts a response and could be on the exam.
+                </li>
+                <li>
+                  Create a question in a <span class="bold">topic area that you are struggling with.</span>
+                </li>
+              </ol>
+            </div>
+            <paper-textarea id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
+          </div>
+          <div>
+            <div class="prendus-card big">
+              <h3>Guidelines for Creating a Grading Rubric</h3>
+              <ol>
+                <li>
+                  Create a rubric that will guide students in grading responses to your essay question. An example is shown
+                </li>
+                <li>
+                  Remember your question: <strong>[[questionText]]</strong>
+                </li>
+              </ol>
+            </div>
+            <br>
+            <h3>Example rubric</h3>
+            <prendus-rubric-table rubric="[[exampleRubric()]]"></prendus-rubric-table>
+            <prendus-rubric-table rubric="[[rubric]]" editable on-rubric-changed="_handleRubric"></prendus-rubric-table>
+          </div>
+        </iron-pages>
+      </div>
+      <template is="dom-if" if="[[step]]">
+        <div class="back">
+          <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>
+        </div>
+      </template>
+      <template is="dom-if" if="[[_showNext(step)]]">
+        <div class="next">
+          <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next">Next</button>
+        </div>
+      </template>
+      <template is="dom-if" if="[[!_showNext(step)]]">
+        <div class="next">
+          <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+        </div>
+      </template>
+    </div>
+
+
+  </template>
+
+  <script type="module" src="prendus-essay-scaffold.ts"></script>
+
+</dom-module>

@@ -1,60 +1,55 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
-import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
+import {parse} from '../../node_modules/assessml/assessml';
 import {createUUID} from '../../services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
-    componentId: string;
-    action: SetPropertyAction | SetComponentPropertyAction;
-    answers: QuestionScaffoldAnswer[];
-    loaded: boolean;
-    myIndex: number;
-    selectedIndex: number;
-    questionScaffold: QuestionScaffold;
+  componentId: string;
+  action: SetPropertyAction | SetComponentPropertyAction;
+  answers: QuestionScaffoldAnswer[];
+  loaded: boolean;
+  questionScaffold: QuestionScaffold;
 
-    static get is() { return 'prendus-scaffold-example'; }
-    static get properties() {
-        return {
-          selectedIndex: {
-            type: Number,
-            observer: 'disableNext'
-          },
-          myIndex: {
-            type: Number
-          },
-          questionScaffold: {
-            type: Object,
-          }
-        };
-    }
-    constructor() {
-        super();
-        this.componentId = createUUID();
-    }
-    connectedCallback() {
-        super.connectedCallback();
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-    }
-    disableNext(): void {
-      if(this.myIndex !== undefined && this.selectedIndex !== undefined && this.myIndex === this.selectedIndex) {
-        // this.action = Actions.setDisabledNext(false);
+  static get is() { return 'prendus-scaffold-example'; }
+  static get properties() {
+    return {
+      questionScaffold: {
+        type: Object,
       }
-    }
+    };
+  }
 
-    stateChange(e: CustomEvent) {
-        const state = e.detail.state;
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.answers = this.questionScaffold ? getQuestionScaffoldAnswers(this.questionScaffold) : this.answers;
-    }
+  constructor() {
+    super();
+    this.componentId = createUUID();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._fireLocalAction('loaded', true);
+  }
+
+  _questionText(text: string): string {
+    if (!text) return '';
+    return parse(text, null).ast[0].content.replace(/<p>|<\/p>/g, '');
+  }
+
+  _fireLocalAction(key: string, value: any) {
+    this.action = {
+      type: 'SET_COMPONENT_PROPERTY',
+      componentId: this.componentId,
+      key,
+      value
+    };
+  }
+
+  stateChange(e: CustomEvent) {
+    const state = e.detail.state;
+    const componentState = state.components[this.componentId] || {};
+    const keys = Object.keys(componentState);
+    if (keys.includes('loaded')) this.loaded = componentState.loaded;
+  }
 }
 
 window.customElements.define(PrendusScaffoldExample.is, PrendusScaffoldExample);

@@ -22,6 +22,7 @@ type User implements Node {
   ownedQuizzes: [Quiz!]! @relation(name: "AuthorOnQuiz")
   ownedQuestions: [Question!]! @relation(name: "AuthorOnQuestion")
   ownedQuestionResponses: [QuestionResponse!]! @relation(name: "AuthorOnQuestionResponse")
+  ownedQuestionResponseRatings: [QuestionResponseRating!]! @relation(name: "RaterOnQuestionResponseRating")
   email: String @isUnique
   password: String
   role: UserRole! @defaultValue(value: STUDENT)
@@ -64,11 +65,12 @@ type Assignment implements Node {
   author: User! @relation(name: "AuthorOnAssignment")
   students: [User!]! @relation(name: "StudentsAndAssignments")
   questions: [Question!]! @relation(name: "AssignmentQuestions")
-  questionType: QuestionType!
+  questionType: QuestionType! @defaultValue(value: MULTIPLE_CHOICE)
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
   numCreateQuestions: Int! @defaultValue(value: 1)
   numReviewQuestions: Int! @defaultValue(value: 3)
+  numGradeResponses: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
 }
 
@@ -104,19 +106,67 @@ type QuestionResponse implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   author: User! @relation(name: "AuthorOnQuestionResponse")
-  responseParts: [Response!]! @relation(name: "ResponsePartsOnQuestionResponse")
-  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponse")
-  question: Question! @relation(name: "QuestionOnQuestionResponse")
+  userVariables: [UserVariable!]! @relation(name: "UserVariablesOnQuestionResponse")
+  userInputs: [UserInput!]! @relation(name: "UserInputsOnQuestionResponse")
+  userEssays: [UserEssay!]! @relation(name: "UserEssaysOnQuestionResponse")
+  userChecks: [UserCheck!]! @relation(name: "UserChecksOnQuestionResponse")
+  userRadios: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
+  ratings: [QuestionResponseRating!]! @relation(name: "RatingsOnQuestionResponse")
+  question: Question! @relation("QuestionOnQuestionResponse")
 }
 
-type Response implements Node {
+type UserEssay implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  type: ResponseType!
-  name: String!
+  varName: String!
   value: String!
-  questionResponse: QuestionResponse! @relation(name: "ResponsePartsOnQuestionResponse")
+  questionResponse: QuestionResponse! @relation(name: "UserEssaysOnQuestionResponse")
+}
+
+type UserVariable implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  value: Float!
+  questionResponse: QuestionResponse! @relation(name: "UserVariablesOnQuestionResponse")
+}
+
+type UserInput implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  value: String!
+  questionResponse: QuestionResponse! @relation(name: "UserInputsOnQuestionResponse")
+}
+
+type UserCheck implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  checked: Boolean!
+  questionResponse: QuestionResponse! @relation(name: "UserChecksOnQuestionResponse")
+}
+
+type UserRadio implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  checked: Boolean!
+  questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
+}
+
+type QuestionResponseRating implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
+  rater: User! @relation(name: "RaterOnQuestionResponseRating")
+  questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
 }
 
 type QuestionRating implements Node {
@@ -136,7 +186,7 @@ type CategoryScore implements Node {
   category: String!
   score: Int!
   questionRating: QuestionRating @relation(name: "ScoresOnQuestionRating")
-  questionResponse: QuestionResponse @relation(name: "ScoresOnQuestionResponse")
+  questionResponseRating: QuestionResponseRating @relation(name: "ScoresOnQuestionResponseRating")
 }
 
 type AnswerComment implements Node {

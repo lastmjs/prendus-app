@@ -1,0 +1,31 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+
+<dom-module id="prendus-take-assignment">
+
+  <template>
+
+    <style include="prendus-styles">
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <prendus-carousel id="carousel" hide-next hide-back data="[[questions]]" on-carousel-data="_handleNextQuestion">
+      <div hidden$="[[!question]]">
+        <prendus-view-question question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
+      </div>
+      <div hidden$="[[question]]">
+        <h3>Done</h3>
+        <p>You have completed this assignment</p>
+      </div>
+    </prendus-carousel>
+
+  </template>
+
+  <script type="module" src="prendus-take-assignment.ts"></script>
+
+</dom-module>

@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
+<link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
+<link rel="import" href="../prendus-question-carousel/prendus-question-carousel.html">
+
+<dom-module id="prendus-essay-review">
+
+  <template>
+
+    <style include="prendus-styles">
+    </style>
+
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <h3>Concept</h3>
+    <p class="prendus-card">[[question.concept.title]]</p>
+    <h3>Resource</h3>
+    <p class="prendus-card">[[question.resource]]</p>
+    <h3>Question:</h3>
+    <p class="prendus-card">[[_questionText(question.text)]]</p>
+    <h3>Rubric:</h3>
+    <prendus-rubric-table rubric="[[rubric]]"></prendus-rubric-table>
+
+  </template>
+
+  <script type="module" src="prendus-essay-review.ts"></script>
+
+</dom-module>

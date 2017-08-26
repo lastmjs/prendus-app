@@ -32,13 +32,13 @@
           width: 45%;
         }
         .prendus-card {
-					border-radius: 2px;
-					padding: 15px;
-					background-color: white;
+          border-radius: 2px;
+          padding: 15px;
+          background-color: white;
 
-					/* material design shadows */
-					@apply(--shadow-elevation-2dp);
-				}
+          /* material design shadows */
+          @apply(--shadow-elevation-2dp);
+        }
         </style>
         <div class="wrapper">
           <div class="row">
@@ -78,7 +78,7 @@
           </div>
           <div class="row">
             <div class="prendus-card left-column">
-              [[questionScaffold.question]]
+              [[_questionText(questionScaffold.question)]]
             </div>
             <div class="prendus-card right-column">
               [[questionScaffold.explanation]]
@@ -94,7 +94,7 @@
             </div>
           </div>
 
-          <template is="dom-repeat" items="[[answers]]">
+          <template is="dom-repeat" items="[[questionScaffold.answers]]">
             <div class="row">
               <div class="prendus-card left-column">
                 [[item.text]]
