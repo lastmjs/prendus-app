@@ -10,7 +10,7 @@ export function getGraphcoolHTTPEndpoint() {
     }
 }
 
-export function getGraphcoolHTTPEndpoint() {
+export function getGraphcoolHTTPFileEndpoint() {
     if (window.process.env.NODE_ENV === 'production') {
         return 'https://api.graph.cool/file/v1/cj48qaw2u6uyd01411y8gj8fr';
     }
