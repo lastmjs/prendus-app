@@ -133,13 +133,14 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('selectedIndex', 0);
   }
 
-  _scaffold(concept: Concept, resource: string, questionText: string, solution: string, answer: string, distractors: string[], hints: string[]): QuestionScaffold {
-    const answers = this._scaffoldAnswers(answer, distractors, hints);
+  _scaffold(concept: Concept, resource: string, questionText: string, solution: string, answer: string, distractors: string[], hints: string[], questionPicture: File, answerPicture: File, distractorPictures: File[]): QuestionScaffold {
+    const answers = this._scaffoldAnswersWithPictures(answer, distractors, hints, answerPicture, distractorPictures);
     return {
       concept,
       resource,
       question: questionText,
-      explanation: solution
+      questionPicture,
+      explanation: solution,
       answers
     }
   }
@@ -150,13 +151,14 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     return [mChoice(answer, hints[0], true), ...distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false))];
   }
 
-  _scaffoldAnswersWithPictures(answer: string, distractors: string[], hints: string[], answerPicture: FileResponse, distractorPictures: FileResponse): QuestionScaffoldAnswer[] {
+  _scaffoldAnswersWithPictures(answer: string, distractors: string[], hints: string[], answerPicture: File|FileResponse, distractorPictures: File[]|FileResponse[]): QuestionScaffoldAnswer[] {
+    if (!answer || !distractors || !hints || !distractorPictures) return [];
     const mChoice = (text, comment, correct, picture) => {
       return {
         text,
         comment,
         correct,
-        pictureUrl: picture ? picture.url.replace(/files/, 'images') + '/x200' : '',
+        picture,
         type: AnswerTypes.MultipleChoice
       }
     });
@@ -182,7 +184,6 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
-    console.log(this.distractorPictures);
     const questionPicture = this.questionPicture ? (await GQLSaveFile(this.questionPicture)) : null;
     const answerPicture = this.answerPicture ? (await GQLSaveFile(this.answerPicture)) : null;
     const distractorPictures = this.distractorPictures.length ? (await asyncMap(this.distractorPictures, GQLSaveFile)) : [];

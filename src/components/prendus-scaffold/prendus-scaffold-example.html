@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
 
 <dom-module id="prendus-scaffold-example">
     <template>
@@ -78,7 +79,8 @@
           </div>
           <div class="row">
             <div class="prendus-card left-column">
-              [[_questionText(questionScaffold.question)]]
+              <div>[[_questionText(questionScaffold.question)]]</div>
+              <span><prendus-image-preview file="[[questionScaffold.questionPicture]]"></prendus-image-preview></span>
             </div>
             <div class="prendus-card right-column">
               [[questionScaffold.explanation]]
@@ -97,7 +99,8 @@
           <template is="dom-repeat" items="[[questionScaffold.answers]]">
             <div class="row">
               <div class="prendus-card left-column">
-                [[item.text]]
+                <div>[[item.text]]</div>
+                <span><prendus-image-preview file="[[item.picture]]"></prendus-image-preview></span>
               </div>
               <div class="prendus-card right-column">
                 [[item.comment]]

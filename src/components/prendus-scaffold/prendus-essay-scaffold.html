@@ -14,6 +14,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
 <link rel="import" href="../prendus-scaffold-concept/prendus-scaffold-concept.html">
 
 <dom-module id="prendus-essay-scaffold">
@@ -150,7 +151,7 @@
             <div>
               <paper-textarea class="has-suffix" id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
               <paper-icon-button icon="camera-enhance" on-click="_triggerPicture"></paper-icon-button>
-              <span id="question-picture-text">[[questionPictureText]]</span>
+              <span id="question-picture-preview"><prendus-image-preview file="[[picture]]"></prendus-image-preview></span>
               <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
             </div>
           </div>
@@ -162,7 +163,8 @@
                   Create a rubric that will guide students in grading responses to your essay question. An example is shown
                 </li>
                 <li>
-                  Remember your question: <strong>[[questionText]]</strong>
+                  <div>Remember your question: <strong>[[questionText]]</strong></div>
+                  <span><prendus-image-preview file="[[picture]]"></prendus-image-preview></span>
                 </li>
               </ol>
             </div>

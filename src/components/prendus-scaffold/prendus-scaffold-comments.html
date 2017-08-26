@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
 
 <dom-module id="prendus-scaffold-comments">
     <template>
@@ -72,6 +73,7 @@
             <div class="row">
               <div class="prendus-card left-column answer-card">
                 [[item.text]]
+                <span><prendus-image-preview file="[[item.picture]]"></prendus-image-preview></span>
               </div>
               <div class="prendus-card right-column">
                 <paper-textarea always-float-label id="comments[[index]]" label="Hint [[plusOne(index)]]" value="[[item.comment]]" on-value-changed="_commentsChanged"></paper-textarea>

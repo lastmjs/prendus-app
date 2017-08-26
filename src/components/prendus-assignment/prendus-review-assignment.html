@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-styles/prendus-styles.html">
 <link rel="import" href="../prendus-essay-review/prendus-essay-review.html">
 <link rel="import" href="../prendus-question-review/prendus-question-review.html">
+<link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 
 <dom-module id="prendus-review-assignment">
@@ -10,27 +12,43 @@
   <template>
 
     <style include="prendus-styles">
-
+      .grid-container {
+        display: grid;
+        grid-template-columns: 70% 30%;
+        grid-gap: 10px;
+      }
+      .question-container {
+        max-height: 400px;
+        overflow: auto;
+      }
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <h2>[[assignment.title]] Review Assignment</h2>
 
     <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
-      <div hidden$="[[!question]]">
-        <dom-if if="[[isEssayType(assignment.questionType)]]">
-          <template>
-            <prendus-essay-review question="[[question]]"></prendus-essay-review>
-          </template>
-        </dom-if>
-        <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
-          <template>
-            <prendus-question-review question="[[question]]"></prendus-question-review>
-          </template>
-        </dom-if>
-        <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
-      </div>
+      <dom-if if="[[question]]">
+        <template>
+            <div class="grid-container">
+              <div>
+                <h3>Question as seen in quiz</h3>
+                <br>
+                <div class="question-container">
+                  <prendus-view-question question="[[question]]"></prendus-view-question>
+                </div>
+              </div>
+              <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
+            </div>
+            <br>
+            <dom-if if="[[isEssayType(assignment.questionType)]]">
+              <template>
+                <h3>Grading Rubric</h3>
+                <prendus-rubric-table rubric="[[_parseRubric(question.code, 'gradingRubric')]]"></prendus-rubric-table>
+              </template>
+            </dom-if>
+        </template>
+      </dom-if>
       <div hidden$="[[question]]">
-        <h3>Done</h3>
+        <h4>Done</h4>
         <p>You have completed this assignment</p>
       </div>
     </prendus-carousel>

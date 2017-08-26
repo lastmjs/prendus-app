@@ -50,8 +50,14 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
-    if (!init.some(distractor => Boolean(distractor))
+    if (!init.some(distractor => Boolean(distractor)) {
       this._fireLocalAction('pictures', Array(init.length));
+      // This mutation is necessary because the value of input[type="file"] cannot be set to an empty string by data binding
+      // And we need to reset the value at the same time as the pictures so the on-change event will always be fired after clearing everything
+      init.forEach((dummy, i) => {
+        this.shadowRoot.querySelector(`#distractor-picture${i}`).value = '';
+      });
+    }
   }
 
   _notify(distractors: string[]) {
@@ -91,8 +97,8 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     this.shadowRoot.querySelector(`#distractor-picture${i}`).click();
   }
 
-  _pictureText(pictures: File[], index: number): string {
-    return pictures[index] ? pictures[index].name : '';
+  _picture(pictures: File[], index: number): string {
+    return pictures[index] || null;
   }
 
   plusOne(num: number): number {

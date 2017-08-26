@@ -59,7 +59,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     if (data) {
       this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
       setTimeout(() => {
-        this._fireLocalAction('rubric', this._parseRubric(data.code));
+        this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
       });
     } else {
       LTIPassback(this.user.id, this.assignment.id, 'REVIEW');
@@ -70,11 +70,15 @@ class PrendusReviewAssignment extends Polymer.Element {
     this._fireLocalAction('ratings', e.detail.scores);
   }
 
-  _parseRubric(code: string): Rubric {
-    const { evaluationRubric } = extractVariables(code);
-    if (evaluationRubric)
+  _parseRubric(code: string, varName: string): Rubric {
+    const { evaluationRubric, gradingRubric } = extractVariables(code);
+    if (varName === 'evaluationRubric' && evaluationRubric)
       return JSON.parse(evaluationRubric.value);
-    return DEFAULT_EVALUATION_RUBRIC;
+    else if (varName === 'evaluationRubric')
+      return DEFAULT_EVALUATION_RUBRIC;
+    else if (varName === 'gradingRubric' && gradingRubric)
+      return JSON.parse(gradingRubric.value);
+    else return {};
   }
 
   async _submit(question: Question, ratings: CategoryScore[]) {
@@ -112,9 +116,9 @@ class PrendusReviewAssignment extends Polymer.Element {
         title
         questionType
         numReviewQuestions
-        questions(filter: {
+        questions(orderBy: createdAt_DESC, first: 3, filter: {
           author: {
-            id_not: $userId
+            id: $userId
           }
         }) {
           id
