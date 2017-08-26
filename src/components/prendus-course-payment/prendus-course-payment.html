@@ -1,0 +1,14 @@
+<script src="https://checkout.stripe.com/checkout.js"></script>
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-course-payment">
+    <template>
+        <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <p>The courseId id is [[courseId]], and the course will cost: $[[course.price]]</p>
+        <button onclick="openModal">Pay</button>
+    </template>
+
+    <script type="module" src="prendus-course-payment.ts"></script>
+</dom-module>
