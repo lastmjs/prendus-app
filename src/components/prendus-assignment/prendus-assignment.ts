@@ -18,8 +18,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     assignmentId: string;
     loaded: boolean;
     assignment: Assignment;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     learningStructure: any;
     subjects: Subject[];
     concepts: Concept[];
@@ -87,18 +87,18 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 
     isCreateType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'CREATE'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'CREATE'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'CREATE';
     }
 
     isReviewType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'REVIEW'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'REVIEW'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'REVIEW';
     }
     isQuizType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'QUIZ'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'QUIZ';
     }
     openAssignmentConceptDialog(e: any){

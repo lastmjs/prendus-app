@@ -1,6 +1,6 @@
 import {GQLMutate} from '../services/graphql-service';
 
-export async function sendStatement(userId: string, contextId: string, contextType: string, verb: string, object: string): Promise<void> {
+export async function sendStatement(userToken: string, userId: string, contextId: string, contextType: string, verb: string, object: string): Promise<void> {
   const createStatement = await GQLMutate(`
     mutation{
       createPrendusAnalytics(
@@ -12,9 +12,11 @@ export async function sendStatement(userId: string, contextId: string, contextTy
         id
       }
     }
-    `, this.userToken, (error: any) => {
+    `, userToken, (error: any) => {
         console.log(error);
   });
+  console.log('this.user', userId, )
+  console.log('createStatement', createStatement)
   const data = await GQLMutate(`
     mutation {
       addToUserOnPrendusAnalytics(
