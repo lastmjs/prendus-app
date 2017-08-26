@@ -50,7 +50,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
-    this._fireLocalAction('pictures', []);
+    this._fireLocalAction('pictures', Array(init.length));
   }
 
   _notify(distractors: string[]) {
@@ -81,6 +81,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     const pictures = [...this.pictures];
     pictures[i] = file;
     this._fireLocalAction('pictures', pictures);
+    console.log(pictures);
     this._notifyPictures(pictures);
   }
 
