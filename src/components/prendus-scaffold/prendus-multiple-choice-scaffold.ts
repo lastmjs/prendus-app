@@ -10,14 +10,17 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   componentId: string;
   action: SetPropertyAction | SetComponentPropertyAction;
   loaded: boolean;
-  selectedIndex: number = 0;
-  concept: Concept = {};
-  resource: string = '';
-  questionText: string = '';
-  answer: string = '';
-  solution: string = '';
-  distractors: string[] = [];
-  hints: string[] = [];
+  selectedIndex: number;
+  concept: Concept;
+  resource: string;
+  questionText: string;
+  answer: string;
+  solution: string;
+  distractors: string[];
+  hints: string[];
+  questionPicture: File;
+  answerPicture: File;
+  distractorPictures: File[];
 
   static get is() { return 'prendus-multiple-choice-scaffold'; }
   static get properties() {
@@ -71,6 +74,16 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   _handleDistractors(e: CustomEvent) {
     this._fireLocalAction('distractors', e.detail.distractors);
+  }
+
+  _handleQuestionPicture(e: Event) {
+  }
+
+  _handleAnswerPicture(e: Event) {
+  }
+
+  _handleDistractorPictures(e: CustomEvent) {
+    this._fireLocalAction('distractorPictures', e.detail.pictures);
   }
 
   _handleHints(e: CustomEvent) {

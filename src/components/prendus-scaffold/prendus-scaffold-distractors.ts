@@ -14,6 +14,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;
   loaded: boolean;
   distractors: any[];
+  pictures: File[];
   answer: string;
 
   static get is() { return 'prendus-scaffold-distractors'; }
@@ -49,6 +50,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
+    this._fireLocalAction('pictures', []);
   }
 
   _notify(distractors: string[]) {
@@ -56,11 +58,29 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     this.dispatchEvent(evt);
   }
 
-  _distractorsChanged(e) {
+  _notifyPictures(pictures: File[]) {
+    const evt = new CustomEvent('distractors-pictures-changed', {detail: {pictures}});
+    this.dispatchEvent(evt);
+  }
+
+  _distractorsChanged(e: CustomEvent) {
     const distractors = [...this.distractors];
     distractors[e.model.itemsIndex] = e.target.value;
     this._fireLocalAction('distractors', distractors);
     this._notify(distractors);
+  }
+
+  _handlePicture(e: CustomEvent) {
+    if (!e.target || !e.target.files || !e.target.files[0])
+      return;
+    const file = e.target.files[0];
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
+      return;
+    const i = e.model.itemsIndex;
+    const pictures = [...this.pictures];
+    pictures[i] = file;
+    this._fireLocalAction('pictures', pictures);
   }
 
   plusOne(num: number): number {
@@ -73,6 +93,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
+    if (keys.includes('pictures')) this.pictures = componentState.pictures;
   }
 }
 

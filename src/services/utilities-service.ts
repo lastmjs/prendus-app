@@ -10,6 +10,15 @@ export function getGraphcoolHTTPEndpoint() {
     }
 }
 
+export function getGraphcoolHTTPEndpoint() {
+    if (window.process.env.NODE_ENV === 'production') {
+        return 'https://api.graph.cool/file/v1/cj48qaw2u6uyd01411y8gj8fr';
+    }
+    else {
+        return 'https://api.graph.cool/file/v1/cj36de9q4dem00134bhkwm44r';
+    }
+}
+
 export function getGraphcoolWebSocketEndpoint() {
     if (window.process.env.NODE_ENV === 'production') {
         return 'wss://subscriptions.us-west-2.graph.cool/v1/cj48qaw2u6uyd01411y8gj8fr';
