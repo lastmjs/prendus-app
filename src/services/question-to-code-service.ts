@@ -14,7 +14,7 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
     + (questionPictureUrl ? `<p><img src="${questionPictureUrl}"/></p>` : '')
     + answers.reduce((prevText, answer, index) => {
       return prevText + `<p style="display: flex; align-items: start;">[*]${answer.text}`
-        + (answer.picture ? `<span>&nbsp;<img src="${answer.picture.replace(/files/, 'images')}/x200"/></span>` : '')
+        + (answer.picture ? `<span>&nbsp;<img src="${answer.picture.url.replace(/files/, 'images')}/x200"/></span>` : '')
         + `[*]</p>`;
     }, '');
   // define code string with answers
