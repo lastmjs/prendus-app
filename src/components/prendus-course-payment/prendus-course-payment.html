@@ -6,8 +6,8 @@
     <template>
         <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
 
-        <p>The courseId id is [[courseId]], and the course will cost: $[[course.price]]</p>
-        <button onclick="openModal">Pay</button>
+        <p>The courseId id is [[courseId]], and the course will cost: $[[getDollarAmount(course.price)]]</p>
+        <button on-click="openModal">Pay</button>
     </template>
 
     <script type="module" src="prendus-course-payment.ts"></script>

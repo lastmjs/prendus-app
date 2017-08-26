@@ -7,7 +7,7 @@ import {Course} from '../../typings/course';
 import {GQLQuery} from '../../services/graphql-service';
 
 interface GQLCourse {
-    price: string;
+    price: number;
 }
 
 class PrendusCoursePayment extends Polymer.Element {
@@ -43,13 +43,25 @@ class PrendusCoursePayment extends Polymer.Element {
         super.connectedCallback();
 
         const options: StripeCheckoutOptions = {
-
+            key: 'pk_test_K1aLpc89HokLmD9GDjhWmqix',
+            name: 'Prendus',
+            image: 'images/favicon.png',
+            zipCode: true,
+            token: (token: stripe.StripeTokenResponse) => {
+                initiatePayment(token.id, this.userToken);
+            }
         };
         this.stripeCheckoutHandler = StripeCheckout.configure(options);
     }
 
+    getDollarAmount(price: number) {
+        return price / 100;
+    }
+
     openModal() {
-        this.stripeCheckoutHandler.open();
+        this.stripeCheckoutHandler.open({
+            amount: this.course ? this.course.price : -1
+        });
     }
 
     stateChange(e: CustomEvent) {
@@ -84,4 +96,9 @@ function fireLocalAction(componentId: string, key: string, value: any): SetCompo
         key,
         value
     };
+}
+
+async function initiatePayment(tokenId: string, userToken: string | null): Promise<void> {
+    console.log('tokenId', tokenId);
+    console.log('userToken', userToken);
 }
