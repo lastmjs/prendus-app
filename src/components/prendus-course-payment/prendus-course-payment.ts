@@ -82,6 +82,7 @@ async function loadCourse(courseId: string | null, userToken: string | null): Pr
                 id: "${courseId}"
             ) {
                 price
+                title
             }
         }
     `, userToken, () => {}, () => {});
