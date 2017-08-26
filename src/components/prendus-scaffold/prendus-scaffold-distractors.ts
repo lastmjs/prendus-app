@@ -59,7 +59,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
   }
 
   _notifyPictures(pictures: File[]) {
-    const evt = new CustomEvent('distractors-pictures-changed', {detail: {pictures}});
+    const evt = new CustomEvent('distractor-pictures-changed', {detail: {pictures}});
     this.dispatchEvent(evt);
   }
 
@@ -81,6 +81,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     const pictures = [...this.pictures];
     pictures[i] = file;
     this._fireLocalAction('pictures', pictures);
+    this._notifyPictures(pictures);
   }
 
   plusOne(num: number): number {

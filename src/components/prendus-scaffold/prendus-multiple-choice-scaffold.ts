@@ -1,8 +1,9 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-service';
 import {AnswerTypes} from '../../typings/answer-types';
 import {NotificationType} from '../../services/constants-service';
+import {GQLSaveFile} from '../../services/graphql-file-service';
 import {setNotification} from '../../redux/actions';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
 
@@ -76,10 +77,26 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('distractors', e.detail.distractors);
   }
 
+  _validPicture(e: CustomEvent): boolean {
+    if (!e.target || !e.target.files || !e.target.files[0])
+      return false;
+    const file = e.target.files[0];
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
+      return false;
+    return true;
+  }
+
   _handleQuestionPicture(e: Event) {
+    if (!this._validPicture(e)) return;
+    const file = e.target.files[0];
+    this._fireLocalAction('questionPicture', file);
   }
 
   _handleAnswerPicture(e: Event) {
+    if (!this._validPicture(e)) return;
+    const file = e.target.files[0];
+    this._fireLocalAction('answerPicture', file);
   }
 
   _handleDistractorPictures(e: CustomEvent) {
@@ -98,6 +115,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('solution', '');
     this._fireLocalAction('distractors', Array(3));
     this._fireLocalAction('hints', ['Correct', 'Incorrect', 'Incorrect', 'Incorrect']);
+    this._fireLocalAction('questionPicture', null)
+    this._fireLocalAction('answerPicture', null)
+    this._fireLocalAction('distractorPictures', [])
     this._fireLocalAction('selectedIndex', 0);
   }
 
@@ -113,8 +133,22 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   }
 
   _scaffoldAnswers(answer: string, distractors: string[], hints: string[]): QuestionScaffoldAnswer[] {
+    if (!answer || !distractors || !hints) return [];
     const mChoice = (text, comment, correct) => Object.assign({}, {text, comment, correct, type: AnswerTypes.MultipleChoice});
     return [mChoice(answer, hints[0], true), ...distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false))];
+  }
+
+  _scaffoldAnswersWithPictures(answer: string, distractors: string[], hints: string[], answerPicture: FileResponse, distractorPictures: FileResponse): QuestionScaffoldAnswer[] {
+    const mChoice = (text, comment, correct, picture) => {
+      return {
+        text,
+        comment,
+        correct,
+        pictureUrl: picture ? picture.url.replace(/files/, 'images') + '/x200' : '',
+        type: AnswerTypes.MultipleChoice
+      }
+    });
+    return [mChoice(answer, hints[0], true, answerPicture), ...distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false, distractorPictures[i]))];
   }
 
   showNext(i: number): boolean {
@@ -129,15 +163,20 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('selectedIndex', this.selectedIndex + 1);
   }
 
-  submit(): void {
+  async submit(): void {
     try {
       validate(this.concept, this.resource, this.questionText, this.answer, this.distractors, this.hints);
     } catch (e) {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
-    const answers = shuffleArray(this._scaffoldAnswers(this.answer, this.distractors, this.hints));
-    const { text, code } = generateMultipleChoice({ stem: this.questionText, answers });
+    console.log(this.distractorPictures);
+    const questionPicture = this.questionPicture ? (await GQLSaveFile(this.questionPicture)) : null;
+    const answerPicture = this.answerPicture ? (await GQLSaveFile(this.answerPicture)) : null;
+    const distractorPictures = this.distractorPictures.length ? (await asyncMap(this.distractorPictures, GQLSaveFile)) : [];
+    const imageIds = [questionPicture, answerPicture, ...distractorPictures].reduce((ids, picture) => picture ? [...ids, picture.id] : ids, []);
+    const answers = shuffleArray(this._scaffoldAnswersWithPictures(this.answer, this.distractors, this.hints, answerPicture, distractorPictures));
+    const { text, code } = generateMultipleChoice({ stem: this.questionText, answers, questionPictureUrl: (questionPicture ? questionPicture.url.replace(/files/, 'images') + '/x300' : '') });
     const question = {
       authorId: this.user.id,
       assignmentId: this.assignment.id,
@@ -147,7 +186,8 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       ...!this.concept.id && {concept: this.concept},
       explanation: this.solution,
       resource: this.resource,
-      answerComments: answers.map(answer => answer.comment)
+      answerComments: answers.map(answer => answer.comment),
+      imageIds
     };
     const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
     this.dispatchEvent(evt);
@@ -166,6 +206,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (keys.includes('solution')) this.solution = componentState.solution;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
     if (keys.includes('hints')) this.hints = componentState.hints;
+    if (keys.includes('questionPicture')) this.questionPicture = componentState.questionPicture;
+    if (keys.includes('answerPicture')) this.answerPicture = componentState.answerPicture;
+    if (keys.includes('distractorPictures')) this.distractorPictures = componentState.distractorPictures;
     this.userToken = state.userToken;
     this.user = state.user;
   }

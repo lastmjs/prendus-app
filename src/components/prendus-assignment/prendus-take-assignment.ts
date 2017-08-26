@@ -93,7 +93,7 @@ class PrendusTakeAssignment extends Polymer.Element {
         title
         numResponseQuestions
         questionType
-        questions(filter: {id: "cj6s8zyc2ej2f011879bszt1f"}) {
+        questions(orderBy: createdAt_DESC, first: 1) {
           id
         }
       }

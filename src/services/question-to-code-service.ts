@@ -8,13 +8,18 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   const answers: GuiAnswer[] = guiQuestion.answers;
   // use the first correct answer as the only correct answer
   const firstCorrectIndex: number = answers.findIndex((answer) => answer.correct === true);
+  const { questionPictureUrl } = guiQuestion;
   // define text string with question stem and radio buttons
   const text: string  = `<p>${guiQuestion.stem}</p>`
-                    + answers.reduce((prevText, answer, index) => {
-    return prevText + `<p>[*]${answer.text}[*]</p>`;
-  }, '');
+    + (questionPictureUrl ? `<p><img src="${questionPictureUrl}"/></p>` : '')
+    + answers.reduce((prevText, answer, index) => {
+      return prevText + `<p style="display: flex; align-items: start;">[*]${answer.text}`
+        + (answer.pictureUrl ? `<span>&nbsp;<img src="${answer.pictureUrl}"/></span>` : '')
+        + `[*]</p>`;
+    }, '');
   // define code string with answers
-  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'; " + answers.reduce((prevCode, answer, index) => {
+  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'; "
+    + answers.reduce((prevCode, answer, index) => {
         if (index === answers.length - 1) {
             return `${prevCode} radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
         }
