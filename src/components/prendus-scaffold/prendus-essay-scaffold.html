@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -44,7 +45,10 @@
       .centered {
         text-align: center;
       }
-
+      paper-textarea.has-suffix {
+        width: 95%;
+        display: inline-block;
+      }
       .big {
         font-size: 22px;
       }
@@ -143,8 +147,12 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
-            <label for="question-picture">Picture: </label><input id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
+            <div>
+              <paper-textarea class="has-suffix" id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
+              <paper-icon-button icon="camera-enhance" on-click="_triggerPicture"></paper-icon-button>
+              <span id="question-picture-text">[[questionPictureText]]</span>
+              <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
+            </div>
           </div>
           <div>
             <div class="prendus-card big">

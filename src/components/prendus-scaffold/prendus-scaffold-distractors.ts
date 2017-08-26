@@ -50,7 +50,8 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
-    this._fireLocalAction('pictures', Array(init.length));
+    if (!init.some(distractor => Boolean(distractor))
+      this._fireLocalAction('pictures', Array(init.length));
   }
 
   _notify(distractors: string[]) {
@@ -63,14 +64,14 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     this.dispatchEvent(evt);
   }
 
-  _distractorsChanged(e: CustomEvent) {
+  _distractorsChanged(e: Event) {
     const distractors = [...this.distractors];
     distractors[e.model.itemsIndex] = e.target.value;
     this._fireLocalAction('distractors', distractors);
     this._notify(distractors);
   }
 
-  _handlePicture(e: CustomEvent) {
+  _handlePicture(e: Event) {
     if (!e.target || !e.target.files || !e.target.files[0])
       return;
     const file = e.target.files[0];
@@ -83,6 +84,15 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     this._fireLocalAction('pictures', pictures);
     console.log(pictures);
     this._notifyPictures(pictures);
+  }
+
+  _triggerPicture(e: Event) {
+    const i = e.model.itemsIndex;
+    this.shadowRoot.querySelector(`#distractor-picture${i}`).click();
+  }
+
+  _pictureText(pictures: File[], index: number): string {
+    return pictures[index] ? pictures[index].name : '';
   }
 
   plusOne(num: number): number {

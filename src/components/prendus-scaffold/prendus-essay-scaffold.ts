@@ -76,6 +76,10 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('rubric', e.detail.rubric);
   }
 
+  _triggerPicture(e: Event) {
+    this.shadowRoot.querySelector('#question-picture').click();
+  }
+
   _handleQuestionPicture(e: Event) {
     if (!e.target || !e.target.files || !e.target.files[0])
       return;
@@ -84,6 +88,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
       return;
     this._fireLocalAction('picture', file);
+    this._fireLocalAction('pictureText', file.name);
   }
 
   exampleRubric(): Object[] {
@@ -147,6 +152,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (keys.includes('concept')) this.concept = componentState.concept;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('picture')) this.picture = componentState.picture;
+    if (keys.includes('pictureText')) this.pictureText = componentState.pictureText;
     this.userToken = state.userToken;
     this.user = state.user;
   }

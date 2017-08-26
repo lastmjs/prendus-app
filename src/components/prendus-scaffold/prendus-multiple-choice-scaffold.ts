@@ -21,6 +21,8 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   hints: string[];
   questionPicture: File;
   answerPicture: File;
+  questionPictureText: string;
+  answerPictureText: string;
   distractorPictures: File[];
 
   static get is() { return 'prendus-multiple-choice-scaffold'; }
@@ -91,12 +93,22 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (!this._validPicture(e)) return;
     const file = e.target.files[0];
     this._fireLocalAction('questionPicture', file);
+    this._fireLocalAction('questionPictureText', file.name);
   }
 
   _handleAnswerPicture(e: Event) {
     if (!this._validPicture(e)) return;
     const file = e.target.files[0];
     this._fireLocalAction('answerPicture', file);
+    this._fireLocalAction('answerPictureText', file.name);
+  }
+
+  _triggerQuestionPicture(e: Event) {
+    this.shadowRoot.querySelector('#question-picture').click();
+  }
+
+  _triggerAnswerPicture(e: Event) {
+    this.shadowRoot.querySelector('#answer-picture').click();
   }
 
   _handleDistractorPictures(e: CustomEvent) {
@@ -208,6 +220,8 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (keys.includes('hints')) this.hints = componentState.hints;
     if (keys.includes('questionPicture')) this.questionPicture = componentState.questionPicture;
     if (keys.includes('answerPicture')) this.answerPicture = componentState.answerPicture;
+    if (keys.includes('questionPictureText')) this.questionPictureText = componentState.questionPictureText;
+    if (keys.includes('answerPictureText')) this.answerPictureText = componentState.answerPictureText;
     if (keys.includes('distractorPictures')) this.distractorPictures = componentState.distractorPictures;
     this.userToken = state.userToken;
     this.user = state.user;

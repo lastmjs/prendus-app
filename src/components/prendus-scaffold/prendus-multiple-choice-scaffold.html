@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
 <link rel="import" href="prendus-scaffold-comments.html">
@@ -42,7 +43,10 @@
         .centered {
           text-align: center;
         }
-
+        paper-textarea.has-suffix {
+          width: 95%;
+          display: inline-block;
+        }
         .big {
           font-size: 22px;
         }
@@ -163,12 +167,16 @@
                   </ol>
                 </div>
                   <div>
-                    <paper-textarea id="question" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
-                    <label for="question-picture">Picture: </label><input id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
+                    <paper-textarea id="question" class="has-suffix" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
+                    <paper-icon-button icon="camera-enhance" on-click="_triggerQuestionPicture"></paper-icon-button>
+                    <span id="question-picture-text">[[questionPictureText]]</span>
+                    <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
                   </div>
                   <div>
-                    <paper-textarea id="answer" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
-                    <label for="answer-picture">Picture: </label><input id="answer-picture" type="file" accept="image/*" on-change="_handleAnswerPicture">
+                    <paper-textarea id="answer" class="has-suffix" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
+                    <paper-icon-button icon="camera-enhance" on-click="_triggerAnswerPicture"></paper-icon-button>
+                    <span id="answer-picture-text">[[answerPictureText]]</span>
+                    <input hidden id="answer-picture" type="file" accept="image/*" on-change="_handleAnswerPicture">
                   </div>
                   <div>
                     <paper-textarea id="solution" on-value-changed="_handleSolution" value="[[solution]]" label="Solution (Optional)"></paper-textarea>
