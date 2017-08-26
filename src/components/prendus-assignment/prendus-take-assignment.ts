@@ -93,7 +93,7 @@ class PrendusTakeAssignment extends Polymer.Element {
         title
         numResponseQuestions
         questionType
-        questions(orderBy: createdAt_DESC, first: 1) {
+        questions {
           id
         }
       }
