@@ -116,9 +116,9 @@ class PrendusReviewAssignment extends Polymer.Element {
         title
         questionType
         numReviewQuestions
-        questions(orderBy: createdAt_DESC, first: 3, filter: {
+        questions(filter: {
           author: {
-            id: $userId
+            id_not: $userId
           }
         }) {
           id

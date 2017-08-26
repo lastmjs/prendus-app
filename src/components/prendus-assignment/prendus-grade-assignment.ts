@@ -128,8 +128,15 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   _questionText(text: string): string {
     if (!text) return '';
-    return parse(text, null).ast[0].content.replace(/<p>|<\/p>/g, '');
+    return parse(text, null).ast[0].content.replace(/<p>|<p style=".*">|<\/p>|<img.*\/>/g, '');
   }
+
+  _questionPicture(text: string): string {
+    if (!text) return '';
+    const m = parse(text, null).ast[0].content.match(/<img src="(.*)"/);
+    return m ? m[1] : '';
+  }
+
 
   async _submit(grades: CategoryScore[], responseId: string, userId: string): Promise<boolean> {
     const data = await GQLrequest(`mutation gradeResponse($grades: [QuestionResponseRatingscoresCategoryScore!]!, $responseId: ID!, $userId: ID!) {
