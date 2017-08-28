@@ -28,11 +28,16 @@
     <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
       <dom-if if="[[question]]">
         <template>
-            <div class="grid-container">
+            <div>
               <div>
+                <h3>Concept</h3>
+                <div class="prendus-card">[[question.concept.title]]</div>
+                <h3>Resource</h3>
+                <div class="prendus-card">[[question.resource]]</div>
+                <br>
                 <h3>Question as seen in quiz</h3>
                 <br>
-                <div class="question-container">
+                <div>
                   <prendus-view-question question="[[question]]"></prendus-view-question>
                 </div>
               </div>
