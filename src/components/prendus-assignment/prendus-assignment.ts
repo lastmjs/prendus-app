@@ -204,7 +204,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {subjectId}, this.userToken, this._handleGQLError.bind(this));
-    if (!data) {
+    if (!conceptData) {
       return;
     }
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
@@ -216,7 +216,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
     const numGradeResponses = this.assignment.questionType === 'ESSAY'
       ? Number(this.shadowRoot.querySelector('#review').value)
-      : this.assignment.grade;
+      : this.assignment.numGradeResponses;
     const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
     const title = this.shadowRoot.querySelector('#assignment-title').value;
     const data = await GQLRequest(`mutation saveAssignment(
