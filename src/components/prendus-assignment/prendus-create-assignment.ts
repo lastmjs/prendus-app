@@ -67,8 +67,8 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
-    const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
-    const questionId = await save(questionVars);
+    const save = question.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
+    const questionId = await save(question);
     this.shadowRoot.querySelector('#carousel').nextData();
   }
 
