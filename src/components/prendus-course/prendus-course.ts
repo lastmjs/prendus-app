@@ -413,7 +413,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       `, {courseId: this.courseId}, this.userToken, (error: any) => {
           setNotification(error.message, NotificationType.ERROR)
       });
-      this.fireLocalAction('learningStructure', data.allDisciplines);
+      this._fireLocalAction('learningStructure', data.allDisciplines);
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
