@@ -51,9 +51,11 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
+        const id = (this.user ? this.user.id : null);
+        const courseKey = `coursesFromUser${this.user ? this.user.id : null}`;
         const data = await GQLRequest(`
             query courses($id: ID!){
-                coursesFromUser${this.user ? this.user.id : null}: allCourses(filter: {
+                ${courseKey}: allCourses(filter: {
                     author: {
                         id: $id
                     }
@@ -62,14 +64,14 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                     title
                 }
             }
-        `, {id: (this.user ? this.user.id : null)}, this.userToken,  (error: any) => {
+        `, {id}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
-        if (!data || !Object.keys(data).length) return;
+        if (!data) return;
         this.action = {
             type: 'SET_PROPERTY',
-            Object.keys(data)[0],
-            data[Object.keys(data)[0]]
+            courseKey,
+            data[courseKey]
         };
     }
     async openDeleteModal(e: any): void {
