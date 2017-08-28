@@ -214,8 +214,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     const questionType = this.shadowRoot.querySelector('#questionTypes').querySelector('paper-listbox').selected;
     const numCreateQuestions = Number(this.shadowRoot.querySelector('#create').value);
     const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
-    const numGradeResponses = this.assignment.questionType === 'ESSAY'
-      ? Number(this.shadowRoot.querySelector('#review').value)
+    const gradeInput = this.shadowRoot.querySelector('#grade');
+    const numGradeResponses = this.assignment.questionType === 'ESSAY' && gradeInput
+      ? Number(gradeInput.value)
       : this.assignment.numGradeResponses;
     const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
     const title = this.shadowRoot.querySelector('#assignment-title').value;
