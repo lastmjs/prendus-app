@@ -29,20 +29,18 @@
       <dom-if if="[[question]]">
         <template>
             <div>
+              <h3>Concept</h3>
+              <div class="prendus-card">[[question.concept.title]]</div>
+              <h3>Resource</h3>
+              <div class="prendus-card">[[question.resource]]</div>
+              <br>
+              <h3>Question as seen in quiz</h3>
+              <br>
               <div>
-                <h3>Concept</h3>
-                <div class="prendus-card">[[question.concept.title]]</div>
-                <h3>Resource</h3>
-                <div class="prendus-card">[[question.resource]]</div>
-                <br>
-                <h3>Question as seen in quiz</h3>
-                <br>
-                <div>
-                  <prendus-view-question question="[[question]]"></prendus-view-question>
-                </div>
+                <prendus-view-question question="[[question]]"></prendus-view-question>
               </div>
-              <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
             </div>
+            <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
             <br>
             <dom-if if="[[isEssayType(assignment.questionType)]]">
               <template>
