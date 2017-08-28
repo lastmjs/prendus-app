@@ -73,8 +73,8 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
         });
         this.action = {
             type: 'SET_PROPERTY',
-            'allDisciplines',
-            data.allDisciplines
+            key: 'allDisciplines',
+            value: data.allDisciplines
         };
     }
 

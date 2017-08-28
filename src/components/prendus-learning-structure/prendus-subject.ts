@@ -112,13 +112,13 @@ class PrendusSubject extends Polymer.Element implements ContainerElement {
         });
         this.action = {
             type: 'SET_PROPERTY',
-            conceptKey,
-            data[conceptKey]
+            key: conceptKey,
+            value: data[conceptKey]
         };
         this.action = {
             type: 'SET_PROPERTY',
-            subjectKey,
-            data[subjectKey]
+            key: subjectKey,
+            value: data[subjectKey]
         };
     }
 

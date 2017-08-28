@@ -102,13 +102,13 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         });
         this.action = {
             type: 'SET_PROPERTY',
-            subjectKey,
-            data[subjectKey]
+            key: subjectKey,
+            value: data[subjectKey]
         };
         this.action = {
             type: 'SET_PROPERTY',
-            disciplineKey,
-            data[disciplineKey]
+            key: disciplineKey,
+            value: data[disciplineKey]
         };
     }
 
