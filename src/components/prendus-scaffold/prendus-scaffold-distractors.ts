@@ -85,10 +85,8 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
       return;
     const i = e.model.itemsIndex;
-    const pictures = [...this.pictures];
-    pictures[i] = file;
+    const pictures = [...this.pictures.slice(0, i), file, ...this.pictures.slice(i+1)];
     this._fireLocalAction('pictures', pictures);
-    console.log(pictures);
     this._notifyPictures(pictures);
   }
 
