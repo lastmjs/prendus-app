@@ -1,7 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {parse} from '../../node_modules/assessml/assessml';
 

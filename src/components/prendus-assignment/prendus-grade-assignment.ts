@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {createUUID, shuffleArray, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {QuestionType, NotificationType, ContextType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {sendStatement} from '../../services/analytics-service';
@@ -46,6 +46,10 @@ class PrendusGradeAssignment extends Polymer.Element {
     };
   }
 
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
+  }
+
   _handleGrades(e: CustomEvent) {
     this._fireLocalAction('grades', e.detail.scores);
   }
@@ -87,7 +91,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   async loadAssignment(assignmentId: string) {
     this.action = await getAndSetUser();
-    const data = await GQLrequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
@@ -115,9 +119,8 @@ class PrendusGradeAssignment extends Polymer.Element {
           }
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     const { assignment, essays } = data;
@@ -139,7 +142,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
 
   async _submit(grades: CategoryScore[], responseId: string, userId: string): Promise<boolean> {
-    const data = await GQLrequest(`mutation gradeResponse($grades: [QuestionResponseRatingscoresCategoryScore!]!, $responseId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`mutation gradeResponse($grades: [QuestionResponseRatingscoresCategoryScore!]!, $responseId: ID!, $userId: ID!) {
       createQuestionResponseRating(
         raterId: $userId,
         questionResponseId: $responseId,
@@ -147,10 +150,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       ) {
         id
       }
-    }`, {grades, responseId, userId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
-    }
+    }`, {grades, responseId, userId}, this.userToken, this._handleGQLError.bind(this));
   }
 
   stateChange(e: CustomEvent) {

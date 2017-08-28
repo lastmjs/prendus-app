@@ -1,11 +1,11 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {setNotification} from '../../redux/actions';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';
 
 class PrendusConcept extends Polymer.Element implements ContainerElement {
@@ -76,54 +76,54 @@ class PrendusConcept extends Polymer.Element implements ContainerElement {
         };
     }
     async loadData() {
-        await GQLQuery(`
-            query {
-                concept${this.conceptId}: Concept(id: "${this.conceptId}") {
+        const conceptKey = `concept${this.conceptId}`;
+        const data = await GQLRequest(`
+            query concept($conceptId: ID!) {
+                ${conceptKey}: Concept(id: $conceptId) {
                     title
                     subject {
                         id
                     }
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
-        }, (error: any) => {
+        `, {conceptId: this.conceptId}, this.userToken, (error: any) => {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
+        this.action = {
+            type: 'SET_PROPERTY',
+            conceptKey,
+            data[conceptKey]
+        };
     }
 
     async saveConcept() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         if (this.conceptId) {
-            GQLMutate(`
-                mutation {
+            GQLRequest(`
+                mutation conceptUpdate($conceptId: ID!, $title: String!, $subjectId: ID!) {
                     updateConcept(
-                        id: "${this.conceptId}"
-                        title: "${title}"
-                        subjectId: "${this.subjectId}"
+                        id: $conceptId
+                        title: $title
+                        subjectId: $subjectId
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
+            `, {conceptId: this.conceptId, title, subjectId: this.subjectId}, this.userToken, (error: any) => {
                 this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
-            const data = await GQLMutate(`
-                mutation {
+            const data = await GQLRequest(`
+                mutation conceptUpdate($title: String!, $subjectId: ID!) {
                     createConcept(
-                        title: "${title}"
-                        subjectId: "${this.subjectId}"
+                        title: $title
+                        subjectId: $subjectId
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
+            `, {title, subjectId: this.subjectId}, this.userToken, (error: any) => {
               this.action = setNotification(error.message, NotificationType.ERROR)
             });
             this.action = {

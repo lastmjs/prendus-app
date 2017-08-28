@@ -3,13 +3,11 @@ import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
 import {Concept} from '../../typings/concept';
 import {AnswerTypes} from '../../typings/answer-types';
-import {createUUID} from '../../services/utilities-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {generateEssay} from '../../services/question-to-code-service';
-import {NotificationType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
-import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
@@ -135,7 +133,8 @@ class PrendusEssayScaffold extends Polymer.Element {
       ...!this.concept.id && { concept: this.concept },
       text,
       code,
-      imageIds
+      imageIds,
+      answerComments: []
     };
     const evt = new CustomEvent('question-created', {composed: true, detail: {question}});
     this.dispatchEvent(evt);

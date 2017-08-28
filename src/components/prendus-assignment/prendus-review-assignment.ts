@@ -1,8 +1,8 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {NotificationType, QuestionType, ContextType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
@@ -37,6 +37,10 @@ class PrendusReviewAssignment extends Polymer.Element {
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true);
+  }
+
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
   _handleNextRequest(e: CustomEvent) {
@@ -96,8 +100,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       ratings,
       raterId: this.user.id
     };
-    const data = await GQLrequest(query, variables, this.userToken);
-    if (data.errors) this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    await GQLRequest(query, variables, this.userToken, this._handleGQLError.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -110,7 +113,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
@@ -134,9 +137,8 @@ class PrendusReviewAssignment extends Polymer.Element {
           }
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     this._fireLocalAction('assignment', data.Assignment);

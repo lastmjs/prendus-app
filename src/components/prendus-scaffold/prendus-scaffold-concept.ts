@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 /*
  * This component takes an array of concepts and displays a dropdown menu.

@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
@@ -6,7 +6,7 @@ import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';
 
 class PrendusLearningStructure extends Polymer.Element implements ContainerElement {
@@ -61,22 +61,21 @@ class PrendusLearningStructure extends Polymer.Element implements ContainerEleme
         });
     }
     async loadData() {
-        await GQLQuery(`
+        const data = await GQLRequest(`
             query {
               allDisciplines {
                   id
                   title
               }
             }
-        `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
-        }, (error: any) => {
+        `, {}, this.userToken, (error: any) => {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
+        this.action = {
+            type: 'SET_PROPERTY',
+            'allDisciplines',
+            data.allDisciplines
+        };
     }
 
     stateChange(e: CustomEvent) {

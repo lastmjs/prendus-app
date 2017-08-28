@@ -1,4 +1,4 @@
-import {GQLrequest} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {setNotification} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
@@ -6,7 +6,7 @@ import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 
@@ -45,6 +45,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       key,
       value
     };
+  }
+
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
   connectedCallback() {
@@ -105,7 +109,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       return;
     }
     const title = this.shadowRoot.querySelector('#custom-concept').value;
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       mutation concept($title: String!, $subjectId: ID!) {
         createConcept(
           title: $title
@@ -121,7 +125,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {title, subjectId: this.assignment.course.subject.id}, this.userToken);
+    `, {title, subjectId: this.assignment.course.subject.id}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('concepts', data.createConcept.subject.concepts)
     this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
     this.shadowRoot.querySelector('#custom-concept').value = '';
@@ -130,7 +134,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   async updateAssignmentConcepts(e: any){
     // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
     const conceptsIds = this.selectedConcepts.map(concept => concept.id);
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!], $id: ID!) {
         updateAssignment(
           id: $id
@@ -150,13 +154,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {conceptsIds, id: this.assignmentId}, this.userToken);
+    `, {conceptsIds, id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('assignment', data.updateAssignment)
     this.shadowRoot.querySelector('#assignmentConceptDialog').close();
   }
 
   async loadData() {
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       query assignment($id: ID!) {
         Assignment(id: $id) {
           id
@@ -178,9 +182,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {id: this.assignmentId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    `, {id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     this.loadConcepts(data.Assignment.course.subject.id);
@@ -190,7 +193,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   }
 
   async loadConcepts(subjectId: string){
-    const conceptData = await GQLrequest(`
+    const conceptData = await GQLRequest(`
       query subject($subjectId: ID!) {
         Subject(id: $subjectId){
           id
@@ -200,9 +203,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {subjectId}, this.userToken);
-    if (conceptData.errors) {
-      this.action = setNotification(conceptData.errors[0].message, NotificationType.ERROR);
+    `, {subjectId}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
@@ -217,7 +219,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       : this.assignment.grade;
     const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
     const title = this.shadowRoot.querySelector('#assignment-title').value;
-    const data = await GQLrequest(`mutation saveAssignment(
+    const data = await GQLRequest(`mutation saveAssignment(
         $questionType: QuestionType!
         $numCreateQuestions: Int!
         $numReviewQuestions: Int!
@@ -255,10 +257,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
       }`,
       {questionType, numCreateQuestions, numReviewQuestions, numGradeResponses, numResponseQuestions, title, id: this.assignment.id},
-      this.userToken
+      this.userToken,
+      this._handleGQLError.bind(this)
     );
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    if (!data) {
       return;
     }
     this.loadConcepts(data.updateAssignment.course.subject.id);

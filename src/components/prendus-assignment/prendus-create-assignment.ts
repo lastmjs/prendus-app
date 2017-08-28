@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID, asyncForEach} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
@@ -7,7 +7,7 @@ import {LTIPassback} from '../../services/lti-service';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {Assignment} from '../../typings/assignment';
-import {GQLrequest} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {GQLVariables} from '../../typings/gql-variables';
 
 class PrendusCreateAssignment extends Polymer.Element {
@@ -50,6 +50,10 @@ class PrendusCreateAssignment extends Polymer.Element {
     };
   }
 
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
+  }
+
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
@@ -63,13 +67,8 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
-    const { answerComments ...questionVars } = question;
     const save = questionVars.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(questionVars);
-    if (answerComments)
-      asyncForEach(answerComments.map(text => {
-        return { text, questionId }
-      }), this.saveAnswerComment);
     this.shadowRoot.querySelector('#carousel').nextData();
   }
 
@@ -82,7 +81,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string) {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
+    const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
@@ -98,9 +97,8 @@ class PrendusCreateAssignment extends Polymer.Element {
           }
         }
       }
-    }`, {assignmentId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {assignmentId}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     // Create array of "questions" just to create carousel events to create multiple questions
@@ -111,7 +109,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async saveQuestion(variables: GQLVariables): Promise<string|null> {
-    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!) {
+    const data = await GQLRequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!) {
       createQuestion(
         authorId: $authorId,
         conceptId: $conceptId,
@@ -123,16 +121,15 @@ class PrendusCreateAssignment extends Polymer.Element {
       ) {
         id
       }
-    }`, variables, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, variables, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return null;
     }
     return data.createQuestion.id;
   }
 
   async saveQuestionAndConcept(variables: GQLVariables): Promise<string|null> {
-    const data = await GQLrequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!) {
+    const data = await GQLRequest(`mutation newQuestion($authorId: ID!, $concept: QuestionconceptConcept!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $answerComments: [QuestionanswerCommentsAnswerComment!]!) {
       createQuestion(
         authorId: $authorId,
         assignmentId: $assignmentId,
@@ -140,28 +137,15 @@ class PrendusCreateAssignment extends Polymer.Element {
         resource: $resource,
         text: $text,
         code: $code
+        answerComments: $answerComments
       ) {
         id
       }
-    }`, variables, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, variables, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return null;
     }
     return data.createQuestion.id;
-  }
-
-  async saveAnswerComment(variables: GQLVariables): Promise<string|null> {
-    const data = await GQLrequest(`mutation newAnswerComment($text: String!, $questionId: ID!) {
-      createAnswerComment(text: $text, questionId: $questionId) {
-        id
-      }
-    }`, variables);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
-      return null;
-    }
-    return data.createAnswerComment.id;
   }
 
   stateChange(e: CustomEvent) {

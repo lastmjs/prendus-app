@@ -1,6 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {isDefinedAndNotEmpty} from '../../services/utilities-service';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 /*
  * This component takes a question and answer and displays text inputs to type incorrect answers.

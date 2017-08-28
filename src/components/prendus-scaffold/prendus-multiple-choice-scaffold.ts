@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
-import {createUUID, shuffleArray, asyncMap} from '../../services/utilities-service';
+import {createUUID, shuffleArray, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {AnswerTypes} from '../../typings/answer-types';
 import {NotificationType} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
@@ -199,7 +199,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       ...!this.concept.id && {concept: this.concept},
       explanation: this.solution,
       resource: this.resource,
-      answerComments: answers.map(answer => answer.comment),
+      answerComments: answers.map(answer => Object.assign({}, {text: answer.comment})),
       imageIds
     };
     const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
