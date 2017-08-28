@@ -5,7 +5,7 @@ import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {NotificationType, QuestionType, ContextType} from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
@@ -113,6 +113,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
+    this.action = await getAndSetUser();
     const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
       Assignment(id: $assignmentId) {
         id

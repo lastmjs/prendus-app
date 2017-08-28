@@ -2,7 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
@@ -81,6 +81,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string) {
+    this.action = await getAndSetUser();
     const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
       Assignment(id: $assignmentId) {
         id
