@@ -60,7 +60,8 @@
         <div class="wrapper">
           <div class="prendus-card question">
             <h3>Question</h3>
-            [[question]]
+            <div>[[question.text]]</div>
+            <span><prendus-image-preview file="[[question.picture]]"></prendus-image-preview></span>
           </div>
 
           <div class="row">
@@ -71,7 +72,8 @@
               <div class="prendus-card">
                 <!-- This here so that when the controller is looking through all values, distractor0 will always have a value.-->
                 <paper-item id="distractor0" value="[[answer]]">
-                  [[answer]]
+                  <div>[[answer.text]]</div>
+                  <span><prendus-image-preview file="[[answer.picture]]"></prendus-image-preview></span>
                 </paper-item>
               </div>
             </div>

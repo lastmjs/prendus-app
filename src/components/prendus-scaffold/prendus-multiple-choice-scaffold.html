@@ -189,13 +189,13 @@
                   thinking about common misconceptions students may have
                   about the content area of your question.
                 </div>
-                <prendus-scaffold-distractors question="[[questionText]]" answer="[[answer]]" init="[[distractors]]" on-distractors-changed="_handleDistractors" on-distractor-pictures-changed="_handleDistractorPictures"></prendus-scaffold-distractors>
+                <prendus-scaffold-distractors question="[[_textAndPicture(questionText, questionPicture)]]" answer="[[_textAndPicture(answer, answerPicture)]]" init="[[distractors]]" on-distractors-changed="_handleDistractors" on-distractor-pictures-changed="_handleDistractorPictures"></prendus-scaffold-distractors>
               </div>
               <div>
                 <div class="prendus-card big">
                   Add comments to the question and answers that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
-                <prendus-scaffold-comments question="[[questionText]]" answers="[[_scaffoldAnswersWithPictures(answer, distractors, hints, answerPicture, distractorPictures)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
+                <prendus-scaffold-comments question="[[_textAndPicture(questionText, questionPicture)]]" answers="[[_scaffoldAnswersWithPictures(answer, distractors, hints, answerPicture, distractorPictures)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
               </div>
               <div>
                 <div class="prendus-card centered">

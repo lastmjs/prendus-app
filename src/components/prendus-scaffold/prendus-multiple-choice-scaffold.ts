@@ -144,17 +144,21 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   }
 
   _scaffoldAnswersWithPictures(answer: string, distractors: string[], hints: string[], answerPicture: File|FileResponse, distractorPictures: File[]|FileResponse[]): QuestionScaffoldAnswer[] {
-    if (!answer || !distractors || !hints || !distractorPictures) return [];
     const mChoice = (text, comment, correct, picture) => {
-      return {
-        text,
-        comment,
-        correct,
-        picture,
-        type: AnswerTypes.MultipleChoice
-      }
-    });
-    return [mChoice(answer, hints[0], true, answerPicture), ...distractors.map((distractor, i) => mChoice(distractor, hints[i+1], false, distractorPictures[i]))];
+      return {text, comment, correct, picture, type: AnswerTypes.MultipleChoice}
+    };
+    const distractorChoice = (distractor, i) => {
+      return mChoice(
+        distractor,
+        hints ? hints[i+1] : '',
+        false,
+        distractorPictures ? distractorPictures[i] : null
+    };
+    return [mChoice(answer, hints ? hints[0] : '', true, answerPicture), ...(distractors || []).map(distractorChoice)];
+  }
+
+  _textAndPicture(text: string, picture: File): {text: string, picture: File} {
+    return { text, picture }
   }
 
   showNext(i: number): boolean {
@@ -171,7 +175,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   async submit(): void {
     try {
-      validate(this.concept, this.resource, this.questionText, this.answer, this.distractors, this.hints);
+      validate(this.concept, this.resource, this.questionText, this.answer, this.distractors, this.hints, this.answerPicture, this.distractorPictures);
     } catch (e) {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
@@ -220,14 +224,15 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
   }
 }
 
-function validate(concept: Concept, resource: string, questionText: string, answer: string, distractors: string[], hints: string[]) {
+function validate(concept: Concept, resource: string, questionText: string, answer: string, distractors: string[], hints: string[], answerPicture: File, distractorPictures: File[]) {
     const empty = str => str == undefined || str.toString().trim() === '';
     const someEmpty = (bitOr, str) => bitOr || empty(str);
+    const someEmptyAndNoPicture = (bitOr, str, i) => bitOr || (empty(str) && !distractorPictures[i]);
     if (empty(concept.id) && empty(concept.title)) throw new Error('Concept must be entered or selected');
     if (empty(resource)) throw new Error('Resource must not be empty');
     if (empty(questionText)) throw new Error('Question text must not be empty');
-    if (empty(answer)) throw new Error('You must provide a correct answer');
-    if (distractors.length !== 3 || distractors.reduce(someEmpty, false))
+    if (empty(answer) && !answerPicture) throw new Error('You must provide a correct answer');
+    if (distractors.length !== 3 || distractors.reduce(someEmptyAndNoPicture, false))
       throw new Error('Incorrect answers must not be empty');
     if (hints.length !== 4 || hints.reduce(someEmpty, false))
       throw new Error('Answer comments must not be empty');

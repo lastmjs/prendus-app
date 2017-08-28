@@ -110,7 +110,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async saveQuestion(variables: GQLVariables): Promise<string|null> {
-    const data = await GQLRequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!) {
+    const data = await GQLRequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!, $answerComments: [QuestionanswerCommentsAnswerComment!]!) {
       createQuestion(
         authorId: $authorId,
         conceptId: $conceptId,
@@ -119,6 +119,7 @@ class PrendusCreateAssignment extends Polymer.Element {
         text: $text,
         code: $code,
         imagesIds: $imageIds
+        answerComments: $answerComments
       ) {
         id
       }
