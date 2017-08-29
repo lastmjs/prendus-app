@@ -96,6 +96,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: false
         };
 
+        const that = this;
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const signupData = await performSignupMutation(email, password, this.userToken);
@@ -131,7 +132,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         }
                 }
             `, {email, password, ltiJWT: getCookie('ltiJWT')}, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
+                that.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
@@ -148,7 +149,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, {email, password}, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
+                that.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
