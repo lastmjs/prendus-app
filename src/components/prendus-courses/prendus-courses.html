@@ -22,7 +22,9 @@
           }
           .course-card{
             width: 30%;
+            min-width: 300px;
             margin-right: 20px;
+            margin-bottom: 20px;
             --paper-card-header-text: {
               overflow: hidden;
               text-overflow: ellipsis;
@@ -56,7 +58,7 @@
                 <paper-dialog id="add-course-modal" modal>
                   <div class="content">
                     <h2>Add Course</h2>
-                    <paper-input id="titleInput" name="title" label="Course Title" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
+                    <paper-input id="titleInput" name="title" label="Course Title" maxlength="50" required auto-validate error-message="Please enter a title." autoFocus on-keydown="submitOnEnter"></paper-input>
                   </div>
                   <div class="buttons">
                     <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>

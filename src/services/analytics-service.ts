@@ -1,6 +1,6 @@
 import {GQLMutate} from '../services/graphql-service';
 
-export async function sendStatement(userId: string, contextId: string, contextType: string, verb: string, object: string): Promise<void> {
+export async function sendStatement(userToken: string, userId: string, contextId: string, contextType: string, verb: string, object: string): Promise<void> {
   const createStatement = await GQLMutate(`
     mutation{
       createPrendusAnalytics(
@@ -12,7 +12,7 @@ export async function sendStatement(userId: string, contextId: string, contextTy
         id
       }
     }
-    `, this.userToken, (error: any) => {
+    `, userToken, (error: any) => {
         console.log(error);
   });
   const data = await GQLMutate(`
@@ -29,7 +29,7 @@ export async function sendStatement(userId: string, contextId: string, contextTy
         }
       }
     }
-    `, this.userToken, (error: any) => {
+    `, userToken, (error: any) => {
         console.log(error);
   });
 }

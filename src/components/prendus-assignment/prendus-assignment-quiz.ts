@@ -18,8 +18,8 @@ class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     selectedIndex: number;
     questions: Question[];
     quizQuestions: Question[];
@@ -113,7 +113,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           credentials: 'include'
       });
       if(LTIResponse.ok === true){
-        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
+        sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
       }else{
         //TODO input a notication error message here once the notifications are merged.
       }

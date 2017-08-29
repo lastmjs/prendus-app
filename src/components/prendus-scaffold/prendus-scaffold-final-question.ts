@@ -145,7 +145,7 @@ class PrendusScaffoldFinalQuestion extends Polymer.Element {
           key: 'questionId',
           value: data.createQuestion.id
       };
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, "SUBMITTED", "CREATE")
       window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
           method: 'post',
           mode: 'no-cors',
