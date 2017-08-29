@@ -75,6 +75,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _parseRubric(code: string, varName: string): Rubric {
+    if (!code) return {};
     const { evaluationRubric, gradingRubric } = extractVariables(code);
     if (varName === 'evaluationRubric' && evaluationRubric)
       return JSON.parse(evaluationRubric.value);
@@ -122,7 +123,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         numReviewQuestions
         questions(filter: {
           author: {
-            id_not: $userId
+            id: $userId
           }
         }) {
           id
