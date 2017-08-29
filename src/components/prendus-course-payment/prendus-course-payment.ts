@@ -2,7 +2,7 @@ import {html} from '../../node_modules/lit-html/lit-html';
 import {render} from '../../node_modules/lit-html/lib/lit-extended';
 import {SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {State} from '../../typings/state';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../services/utilities-service';
 import {Course} from '../../typings/course';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {User} from '../../typings/user';
@@ -11,7 +11,6 @@ interface GQLCourse {
     price: number;
 }
 
-//TODO we must add a loading... thing to ensure that the course and price are loaded or they could accidentally click the pay now button before the price is set
 class PrendusCoursePayment extends Polymer.Element {
     stripeCheckoutHandler: StripeCheckoutHandler;
     courseId: string | null;
@@ -22,6 +21,7 @@ class PrendusCoursePayment extends Polymer.Element {
     userToken: string | null;
     user: User | null;
     loaded: boolean;
+    redirectUrl: string;
 
     static get is() { return 'prendus-course-payment'; }
     static get properties() {
@@ -39,7 +39,6 @@ class PrendusCoursePayment extends Polymer.Element {
     }
 
     async courseIdSet() {
-        console.log('this.courseId', this.courseId);
         this.action = fireLocalAction(this.componentId, 'courseId', this.courseId);
         this.action = fireLocalAction(this.componentId, 'loaded', false);
         this.action = fireLocalAction(this.componentId, 'course', await loadCourse(this.courseId, this.userToken));
@@ -56,8 +55,10 @@ class PrendusCoursePayment extends Polymer.Element {
             name: 'Prendus',
             image: 'images/favicon.png',
             zipCode: true,
-            token: (token: stripe.StripeTokenResponse) => {
-                initiatePayment(token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken);
+            token: async (token: stripe.StripeTokenResponse) => {
+                await initiatePayment(token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken);
+                // navigate(decodeURIComponent(this.redirectUrl) || '/');
+                window.location.href = decodeURIComponent(this.redirectUrl); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
             }
         };
         this.stripeCheckoutHandler = StripeCheckout.configure(options);

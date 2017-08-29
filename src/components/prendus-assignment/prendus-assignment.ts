@@ -105,7 +105,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
 
         if (!userPaidForCourse) {
-            navigate(`/course/${this.assignment.course.id}/payment`);
+            navigate(`/course/${this.assignment.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
             return;
         }
         //TODO place this code in each assignment component
@@ -339,9 +339,14 @@ async function hasUserPaidForCourse(userId: string, userToken: string, courseId:
             ) {
                 purchases(
                     filter: {
-                        user: {
-                            id: "${userId}"
-                        }
+                        AND: [{
+                                user: {
+                                    id: "${userId}"
+                                }
+                            }, {
+                                isPaid: true
+                            }
+                        ]
                     }
                 ) {
                     id
