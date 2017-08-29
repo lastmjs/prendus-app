@@ -19,8 +19,8 @@ class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     selectedIndex: number;
     myIndex: number;
     disableNext: boolean;
@@ -207,10 +207,10 @@ class PrendusQuestionReview extends Polymer.Element {
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);
-      sendStatement(this.user.id, e.target.id, ContextType.QUESTION, "EVALUATED", "QUESTION");
+      sendStatement(this.userToken, this.user.id, e.target.id, ContextType.QUESTION, "EVALUATED", "QUESTION");
 
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
-        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "REVIEW");
+        sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "REVIEW");
         this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       }
     }

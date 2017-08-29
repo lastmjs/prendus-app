@@ -89,13 +89,13 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
       value: disableNext
   };
 };
-export function setNotification(message: string, type: string): SetPropertyAction {
+export function setNotification(message: string, notificationType: string): SetPropertyAction {
   return {
       type: 'SET_PROPERTY',
       key: 'notification',
       value: {
         message,
-        type
+        notificationType
       }
   };
 };
