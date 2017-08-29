@@ -57,8 +57,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         value
       };
     }
+
     async connectedCallback() {
         super.connectedCallback();
+
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
         this._fireLocalAction('connected', true)
         this._fireLocalAction('loaded', true)
     }
@@ -76,12 +81,45 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isResultMode(mode: string) {
         return mode === 'result';
     }
+
     async assignmentIdChanged() {
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
+
         this._fireLocalAction('assignmentId', this.assignmentId)
         await this.loadData();
+
+        //TODO place this code in each assignment component
+        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignment.course.id);
+        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignment.course.id);
+
+        if (!userOnCourse) {
+            alert('You are not authorized to access this assignment');
+            navigate('/');
+            return;
+        }
+
+        if (!userPaidForCourse) {
+            navigate(`/course/${this.assignment.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
+        //TODO place this code in each assignment component
     }
 
-    assignmentTypeChanged() {
+    async assignmentTypeChanged() {
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
+
         this._fireLocalAction('assignmentType', this.assignmentType)
     }
 
@@ -271,3 +309,52 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
+
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
+async function isUserOnCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                enrolledStudents(
+                    filter: {
+                        id: "${userId}"
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+
+    return !!data.Course.enrolledStudents[0];
+}
+
+async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                purchases(
+                    filter: {
+                        AND: [{
+                                user: {
+                                    id: "${userId}"
+                                }
+                            }, {
+                                isPaid: true
+                            }
+                        ]
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+
+    return !!data.Course.purchases[0];
+}
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components

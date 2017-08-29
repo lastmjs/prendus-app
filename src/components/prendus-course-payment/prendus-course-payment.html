@@ -1,0 +1,30 @@
+<script src="https://checkout.stripe.com/checkout.js"></script>
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+
+<dom-module id="prendus-course-payment">
+    <template>
+        <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <p>You are about to pay for the course entitled: [[course.title]]</p>
+                <p>The course will cost: $[[getDollarAmount(course.price)]]</p>
+                <p>You agree to the <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#payment-terms">Payment Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#refund-terms">Refund Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#stripe">Stripe privacy conditions</a>, and <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#cookies">Cookie conditions</a></p>
+                <button on-click="openModal">Start Payment</button>
+
+                <p>The Stripe name and logos are trademarks or service marks of Stripe, Inc. or its affiliates in the U.S. and other countries.</p>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
+    </template>
+
+    <script type="module" src="prendus-course-payment.ts"></script>
+</dom-module>
