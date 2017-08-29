@@ -4,12 +4,14 @@ import {SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {State} from '../../typings/state';
 import {createUUID} from '../../services/utilities-service';
 import {Course} from '../../typings/course';
-import {GQLQuery} from '../../services/graphql-service';
+import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {User} from '../../typings/user';
 
 interface GQLCourse {
     price: number;
 }
 
+//TODO we must add a loading... thing to ensure that the course and price are loaded or they could accidentally click the pay now button before the price is set
 class PrendusCoursePayment extends Polymer.Element {
     stripeCheckoutHandler: StripeCheckoutHandler;
     courseId: string | null;
@@ -18,6 +20,7 @@ class PrendusCoursePayment extends Polymer.Element {
     componentId: string;
     course: GQLCourse | null;
     userToken: string | null;
+    user: User | null;
 
     static get is() { return 'prendus-course-payment'; }
     static get properties() {
@@ -48,7 +51,7 @@ class PrendusCoursePayment extends Polymer.Element {
             image: 'images/favicon.png',
             zipCode: true,
             token: (token: stripe.StripeTokenResponse) => {
-                initiatePayment(token.id, this.userToken);
+                initiatePayment(token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken);
             }
         };
         this.stripeCheckoutHandler = StripeCheckout.configure(options);
@@ -70,6 +73,7 @@ class PrendusCoursePayment extends Polymer.Element {
         if (state.components[this.componentId]) this.courseId = state.components[this.componentId].courseId;
         if (state.components[this.componentId]) this.course = state.components[this.componentId].course;
         this.userToken = state.userToken;
+        this.user = state.user;
     }
 }
 
@@ -99,7 +103,19 @@ function fireLocalAction(componentId: string, key: string, value: any): SetCompo
     };
 }
 
-async function initiatePayment(tokenId: string, userToken: string | null): Promise<void> {
-    console.log('tokenId', tokenId);
-    console.log('userToken', userToken);
+async function initiatePayment(tokenId: string, courseId: string, amount: number, userId: string, userToken: string | null): Promise<void> {
+    await GQLMutate(`
+        mutation {
+            createPurchase(
+                userId: "${userId}"
+                amount: ${amount}
+                courseId: "${courseId}"
+                stripeTokenId: "${tokenId}"
+            ) {
+                id
+            }
+        }
+    `, userToken, (error: any) => {
+        console.log(error);
+    });
 }
