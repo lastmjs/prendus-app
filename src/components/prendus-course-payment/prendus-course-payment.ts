@@ -21,6 +21,7 @@ class PrendusCoursePayment extends Polymer.Element {
     course: GQLCourse | null;
     userToken: string | null;
     user: User | null;
+    loaded: boolean;
 
     static get is() { return 'prendus-course-payment'; }
     static get properties() {
@@ -38,12 +39,17 @@ class PrendusCoursePayment extends Polymer.Element {
     }
 
     async courseIdSet() {
+        console.log('this.courseId', this.courseId);
         this.action = fireLocalAction(this.componentId, 'courseId', this.courseId);
+        this.action = fireLocalAction(this.componentId, 'loaded', false);
         this.action = fireLocalAction(this.componentId, 'course', await loadCourse(this.courseId, this.userToken));
+        this.action = fireLocalAction(this.componentId, 'loaded', true);
     }
 
     connectedCallback() {
         super.connectedCallback();
+
+        this.action = fireLocalAction(this.componentId, 'loaded', false);
 
         const options: StripeCheckoutOptions = {
             key: 'pk_test_K1aLpc89HokLmD9GDjhWmqix',
@@ -72,6 +78,7 @@ class PrendusCoursePayment extends Polymer.Element {
 
         if (state.components[this.componentId]) this.courseId = state.components[this.componentId].courseId;
         if (state.components[this.componentId]) this.course = state.components[this.componentId].course;
+        if (state.components[this.componentId]) this.loaded = state.components[this.componentId].loaded;
         this.userToken = state.userToken;
         this.user = state.user;
     }
