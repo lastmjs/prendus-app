@@ -160,7 +160,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       const conceptIds = this.selectedConcepts.map((concept: Concept)=>{
         return `"${concept.id}"`
       })
-      const variableString = `{"conceptsIds": [${conceptIds}]}`
+      const variableString = `{"conceptsIds": [${conceptIds}]}`;
       const data = await GQLMutateWithVariables(`
         mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!]) {
           updateAssignment(

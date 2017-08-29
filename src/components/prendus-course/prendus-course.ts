@@ -122,7 +122,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       if(this.subjects){
         this._fireLocalAction('subjects', null);
       }
-      this.action = setNotification("Discipline created", NotificationType.SUCCESS)
     }
     async saveDisciplineToCourse(disciplineId: string){
       const courseData = await GQLMutate(`
@@ -177,7 +176,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadLearningStructure();
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
-      this.action = setNotification("Discipline selected for course", NotificationType.SUCCESS)
+      this.action = setNotification(`${courseData.addToCourseDiscipline.coursesCourse.discipline.title} is now the discipline of the course`, NotificationType.SUCCESS)
     }
 
     async saveSubjectToCourse(subjectId: string){
@@ -214,7 +213,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadLearningStructure();
       // this.shadowRoot.querySelector('#subject-list').disabled = false;
       this.shadowRoot.querySelector('#create-discipline').close();
-      this.action = setNotification("Subject selected for course", NotificationType.SUCCESS)
+      this.action = setNotification(`${courseData.addToCourseSubject.coursesCourse.subject.title} is now the subject of the course`, NotificationType.SUCCESS)
     }
     updateCourseDiscipline(e){
       //Setting this here because we don't want to show concepts that aren't aligned with a Subject. I assume this is the best way to do it?
@@ -251,7 +250,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('customSubject', true)
       this._fireLocalAction('selectedSubjectId', data.createSubject.id)
       this.shadowRoot.querySelector('#create-subject').close();
-      this.action = setNotification("Subject created", NotificationType.SUCCESS)
+      // this.action = setNotification("Subject created", NotificationType.SUCCESS)
     }
     getLTILinks(e){
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
@@ -261,14 +260,13 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
   	}
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
-      console.log('this.course.discipline', this.course.discipline,  this.course.subject)
       if(this.course.discipline && this.course.subject){
         this.shadowRoot.querySelector('#create-assignment').open();
       }else{
         this.action = setNotification("Select a discipline and subject before creating any assignments", NotificationType.WARNING)
       }
     }
-    async createAssignment(e){
+    async createAssignment(){
       const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value;
       // const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
       if(assignmentTitle){
@@ -407,6 +405,15 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       }, (error: any) => {
           setNotification(error.message, NotificationType.ERROR)
       });
+    }
+    createDisciplineOnEnter(e: any){
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createDiscipline();
+    }
+    createSubjectOnEnter(e: any){
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createSubject();
+    }
+    createAssignmentOnEnter(e: any){
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createAssignment();
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;

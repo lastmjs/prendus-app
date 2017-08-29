@@ -138,7 +138,9 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
             this.loadData();
         });
     }
-
+    submitOnEnter(e: any) {
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createCourse();
+    }
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
