@@ -2,7 +2,6 @@ const fetch = require('isomorphic-fetch');
 const graphCoolEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
 const prendusCloudFunctionJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE0OTY4NjI4ODUsImNsaWVudElkIjoiY2oyd2lmdnZmM29raTAxNTRtZnN0c2lscCIsInByb2plY3RJZCI6ImNqMzZkZTlxNGRlbTAwMTM0Ymhrd200NHIiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqM25kaWlidGZmcTUwMTczdnJma2p6cTAifQ.rsV46JtH7yOxB-kz17UDs33XIfHpBT72M_OSLlQq1LA';
 
-
 module.exports = function (event) {
     return new Promise(function(resolve, reject) {
         const courseTitle = event.data.Purchase.node.course.title;
