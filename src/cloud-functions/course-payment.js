@@ -2,17 +2,20 @@ const fetch = require('isomorphic-fetch');
 const graphCoolEndpoint = 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
 const prendusCloudFunctionJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE0OTY4NjI4ODUsImNsaWVudElkIjoiY2oyd2lmdnZmM29raTAxNTRtZnN0c2lscCIsInByb2plY3RJZCI6ImNqMzZkZTlxNGRlbTAwMTM0Ymhrd200NHIiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqM25kaWlidGZmcTUwMTczdnJma2p6cTAifQ.rsV46JtH7yOxB-kz17UDs33XIfHpBT72M_OSLlQq1LA';
 
+
 module.exports = function (event) {
     return new Promise(function(resolve, reject) {
+        const courseTitle = event.data.Purchase.node.course.title;
         const purchaseId = event.data.Purchase.node.id;
         const purchaseIsPaid = event.data.Purchase.node.isPaid;
         const purchaseAmount = event.data.Purchase.node.amount;
         const courseAmount = event.data.Purchase.node.course.price;
         const stripeTokenId = event.data.Purchase.node.stripeTokenId;
+        const userEmail = event.data.Purchase.node.user.email;
         const idempotency_key = createUUID();
         if (courseAmount !== purchaseAmount) throw new Error('The course price and the purchase price are not the same. The client could be manipulating the price saved to the Purchase. This must be investigated before any payments are made through Stripe');
         if (purchaseIsPaid === true) throw new Error('The isPaid property on the new Purchase is set to true. The client could be manipulating the Purchase object. This must be investigated before any payments are made through Stripe');
-        executeCharge(courseAmount, stripeTokenId, idempotency_key, graphCoolEndpoint, prendusCloudFunctionJWT, purchaseId)
+        executeCharge(courseAmount, stripeTokenId, idempotency_key, graphCoolEndpoint, prendusCloudFunctionJWT, purchaseId, userEmail, `Payment for course: ${courseTitle}`)
         .then((data) => {
             resolve({
                 data
@@ -40,12 +43,14 @@ function createUUID() {
 	return uuid;
 }
 
-function executeCharge(amount, stripeTokenId, idempotency_key, graphCoolEndpoint, prendusCloudFunctionJWT, purchaseId) {
+function executeCharge(amount, stripeTokenId, idempotency_key, graphCoolEndpoint, prendusCloudFunctionJWT, purchaseId, userEmail, description) {
     return new Promise((resolve, reject) => {
         stripe.charges.create({
             amount,
             currency: 'usd',
-            source: stripeTokenId
+            source: stripeTokenId,
+            receipt_email: userEmail,
+            description
         }, {
             idempotency_key
         }, (err, charge) => {
