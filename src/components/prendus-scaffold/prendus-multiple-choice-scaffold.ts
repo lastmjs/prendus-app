@@ -123,11 +123,11 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('questionText', '');
     this._fireLocalAction('answer', '');
     this._fireLocalAction('solution', '');
-    this._fireLocalAction('distractors', Array(3));
+    this._fireLocalAction('distractors', Array(3).fill(''));
     this._fireLocalAction('hints', ['Correct', 'Incorrect', 'Incorrect', 'Incorrect']);
-    this._fireLocalAction('questionPicture', null)
-    this._fireLocalAction('answerPicture', null)
-    this._fireLocalAction('distractorPictures', [])
+    this._fireLocalAction('questionPicture', null);
+    this._fireLocalAction('answerPicture', null);
+    this._fireLocalAction('distractorPictures', []);
     this._fireLocalAction('selectedIndex', 0);
   }
 
