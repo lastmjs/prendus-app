@@ -123,7 +123,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         numReviewQuestions
         questions(filter: {
           author: {
-            id: $userId
+            id_not: $userId
           }
         }) {
           id
