@@ -118,7 +118,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLRequest(`
-                mutation signup($email: String!, $password: String!, $ltiJWT: String!) {
+                mutation signup($email: String!, $password: String!, $ltiJWT: String) {
                     createUser(
                             authProvider: {
                                 email: {
