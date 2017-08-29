@@ -7,6 +7,7 @@ import {Course} from '../../typings/course';
 import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {getStripeKey} from '../../services/utilities-service';
 
 interface GQLCourse {
     price: number;
@@ -50,7 +51,6 @@ class PrendusCoursePayment extends Polymer.Element {
         this.action = fireLocalAction(this.componentId, 'course', await loadCourse(this.courseId, this.userToken));
         if (this.courseId && this.redirectUrl) {
             await subscribeToPurchaseIsPaid(this.componentId, this.courseId || 'courseId is null', this.user ? this.user.id : 'user is null', this.redirectUrl || 'redirectUrl is null');
-            this.action = fireLocalAction(this.componentId, 'loaded', true);
         }
         this.action = fireLocalAction(this.componentId, 'loaded', true);
     }
@@ -60,7 +60,6 @@ class PrendusCoursePayment extends Polymer.Element {
         this.action = await getAndSetUser();
         if (this.courseId && this.redirectUrl) {
             await subscribeToPurchaseIsPaid(this.componentId, this.courseId || 'courseId is null', this.user ? this.user.id : 'user is null', this.redirectUrl || 'redirectUrl is null');
-            this.action = fireLocalAction(this.componentId, 'loaded', true);
         }
     }
 
@@ -70,7 +69,7 @@ class PrendusCoursePayment extends Polymer.Element {
         this.action = fireLocalAction(this.componentId, 'loaded', false);
 
         const options: StripeCheckoutOptions = {
-            key: 'pk_test_K1aLpc89HokLmD9GDjhWmqix',
+            key: getStripeKey(),
             name: 'Prendus',
             image: 'images/favicon.png',
             zipCode: true,
