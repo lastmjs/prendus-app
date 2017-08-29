@@ -38,7 +38,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
 
-        console.log('connected');
         await this.loadData();
 
         this.action = {
