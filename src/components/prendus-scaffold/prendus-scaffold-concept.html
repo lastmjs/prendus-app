@@ -15,15 +15,17 @@
               <div id ="concepts">
                 <dom-if if="[[concepts.length]]">
                   <template>
-                    <paper-dropdown-menu label="Question Concept">
-                      <paper-listbox slot="dropdown-content">
-                        <dom-repeat items="[[concepts]]">
-                          <template>
-                              <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
-                          </template>
-                        </dom-repeat>
-                      </paper-listbox>
-                    </paper-dropdown-menu>
+                    <div contentEditable style="display:inline-block">
+                      <paper-dropdown-menu label="Question Concept">
+                        <paper-listbox slot="dropdown-content">
+                          <dom-repeat items="[[concepts]]">
+                            <template>
+                                <paper-item id="[[index]]" on-click="saveConcept">[[item.title]]</paper-item>
+                            </template>
+                          </dom-repeat>
+                        </paper-listbox>
+                      </paper-dropdown-menu>
+                    </div>
                   </template>
                 </dom-if>
                 <dom-if if="[[!concepts.length]]">
