@@ -79,6 +79,10 @@ class PrendusApp extends Polymer.Element {
         if (examplesQuestionRouteActive) return 'examplesQuestionView';
     }
 
+    _isStudent(user: User): boolean {
+      return user ? user.role === 'STUDENT' : true;
+    }
+
     logout() {
       if (this.userToken){
         this.action = removeUser();
