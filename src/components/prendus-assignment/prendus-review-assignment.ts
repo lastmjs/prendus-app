@@ -1,11 +1,11 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {NotificationType, QuestionType, ContextType} from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
@@ -39,6 +39,10 @@ class PrendusReviewAssignment extends Polymer.Element {
     this._fireLocalAction('loaded', true);
   }
 
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
+  }
+
   _handleNextRequest(e: CustomEvent) {
     try {
       validate(this.rubric, this.ratings);
@@ -59,7 +63,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     if (data) {
       this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
       setTimeout(() => {
-        this._fireLocalAction('rubric', this._parseRubric(data.code));
+        this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
       });
     } else {
       LTIPassback(this.user.id, this.assignment.id, 'REVIEW');
@@ -70,11 +74,16 @@ class PrendusReviewAssignment extends Polymer.Element {
     this._fireLocalAction('ratings', e.detail.scores);
   }
 
-  _parseRubric(code: string): Rubric {
-    const { evaluationRubric } = extractVariables(code);
-    if (evaluationRubric)
+  _parseRubric(code: string, varName: string): Rubric {
+    if (!code) return {};
+    const { evaluationRubric, gradingRubric } = extractVariables(code);
+    if (varName === 'evaluationRubric' && evaluationRubric)
       return JSON.parse(evaluationRubric.value);
-    return DEFAULT_EVALUATION_RUBRIC;
+    else if (varName === 'evaluationRubric')
+      return DEFAULT_EVALUATION_RUBRIC;
+    else if (varName === 'gradingRubric' && gradingRubric)
+      return JSON.parse(gradingRubric.value);
+    else return {};
   }
 
   async _submit(question: Question, ratings: CategoryScore[]) {
@@ -92,8 +101,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       ratings,
       raterId: this.user.id
     };
-    const data = await GQLrequest(query, variables, this.userToken);
-    if (data.errors) this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    await GQLRequest(query, variables, this.userToken, this._handleGQLError.bind(this));
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -106,7 +114,8 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    this.action = await getAndSetUser();
+    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
       Assignment(id: $assignmentId) {
         id
         title
@@ -130,9 +139,8 @@ class PrendusReviewAssignment extends Polymer.Element {
           }
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+    if (!data) {
       return;
     }
     this._fireLocalAction('assignment', data.Assignment);

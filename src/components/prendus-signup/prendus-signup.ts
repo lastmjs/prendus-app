@@ -1,11 +1,10 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate, getCookie, deleteCookie} from '../../services/utilities-service';
-import {EMAIL_REGEX} from '../../services/constants-service';
-import {NotificationType} from '../../services/constants-service';
+import {createUUID, navigate, getCookie, deleteCookie} from '../../node_modules/prendus-shared/services/utilities-service';
+import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -97,6 +96,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: false
         };
 
+        const that = this;
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const signupData = await performSignupMutation(email, password, this.userToken);
@@ -117,39 +117,39 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
         async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
-            const data = await GQLMutate(`
-                mutation {
+            const data = await GQLRequest(`
+                mutation signup($email: String!, $password: String!, $ltiJWT: String) {
                     createUser(
                             authProvider: {
                                 email: {
-                                    email: "${email}"
-                                    password: "${password}"
+                                    email: $email
+                                    password: $password
                                 }
                             }
-                            ltiJWT: "${getCookie('ltiJWT')}"
+                            ltiJWT: $ltiJWT
                         ) {
                             id
                         }
                 }
-            `, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
+            `, {email, password, ltiJWT: getCookie('ltiJWT')}, userToken, (error: any) => {
+                that.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
         }
 
         async function performLoginMutation(email: string, password: string, userToken: string | null) {
-            const data = await GQLMutate(`
-                mutation {
+            const data = await GQLRequest(`
+                mutation signin($email: String!, $password: String!) {
                     signinUser(email: {
-                        email: "${email}"
-                        password: "${password}"
+                        email: $email
+                        password: $password
                     }) {
                         token
                     }
                 }
-            `, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
+            `, {email, password}, userToken, (error: any) => {
+                that.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;

@@ -1,4 +1,4 @@
-import {GQLQuery} from '../services/graphql-service';
+import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction} from '../typings/actions';
 import {State} from '../typings/state';
 import {Question} from '../typings/question';
@@ -45,14 +45,14 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
     const originalUserToken = window.localStorage.getItem('userToken');
 
     if (originalUserToken) {
-        const data = await GQLQuery(`
+        const data = await GQLRequest(`
             query {
                 user {
                     id
                     email
                 }
             }
-        `, originalUserToken, (key: string, value: any) => {}, (error: any) => {
+        `, {}, originalUserToken, (error: any) => {
             throw error;
         });
 

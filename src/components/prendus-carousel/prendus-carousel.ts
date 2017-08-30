@@ -1,5 +1,5 @@
 import {SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusCarousel extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;

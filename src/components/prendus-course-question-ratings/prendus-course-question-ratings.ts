@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
@@ -8,7 +8,7 @@ import {QuestionRating} from '../../typings/question-rating';
 import {QuestionRatingStats} from '../../typings/question-rating-stats';
 import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 import {setNotification} from '../../redux/actions'
@@ -108,9 +108,9 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   async loadQuestions() {
-    const data = await GQLQuery(`
-        query {
-          course: Course(id: "${this.courseId}") {
+    const data = await GQLRequest(`
+        query getCourse($courseId: ID!) {
+          course: Course(id: $courseId) {
             id
             title
             assignments {
@@ -133,9 +133,12 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
             }
           }
         }
-    `, this.userToken,
-      (key: string, value: any) => { this._fireLocalAction(key, value) },
-      this._handleError);
+    `,
+      {courseId: this.courseId},
+      this.userToken,
+      this._handleError
+    );
+    this._fireLocalAction('course', data.course);
     this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
     this._fireLocalAction('questionStats', this._computeQuestionStats(data.course.assignments));
   }
@@ -226,7 +229,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _questionOnly(text: string): string {
-    return this._truncate(parse(text, null).ast[0].content.replace(/<p>|<\/p>/g, ''));
+    return this._truncate(parse(text, null).ast[0].content.replace(/<p>|<p style=".*">|<\/p>|<img.*\/>/g, ''));
   }
 
   _truncate(str: string): string {

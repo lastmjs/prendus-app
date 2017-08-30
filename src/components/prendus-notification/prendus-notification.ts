@@ -1,6 +1,6 @@
 import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions';
 import {checkForUserToken} from '../../redux/actions';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {Notification} from '../../typings/notification';
 
 class PrendusNotification extends Polymer.Element implements ContainerElement {

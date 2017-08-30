@@ -1,6 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {isDefinedAndNotEmpty, getQuestionScaffoldAnswers} from '../../services/utilities-service';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 /*
  * This component takes a question and an array of answers, assuming the first is the correct answer.
