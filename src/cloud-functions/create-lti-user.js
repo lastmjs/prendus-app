@@ -10,14 +10,14 @@ module.exports = function(event) {
       const userId = event.data.User.node.id;
       const payload = JWT.verify(ltiJWT, 'secret');
       const ltiUserId = payload.ltiUserId;
-      const assignmentId = payload.assignmentId;
+      const courseId = payload.courseId;
 
       return new Promise((resolve, reject) => {
           createLTIUser(graphCoolEndpoint, prendusCloudFunctionJWT, ltiUserId, userId)
           .then((data) => {
-              return authorizeUserOnAssignment(graphCoolEndpoint, prendusCloudFunctionJWT, userId, assignmentId);
-          }).
-          then((data) => {
+              return enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId);
+          })
+          .then((data) => {
              resolve(data);
           })
           .catch((error) => {
@@ -63,7 +63,7 @@ function createLTIUser(graphCoolEndpoint, prendusCloudFunctionJWT, ltiUserId, us
     });
 }
 
-function authorizeUserOnAssignment(graphCoolEndpoint, prendusCloudFunctionJWT, userId, assignmentId) {
+function enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId) {
     return new Promise((resolve, reject) => {
         fetch(graphCoolEndpoint, {
             method: 'post',
@@ -74,14 +74,14 @@ function authorizeUserOnAssignment(graphCoolEndpoint, prendusCloudFunctionJWT, u
             body: JSON.stringify({
                 query: `
                     mutation {
-                        addToStudentsAndAssignments(
-                            enrolledAssignmentsAssignmentId: "${assignmentId}"
-                            studentsUserId: "${userId}"
+                        addToStudentsAndCourses(
+                            enrolledCoursesCourseId: "${courseId}"
+                            enrolledStudentsUserId: "${userId}"
                         ) {
-                            studentsUser {
+                            enrolledStudentsUser {
                                 id
                             }
-                            enrolledAssignmentsAssignment {
+                            enrolledCoursesCourse {
                                 id
                             }
                         }
