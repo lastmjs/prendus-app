@@ -13,7 +13,7 @@ import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/consta
 import {parse} from '../../node_modules/assessml/assessml';
 import {setNotification, getAndSetUser} from '../../redux/actions'
 
-class PrendusCourseQuestionRatings extends Polymer.Element {
+export class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
@@ -169,12 +169,14 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     await this.loadQuestions(20, 0);
     this._subscribeToData();
     this._fireLocalAction('loaded', true);
+    this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
   async _updateData(data) {
     this._fireLocalAction('loaded', false);
     await this.loadQuestions(20, 0);
     this._fireLocalAction('loaded', true);
+    this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
   _assignmentIdChanged(e) {
