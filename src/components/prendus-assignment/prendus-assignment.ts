@@ -90,27 +90,28 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             navigate('/authenticate');
             return;
         }
-
+        //TODO place this code in each assignment component
+        await this.getCourseId();
+        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignmentId);
+        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignmentId, this.courseId);
+        //TODO place this code in each assignment component
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
+            // alert('You are not authorized to access this assignment');
+            // navigate('/');
+            return;
+        }
+        if (!userPaidForCourse) {
+            navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
         this._fireLocalAction('assignmentId', this.assignmentId)
         await this.loadData();
-
-        //TODO place this code in each assignment component
-        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignment.course.id);
-        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignment.course.id);
-
-        if (!userOnCourse) {
-            alert('You are not authorized to access this assignment');
-            navigate('/');
-            return;
-        }
-
-        if (!userPaidForCourse) {
-            navigate(`/course/${this.assignment.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-        //TODO place this code in each assignment component
     }
-
+    continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close()
+      navigate('/');
+    }
     async assignmentTypeChanged() {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
@@ -225,6 +226,22 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
+    async getCourseId() {
+        const data = await GQLQuery(`
+            query {
+                Assignment(id: "${this.assignmentId}") {
+                    id
+                    course {
+                        id
+                    }
+                }
+            }
+        `, this.userToken, (key: string, value: any) => {},
+          (error: any) => {
+            this.action =  setNotification(error.message, NotificationType.ERROR)
+        });
+        this._fireLocalAction('courseId', data.Assignment.course.id)
+    }
     async loadData() {
         const data = await GQLQuery(`
             query {
@@ -311,50 +328,58 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
 
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
-async function isUserOnCourse(userId: string, userToken: string, courseId: string) {
+async function isUserOnCourse(userId: string, userToken: string, assignmentId: string) {
     const data = await GQLQuery(`
         query {
-            Course(
-                id: "${courseId}"
+            Assignment(
+                id: "${assignmentId}"
             ) {
-                enrolledStudents(
-                    filter: {
-                        id: "${userId}"
-                    }
-                ) {
+                course{
+                  author{
                     id
+                  }
+                  enrolledStudents(
+                      filter: {
+                          id: "${userId}"
+                      }
+                  ) {
+                      id
+                  }
                 }
             }
         }
     `, userToken, () => {}, (error: any) => {});
-
-    return !!data.Course.enrolledStudents[0];
+    return !!(data.Assignment.course.enrolledStudents[0] || (data.Assignment.course.author.id === userId));
 }
 
-async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
+async function hasUserPaidForCourse(userId: string, userToken: string, assignmentId: string, courseId: string) {
     const data = await GQLQuery(`
         query {
-            Course(
-                id: "${courseId}"
+            Assignment(
+                id: "${assignmentId}"
             ) {
-                purchases(
-                    filter: {
-                        AND: [{
-                                user: {
-                                    id: "${userId}"
-                                }
-                            }, {
-                                isPaid: true
-                            }
-                        ]
-                    }
-                ) {
+                course{
+                  author{
                     id
+                  }
+                  purchases(
+                      filter: {
+                          AND: [{
+                                  user: {
+                                      id: "${userId}"
+                                  }
+                              }, {
+                                  isPaid: true
+                              }
+                          ]
+                      }
+                  ) {
+                      id
+                  }
                 }
             }
         }
     `, userToken, () => {}, (error: any) => {});
-
-    return !!data.Course.purchases[0];
+    return !!(data.Assignment.course.purchases[0] || (data.Assignment.course.author.id === userId));
 }
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
