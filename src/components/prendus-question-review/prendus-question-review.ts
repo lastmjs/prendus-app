@@ -1,4 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
 import {GuiAnswer} from '../../typings/gui-answer';
@@ -9,9 +10,33 @@ import {QuestionRating} from '../../typings/question-rating';
 import {createUUID} from '../../services/utilities-service';
 
 class PrendusQuestionReview extends Polymer.Element {
-  componentId: string;
-  action: SetPropertyAction | SetComponentPropertyAction;
-  loaded: boolean;
+    componentId: string;
+    action: SetPropertyAction | SetComponentPropertyAction;
+    loaded: boolean;
+    userToken: string;
+    user: User;
+    selectedIndex: number;
+    myIndex: number;
+    disableNext: boolean;
+    numberOfAnswers: number;
+    exampleQuestionScaffold: QuestionScaffold;
+    exampleQuestionScaffoldAnswers: QuestionScaffoldAnswer[];
+    questionScaffold: QuestionScaffold;
+    questionScaffoldAnswers: QuestionScaffoldAnswer[];
+    questionScaffoldsToRate: QuestionScaffold[];
+    questionScaffoldQuizId: string;
+    assignmentId: string;
+    questions: Question[];
+    quizQuestions: Question[];
+    maxSliderValue: number;
+    minSliderValue: number;
+    quality: number;
+    difficulty: number;
+    accuracy: number;
+    querySelector: any;
+    questionReviewNumber: number;
+    rubricCategories: string[];
+    rubricScores: { [key: string]: number };
 
   static get is() { return 'prendus-question-review'; }
 

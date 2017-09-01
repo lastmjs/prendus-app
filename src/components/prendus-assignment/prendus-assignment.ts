@@ -33,24 +33,28 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     };
   }
 
-  constructor() {
-    super();
-    this.componentId = createUUID();
-  }
+    constructor() {
+        super();
+        this.componentId = createUUID();
+    }
+    _fireLocalAction(key: string, value: any) {
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+        componentId: this.componentId,
+        key,
+        value
+      };
+    }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
-  }
+    async connectedCallback() {
+        super.connectedCallback();
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._fireLocalAction('loaded', true)
-  }
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
+        this._fireLocalAction('connected', true)
+        this._fireLocalAction('loaded', true)
+    }
 
   async assignmentIdChanged() {
     this._fireLocalAction('assignmentId', this.assignmentId)
@@ -70,12 +74,65 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   openAssignmentConceptDialog(e: any){
     this.shadowRoot.querySelector('#assignmentConceptDialog').open();
   }
+  async assignmentIdChanged() {
+      this.action = checkForUserToken();
+      this.action = await getAndSetUser();
 
-  removeAssignmentConcept(e){
-    if(this.selectedConcepts.length === 1){
-      alert('The Assignment needs at least 1 Concept')
-    } else {
-      const newSelectedConcepts = this.selectedConcepts.filter((concept) => {
+      if (!this.user) {
+          navigate('/authenticate');
+          return;
+      }
+
+      this._fireLocalAction('assignmentId', this.assignmentId)
+      await this.loadData();
+
+      //TODO place this code in each assignment component
+      const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignment.course.id);
+      const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignment.course.id);
+
+      if (!userOnCourse) {
+          alert('You are not authorized to access this assignment');
+          navigate('/');
+          return;
+      }
+
+      if (!userPaidForCourse) {
+          navigate(`/course/${this.assignment.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+          return;
+      }
+      //TODO place this code in each assignment component
+  }
+
+  async assignmentTypeChanged() {
+      this.action = checkForUserToken();
+      this.action = await getAndSetUser();
+
+      if (!this.user) {
+          navigate('/authenticate');
+          return;
+      }
+
+      this._fireLocalAction('assignmentType', this.assignmentType)
+  }
+
+  isCreateType(assignmentType: String) {
+      this.action = checkForUserToken();
+      if (assignmentType === 'CREATE'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+      return assignmentType === 'CREATE';
+  }
+
+  isReviewType(assignmentType: String) {
+      this.action = checkForUserToken();
+      if (assignmentType === 'REVIEW'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+      return assignmentType === 'REVIEW';
+  }
+  isQuizType(assignmentType: String) {
+      this.action = checkForUserToken();
+      if (assignmentType === 'QUIZ'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+      return assignmentType === 'QUIZ';
+  }
+  removeAssignmentConcept(e: any){
+    const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
         return e.model.item.id !== concept.id;
       })
       this._fireLocalAction('selectedConcepts', newSelectedConcepts);
@@ -183,49 +240,14 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
       return;
     }
-    this.loadConcepts(data.Assignment.course.subject.id);
-    this._fireLocalAction('assignment', data.Assignment)
-    this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
-    this._fireLocalAction('courseId', data.Assignment.course.id)
-  }
-
-  async loadConcepts(subjectId: string){
-    const conceptData = await GQLrequest(`
-      query subject($subjectId: ID!) {
-        Subject(id: $subjectId){
-          id
-          concepts{
-            id
-            title
-          }
-        }
-      }
-    `, {subjectId}, this.userToken);
-    if (conceptData.errors) {
-      this.action = setNotification(conceptData.errors[0].message, NotificationType.ERROR);
-      return;
-    }
-    this._fireLocalAction('concepts', conceptData.Subject.concepts)
-  }
-
-  async saveData(e) {
-    const questionType = this.shadowRoot.querySelector('#questionTypes').querySelector('paper-listbox').selected;
-    const numCreateQuestions = Number(this.shadowRoot.querySelector('#create').value);
-    const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
-    const numGradeResponses = this.assignment.questionType === 'ESSAY'
-      ? Number(this.shadowRoot.querySelector('#review').value)
-      : this.assignment.grade;
-    const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
-    const title = this.shadowRoot.querySelector('#assignment-title').value;
-    const data = await GQLrequest(`mutation saveAssignment(
-        $questionType: QuestionType!
-        $numCreateQuestions: Int!
-        $numReviewQuestions: Int!
-        $numGradeResponses: Int!
-        $numResponseQuestions: Int!
-        $title: String!
-        $id: ID!
-      ) {
+    async updateAssignmentConcepts(e: any){
+      // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
+      const conceptIds = this.selectedConcepts.map((concept: Concept)=>{
+        return `"${concept.id}"`
+      })
+      const variableString = `{"conceptsIds": [${conceptIds}]}`;
+      const data = await GQLMutateWithVariables(`
+        mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!]) {
           updateAssignment(
             id: $id
             questionType: $questionType
@@ -285,3 +307,52 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
+
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
+async function isUserOnCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                enrolledStudents(
+                    filter: {
+                        id: "${userId}"
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+
+    return !!data.Course.enrolledStudents[0];
+}
+
+async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                purchases(
+                    filter: {
+                        AND: [{
+                                user: {
+                                    id: "${userId}"
+                                }
+                            }, {
+                                isPaid: true
+                            }
+                        ]
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+
+    return !!data.Course.purchases[0];
+}
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
