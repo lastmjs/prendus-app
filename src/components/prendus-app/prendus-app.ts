@@ -1,6 +1,5 @@
 import {RootReducer} from '../../redux/reducers';
-import {GQLSubscribe} from '../../services/graphql-service';
-import {navigate} from '../../services/utilities-service';
+import {navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';

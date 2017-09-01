@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
@@ -6,7 +6,7 @@ import {setNotification} from '../../redux/actions';
 import {Subject} from '../../typings/subject';
 import {Discipline} from '../../typings/discipline';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';
 
 class PrendusDiscipline extends Polymer.Element implements ContainerElement {
@@ -81,59 +81,65 @@ class PrendusDiscipline extends Polymer.Element implements ContainerElement {
         };
     }
     async loadData() {
-        await GQLQuery(`
-            query {
-                subjectsFromDiscipline${this.disciplineId}: allSubjects(filter: {
+        const subjectKey = `subjectsFromDiscipline${this.disciplineId}`;
+        const disciplineKey = `discipline${this.disciplineId}`;
+        const data = await GQLRequest(`
+            query subjectsAndDiscipline($disciplineId: ID!) {
+                ${subjectKey}: allSubjects(filter: {
                     discipline: {
-                        id: "${this.disciplineId}"
+                        id: $disciplineId
                     }
                 }) {
                     id
                     title
                 }
-                discipline${this.disciplineId}: Discipline(id: "${this.disciplineId}") {
+                ${disciplineKey}: Discipline(id: $disciplineId) {
                     title
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
-        }, (error: any) => {
+        `, {disciplineId: this.disciplineId}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: subjectKey,
+            value: data[subjectKey]
+        };
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: disciplineKey,
+            value: data[disciplineKey]
+        };
     }
 
     async saveDiscipline() {
         const title = this.shadowRoot.querySelector('#titleInput').value;
         //TODO replace this with an updateOrCreate mutation once you figure out how to do that. You had a conversation on slack about it
         if (this.disciplineId) {
-            GQLMutate(`
-                mutation {
+            GQLRequest(`
+                mutation discipline($disciplineId: ID!, $title: String!) {
                     updateDiscipline(
-                        id: "${this.disciplineId}"
-                        title: "${title}"
+                        id: $disciplineId
+                        title: $title
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
+            `, {disciplineId: this.disciplineId, title}, this.userToken, (error: any) => {
                 this.action = setNotification(error.message, NotificationType.ERROR)
             });
         }
         else {
-            const data = await GQLMutate(`
-                mutation {
+            const data = await GQLRequest(`
+                mutation discipline($title: String!) {
                     createDiscipline(
-                        title: "${title}"
+                        title: $title
                     ) {
                         id
                     }
                 }
-            `, this.userToken, (error: any) => {
-              console.log('error', error)
+            `, {title}, this.userToken, (error: any) => {
+                console.log('error', error)
                 this.action = setNotification(error.message, NotificationType.ERROR)
             });
 

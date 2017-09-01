@@ -2,7 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {QuestionScaffold} from '../../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {parse} from '../../node_modules/assessml/assessml';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusScaffoldExample extends Polymer.Element {
   componentId: string;

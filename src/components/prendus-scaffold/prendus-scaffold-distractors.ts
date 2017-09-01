@@ -1,6 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {isDefinedAndNotEmpty} from '../../services/utilities-service';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 /*
  * This component takes a question and answer and displays text inputs to type incorrect answers.
@@ -14,6 +13,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
   action: SetPropertyAction | SetComponentPropertyAction;
   loaded: boolean;
   distractors: any[];
+  pictures: File[];
   answer: string;
 
   static get is() { return 'prendus-scaffold-distractors'; }
@@ -49,6 +49,8 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
+    if (!this.pictures || !this.pictures.length)
+      this._fireLocalAction('pictures', Array(init.length));
   }
 
   _notify(distractors: string[]) {
@@ -56,11 +58,38 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     this.dispatchEvent(evt);
   }
 
-  _distractorsChanged(e) {
+  _notifyPictures(pictures: File[]) {
+    const evt = new CustomEvent('distractor-pictures-changed', {detail: {pictures}});
+    this.dispatchEvent(evt);
+  }
+
+  _distractorsChanged(e: Event) {
     const distractors = [...this.distractors];
     distractors[e.model.itemsIndex] = e.target.value;
     this._fireLocalAction('distractors', distractors);
     this._notify(distractors);
+  }
+
+  _handlePicture(e: Event) {
+    if (!e.target || !e.target.files || !e.target.files[0])
+      return;
+    const file = e.target.files[0];
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
+      return;
+    const i = e.model.itemsIndex;
+    const pictures = [...this.pictures.slice(0, i), file, ...this.pictures.slice(i+1)];
+    this._fireLocalAction('pictures', pictures);
+    this._notifyPictures(pictures);
+  }
+
+  _triggerPicture(e: Event) {
+    const i = e.model.itemsIndex;
+    this.shadowRoot.querySelector(`#distractor-picture${i}`).click();
+  }
+
+  _picture(pictures: File[], index: number): string {
+    return pictures[index] || null;
   }
 
   plusOne(num: number): number {
@@ -73,6 +102,7 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
+    if (keys.includes('pictures')) this.pictures = componentState.pictures;
   }
 }
 

@@ -1,12 +1,12 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {GQLVariables} from '../../typings/gql-variables';
-import {createUUID, shuffleArray} from '../../services/utilities-service';
+import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/services/utilities-service';
 import {QuestionType, NotificationType, ContextType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 
 class PrendusTakeAssignment extends Polymer.Element {
   loaded: boolean;
@@ -58,9 +58,9 @@ class PrendusTakeAssignment extends Polymer.Element {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0])
-      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'STARTED');
+      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'STARTED', 'QUIZ');
     else
-      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'RESPONDED');
+      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'RESPONDED', 'QUIZ');
     if (!data)
       LTIPassback(this.user.id, this.assignment.id, ContextType.QUIZ);
   }
@@ -72,6 +72,10 @@ class PrendusTakeAssignment extends Polymer.Element {
       key,
       value
     };
+  }
+
+  _handleError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
   //TODO: this seems to be getting called twice...
@@ -87,7 +91,7 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {
-    const data = await GQLrequest(`query getAssignment($assignmentId: ID!) {
+    const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
@@ -97,16 +101,15 @@ class PrendusTakeAssignment extends Polymer.Element {
           id
         }
       }
-    }`, {assignmentId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {assignmentId}, this.userToken, this._handleError.bind(this));
+    if (!data) {
       return;
     }
     return data.assignment;
   }
 
   async _createQuiz(questionIds: string[], userId: string): Promise<Question[]> {
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       mutation quiz($userId: ID!, $questionIds: [ID!]!){
         createQuiz(
           authorId: $userId
@@ -119,9 +122,8 @@ class PrendusTakeAssignment extends Polymer.Element {
           code
         }
       }
-    }`, {questionIds, userId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
+    }`, {questionIds, userId}, this.userToken, this._handleError.bind(this));
+    if (!data) {
       return [];
     }
     return data.createQuiz.questions;
@@ -149,7 +151,7 @@ class PrendusTakeAssignment extends Polymer.Element {
         id
       }
     }`;
-    return GQLrequest(query, variables, this.userToken);
+    return GQLRequest(query, variables, this.userToken, this._handleError.bind(this));
   }
 
   stateChange(e: CustomEvent) {

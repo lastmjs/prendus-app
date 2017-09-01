@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -11,9 +12,10 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="../prendus-styles/prendus-styles.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
-<link rel="import" href="../prendus-scaffold-concept/prendus-scaffold-concept.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
+<link rel="import" href="prendus-scaffold-concept.html">
 
 <dom-module id="prendus-essay-scaffold">
 
@@ -44,7 +46,10 @@
       .centered {
         text-align: center;
       }
-
+      paper-textarea.has-suffix {
+        width: 95%;
+        display: inline-block;
+      }
       .big {
         font-size: 22px;
       }
@@ -143,7 +148,12 @@
                 </li>
               </ol>
             </div>
-            <paper-textarea id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
+            <div>
+              <paper-textarea class="has-suffix" id="questionInput" type="text" label="Question" value="[[questionText]]" on-value-changed="setQuestionText"></paper-textarea>
+              <paper-icon-button icon="camera-enhance" on-click="_triggerPicture"></paper-icon-button>
+              <span id="question-picture-preview"><prendus-image-preview file="[[picture]]"></prendus-image-preview></span>
+              <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
+            </div>
           </div>
           <div>
             <div class="prendus-card big">
@@ -153,7 +163,8 @@
                   Create a rubric that will guide students in grading responses to your essay question. An example is shown
                 </li>
                 <li>
-                  Remember your question: <strong>[[questionText]]</strong>
+                  <div>Remember your question: <strong>[[questionText]]</strong></div>
+                  <span><prendus-image-preview file="[[picture]]"></prendus-image-preview></span>
                 </li>
               </ol>
             </div>

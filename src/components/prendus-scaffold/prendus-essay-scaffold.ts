@@ -3,22 +3,22 @@ import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
 import {Concept} from '../../typings/concept';
 import {AnswerTypes} from '../../typings/answer-types';
-import {createUUID} from '../../services/utilities-service';
-import {GQLrequest} from '../../services/graphql-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {GQLSaveFile} from '../../services/graphql-file-service';
 import {generateEssay} from '../../services/question-to-code-service';
-import {NotificationType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
-import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  step: number = 0;
-  concept: Concept = {};
-  questionText: string = '';
-  resource: string = '';
-  rubric: Rubric = {};
+  step: number;
+  concept: Concept;
+  questionText: string;
+  resource: string;
+  rubric: Rubric;
+  picture: File;
   userToken: string | null;
   user: User;
 
@@ -63,6 +63,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('questionText', '');
     this._fireLocalAction('rubric', {});
     this._fireLocalAction('concept', {});
+    this._fireLocalAction('picture', null);
   }
 
   _handleConcept(e: CustomEvent) {
@@ -71,6 +72,21 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   _handleRubric(e: CustomEvent) {
     this._fireLocalAction('rubric', e.detail.rubric);
+  }
+
+  _triggerPicture(e: Event) {
+    this.shadowRoot.querySelector('#question-picture').click();
+  }
+
+  _handleQuestionPicture(e: Event) {
+    if (!e.target || !e.target.files || !e.target.files[0])
+      return;
+    const file = e.target.files[0];
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
+      return;
+    this._fireLocalAction('picture', file);
+    this._fireLocalAction('pictureText', file.name);
   }
 
   exampleRubric(): Object[] {
@@ -93,14 +109,22 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('step', this.step + 1);
   }
 
-  submit(): void {
+  async submit(): void {
     try {
       validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
-    const { text, code } = generateEssay({stem: this.questionText}, this.rubric, DEFAULT_EVALUATION_RUBRIC);
+    const images = this.picture ? [(await GQLSaveFile(this.picture))] : [];
+    const imageIds = images.map(image => image.id);
+    const imageUrls = images.map(image => image.url.replace(/files/, 'images') + '/x300');
+    const { text, code } = generateEssay({
+      stem: this.questionText
+      gradingRubric: this.rubric,
+      evaluationRubric: DEFAULT_EVALUATION_RUBRIC,
+      imageUrls
+    });
     const question = {
       authorId: this.user.id,
       assignmentId: this.assignment.id,
@@ -108,7 +132,9 @@ class PrendusEssayScaffold extends Polymer.Element {
       ...this.concept.id && { conceptId: this.concept.id },
       ...!this.concept.id && { concept: this.concept },
       text,
-      code
+      code,
+      imageIds,
+      answerComments: []
     };
     const evt = new CustomEvent('question-created', {composed: true, detail: {question}});
     this.dispatchEvent(evt);
@@ -124,6 +150,8 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (keys.includes('questionText')) this.questionText = componentState.questionText;
     if (keys.includes('concept')) this.concept = componentState.concept;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
+    if (keys.includes('picture')) this.picture = componentState.picture;
+    if (keys.includes('pictureText')) this.pictureText = componentState.pictureText;
     this.userToken = state.userToken;
     this.user = state.user;
   }
