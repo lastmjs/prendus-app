@@ -11,7 +11,7 @@ import {Concept} from '../../typings/concept';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
-import {setNotification} from '../../redux/actions'
+import {setNotification, getAndSetUser} from '../../redux/actions'
 
 class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
@@ -34,6 +34,10 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return {
       courseId: {
         observer: '_courseIdChanged'
+      },
+      filterByUser: {
+        type: Boolean,
+        value: false
       }
     }
   }
@@ -108,6 +112,10 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   async loadQuestions() {
+    this.action = await getAndSetUser();
+    const filter = this.filterByUser
+      ? `(filter: {author: {id: "${this.user.id}"}})`
+      : '';
     const data = await GQLRequest(`
         query getCourse($courseId: ID!) {
           course: Course(id: $courseId) {
@@ -116,8 +124,11 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
             assignments {
               id
               title
-              questions {
+              questions${filter} {
                 id
+                author {
+                  email
+                }
                 text
                 concept {
                   id
@@ -136,7 +147,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     `,
       {courseId: this.courseId},
       this.userToken,
-      this._handleError
+      this._handleError.bind(this)
     );
     this._fireLocalAction('course', data.course);
     this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
@@ -273,7 +284,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       return {
         assignmentId: assignment.id,
         conceptId: question.concept.id,
-        student: '', //question.author.email,
+        student: question.author.email,
         text: question.text,
         overall,
         stats

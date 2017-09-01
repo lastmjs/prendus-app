@@ -50,6 +50,7 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
                 user {
                     id
                     email
+                    role
                 }
             }
         `, {}, originalUserToken, (error: any) => {
