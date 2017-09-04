@@ -28,7 +28,7 @@
                 </dom-if>
                 <dom-if if="[[!assignment.concepts.length]]">
                   <template>
-                    <paper-input id="concept-input" label="Question Concept" value="[[concept.title]]" on-change="createConcept"></paper-input>
+                    <paper-input id="concept-input" label="Question Concept" value="[[selectedConcept.title]]" on-change="createConcept"></paper-input>
                     <!-- <paper-dropdown-menu label="Concept">
                       <paper-listbox slot="dropdown-content" selected="1">
                         <dom-repeat items="[[concepts]]">

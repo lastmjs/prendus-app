@@ -22,7 +22,10 @@ class PrendusScaffoldConcept extends Polymer.Element {
   static get properties() {
     return {
       assignment: Object,
-      selectedConcept: Object
+      selectedConcept: {
+        type: Object,
+        observer: '_conceptChanged'
+      }
     };
   }
 
@@ -43,6 +46,15 @@ class PrendusScaffoldConcept extends Polymer.Element {
       key,
       value
     };
+  }
+
+  _conceptChanged(concept: Concept) {
+    if (!concept && !this.assignment.concepts.length)
+      this._fireLocalAction('selectedConcept', {
+        title: '',
+        subjectId: this.assignment.course.subject.id,
+        assignmentsIds: [this.assignment.id]
+      });
   }
 
   _notify(concept) {
