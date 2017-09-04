@@ -1,4 +1,4 @@
-import {GQLrequest, GQLQuery} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {setNotification, checkForUserToken, getAndSetUser} from '../../redux/actions';
 import {ContainerElement} from '../../typings/container-element';
@@ -49,6 +49,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     };
   }
 
+  _handleGQLError(err: any) {
+    this.action = setNotification(err.message, NotificationType.ERROR);
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this._fireLocalAction('loaded', true)
@@ -82,19 +86,20 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     await this.loadData();
   }
   async getCourseId() {
-      const data = await GQLQuery(`
-          query {
-              Assignment(id: "${this.assignmentId}") {
+      const data = await GQLRequest(`
+          query getCourseId($id: ID!) {
+              Assignment(id: $id) {
                   id
                   course {
                       id
                   }
               }
           }
-      `, this.userToken, (key: string, value: any) => {},
-        (error: any) => {
-          this.action =  setNotification(error.message, NotificationType.ERROR)
-      });
+        `,
+        {id: this.assignmentId},
+        this.userToken,
+        this._handleGQLError.bind(this)
+      );
       this._fireLocalAction('courseId', data.Assignment.course.id)
   }
   isEssayType(questionType: string): boolean {
@@ -148,7 +153,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       return;
     }
     const title = this.shadowRoot.querySelector('#custom-concept').value;
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       mutation concept($title: String!, $subjectId: ID!) {
         createConcept(
           title: $title
@@ -164,7 +169,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {title, subjectId: this.assignment.course.subject.id}, this.userToken);
+    `, {title, subjectId: this.assignment.course.subject.id}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('concepts', data.createConcept.subject.concepts)
     this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
     this.shadowRoot.querySelector('#custom-concept').value = '';
@@ -173,7 +178,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   async updateAssignmentConcepts(e: any){
     // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
     const conceptsIds = this.selectedConcepts.map(concept => concept.id);
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!], $id: ID!) {
         updateAssignment(
           id: $id
@@ -193,13 +198,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {conceptsIds, id: this.assignmentId}, this.userToken);
+    `, {conceptsIds, id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('assignment', data.updateAssignment)
     this.shadowRoot.querySelector('#assignmentConceptDialog').close();
   }
 
   async loadData() {
-    const data = await GQLrequest(`
+    const data = await GQLRequest(`
       query assignment($id: ID!) {
         Assignment(id: $id) {
           id
@@ -221,11 +226,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {id: this.assignmentId}, this.userToken);
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
-      return;
-    }
+    `, {id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
     this.loadConcepts(data.Assignment.course.subject.id);
     this._fireLocalAction('assignment', data.Assignment)
     this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
@@ -233,7 +234,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   }
 
   async loadConcepts(subjectId: string){
-    const conceptData = await GQLrequest(`
+    const conceptData = await GQLRequest(`
       query subject($subjectId: ID!) {
         Subject(id: $subjectId){
           id
@@ -243,11 +244,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {subjectId}, this.userToken);
-    if (conceptData.errors) {
-      this.action = setNotification(conceptData.errors[0].message, NotificationType.ERROR);
-      return;
-    }
+    `, {subjectId}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('concepts', conceptData.Subject.concepts)
   }
 
@@ -256,12 +253,11 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     const numCreateQuestions = Number(this.shadowRoot.querySelector('#create').value);
     const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
     const numGradeResponses = this.assignment.questionType === 'ESSAY'
-      ? Number(this.shadowRoot.querySelector('#review').value)
-      : this.assignment.grade;
-      console.log('grade responses', numGradeResponses, 'value', Number(this.shadowRoot.querySelector('#review').value))
+      ? Number(this.shadowRoot.querySelector('#grade').value)
+      : this.assignment.numGradeResponses;
     const numResponseQuestions = Number(this.shadowRoot.querySelector('#take').value);
     const title = this.shadowRoot.querySelector('#assignment-title').value;
-    const data = await GQLrequest(`mutation saveAssignment(
+    const data = await GQLRequest(`mutation saveAssignment(
         $questionType: QuestionType!
         $numCreateQuestions: Int!
         $numReviewQuestions: Int!
@@ -299,12 +295,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
       }`,
       {questionType, numCreateQuestions, numReviewQuestions, numGradeResponses, numResponseQuestions, title, id: this.assignment.id},
-      this.userToken
+      this.userToken,
+      this._handleGQLError.bind(this)
     );
-    if (data.errors) {
-      this.action = setNotification(data.errors[0].message, NotificationType.ERROR);
-      return;
-    }
     this.loadConcepts(data.updateAssignment.course.subject.id);
     this._fireLocalAction('assignment', data.updateAssignment);
     this._fireLocalAction('selectedConcepts', data.updateAssignment.concepts);
@@ -332,10 +325,10 @@ window.customElements.define(PrendusAssignment.is, PrendusAssignment);
 
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
 async function isUserOnCourse(userId: string, userToken: string, assignmentId: string) {
-    const data = await GQLQuery(`
-        query {
+    const data = await GQLRequest(`
+        query enrolled($assignmentId: ID!, $userId: ID!) {
             Assignment(
-                id: "${assignmentId}"
+                id: $assignmentId
             ) {
                 course{
                   author{
@@ -343,7 +336,7 @@ async function isUserOnCourse(userId: string, userToken: string, assignmentId: s
                   }
                   enrolledStudents(
                       filter: {
-                          id: "${userId}"
+                          id: $userId
                       }
                   ) {
                       id
@@ -351,15 +344,15 @@ async function isUserOnCourse(userId: string, userToken: string, assignmentId: s
                 }
             }
         }
-    `, userToken, () => {}, (error: any) => {});
+    `, {assignmentId, userId}, userToken, (error: any) => {});
     return !!(data.Assignment.course.enrolledStudents[0] || (data.Assignment.course.author.id === userId));
 }
 
 async function hasUserPaidForCourse(userId: string, userToken: string, assignmentId: string, courseId: string) {
-    const data = await GQLQuery(`
-        query {
+    const data = await GQLRequest(`
+        query hasPaid($assignmentId: ID!, $userId: ID!) {
             Assignment(
-                id: "${assignmentId}"
+                id: $assignmentId
             ) {
                 course{
                   author{
@@ -369,7 +362,7 @@ async function hasUserPaidForCourse(userId: string, userToken: string, assignmen
                       filter: {
                           AND: [{
                                   user: {
-                                      id: "${userId}"
+                                      id: $userId
                                   }
                               }, {
                                   isPaid: true
@@ -382,5 +375,5 @@ async function hasUserPaidForCourse(userId: string, userToken: string, assignmen
                 }
             }
         }
-    `, userToken, () => {}, (error: any) => {});
+    `, {assignmentId, userId}, userToken, (error: any) => {});
     return !!(data.Assignment.course.purchases[0] || (data.Assignment.course.author.id === userId));

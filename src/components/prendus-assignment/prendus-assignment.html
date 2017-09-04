@@ -107,11 +107,7 @@
                       </paper-dropdown-menu>
                       <paper-input id="create" type="number" min="1" label="# Questions for Create Assignment" value="[[assignment.numCreateQuestions]]" on-change="saveData"></paper-input>
                       <paper-input id="review" type="number" min="1" label="# Questions for Review Assignment" value="[[assignment.numReviewQuestions]]" on-change="saveData"></paper-input>
-                      <dom-if if="[[isEssayType(assignment.questionType)]]">
-                        <template>
-                          <paper-input id="grade" type="number" min="1" label="# Responses for Grade Assignment" value="[[assignment.numGradeResponses]]" on-change="saveData"></paper-input>
-                        </template>
-                      </dom-if>
+                      <paper-input id="grade" type="number" min="1" label="# Responses for Grade Assignment" value="[[assignment.numGradeResponses]]" on-change="saveData" hidden$="[[!isEssayType(assignment.questionType)]]"></paper-input>
                       <paper-input id="take" type="number" min="1" label="# Questions for Take Assignment" value="[[assignment.numResponseQuestions]]" on-change="saveData"></paper-input>
                     </div>
                   </div>

@@ -109,11 +109,7 @@ type QuestionResponse implements Node {
   userChecks: [UserCheck!]! @relation(name: "UserChecksOnQuestionResponse")
   userRadios: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
   ratings: [QuestionResponseRating!]! @relation(name: "RatingsOnQuestionResponse")
-<<<<<<< HEAD
-  question: Question! @relation("QuestionOnQuestionResponse")
-=======
   question: Question! @relation(name: "QuestionOnQuestionResponse")
->>>>>>> develop
 }
 
 type UserEssay implements Node {
@@ -159,7 +155,6 @@ type UserRadio implements Node {
   varName: String!
   checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
-<<<<<<< HEAD
 }
 
 type QuestionResponseRating implements Node {
@@ -169,8 +164,6 @@ type QuestionResponseRating implements Node {
   scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
   rater: User! @relation(name: "RaterOnQuestionResponseRating")
   questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
-=======
->>>>>>> develop
 }
 
 type QuestionRating implements Node {

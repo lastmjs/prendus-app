@@ -383,7 +383,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.componentId, (data: any) => {
-            this.loadData();
+            if (this.courseId)
+              this.loadData();
         });
     }
     async loadLearningStructure(){
