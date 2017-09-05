@@ -91,9 +91,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             return;
         }
         //TODO place this code in each assignment component
-        await this.getCourseId();
-        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignmentId);
-        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignmentId, this.courseId);
+        await this.getCourseIdOnAssignment();
+        console.log('this.courseId', this.courseId)
+        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
+        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
         //TODO place this code in each assignment component
         if (!userOnCourse) {
             this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
@@ -226,7 +227,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
-    async getCourseId() {
+    async getCourseIdOnAssignment() {
+        console.log('this.assignmentId', this.assignmentId)
         const data = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
@@ -240,6 +242,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           (error: any) => {
             this.action =  setNotification(error.message, NotificationType.ERROR)
         });
+        console.log('this.data', data)
         this._fireLocalAction('courseId', data.Assignment.course.id)
     }
     async loadData() {
@@ -328,58 +331,50 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
 
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
-async function isUserOnCourse(userId: string, userToken: string, assignmentId: string) {
+async function isUserOnCourse(userId: string, userToken: string, courseId: string) {
     const data = await GQLQuery(`
         query {
-            Assignment(
-                id: "${assignmentId}"
+            Course(
+                id: "${courseId}"
             ) {
-                course{
-                  author{
+                enrolledStudents(
+                    filter: {
+                        id: "${userId}"
+                    }
+                ) {
                     id
-                  }
-                  enrolledStudents(
-                      filter: {
-                          id: "${userId}"
-                      }
-                  ) {
-                      id
-                  }
                 }
             }
         }
     `, userToken, () => {}, (error: any) => {});
-    return !!(data.Assignment.course.enrolledStudents[0] || (data.Assignment.course.author.id === userId));
+
+    return !!data.Course.enrolledStudents[0];
 }
 
-async function hasUserPaidForCourse(userId: string, userToken: string, assignmentId: string, courseId: string) {
+async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
     const data = await GQLQuery(`
         query {
-            Assignment(
-                id: "${assignmentId}"
+            Course(
+                id: "${courseId}"
             ) {
-                course{
-                  author{
+                purchases(
+                    filter: {
+                        AND: [{
+                                user: {
+                                    id: "${userId}"
+                                }
+                            }, {
+                                isPaid: true
+                            }
+                        ]
+                    }
+                ) {
                     id
-                  }
-                  purchases(
-                      filter: {
-                          AND: [{
-                                  user: {
-                                      id: "${userId}"
-                                  }
-                              }, {
-                                  isPaid: true
-                              }
-                          ]
-                      }
-                  ) {
-                      id
-                  }
                 }
             }
         }
     `, userToken, () => {}, (error: any) => {});
-    return !!(data.Assignment.course.purchases[0] || (data.Assignment.course.author.id === userId));
+
+    return !!data.Course.purchases[0];
 }
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
