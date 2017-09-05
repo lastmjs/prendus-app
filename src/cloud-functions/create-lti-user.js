@@ -10,15 +10,22 @@ module.exports = function(event) {
       const userId = event.data.User.node.id;
       const payload = JWT.verify(ltiJWT, 'secret');
       const ltiUserId = payload.ltiUserId;
-      const courseId = payload.courseId;
+      const assignmentId = payload.assignmentId;
+
 
       return new Promise((resolve, reject) => {
-          createLTIUser(graphCoolEndpoint, prendusCloudFunctionJWT, ltiUserId, userId)
-          .then((data) => {
-              return enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId);
-          })
-          .then((data) => {
-             resolve(data);
+          getCourseId(graphCoolEndpoint, prendusCloudFunctionJWT, assignmentId)
+          .then((courseId) => {
+              createLTIUser(graphCoolEndpoint, prendusCloudFunctionJWT, ltiUserId, userId)
+              .then((data) => {
+                  return enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId);
+              })
+              .then((data) => {
+                 resolve(data);
+              })
+              .catch((error) => {
+                  reject(error);
+              });
           })
           .catch((error) => {
               reject(error);
@@ -101,5 +108,42 @@ function enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, 
               resolve(data);
           }
       });
+    });
+}
+
+function getCourseId(graphCoolEndpoint, prendusCloudFunctionJWT, assignmentId) {
+    return new Promise(function(resolve, reject) {
+        fetch(graphCoolEndpoint, {
+              method: 'post',
+              headers: {
+                  'content-type': 'application/json',
+                  'Authorization': `Bearer ${prendusCloudFunctionJWT}`
+              },
+              body: JSON.stringify({
+                  query: `
+                    query {
+                    	Assignment(
+                    		id: "${assignmentId}"
+                    	) {
+                    		course {
+                                id
+                            }
+                    	}
+                    }
+                  `
+              })
+          })
+        .then((response) => response.json())
+        .then((responseJSON) => {
+          const data = responseJSON.data;
+          const errors = responseJSON.errors;
+
+          if (errors) {
+              reject(errors);
+          }
+          else {
+              resolve(data.Assignment.course.id);
+          }
+        });
     });
 }
