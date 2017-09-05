@@ -93,9 +93,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         //TODO place this code in each assignment component
         await this.getCourseIdOnAssignment();
         const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
-        console.log('userOnCourse', userOnCourse)
         const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
-        console.log('userPaidForCourse', userPaidForCourse)
         //TODO place this code in each assignment component
         if (!userOnCourse) {
             this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
