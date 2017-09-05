@@ -21,6 +21,9 @@ module.exports = function(event) {
                   return enrollUserOnCourse(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId);
               })
               .then((data) => {
+                  return payForCourseIfFree(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId);
+              })
+              .then((data) => {
                  resolve(data);
               })
               .catch((error) => {
@@ -143,6 +146,82 @@ function getCourseId(graphCoolEndpoint, prendusCloudFunctionJWT, assignmentId) {
           }
           else {
               resolve(data.Assignment.course.id);
+          }
+        });
+    });
+}
+
+function payForCourseIfFree(graphCoolEndpoint, prendusCloudFunctionJWT, userId, courseId) {
+    return new Promise(function(resolve, reject) {
+        fetch(graphCoolEndpoint, {
+              method: 'post',
+              headers: {
+                  'content-type': 'application/json',
+                  'Authorization': `Bearer ${prendusCloudFunctionJWT}`
+              },
+              body: JSON.stringify({
+                  query: `
+                    query {
+                    	Course(
+                    		id: "${courseId}"
+                    	) {
+                    		price
+                    	}
+                    }
+                  `
+              })
+          })
+        .then((response) => response.json())
+        .then((responseJSON) => {
+          const data = responseJSON.data;
+          const errors = responseJSON.errors;
+
+          if (errors) {
+              reject(errors);
+          }
+          else {
+              const price = data.Course.price;
+              if (price === 0) {
+                  fetch(graphCoolEndpoint, {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json',
+                            'Authorization': `Bearer ${prendusCloudFunctionJWT}`
+                        },
+                        body: JSON.stringify({
+                            query: `
+                              mutation {
+                              	createPurchase(
+                              		userId: "${userId}"
+                                    amount: ${price}
+                                    courseId: "${courseId}"
+                                    isPaid: true
+                                    stripeTokenId: "there is no stripeTokenId for a free course"
+                              	) {
+                              		course {
+                                          price
+                                      }
+                              	}
+                              }
+                            `
+                        })
+                    })
+                  .then((response) => response.json())
+                  .then((responseJSON) => {
+                      const data = responseJSON.data;
+                      const errors = responseJSON.errors;
+
+                      if (errors) {
+                          reject(errors);
+                      }
+                      else {
+                          resolve(data);
+                      }
+                  });
+              }
+              else {
+                  resolve(data);
+              }
           }
         });
     });
