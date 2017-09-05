@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction } from '../../typings/actions';
 import {GQLQuery, GQLMutate} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext, checkForUserToken} from '../../redux/actions'
+import {setDisabledNext, checkForUserToken, setNotification} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Assignment} from '../../typings/assignment';
 import {Question} from '../../typings/question';
@@ -12,14 +12,14 @@ import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {QuestionRating} from '../../typings/question-rating';
 import {createUUID, getPrendusLTIServerOrigin, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignmentQuiz extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     selectedIndex: number;
     questions: Question[];
     quizQuestions: Question[];
@@ -78,7 +78,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
             }
         `, this.userToken, (key: string, value: Assignment) => {
         }, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
         if(questionData.Assignment){
           const quizQuestions = shuffleArray(questionData.Assignment.questions).slice(0,10);
@@ -101,8 +101,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
               }
           }
       `, this.userToken, (error: any) => {
-          alert(error);
-          console.log('error', error)
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('quizId', data.createQuiz.id)
     }
@@ -114,7 +113,7 @@ class PrendusAssignmentQuiz extends Polymer.Element {
           credentials: 'include'
       });
       if(LTIResponse.ok === true){
-        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
+        sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "QUIZ")
       }else{
         //TODO input a notication error message here once the notifications are merged.
       }

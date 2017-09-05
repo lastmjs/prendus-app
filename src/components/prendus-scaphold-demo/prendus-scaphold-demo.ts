@@ -17,7 +17,6 @@ class PrendusScapholdDemo extends Polymer.Element {
     }
 
     stemInputChanged() {
-        console.log('input changed');
 
         const stemInput = this.shadowRoot.querySelector('#stemInput');
 

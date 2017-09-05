@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLQuery, GQLMutate, GQLrequest} from '../../services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
-import {setDisabledNext} from '../../redux/actions'
+import {setDisabledNext, setNotification} from '../../redux/actions'
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GuiQuestion} from '../../typings/gui-question';
@@ -13,14 +13,14 @@ import {QuestionRating} from '../../typings/question-rating';
 import {rubric} from '../../typings/evaluation-rubric';
 import {createUUID, shuffleArray} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusQuestionReview extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction;
     loaded: boolean;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     selectedIndex: number;
     myIndex: number;
     disableNext: boolean;
@@ -150,7 +150,7 @@ class PrendusQuestionReview extends Polymer.Element {
             }
 
         }, (error: any) => {
-            console.log(error);
+            this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
     generateQuestionScaffolds(){
@@ -184,7 +184,7 @@ class PrendusQuestionReview extends Polymer.Element {
     hasQuestions(item: any) {
       return item;
     }
-    async submit(e: any): Promise<void> {
+    async submit(e: any): Promise<void>{
       try {
         const variables = {
           json: JSON.stringify(this.rubricScores),
@@ -203,14 +203,14 @@ class PrendusQuestionReview extends Polymer.Element {
           }`;
         GQLrequest(mutation, variables, this.userToken);
       } catch(error) {
-        console.error(error);
+        this.action = setNotification(error.message, NotificationType.ERROR)
       }
       this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       this._fireLocalAction('questionReviewNumber', ++this.questionReviewNumber);
-      sendStatement(this.user.id, e.target.id, ContextType.QUESTION, "EVALUATED", "QUESTION");
+      sendStatement(this.userToken, this.user.id, e.target.id, ContextType.QUESTION, "EVALUATED", "QUESTION");
 
       if(this.selectedIndex == this.questionScaffoldsToRate.length){
-        sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "REVIEW");
+        sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "SUBMITTED", "REVIEW");
         this._fireLocalAction('selectedIndex', ++this.selectedIndex);
       }
     }

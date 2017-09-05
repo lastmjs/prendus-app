@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+<dom-module id="prendus-notification">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style include="prendus-styles">
+          :host{
+            display: block;
+          }
+          .error{
+            background-color: #F44336;
+            color: black;
+          }
+          .success{
+            background-color: #4CAF50;
+            color: black;
+          }
+          .warning{
+            background-color: #FFEB3B;
+            color: black;
+          }
+          #toast{
+            margin-left: 30px;
+            margin-bottom: 30px;
+          }
+        </style>
+        <!-- Anyone know how to bind to the class attribute instead of the property without using a polymer notation?  -->
+        <paper-toast id="toast" class$="[[notificationType]]" text="[[notificationMessage]]" duration="[[duration]]"></paper-toast>
+    </template>
+
+    <script type="module" src="prendus-notification.ts"></script>
+</dom-module>

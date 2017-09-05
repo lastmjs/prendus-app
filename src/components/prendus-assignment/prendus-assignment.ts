@@ -5,11 +5,11 @@ import {Assignment} from '../../typings/assignment';
 import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {AssignmentType} from '../../typings/assignment-type';
-import {ContextType} from '../../services/constants-service';
+import {ContextType, NotificationType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -18,8 +18,8 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     assignmentId: string;
     loaded: boolean;
     assignment: Assignment;
-    userToken: string | null;
-    user: User | null;
+    userToken: string;
+    user: User;
     learningStructure: any;
     subjects: Subject[];
     concepts: Concept[];
@@ -57,8 +57,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         value
       };
     }
+
     async connectedCallback() {
         super.connectedCallback();
+
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
         this._fireLocalAction('connected', true)
         this._fireLocalAction('loaded', true)
     }
@@ -76,43 +81,73 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     isResultMode(mode: string) {
         return mode === 'result';
     }
+
     async assignmentIdChanged() {
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
+        //TODO place this code in each assignment component
+        await this.getCourseIdOnAssignment();
+        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
+        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
+        //TODO place this code in each assignment component
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
+            // alert('You are not authorized to access this assignment');
+            // navigate('/');
+            return;
+        }
+        if (!userPaidForCourse) {
+            navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
         this._fireLocalAction('assignmentId', this.assignmentId)
         await this.loadData();
     }
+    continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close()
+      navigate('/');
+    }
+    async assignmentTypeChanged() {
+        this.action = checkForUserToken();
+        this.action = await getAndSetUser();
 
-    assignmentTypeChanged() {
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
+
         this._fireLocalAction('assignmentType', this.assignmentType)
     }
 
     isCreateType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'CREATE'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'CREATE'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'CREATE';
     }
 
     isReviewType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'REVIEW'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'REVIEW'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'REVIEW';
     }
     isQuizType(assignmentType: String) {
         this.action = checkForUserToken();
-        if (assignmentType === 'QUIZ'){ sendStatement(this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
+        if (assignmentType === 'QUIZ'){ sendStatement(this.userToken, this.user.id, this.assignmentId, ContextType.ASSIGNMENT, "STARTED", this.assignmentType)}
         return assignmentType === 'QUIZ';
     }
     openAssignmentConceptDialog(e: any){
       this.shadowRoot.querySelector('#assignmentConceptDialog').open();
     }
     removeAssignmentConcept(e){
-      if(this.selectedConcepts.length === 1){
-        alert('The Assignment needs at least 1 Concept')
-      }else{
-        const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
-          return e.model.item.id !== concept.id;
-        })
-        this._fireLocalAction('selectedConcepts', newSelectedConcepts);
-      }
+      const newSelectedConcepts = this.selectedConcepts.filter((concept)=>{
+        return e.model.item.id !== concept.id;
+      })
+      this._fireLocalAction('selectedConcepts', newSelectedConcepts);
     }
     addConceptToAssignmentConcepts(e){
       const conceptInSelectedConcepts = this.selectedConcepts.filter((concept)=>{
@@ -131,7 +166,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
     async createConcept(e){
       if(!this.shadowRoot.querySelector('#custom-concept').value){
-        alert('Must enter a valid title for the new concept before adding it')
+        this.action = setNotification("Must enter a valid title for the new concept before adding it", NotificationType.ERROR)
         return;
       }
       const newConcept = e.target;
@@ -153,7 +188,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+        this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('concepts', data.createConcept.subject.concepts)
       this._fireLocalAction('selectedConcepts', [...(this.selectedConcepts || []), {id: data.createConcept.id, title: data.createConcept.title}]);
@@ -164,7 +199,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       const conceptIds = this.selectedConcepts.map((concept: Concept)=>{
         return `"${concept.id}"`
       })
-      const variableString = `{"conceptsIds": [${conceptIds}]}`
+      const variableString = `{"conceptsIds": [${conceptIds}]}`;
       const data = await GQLMutateWithVariables(`
         mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!]) {
           updateAssignment(
@@ -186,10 +221,26 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, variableString, (error: any) => {
-          console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
+    }
+    async getCourseIdOnAssignment() {
+        const data = await GQLQuery(`
+            query {
+                Assignment(id: "${this.assignmentId}") {
+                    id
+                    course {
+                        id
+                    }
+                }
+            }
+        `, this.userToken, (key: string, value: any) => {},
+          (error: any) => {
+            this.action =  setNotification(error.message, NotificationType.ERROR)
+        });
+        this._fireLocalAction('courseId', data.Assignment.course.id)
     }
     async loadData() {
         const data = await GQLQuery(`
@@ -211,7 +262,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             }
         `, this.userToken, (key: string, value: any) => {},
           (error: any) => {
-            console.log(error);
+            this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this.loadConcepts(data.Assignment.course.subject.id);
         this._fireLocalAction('assignment', data.Assignment)
@@ -231,7 +282,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         `, this.userToken, (key: string, value: any) => {
         }, (error: any) => {
-            console.log(error);
+          this.action =  setNotification(error.message, NotificationType.ERROR)
         });
         this._fireLocalAction('concepts', conceptData.Subject.concepts)
     }
@@ -275,3 +326,57 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
+
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
+async function isUserOnCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                author{
+                  id
+                }
+                enrolledStudents(
+                    filter: {
+                        id: "${userId}"
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+    return !!(data.Course.enrolledStudents[0] || (data.Course.author.id === userId));
+}
+
+async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
+    const data = await GQLQuery(`
+        query {
+            Course(
+                id: "${courseId}"
+            ) {
+                author{
+                  id
+                }
+                purchases(
+                    filter: {
+                        AND: [{
+                                user: {
+                                    id: "${userId}"
+                                }
+                            }, {
+                                isPaid: true
+                            }
+                        ]
+                    }
+                ) {
+                    id
+                }
+            }
+        }
+    `, userToken, () => {}, (error: any) => {});
+
+    return !!(data.Course.purchases[0] || (data.Course.author.id === userId));
+}
+//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components

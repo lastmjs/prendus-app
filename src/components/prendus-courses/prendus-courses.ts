@@ -4,8 +4,9 @@ import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {State} from '../../typings/state';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
     courses: Course[];
@@ -68,7 +69,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 value
             };
         }, (error: any) => {
-            console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
     }
     async openDeleteModal(e: any): void {
@@ -83,7 +84,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
           }
         }
       `, this.userToken, (error: any) => {
-          console.log(error);
+        this.action =  setNotification(error.message, NotificationType.ERROR)
       });
       this.loadData()
 			// this.shadowRoot.querySelector('#confirm-delete-modal').open();
@@ -110,13 +111,13 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.userToken, (error: any) => {
-            console.log(error);
+          this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;
         this.shadowRoot.querySelector('#add-course-modal').close();
         navigate(`/course/${data.createCourse.id}/edit`)
       }else{
-        alert('Add a title to continue')
+        this.action = setNotification("Add a title to continue", NotificationType.ERROR)
       }
 
     }
@@ -137,10 +138,11 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
             this.loadData();
         });
     }
-
+    submitOnEnter(e: any) {
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createCourse();
+    }
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
         this.courses = state[`coursesFromUser${this.user ? this.user.id : null}`];
         this.userToken = state.userToken;
