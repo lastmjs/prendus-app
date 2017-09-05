@@ -92,7 +92,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
         //TODO place this code in each assignment component
         await this.getCourseIdOnAssignment();
-        console.log('this.courseId', this.courseId)
         const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
         const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
         //TODO place this code in each assignment component
@@ -228,7 +227,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
     async getCourseIdOnAssignment() {
-        console.log('this.assignmentId', this.assignmentId)
         const data = await GQLQuery(`
             query {
                 Assignment(id: "${this.assignmentId}") {
@@ -242,7 +240,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           (error: any) => {
             this.action =  setNotification(error.message, NotificationType.ERROR)
         });
-        console.log('this.data', data)
         this._fireLocalAction('courseId', data.Assignment.course.id)
     }
     async loadData() {
