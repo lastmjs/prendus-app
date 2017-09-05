@@ -1,4 +1,6 @@
-// const lti = require('ims-lti');
+process.env[‘PATH’] = process.env[‘PATH’] + ‘:’ + process.env[‘LAMBDA_TASK_ROOT’]
+
+const lti = require('ims-lti');
 // const JWT = require('jsonwebtoken');
 
 exports.handler = (event, context, callback) => {
@@ -9,12 +11,13 @@ exports.handler = (event, context, callback) => {
         const assignmentId = event.pathParameters.assignmentid;
         const assignmentType = event.pathParameters.assignmenttype;
         const key = body.oauth_consumer_key;
-        // const secret = getLTISecret(key);
+        const secret = getLTISecret(key);
 
         console.log('ltiUserId', ltiUserId);
         console.log('assignmentId', assignmentId);
         console.log('assignmentType', assignmentType);
         console.log('key', key);
+        console.log('secret', secret);
 
         return callback(null, {
             statusCode: 200
@@ -27,3 +30,12 @@ exports.handler = (event, context, callback) => {
         });
     }
 };
+
+function getLTISecret(key) {
+    if (key === 'key') {
+        return 'secret';
+    }
+    else {
+        return process.env.PRENDUS_LTI_SECRET;
+    }
+}
