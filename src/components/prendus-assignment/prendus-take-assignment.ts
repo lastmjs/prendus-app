@@ -12,7 +12,7 @@ class PrendusTakeAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  userToken: string | null;
+  userToken: string;
   user: User;
 
   static get is() { return 'prendus-take-assignment' }
@@ -58,9 +58,9 @@ class PrendusTakeAssignment extends Polymer.Element {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0])
-      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'STARTED', 'QUIZ');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ, 'STARTED', 'QUIZ');
     else
-      sendStatement(this.user.id, this.assignment.id, ContextType.QUIZ, 'RESPONDED', 'QUIZ');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ, 'RESPONDED', 'QUIZ');
     if (!data)
       LTIPassback(this.user.id, this.assignment.id, ContextType.QUIZ);
   }

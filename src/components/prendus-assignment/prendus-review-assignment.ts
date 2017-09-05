@@ -15,7 +15,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   componentId: string;
   ratings: CategoryScore[];
   rubric: Rubric;
-  userToken: string | null;
+  userToken: string;
   user: User;
 
   static get is() { return 'prendus-review-assignment' }
@@ -57,9 +57,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0])
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'REVIEW');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'REVIEW');
     else
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'REVIEWED', 'REVIEW');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'REVIEWED', 'REVIEW');
     if (data) {
       this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
       setTimeout(() => {

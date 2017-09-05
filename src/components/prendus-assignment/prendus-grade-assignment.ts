@@ -13,7 +13,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  userToken: string | null;
+  userToken: string;
   user: User;
 
   static get is() { return 'prendus-grade-assignment' }
@@ -69,9 +69,9 @@ class PrendusGradeAssignment extends Polymer.Element {
     const response = e.detail.data;
     this._fireLocalAction('response', response);
     if (response && response === this.responses[0])
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'GRADE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'GRADE');
     else
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'GRADED', 'GRADE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'GRADED', 'GRADE');
     if (response) {
       //force rubric dropdowns to reset
       this._fireLocalAction('rubric', null);
