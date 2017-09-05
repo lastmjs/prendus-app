@@ -93,7 +93,9 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         //TODO place this code in each assignment component
         await this.getCourseIdOnAssignment();
         const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
+        console.log('userOnCourse', userOnCourse)
         const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
+        console.log('userPaidForCourse', userPaidForCourse)
         //TODO place this code in each assignment component
         if (!userOnCourse) {
             this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
@@ -334,6 +336,9 @@ async function isUserOnCourse(userId: string, userToken: string, courseId: strin
             Course(
                 id: "${courseId}"
             ) {
+                author{
+                  id
+                }
                 enrolledStudents(
                     filter: {
                         id: "${userId}"
@@ -344,8 +349,7 @@ async function isUserOnCourse(userId: string, userToken: string, courseId: strin
             }
         }
     `, userToken, () => {}, (error: any) => {});
-
-    return !!data.Course.enrolledStudents[0];
+    return !!(data.Course.enrolledStudents[0] || (data.Course.author.id === userId));
 }
 
 async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
@@ -354,6 +358,9 @@ async function hasUserPaidForCourse(userId: string, userToken: string, courseId:
             Course(
                 id: "${courseId}"
             ) {
+                author{
+                  id
+                }
                 purchases(
                     filter: {
                         AND: [{
@@ -372,6 +379,6 @@ async function hasUserPaidForCourse(userId: string, userToken: string, courseId:
         }
     `, userToken, () => {}, (error: any) => {});
 
-    return !!data.Course.purchases[0];
+    return !!(data.Course.purchases[0] || (data.Course.author.id === userId));
 }
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
