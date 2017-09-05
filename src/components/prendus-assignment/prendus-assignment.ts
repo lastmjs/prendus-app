@@ -65,7 +65,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         this.action = await getAndSetUser();
 
         this._fireLocalAction('connected', true)
-        this._fireLocalAction('loaded', true)
     }
 
     isViewMode(mode: string) {
@@ -83,30 +82,35 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     }
 
     async assignmentIdChanged() {
-        this.action = checkForUserToken();
-        this.action = await getAndSetUser();
+        //TODO huge hack until we subscribe to adding the user on a course
+        this._fireLocalAction('loaded', false);
+        setTimeout(async () => {
+            this.action = checkForUserToken();
+            this.action = await getAndSetUser();
 
-        if (!this.user) {
-            navigate('/authenticate');
-            return;
-        }
-        //TODO place this code in each assignment component
-        await this.getCourseIdOnAssignment();
-        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
-        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
-        //TODO place this code in each assignment component
-        if (!userOnCourse) {
-            this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
-            // alert('You are not authorized to access this assignment');
-            // navigate('/');
-            return;
-        }
-        if (!userPaidForCourse) {
-            navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-        this._fireLocalAction('assignmentId', this.assignmentId)
-        await this.loadData();
+            if (!this.user) {
+                navigate('/authenticate');
+                return;
+            }
+            //TODO place this code in each assignment component
+            await this.getCourseIdOnAssignment();
+            const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
+            const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
+            //TODO place this code in each assignment component
+            if (!userOnCourse) {
+                this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
+                // alert('You are not authorized to access this assignment');
+                // navigate('/');
+                return;
+            }
+            if (!userPaidForCourse) {
+                navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+                return;
+            }
+            this._fireLocalAction('assignmentId', this.assignmentId)
+            await this.loadData();
+            this._fireLocalAction('loaded', true);
+        }, 5000);
     }
     continueToHome(){
       this.shadowRoot.querySelector("#unauthorizedAccessModal").close()
