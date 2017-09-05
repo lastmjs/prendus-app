@@ -2,19 +2,41 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <dom-module id="prendus-course-payment">
     <template>
+        <style include="prendus-styles">
+          paper-card {
+            width: 100%;
+            max-width: 680px;
+          }
+          #content{
+            margin: 15px;
+          }
+          #stripeTerms{
+            font-size: 12px;
+          }
+          #payment-button{
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+        </style>
         <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
 
         <dom-if if="[[loaded]]">
             <template>
-                <p>You are about to pay for the course entitled: [[course.title]]</p>
-                <p>The course will cost: $[[getDollarAmount(course.price)]]</p>
-                <p>You agree to the <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#payment-terms">Payment Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#refund-terms">Refund Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#stripe">Stripe privacy conditions</a>, and <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#cookies">Cookie conditions</a></p>
-                <button on-click="openModal">Start Payment</button>
+              <paper-card id="payment-container">
 
-                <p>The Stripe name and logos are trademarks or service marks of Stripe, Inc. or its affiliates in the U.S. and other countries.</p>
+                <div id="content">
+                  <h1>Pay for [[course.title]]</h1>
+                  <h3>You are about to pay for Prendus access to your [[course.title]] course. This course costs $[[getDollarAmount(course.price)]]</h3>
+                  <p>By joining this course you agree to the <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#payment-terms">Payment Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/terms-of-use.md#refund-terms">Refund Terms</a>, <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#stripe">Stripe privacy conditions</a>, and <a href="https://github.com/Prendus/content/blob/stripe/privacy-policy.md#cookies">Cookie conditions</a></p>
+                  <button id="payment-button" on-click="openModal" class="prendus-button prendus-button--recommended">Start Payment</button>
+                  <p id="stripeTerms">The Stripe name and logos are trademarks or service marks of Stripe, Inc. or its affiliates in the U.S. and other countries.</p>
+                </div>
+              </paper>
             </template>
         </dom-if>
 
