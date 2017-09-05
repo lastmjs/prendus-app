@@ -90,27 +90,28 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
             navigate('/authenticate');
             return;
         }
-
+        //TODO place this code in each assignment component
+        await this.getCourseIdOnAssignment();
+        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.courseId);
+        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.courseId);
+        //TODO place this code in each assignment component
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
+            // alert('You are not authorized to access this assignment');
+            // navigate('/');
+            return;
+        }
+        if (!userPaidForCourse) {
+            navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
         this._fireLocalAction('assignmentId', this.assignmentId)
         await this.loadData();
-
-        //TODO place this code in each assignment component
-        const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignment.course.id);
-        const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignment.course.id);
-
-        if (!userOnCourse) {
-            alert('You are not authorized to access this assignment');
-            navigate('/');
-            return;
-        }
-
-        if (!userPaidForCourse) {
-            navigate(`/course/${this.assignment.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-        //TODO place this code in each assignment component
     }
-
+    continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close()
+      navigate('/');
+    }
     async assignmentTypeChanged() {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
@@ -225,6 +226,22 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('assignment', data.updateAssignment)
       this.shadowRoot.querySelector('#assignmentConceptDialog').close();
     }
+    async getCourseIdOnAssignment() {
+        const data = await GQLQuery(`
+            query {
+                Assignment(id: "${this.assignmentId}") {
+                    id
+                    course {
+                        id
+                    }
+                }
+            }
+        `, this.userToken, (key: string, value: any) => {},
+          (error: any) => {
+            this.action =  setNotification(error.message, NotificationType.ERROR)
+        });
+        this._fireLocalAction('courseId', data.Assignment.course.id)
+    }
     async loadData() {
         const data = await GQLQuery(`
             query {
@@ -317,6 +334,9 @@ async function isUserOnCourse(userId: string, userToken: string, courseId: strin
             Course(
                 id: "${courseId}"
             ) {
+                author{
+                  id
+                }
                 enrolledStudents(
                     filter: {
                         id: "${userId}"
@@ -327,8 +347,7 @@ async function isUserOnCourse(userId: string, userToken: string, courseId: strin
             }
         }
     `, userToken, () => {}, (error: any) => {});
-
-    return !!data.Course.enrolledStudents[0];
+    return !!(data.Course.enrolledStudents[0] || (data.Course.author.id === userId));
 }
 
 async function hasUserPaidForCourse(userId: string, userToken: string, courseId: string) {
@@ -337,6 +356,9 @@ async function hasUserPaidForCourse(userId: string, userToken: string, courseId:
             Course(
                 id: "${courseId}"
             ) {
+                author{
+                  id
+                }
                 purchases(
                     filter: {
                         AND: [{
@@ -355,6 +377,6 @@ async function hasUserPaidForCourse(userId: string, userToken: string, courseId:
         }
     `, userToken, () => {}, (error: any) => {});
 
-    return !!data.Course.purchases[0];
+    return !!(data.Course.purchases[0] || (data.Course.author.id === userId));
 }
 //TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
