@@ -76,6 +76,8 @@ class PrendusApp extends Polymer.Element {
         if (editQuestionRouteActive) return 'editQuestionView';
         if (editDemoQuestionRouteActive) return 'editDemoQuestionView';
         if (examplesQuestionRouteActive) return 'examplesQuestionView';
+
+        return '404View';
     }
 
     logout() {
