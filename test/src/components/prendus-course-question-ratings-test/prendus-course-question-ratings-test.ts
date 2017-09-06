@@ -5,6 +5,9 @@ import {DEFAULT_EVALUATION_RUBRIC} from '../../../../src/services/constants-serv
 import {CourseArb} from '../../services/arbitraries-service';
 import {saveArbitrary, authenticateTestUser, deleteTestUsers} from '../../services/dataGen-service';
 
+const jsc = require('jsverify');
+const courseArb = jsc.nonshrink(CourseArb);
+
 class PrendusCourseQuestionRatingsTest extends Polymer.Element {
 
   static get is() { return 'prendus-course-question-ratings-test' }
@@ -27,10 +30,9 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Set course id without residual state', [CourseArb], async (course: Course) => {
+    test('Set course id without residual state', [courseArb], async (course: Course) => {
       const student = await authenticateTestUser('STUDENT');
       const instructor = await authenticateTestUser('INSTRUCTOR');
-      const ids = await saveArbitrary(course);
       await deleteTestUsers(student, instructor);
       return true;
       //      const courseData = await saveCourse(course);
