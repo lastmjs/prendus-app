@@ -17,6 +17,21 @@ export const NotificationType = {
   SUCCESS: "success",
   WARNING: "warning"
 };
+export const VerbType = {
+  STARTED: "STARTED",
+  REVIEWED: "REVIEWED",
+  RESPONDED: "RESPONDED",
+  GRADED: "GRADED",
+  CREATED: "CREATED",
+
+};
+export const ObjectType = {
+  CREATE: "CREATE",
+  REVIEW: "REVIEW",
+  RESPOND: "RESPOND",
+  GRADE: "GRADE",
+  QUIZ: "QUIZ"
+};
 export const DEFAULT_EVALUATION_RUBRIC = {
   Language: {
     Professional: {

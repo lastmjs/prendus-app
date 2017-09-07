@@ -2,7 +2,7 @@ import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actio
 import {User} from '../../typings/user';
 import {createUUID, shuffleArray, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {QuestionType, NotificationType, ContextType} from '../../services/constants-service';
+import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {sendStatement} from '../../services/analytics-service';
 import {LTIPassback} from '../../services/lti-service';
@@ -69,9 +69,9 @@ class PrendusGradeAssignment extends Polymer.Element {
     const response = e.detail.data;
     this._fireLocalAction('response', response);
     if (response && response === this.responses[0])
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'GRADE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.GRADE);
     else
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'GRADED', 'GRADE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.GRADED, ObjectType.GRADE);
     if (response) {
       //force rubric dropdowns to reset
       this._fireLocalAction('rubric', null);
