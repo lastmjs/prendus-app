@@ -1,17 +1,17 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
 import {NotificationType, QuestionType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
-import {setNotification, getAndSetUser} from '../../redux/actions';
+import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
+  action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
   ratings: CategoryScore[];
   rubric: Rubric;
@@ -36,12 +36,16 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('loaded', true);
   }
 
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
+
+  continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close();
+      navigate('/');
+    }
 
   _handleNextRequest(e: CustomEvent) {
     try {
@@ -114,37 +118,64 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-    this.action = await getAndSetUser();
-    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
-      Assignment(id: $assignmentId) {
-        id
-        title
-        questionType
-        numReviewQuestions
-        questions(filter: {
-          author: {
-            id_not: $userId
-          }
-        }) {
-          id
-          text
-          code
-          explanation
-          concept {
-            title
-          }
-          resource
-          answerComments {
-            text
-          }
+      this._fireLocalAction('loaded', false);
+
+      //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
+      setTimeout(async () => {
+          this.action = checkForUserToken();
+        this.action = await getAndSetUser();
+
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
         }
-      }
-    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-    if (!data) {
-      return;
-    }
-    this._fireLocalAction('assignment', data.Assignment);
-    this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
+
+        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+            return;
+        }
+
+        if (!userPaidForCourse) {
+            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
+
+
+        const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+          Assignment(id: $assignmentId) {
+            id
+            title
+            questionType
+            numReviewQuestions
+            questions(filter: {
+              author: {
+                id_not: $userId
+              }
+            }) {
+              id
+              text
+              code
+              explanation
+              concept {
+                title
+              }
+              resource
+              answerComments {
+                text
+              }
+            }
+          }
+        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+        if (!data) {
+          return;
+        }
+        this._fireLocalAction('assignment', data.Assignment);
+        this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
+        this._fireLocalAction('loaded', true);
+      }, 5000);
   }
 
   isEssayType(questionType: string): boolean {
