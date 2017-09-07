@@ -52,6 +52,9 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         value
       };
     }
+    _handleGQLError(err: any) {
+      this.action = setNotification(err.message, NotificationType.ERROR);
+    }
     async connectedCallback() {
         super.connectedCallback();
         this._fireLocalAction('loaded', true)

@@ -71,7 +71,7 @@
               </div>
               <div class="prendus-card">
                 <!-- This here so that when the controller is looking through all values, distractor0 will always have a value.-->
-                <paper-item id="distractor0" value="[[answer]]">
+                <paper-item id="distractor0" value="[[answer.text]]">
                   <div>[[answer.text]]</div>
                   <span><prendus-image-preview file="[[answer.picture]]"></prendus-image-preview></span>
                 </paper-item>
@@ -83,9 +83,9 @@
               </div>
               <template is="dom-repeat" items="[[distractors]]">
                 <div class="prendus-card distractor-card">
-                  <paper-textarea class="has-suffix" id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" value="[[item]]" on-value-changed="_distractorsChanged"></paper-textarea>
+                  <paper-textarea class="has-suffix" id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" value="[[item.text]]" on-value-changed="_distractorsChanged"></paper-textarea>
                   <paper-icon-button icon="camera-enhance" on-click="_triggerPicture"></paper-icon-button>
-                  <span id="distractor-picture-preview"><prendus-image-preview file="[[_picture(pictures, index)]]"></prendus-image-preview></span>
+                  <span id="distractor-picture-preview"><prendus-image-preview file="[[item.picture]]"></prendus-image-preview></span>
                   <input hidden id="distractor-picture[[index]]" type="file" accept="image/*" on-change="_handlePicture">
                 </div>
               </template>

@@ -168,15 +168,15 @@
                   </ol>
                 </div>
                   <div>
-                    <paper-textarea id="question" class="has-suffix" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
+                    <paper-textarea id="question" class="has-suffix" on-value-changed="_handleQuestion" value="[[questionStem.text]]" label="Question"></paper-textarea>
                     <paper-icon-button icon="camera-enhance" on-click="_triggerQuestionPicture"></paper-icon-button>
-                    <span id="question-picture-preview"><prendus-image-preview file="[[questionPicture]]"></prendus-image-preview></span>
+                    <span id="question-picture-preview"><prendus-image-preview file="[[questionStem.picture]]"></prendus-image-preview></span>
                     <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
                   </div>
                   <div>
-                    <paper-textarea id="answer" class="has-suffix" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
+                    <paper-textarea id="answer" class="has-suffix" on-value-changed="_handleAnswer" value="[[answer.text]]" label="Correct Answer"></paper-textarea>
                     <paper-icon-button icon="camera-enhance" on-click="_triggerAnswerPicture"></paper-icon-button>
-                    <span id="answer-picture-preview"><prendus-image-preview file="[[answerPicture]]"></prendus-image-preview></span>
+                    <span id="answer-picture-preview"><prendus-image-preview file="[[answer.picture]]"></prendus-image-preview></span>
                     <input hidden id="answer-picture" type="file" accept="image/*" on-change="_handleAnswerPicture">
                   </div>
                   <div>
@@ -189,19 +189,19 @@
                   thinking about common misconceptions students may have
                   about the content area of your question.
                 </div>
-                <prendus-scaffold-distractors question="[[_textAndPicture(questionText, questionPicture)]]" answer="[[_textAndPicture(answer, answerPicture)]]" init="[[distractors]]" on-distractors-changed="_handleDistractors" on-distractor-pictures-changed="_handleDistractorPictures"></prendus-scaffold-distractors>
+                <prendus-scaffold-distractors question="[[questionStem]]" answer="[[answer]]" init="[[distractors]]" on-distractors-changed="_handleDistractors"></prendus-scaffold-distractors>
               </div>
               <div>
                 <div class="prendus-card big">
                   Add comments to the question and answers that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
-                <prendus-scaffold-comments question="[[_textAndPicture(questionText, questionPicture)]]" answers="[[_scaffoldAnswersWithPictures(answer, distractors, hints, answerPicture, distractorPictures)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
+                <prendus-scaffold-comments question="[[questionStem]]" answers="[[_scaffoldAnswersWithPictures(answer, distractors, hints)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
               </div>
               <div>
                 <div class="prendus-card centered">
                   <h3>Final Question</h3>
                 </div>
-                <prendus-scaffold-example question-scaffold="[[_scaffold(concept, resource, questionText, solution, answer, distractors, hints, questionPicture, answerPicture, distractorPictures)]]"></prendus-scaffold-example>
+                <prendus-scaffold-example question-scaffold="[[_scaffold(concept, resource, questionStem, solution, answer, distractors, hints)]]"></prendus-scaffold-example>
               </div>
             </iron-pages>
           </div>
