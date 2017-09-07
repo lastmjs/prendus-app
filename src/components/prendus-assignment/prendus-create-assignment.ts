@@ -124,16 +124,13 @@ class PrendusCreateAssignment extends Polymer.Element {
             if (!data) {
               return;
             }
+            
+            // Create array of "questions" just to create carousel events to create multiple questions
+            // avoid 0 because question is evaluated as a boolean
+            const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
+            this._fireLocalAction('assignment', data.Assignment);
+            this._fireLocalAction('questions', questions);
             this._fireLocalAction('loaded', true);
-
-            //we need to allow the dom-if to stamp its contents before setting the assignment and questions properties
-            setTimeout(() => {
-                // Create array of "questions" just to create carousel events to create multiple questions
-                // avoid 0 because question is evaluated as a boolean
-                const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
-                this._fireLocalAction('assignment', data.Assignment);
-                this._fireLocalAction('questions', questions);
-            });
         }, 5000);
   }
 
