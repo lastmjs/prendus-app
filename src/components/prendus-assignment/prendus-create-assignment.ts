@@ -1,8 +1,8 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
+import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType, VerbType, ObjectType} from '../../services/constants-service';
-import {setNotification, getAndSetUser} from '../../redux/actions';
+import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
@@ -12,7 +12,7 @@ import {GQLVariables} from '../../typings/gql-variables';
 
 class PrendusCreateAssignment extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
+  action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
   assignment: Assignment;
   questions: Question[];
@@ -38,7 +38,6 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('loaded', true);
   }
 
   _fireLocalAction(key: string, value: any) {
@@ -81,33 +80,67 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string) {
-    this.action = await getAndSetUser();
-    const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
-      Assignment(id: $assignmentId) {
-        id
-        title
-        numCreateQuestions
-        questionType
-        concepts {
-          id
-          title
-        }
-        course {
-          subject {
-            id
-          }
-        }
-      }
-    }`, {assignmentId}, this.userToken, this._handleGQLError.bind(this));
-    if (!data) {
-      return;
-    }
-    // Create array of "questions" just to create carousel events to create multiple questions
-    // avoid 0 because question is evaluated as a boolean
-    const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
-    this._fireLocalAction('assignment', data.Assignment);
-    this._fireLocalAction('questions', questions);
+        this._fireLocalAction('loaded', false);
+        //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
+        setTimeout(async () => {
+            this.action = checkForUserToken();
+            this.action = await getAndSetUser();
+
+            if (!this.user) {
+                navigate('/authenticate');
+                return;
+            }
+
+            const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+            const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+
+            if (!userOnCourse) {
+                this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+                return;
+            }
+
+            if (!userPaidForCourse) {
+                navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+                return;
+            }
+
+            const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
+              Assignment(id: $assignmentId) {
+                id
+                title
+                numCreateQuestions
+                questionType
+                concepts {
+                  id
+                  title
+                }
+                course {
+                  subject {
+                    id
+                  }
+                }
+              }
+            }`, {assignmentId}, this.userToken, this._handleGQLError.bind(this));
+            if (!data) {
+              return;
+            }
+            this._fireLocalAction('loaded', true);
+
+            //we need to allow the dom-if to stamp its contents before setting the assignment and questions properties
+            setTimeout(() => {
+                // Create array of "questions" just to create carousel events to create multiple questions
+                // avoid 0 because question is evaluated as a boolean
+                const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
+                this._fireLocalAction('assignment', data.Assignment);
+                this._fireLocalAction('questions', questions);
+            });
+        }, 5000);
   }
+
+  continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close();
+      navigate('/');
+    }
 
   async saveQuestion(variables: GQLVariables): Promise<string|null> {
     const data = await GQLRequest(`mutation newQuestion($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!, $answerComments: [QuestionanswerCommentsAnswerComment!]!) {
