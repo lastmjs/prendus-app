@@ -29,6 +29,11 @@ class PrendusApp extends Polymer.Element {
 
     getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
         this.action = checkForUserToken();
+        console.log('this.queryParams', this.queryParams)
+        console.log('this.route', this.route.path)
+        console.log('isActive', viewAssignmentRouteActive)
+        window.ga('set', 'page', `/${this.route.path}`);
+        window.ga('send', 'pageview');
         if (rootRouteActive){
           if(this.userToken){
             return 'coursesView';
@@ -37,7 +42,10 @@ class PrendusApp extends Polymer.Element {
           }
         }
 
-        if (signupRouteActive) return 'signupView';
+        if (signupRouteActive){
+
+          return 'signupView';
+        }
         if (loginRouteActive) return 'loginView';
         if (authenticateRouteActive) return 'authenticateView';
         if (openSourceRouteActive) return 'openSourceView';
