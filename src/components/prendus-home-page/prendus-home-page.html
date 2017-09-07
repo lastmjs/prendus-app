@@ -1,0 +1,368 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="stylesheet" href="./stylesheet.css">
+
+
+<dom-module id="prendus-home-page">
+    <template>
+      <style include ="prendus-styles">
+
+
+
+    .landing-page
+    {
+      height: 100%;
+      margin:0;
+      padding:0;
+      color: white;
+      font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
+    }
+
+      .button
+      {
+      font-family: 'Roboto', sans-serif;
+      font-size: 32px;
+      background-color: #003BB1;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      display: inline-block;
+      font-size: 24px;
+      border:none;
+      box-shadow: 0 1px 3 <meta name="viewport" content="width=device-width">px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      border-radius: 3px;
+      }
+      .button:hover
+      {
+        /**background-color: #4ABACA; **/
+          box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+      }
+
+      .home-hero
+      {
+        position: relative;
+        background: linear-gradient(rgba(100,100,100,0.2),rgba(100,100,150,0.2)) ,url(../../images/hero-typing-guy.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 85vh;
+        text-align: center;
+        margin:0;
+      }
+
+      .home-hero img
+      {
+        margin-top: 40vh;
+        max-width: 90vw;
+      }
+
+      .call-to-action
+      {
+        display: flex;
+        align-items: center;
+        background:#00246C;
+        height:15vh;
+        box-shadow: 10px 15px 12px rgba(0,0,0,0.22);
+
+      }
+
+      .call-to-action-phrase { flex:6;  }
+      .call-to-action-phrase h2
+      {
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        font-size: 48px;
+        font-weight: 100;
+        min-width: 60vw;
+      }
+
+      .call-to-action-button { flex:3; }
+
+
+      .product-showcase
+      {
+        padding-top: 5vh;
+        display:flex;
+        flex-direction: column;
+        background: white;
+        align-items: center;
+        flex-wrap: wrap;
+        color: #00246C;
+      }
+      .product-showcase h2
+      {
+        font-size: 48px;
+        font-weight: 300;
+      }
+      .product-showcase h3
+      {
+
+        font-size: 21px;
+        font-weight: 300;
+      }
+
+      .main-description  { padding: 10vh 10vw; }
+      .main-description-wording
+      {
+      display: flex;
+      text-align: center;
+      padding-bottom: 50px;
+      justify-content: center;
+      flex-direction: column;
+      width:60vw;
+
+      }
+      .main-description-wording h3
+      {
+          color:  #00246C;
+      }
+
+
+      .sub-description
+      {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding-top: 50px;
+        text-align: center;
+        min-height: 50vh;
+        padding: 0 5%;
+      }
+      .sub-description h3
+      {
+        color: #00246C;
+        text-align: justify;
+      }
+
+      .sub-description-wording
+      {
+        justify-content: center;
+        text-align: center;
+        flex-basis: 50%;
+        padding:90px;
+      }
+
+      .sub-description-one-img { background: url(../../images/meeting.jpg); }
+      .sub-description-two-img  { background: url(../../images/teacher.jpg); }
+      .sub-description-three-img { background: url(../../images/hands-typing.jpg);}
+      .sub-description-img
+      {
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        width:100%;
+        min-height: 400px;
+        flex-basis: 50%;
+      }
+
+
+      .review-title-bar
+      {
+        align-items: center;
+        height: 15vh;
+        font-size: 32px;
+        font-weight: 200;
+        justify-content: center;
+        text-align: center;
+        display: flex;
+        background:#00246C;
+      }
+      .review-title-bar h2
+      {
+          font-weight: 200;
+          padding:0px 0;
+      }
+
+      .review-bar
+      {
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)) ,url(../../images/person-typing.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 40vh;
+        text-align: center;
+        margin:0;
+        padding: 0;
+      }
+      .review-bar-wording
+      {
+          max-width: 60vw;
+          margin: 0 auto;
+      }
+      .review-bar h2
+      {
+        font-size: 48px;
+        font-weight: 300;
+      }
+      .review-bar h3
+      {
+        color:white;
+        font-size: 24px;
+        font-weight: 300;
+      }
+      .review-bar h4
+      {
+        font-size: 24px;
+        font-weight: 300;
+      }
+      .reverse
+      {
+        flex-direction: row-reverse;
+      }
+
+      @media(max-width:768px) {
+
+      .call-to-action
+      {
+        flex-direction: column;
+          box-shadow: 0px 0px 0px rgba(0,0,0,0.22);
+          margin: 0;
+          height:30vh;
+          text-align: center;
+
+      }
+        .call-to-action-phrase
+        {
+          padding:5vh 0;
+          width: 90vw;
+        }
+
+        .call-to-action-button
+        {
+          /*padding-top: 400px;
+          padding-bottom: 200px;*/
+          text-align: center;
+          min-width: 100vw;
+          padding-bottom: 50px;
+        }
+        .product-showcase { padding-top:0;}
+        .product-showcase h2
+        {
+          font-size: 28px;
+          font-weight: 400;
+          text-align: left;
+        }
+        .main-description
+        {
+          background-color:#003BB1;
+          color:white;
+          display: inline;
+          padding: 0 0;
+        }
+        .main-description h3 { color: white; }
+        .main-description-wording
+        {
+          width:80vw;
+          padding: 10vw 10vh;
+          text-align: justify;
+
+
+        }
+        .sub-description
+        {
+          display: inline;
+          padding: 0 0;
+        }
+        .sub-description-wording
+        {
+              padding: 10vw 10vw;
+              text-align: justify;
+        }
+        .sub-description-one-img .sub-description-two-img .sub-description-three-img
+        {
+          min-height: 200px;
+
+        }
+        /*.review-title-bar { height: 15vh;}*/
+        .review-title-bar h2 {font-size: 32px; padding: 10vw 10vw;}
+        .review-bar-wording
+        {
+          padding-top: 60px;
+          max-width: 80vw;
+          height: 100vh;
+        }
+        .review-bar-wording h3
+        {
+          text-align: justify;
+        }
+        .review-bar
+        {
+            height: 80vh;
+        }
+      }
+
+
+      </style>
+      <div class="landing-page">
+        <div class="home-hero">
+           <img src="images/navbar-logo.png" alt="hero-image-man-typing">
+        </div>
+        <div class="call-to-action">
+          <div class="call-to-action-phrase">
+            <h2>New to Prendus?</h2>
+          </div>
+          <div class="call-to-action-button">
+              <a href="/signup"><button class="button" type="button" name="button">Get Started</button></a>
+          </div>
+        </div>
+        <div class="product-showcase">
+          <div class="main-description">
+            <div class="main-description-wording ">
+              <h2>Its time to revolutionize the way we learn.</h2>
+                <h3>We believe in unleashing the power of questions. Prendus provides the opprotunity and technology for learners to ask questions, then find solutions
+                  to the questions asked by others. </h3>
+            </div>
+          </div>
+            <div class="sub-description">
+              <div class="sub-description-wording ">
+                <h2>Challenge students</h2>
+                <h3>We push students to apply what they learn by writing practice questions, bringing out their highest levels of thinking: creativity. They then answer and evaluate their classmates' questions. </h3>
+              </div>
+              <div class="sub-description-one-img sub-description-img"></div>
+            </div>
+        <div class="sub-description reverse">
+
+          <div class="sub-description-wording ">
+            <h2>Partner with teachers</h2>
+            <h3>We provide teachers real-time access to student questions and statistics; they can see the concepts their students succeed and struggle with, then save time writing future assessments when they encounter compelling student questions.</h3>
+          </div>
+            <div class="sub-description-two-img sub-description-img"></div>
+        </div>
+        <div class="sub-description">
+          <div class="sub-description-wording ">
+            <h2>Build a community</h2>
+            <h3>We enhance the class community by helping students teach each other. After the term, some questions enter a pool for future teachers and learners. Students always have access to questions they create, and instructors keep access to those created within their class. This way, students contribute to both their class community and the global community of learners.</h3>
+          </div>
+          <div class="sub-description-three-img sub-description-img"></div>
+        </div>
+      </div>
+
+        <div class="review-title-bar">
+        <h2>What our students are saying</h2>
+        </div>
+
+        <div class="review-bar">
+          <div class="review-bar-wording">
+            <h3>I loved using Prendus this semester. The application was incredibly user friendly and it really helped me in class. I cant wait for more teachers to start using it!</h3>
+            <h2>Ben F.</h2>
+            <h4>Mech. Engineering '19</h4>
+          </div>
+        </div>
+
+        <!-- <div class="social-bar">
+          //logos go here
+        </div> -->
+      </div>
+
+
+    </template>
+
+    <script type="module" src="prendus-home-page.ts"></script>
+</dom-module>

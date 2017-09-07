@@ -1,0 +1,314 @@
+/*Primary navy: 00246C
+Secondary blue (headers): 003BB1
+Accent (teal): 4ABACA
+Textbox gray: Lightest possible; perhaps F2F2F2
+Text: 000000
+Text on primary: FFFFFF*/
+
+@import url('https://fonts.googleapis.com/css?family=Lato:100,300,400,700|Roboto:100,300,400,500');
+
+body
+{
+  height: 100%;
+  margin:0;
+  padding:0;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
+}
+
+.button
+{
+font-family: 'Roboto', sans-serif;
+font-size: 32px;
+background-color: #003BB1;
+color: white;
+padding: 15px 32px;
+text-align: center;
+display: inline-block;
+font-size: 24px;
+border:none;
+box-shadow: 0 1px 3 <meta name="viewport" content="width=device-width">px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.button:hover
+{
+  /**background-color: #4ABACA; **/
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.hero
+{
+  position: relative;
+  background: linear-gradient(rgba(100,100,100,0.2),rgba(100,100,150,0.2)) ,url(./images/hero-typing-guy.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100vh;
+  text-align: center;
+  margin:0;
+}
+
+.hero img
+{
+  margin-top: 40vh;
+  max-width: 90vw;
+}
+
+.call-to-action
+{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin:0;
+  margin-bottom: 40px;
+  padding:0;
+  background:#00246C;
+  box-shadow: 0px 15px 12px rgba(0,0,0,0.22);
+}
+.call-to-action-phrase
+{
+    flex:6;
+}
+.call-to-action-phrase h2
+{
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 48px;
+  font-weight: 100;
+  min-width: 60vw;
+
+}
+
+
+.call-to-action-button
+{
+flex:3;
+margin: 20px; auto;
+
+}
+
+.product-showcase
+{
+  display:flex;
+  flex-direction: column;
+  background: white;
+  /*height: 100vh;*/
+  align-items: center;
+  flex-wrap: wrap;
+    color: #00246C;
+}
+.product-showcase h2
+{
+  font-size: 48px;
+  font-weight: 300;
+}
+
+.main-description-wording
+{
+display: flex;
+text-align: center;
+padding-bottom: 50px;
+justify-content: center;
+flex-direction: column;
+}
+
+
+.main-description-subwording
+{
+max-width: 60vw;
+  margin: 0 auto;
+}
+
+.product-showcase h3
+{
+  font-size: 21px;
+  font-weight: 200;
+}
+
+.sub-description
+{
+    display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-top: 50px;
+  text-align: center;
+  min-height: 50vh;
+  width: 100vw;
+}
+
+.sub-description-wording
+{
+  justify-content: center;
+  text-align: center;
+  flex-basis: 45%;
+  padding:90px;
+}
+
+.sub-description-one-img
+{
+  justify-content: center;
+  background: url(./images/question-creation-shadow.png);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 400px;
+  flex-basis: 45%;
+}
+
+.review-title-bar
+{
+  font-size: 32px;
+  font-weight: 200;
+  justify-content: center;
+  text-align: center;
+  display: flex;
+  /*height: 12vh;*/
+  background:#00246C;
+ /*box-shadow: 0px 15px 12px rgba(0,0,0,0.22);*/
+  padding:0;
+  margin:0;
+}
+.review-title-bar h2
+{
+    font-weight: 200;
+    padding:0px 0;
+}
+
+.review-bar
+{
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)) ,url(./images/person-typing.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 40vh;
+  text-align: center;
+  margin:0;
+  padding: 0;
+}
+.review-bar-wording
+{
+    max-width: 60vw;
+    margin: 0 auto;
+}
+.review-bar h2
+{
+  font-size: 48px;
+  font-weight: 300;
+}
+.review-bar h3
+{
+  font-size: 24px;
+  font-weight: 200;
+}
+.review-bar h4
+{
+  font-size: 24px;
+  font-weight: 200;
+}
+
+.footer
+{
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  height: 5vh;
+  background:#222;
+  padding-top: 15px;
+}
+
+.footer a{
+  color: white;
+  text-decoration: none;
+}
+.footer a:hover
+{
+  color:grey;
+}
+
+.footer a:active
+{
+  color:grey;
+  text-decoration: underline;
+}
+
+.reverse
+{
+  flex-direction: row-reverse;
+}
+
+@media(max-width:768px) {
+
+.call-to-action
+{
+    box-shadow: 0px 0px 0px rgba(0,0,0,0.22);
+    margin: 0;
+}
+
+  .call-to-action-phrase h2{ min-width: 80vw; padding: 0 10vw;}
+
+  .call-to-action-button
+  {
+    text-align: center;
+    min-width; 80vw;
+    padding-bottom: 10vh;
+  }
+  .product-showcase h2
+  {
+    font-size: 28px;
+    text-align: justify;
+    padding: 0 10vw;
+  }
+
+  .main-description-wording h3
+  {
+  text-align: justify;
+    padding: 0 10vw;
+  }
+  .main-description-subwording
+  {
+     max-width: 100vw;
+     text-align: justify;
+  }
+  .main-description
+  {
+    background-color:#003BB1;
+    color:white;
+  }
+
+  .sub-description
+  {
+    display: inline;
+  }
+  .sub-description-wording
+  {
+        padding: 0 10vw;
+        text-align: justify;
+  }
+  .sub-description-one-img
+  {
+     min-height: 200px;
+    background-color: #003BB1;
+  }
+  /*.review-title-bar { height: 15vh;}*/
+  .review-title-bar h2 {font-size: 32px; padding: 0 10vw;}
+  .review-bar-wording
+  {
+    padding-top: 60px;
+    max-width: 80vw;
+      height: 100vh;
+  }
+  .review-bar
+  {
+      height: 80vh;
+  }
+  .footer { height: 10vh;}
+
+
+
+
+}
