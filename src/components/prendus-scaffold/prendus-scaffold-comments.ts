@@ -16,7 +16,7 @@ class PrendusScaffoldComments extends Polymer.Element {
   static get is() { return 'prendus-scaffold-comments'; }
   static get properties() {
     return {
-      question: String,
+      question: Object,
       answers: Array
     };
   }
