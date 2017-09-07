@@ -82,7 +82,7 @@
             <template>
                   <!-- <h1>Edit Assignment</h1> -->
                   <a href="course/[[courseId]]/edit" class="prendus-button">Return to Course</a>
-                  <paper-input id="assignment-title" class="edit-input" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title."></paper-input>
+                  <paper-input id="assignment-title" class="edit-input" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title." on-focusout="saveData"></paper-input>
                   <br>
                   <div class="grid">
                     <div class="grid-cell">

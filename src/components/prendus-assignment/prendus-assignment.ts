@@ -50,7 +50,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   }
 
   _handleGQLError(err: any) {
-    console.log('there is an error', err)
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
@@ -186,13 +185,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           conceptsIds: $conceptsIds
         ) {
           id
-          title,
-          course {
-              id
-              subject{
-                id
-              }
-          }
           concepts{
             id
             title
@@ -200,7 +192,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {conceptsIds, id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
-    this._fireLocalAction('assignment', data.updateAssignment)
+    this._fireLocalAction('assignment', {
+      ...this.assignment,
+      concepts: data.updateAssignment.concepts
+    })
     this.shadowRoot.querySelector('#assignmentConceptDialog').close();
   }
 
@@ -253,9 +248,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     const questionType = this.shadowRoot.querySelector('#questionTypes').querySelector('paper-listbox').selected;
     const numCreateQuestions = Number(this.shadowRoot.querySelector('#create').value);
     const numReviewQuestions = Number(this.shadowRoot.querySelector('#review').value);
-    console.log('this.assignment', this.assignment)
-    console.log('dom', this.shadowRoot.querySelector('#grade').value)
-    console.log('grade responses', this.assignment.numGradeResponses)
     const numGradeResponses = this.assignment.questionType === 'ESSAY'
       ? Number(this.shadowRoot.querySelector('#grade').value)
       : this.assignment.numGradeResponses;
