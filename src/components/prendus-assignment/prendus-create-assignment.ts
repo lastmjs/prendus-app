@@ -1,7 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
-import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
+import {ContextType, NotificationType, QuestionType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {User} from '../../typings/user';
@@ -17,7 +17,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   assignment: Assignment;
   questions: Question[];
   question: Question;
-  userToken: string | null;
+  userToken: string;
   user: User;
 
   static get is() { return 'prendus-create-assignment' }
@@ -58,9 +58,9 @@ class PrendusCreateAssignment extends Polymer.Element {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0]) //first round started
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'CREATE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.CREATE);
     else //subsequent rounds mean a question was created
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'CREATED', 'CREATE');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.CREATED, ObjectType.CREATE);
     if (!data) //last round
       LTIPassback(this.user.id, this.assignment.id, 'CREATE');
   }

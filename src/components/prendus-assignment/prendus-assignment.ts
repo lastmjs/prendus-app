@@ -185,13 +185,6 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           conceptsIds: $conceptsIds
         ) {
           id
-          title,
-          course {
-              id
-              subject{
-                id
-              }
-          }
           concepts{
             id
             title
@@ -199,7 +192,10 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         }
       }
     `, {conceptsIds, id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
-    this._fireLocalAction('assignment', data.updateAssignment)
+    this._fireLocalAction('assignment', {
+      ...this.assignment,
+      concepts: data.updateAssignment.concepts
+    })
     this.shadowRoot.querySelector('#assignmentConceptDialog').close();
   }
 

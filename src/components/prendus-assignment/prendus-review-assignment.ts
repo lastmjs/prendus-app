@@ -4,7 +4,7 @@ import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/servic
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
-import {NotificationType, QuestionType, ContextType} from '../../services/constants-service';
+import {NotificationType, QuestionType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
@@ -15,7 +15,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   componentId: string;
   ratings: CategoryScore[];
   rubric: Rubric;
-  userToken: string | null;
+  userToken: string;
   user: User;
 
   static get is() { return 'prendus-review-assignment' }
@@ -57,9 +57,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
     if (data && data === this.questions[0])
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'STARTED', 'REVIEW');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
     else
-      sendStatement(this.user.id, this.assignment.id, ContextType.ASSIGNMENT, 'REVIEWED', 'REVIEW');
+      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
     if (data) {
       this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
       setTimeout(() => {
