@@ -118,64 +118,68 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   async loadAssignment(assignmentId: string): Assignment {
-      this._fireLocalAction('loaded', false);
+      this._fireLocalAction('loaded', true);
 
-      //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
-      setTimeout(async () => {
-          this.action = checkForUserToken();
-        this.action = await getAndSetUser();
+      setTimeout(() => {
+          this._fireLocalAction('loaded', false);
 
-        if (!this.user) {
-            navigate('/authenticate');
-            return;
-        }
+          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
+          setTimeout(async () => {
+              this.action = checkForUserToken();
+            this.action = await getAndSetUser();
 
-        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
-
-        if (!userOnCourse) {
-            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-            return;
-        }
-
-        if (!userPaidForCourse) {
-            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-
-
-        const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
-          Assignment(id: $assignmentId) {
-            id
-            title
-            questionType
-            numReviewQuestions
-            questions(filter: {
-              author: {
-                id_not: $userId
-              }
-            }) {
-              id
-              text
-              code
-              explanation
-              concept {
-                title
-              }
-              resource
-              answerComments {
-                text
-              }
+            if (!this.user) {
+                navigate('/authenticate');
+                return;
             }
-          }
-        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-        if (!data) {
-          return;
-        }
-        this._fireLocalAction('assignment', data.Assignment);
-        this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
-        this._fireLocalAction('loaded', true);
-      }, 5000);
+
+            const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+            const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+
+            if (!userOnCourse) {
+                this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+                return;
+            }
+
+            if (!userPaidForCourse) {
+                navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+                return;
+            }
+
+
+            const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+              Assignment(id: $assignmentId) {
+                id
+                title
+                questionType
+                numReviewQuestions
+                questions(filter: {
+                  author: {
+                    id_not: $userId
+                  }
+                }) {
+                  id
+                  text
+                  code
+                  explanation
+                  concept {
+                    title
+                  }
+                  resource
+                  answerComments {
+                    text
+                  }
+                }
+              }
+            }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+            if (!data) {
+              return;
+            }
+            this._fireLocalAction('assignment', data.Assignment);
+            this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
+            this._fireLocalAction('loaded', true);
+          }, 5000);
+      });
   }
 
   isEssayType(questionType: string): boolean {
