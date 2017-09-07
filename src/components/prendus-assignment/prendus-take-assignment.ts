@@ -1,16 +1,16 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {GQLVariables} from '../../typings/gql-variables';
-import {createUUID, shuffleArray} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
-import {setNotification, getAndSetUser} from '../../redux/actions';
+import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {Assignment} from '../../typings/assignment'
 class PrendusTakeAssignment extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
+  action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
   userToken: string;
   user: User;
@@ -34,7 +34,6 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('loaded', true);
   }
 
   _handleResponse(e: CustomEvent) {
@@ -54,6 +53,11 @@ class PrendusTakeAssignment extends Polymer.Element {
     }
     this.shadowRoot.querySelector('#carousel').nextData();
   }
+
+  continueToHome(){
+      this.shadowRoot.querySelector("#unauthorizedAccessModal").close();
+      navigate('/');
+    }
 
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
@@ -81,14 +85,41 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   //TODO: this seems to be getting called twice...
   async generateQuiz(assignmentId: string) {
-    this._fireLocalAction('loaded', false);
-    this.action = await getAndSetUser();
-    const assignment = await this._assignment(assignmentId);
-    this._fireLocalAction('assignment', assignment);
-    const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
-    const questions = await this._createQuiz(questionIds, this.user.id);
-    this._fireLocalAction('questions', questions);
-    this._fireLocalAction('loaded', true);
+      this._fireLocalAction('loaded', true);
+      setTimeout(() => {
+          this._fireLocalAction('loaded', false);
+
+          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
+          setTimeout(async () => {
+              this.action = checkForUserToken();
+              this.action = await getAndSetUser();
+
+              if (!this.user) {
+                  navigate('/authenticate');
+                  return;
+              }
+
+              const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+              const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+
+              if (!userOnCourse) {
+                  this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+                  return;
+              }
+
+              if (!userPaidForCourse) {
+                  navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+                  return;
+              }
+
+              const assignment = await this._assignment(assignmentId);
+              this._fireLocalAction('assignment', assignment);
+              const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
+              const questions = await this._createQuiz(questionIds, this.user.id);
+              this._fireLocalAction('questions', questions);
+              this._fireLocalAction('loaded', true);
+          }, 5000);
+      });
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {

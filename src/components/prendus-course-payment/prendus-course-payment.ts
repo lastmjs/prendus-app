@@ -122,15 +122,13 @@ async function subscribeToPurchaseIsPaid(componentId: string, courseId: string, 
                 }
             ) {
                 node {
-                    isPaid
+                    id
                 }
             }
         }
     `, componentId, (data: any) => {
-        if (data.payload.data.Purchase.node.isPaid === true) {
-            // navigate(decodeURIComponent(this.redirectUrl) || '/');
-            window.location.href = decodeURIComponent(redirectUrl); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
-        }
+        // navigate(decodeURIComponent(redirectUrl) || '/');
+        window.location.href = decodeURIComponent(redirectUrl); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
     });
 }
 
