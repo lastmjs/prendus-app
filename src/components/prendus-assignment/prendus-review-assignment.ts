@@ -66,7 +66,7 @@ class PrendusReviewAssignment extends Polymer.Element {
         this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
       });
     } else {
-      LTIPassback(this.user.id, this.assignment.id, 'REVIEW');
+      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
     }
   }
 

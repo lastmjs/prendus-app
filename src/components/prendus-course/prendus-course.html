@@ -65,7 +65,7 @@
                   <h1>[[course.title]]</h1>
                 </template>
                 <template is="dom-if" if="[[!isViewMode(mode)]]">
-                  <paper-input id="course-title" class="edit-input" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-change="titleChanged" required auto-validate error-message="Please enter a title."></paper-input>
+                  <paper-input id="course-title" class="edit-input" name="title" label="Course Title" value="[[course.title]]" maxlength="50" on-focusout="saveCourseTitle" required auto-validate error-message="Please enter a title."></paper-input>
                 </template>
               </div>
               <paper-dropdown-menu label="Discipline">

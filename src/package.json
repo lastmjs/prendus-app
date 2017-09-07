@@ -4,7 +4,6 @@
     "prendus-question-elements": "^0.2.6",
     "prendus-shared": "0.0.2",
     "lit-html": "^0.5.0",
-    "prendus-question-elements": "^0.2.6",
     "redux-store-element": "^1.2.13"
   },
   "devDependencies": {

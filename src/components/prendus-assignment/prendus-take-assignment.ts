@@ -63,7 +63,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ, VerbType.RESPONDED, ObjectType.QUIZ);
     if (!data)
-      LTIPassback(this.user.id, this.assignment.id, ContextType.QUIZ);
+      LTIPassback(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ);
   }
 
   _fireLocalAction(key: string, value: any) {
