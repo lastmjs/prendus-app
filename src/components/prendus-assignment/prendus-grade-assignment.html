@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
+<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
+
+<dom-module id="prendus-grade-assignment">
+
+  <template>
+
+    <style include="prendus-styles">
+      .question-picture {
+        max-height: 200px;
+        max-width: 200px;
+      }
+    </style>
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <h2>[[assignment.title]] Grade Assignment</h2>
+    <br>
+    <prendus-carousel id="carousel" hide-back next-text="Submit" label="Response" data="[[responses]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextResponse">
+      <div hidden$="[[!response]]">
+        <h4>Question</h4>
+        <p>[[_questionText(response.questionResponse.question.text)]]</p>
+        <p><img class="question-picture" src$="[[_questionPicture(response.questionResponse.question.text)]]"></p>
+        <h4>Response</h4>
+        <p>[[response.value]]</p>
+        <prendus-rubric-dropdowns rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
+      </div>
+      <div hidden$="[[response]]">
+        <h3>Done</h3>
+        <p>You have finished all the responses for this grading assignment</p>
+      </div>
+    </prendus-carousel>
+
+  </template>
+
+  <script type="module" src="prendus-grade-assignment.ts"></script>
+
+</dom-module>

@@ -1,10 +1,10 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {persistUserToken, setNotification} from '../../redux/actions';
-import {navigate, createUUID, getCookie, deleteCookie} from '../../services/utilities-service';
+import {navigate, createUUID, getCookie, deleteCookie} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusLogin extends Polymer.Element implements ContainerElement {
@@ -97,32 +97,34 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         }
         async function signinUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
-            const data = await GQLMutate(`
-                mutation {
+            const data = await GQLRequest(`
+                mutation signin($email: String!, $password: String!) {
                     signinUser(email: {
-                        email: "${email}"
-                        password: "${password}"
+                        email: $email
+                        password: $password
                     }) {
                         token
                     }
                 }
-            `, userToken, (error: any) => {
+            `, {email, password}, userToken, (error: any) => {
               that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
         }
 
         async function addLtiJwtToUser(user: User | null, userToken: string | null)  {
-            const data = await GQLMutate(`
-                mutation {
+            const id = user ? user.id : null;
+            const ltiJWT = getCookie('ltiJWT');
+            const data = await GQLRequest(`
+                mutation update($id: ID!, $ltiJWT: String) {
                     updateUser(
-                        id: "${user ? user.id : null}"
-                        ltiJWT: "${getCookie('ltiJWT')}"
+                        id: $id
+                        ltiJWT: $ltiJWT
                     ) {
                         id
                     }
                 }
-            `, userToken, (error: any) => {
+            `, {id, ltiJWT}, userToken, (error: any) => {
               that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
@@ -131,9 +133,9 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         async function getUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const that = this;
-            const data = await GQLQuery(`
-              query {
-                User(email:"${email}") {
+            const data = await GQLRequest(`
+              query user($email: String!) {
+                User(email:$email) {
                     id
                     email
                     ownedCourses{
@@ -142,9 +144,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
                     }
                 }
               }
-            `, userToken, (key: string, value: any) => {
-            }, (error: any) => {
-            that.action = setNotification(error.message, NotificationType.ERROR)
+            `, {email}, userToken, (error: any) => {
+              that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
         }

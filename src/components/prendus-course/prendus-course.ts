@@ -1,4 +1,4 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Mode} from '../../typings/mode';
 import {Subject} from '../../typings/subject';
@@ -8,8 +8,8 @@ import {Assignment} from '../../typings/assignment';
 import {Course} from '../../typings/course';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
-import {NotificationType} from '../../services/constants-service';
+import {createUUID, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
+import {NotificationType, QuestionType} from '../../services/constants-service';
 
 class PrendusCourse extends Polymer.Element implements ContainerElement {
     courseId: string;
@@ -80,8 +80,12 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     isViewMode(mode: Mode) {
-      this._fireLocalAction('loaded', true)
+        this._fireLocalAction('loaded', true)
         return mode === 'view';
+    }
+
+    isEssayType(questionType: string): boolean {
+      return questionType === QuestionType.ESSAY;
     }
 
     isEditMode(mode: Mode) {
@@ -105,16 +109,17 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#create-subject').close();
     }
     async createDiscipline(){
-      const data = await GQLMutate(`
-          mutation {
+      const title = this.shadowRoot.querySelector('#discipline-title').value;
+      const data = await GQLRequest(`
+          mutation discipline($title: String!) {
               createDiscipline(
-                  title: "${this.shadowRoot.querySelector('#discipline-title').value}"
+                  title: $title
               ) {
                   id
                   title
               }
           }
-      `, this.userToken, (error: any) => {
+      `, {title}, this.userToken, (error: any) => {
         this.action = setNotification(error.message, NotificationType.ERROR)
       });
       //TODO combine this with the creatediscipline above
@@ -124,11 +129,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       }
     }
     async saveDisciplineToCourse(disciplineId: string){
-      const courseData = await GQLMutate(`
-        mutation {
+      const courseData = await GQLRequest(`
+        mutation addDiscipline($courseId: ID!, $disciplineId: ID!) {
           addToCourseDiscipline(
-            coursesCourseId: "${this.courseId}"
-            disciplineDisciplineId: "${disciplineId}"
+            coursesCourseId: $courseId
+            disciplineDisciplineId: $disciplineId
           ) {
             coursesCourse{
               id
@@ -141,22 +146,22 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         }
-      `, this.userToken, (error: any) => {
+      `, {disciplineId, courseId: this.courseId}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
       });
       if(this.course.subject){
-        await GQLMutate(`
-          mutation {
+        await GQLRequest(`
+          mutation removeSubject($courseId: ID!, $subjectId: ID!) {
             removeFromCourseSubject(
-              coursesCourseId: "${this.courseId}"
-              subjectSubjectId: "${this.course.subject.id}"
+              coursesCourseId: $courseId
+              subjectSubjectId: $subjectId
             ) {
               coursesCourse{
                 id
               }
             }
           }
-        `, this.userToken, (error: any) => {
+        `, {courseId: this.courseId, subjectId: this.course.subject.id} this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
       }
@@ -180,11 +185,11 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
 
     async saveSubjectToCourse(subjectId: string){
-      const courseData = await GQLMutate(`
-        mutation {
+      const courseData = await GQLRequest(`
+        mutation addSubject($courseId: ID!, $subjectId: ID!) {
           addToCourseSubject(
-            coursesCourseId: "${this.courseId}"
-            subjectSubjectId: "${subjectId}"
+            coursesCourseId: $courseId
+            subjectSubjectId: $subjectId
           ) {
             coursesCourse{
               id
@@ -197,7 +202,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         }
-      `, this.userToken, (error: any) => {
+      `, {subjectId, courseId: this.courseId}, this.userToken, (error: any) => {
         this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this._fireLocalAction('selectedSubjectId', subjectId)
@@ -231,17 +236,19 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this._fireLocalAction('selectedSubjectId', e.target.id)
     }
     async createSubject(){
-      const data = await GQLMutate(`
-          mutation {
+      const title = this.shadowRoot.querySelector('#subject-title').value;
+      const disciplineId = this.selectedDisciplineId;
+      const data = await GQLRequest(`
+          mutation subject($title: String!, $disciplineId: ID!) {
               createSubject(
-                  title: "${this.shadowRoot.querySelector('#subject-title').value}"
-                  disciplineId: "${this.selectedDisciplineId}"
+                  title: $title
+                  disciplineId: $disciplineId
               ) {
                   id
                   title
               }
           }
-      `, this.userToken, (error: any) => {
+      `, {title, disciplineId}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this.saveSubjectToCourse(data.createSubject.id);
@@ -256,8 +263,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector(`#assignment-lti-links-modal${e.model.item.id}`).open();
     }
     getEditIcon(editStatus: boolean): string {
-  		return editStatus ? 'check' : 'create';
-  	}
+      return editStatus ? 'check' : 'create';
+    }
     openCreateAssignmentModal(e){
       this.shadowRoot.querySelector('#assignment-title').value = null;
       if(this.course.discipline && this.course.subject){
@@ -270,17 +277,18 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value;
       // const conceptTitle = this.shadowRoot.querySelector('#concept-title').value;
       if(assignmentTitle){
-        const data = await GQLMutate(`
-          mutation{
+        const data = await GQLRequest(`
+          mutation assignment($assignmentTitle: String!, $userId: ID, $courseId: ID!) {
             createAssignment(
-              title: "${assignmentTitle}"
-              authorId: "${this.user ? this.user.id : null}"
-              courseId: "${this.courseId}"
+              title: $assignmentTitle
+              authorId: $userId
+              courseId: $courseId
             ){
               id
             }
           }
-        `, this.userToken, (error: any) => {
+        `, {assignmentTitle, userId: (this.user ? this.user.id : null), courseId: this.courseId},
+          this.userToken, (error: any) => {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#create-assignment').close();
@@ -291,29 +299,30 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       // href=""
     }
     async deleteAssignment(e){
-      const data = await GQLMutate(`
-          mutation {
-              deleteAssignment(id: "${e.model.item.id}"){
+      const data = await GQLRequest(`
+          mutation delete($id: ID!) {
+              deleteAssignment(id: $id){
                 id
               }
           }
-      `, this.userToken, (error: any) => {
+      `, {id: e.model.item.id}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
       });
       this.loadData();
     }
     async loadData() {
-        const data = await GQLQuery(`
-            query {
+        const data = await GQLRequest(`
+            query getAssignments($courseId: ID!) {
                 allAssignments(filter: {
                     course: {
-                        id: "${this.courseId}"
+                        id: $courseId
                     }
                 }) {
                     id
                     title
+                    questionType
                 }
-                Course(id: "${this.courseId}") {
+                Course(id: $courseId) {
                     title
                     discipline{
                       id
@@ -327,8 +336,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                     }
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
-        }, (error: any) => {
+        `, {courseId: this.courseId}, this.userToken, (error: any) => {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this._fireLocalAction('assignments', data.allAssignments)
@@ -375,18 +383,19 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.componentId, (data: any) => {
-            this.loadData();
+            if (this.courseId)
+              this.loadData();
         });
     }
     async loadLearningStructure(){
-      await GQLQuery(`
-        query {
+      const data = await GQLRequest(`
+        query getLearningStructure($courseId: ID!) {
           allDisciplines(
             first: 25
             filter: {
               OR: [{
                   courses_some: {
-                  id: "${this.courseId}"
+                  id: $courseId
                 }
               },{
                 approved_in:YES
@@ -400,11 +409,10 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             }
           }
         }
-      `, this.userToken, (key: string, value: any) => {
-        this._fireLocalAction('learningStructure', value)
-      }, (error: any) => {
+      `, {courseId: this.courseId}, this.userToken, (error: any) => {
           setNotification(error.message, NotificationType.ERROR)
       });
+      this._fireLocalAction('learningStructure', data.allDisciplines);
     }
     createDisciplineOnEnter(e: any){
       if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createDiscipline();

@@ -1,8 +1,8 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLQuery, GQLMutate} from '../../services/graphql-service';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {User} from '../../typings/user';
-import {createUUID} from '../../services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {setNotification} from '../../redux/actions'
 import {NotificationType} from '../../services/constants-service';
 
@@ -39,7 +39,7 @@ class PrendusTeacherApproval extends Polymer.Element {
   }
   async loadTeachers(){
     //TODO this needs to be paginated eventually. Or we need to put in a search to find specific users
-    const teacherData = await GQLQuery(`
+    const teacherData = await GQLRequest(`
         query {
           allUsers(
             first: 10
@@ -51,7 +51,7 @@ class PrendusTeacherApproval extends Polymer.Element {
             email
           }
         }
-    `, this.userToken, (key: string, value: any) => {},
+    `, {}, this.userToken,
       (error: any) => {
         this.action = setNotification(error.message, NotificationType.ERROR)
     });
@@ -73,10 +73,10 @@ class PrendusTeacherApproval extends Polymer.Element {
 	}
 
 	async approveTeacher(e: any): Promise<void> {
-    const teacherData = await GQLMutate(`
-        mutation {
+    const teacherData = await GQLRequest(`
+        mutation approve($id: ID!) {
           updateUser(
-            id:"${e.model.item.id}"
+            id: $id
             role: INSTRUCTOR
           ){
             id
@@ -84,7 +84,7 @@ class PrendusTeacherApproval extends Polymer.Element {
             email
           }
         }
-        `, this.userToken, (error: any) => {
+        `, {id: e.model.item.id}, this.userToken, (error: any) => {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
         const newUnverifiedTeachers = this.unverifiedTeachers.filter((teacher) => {

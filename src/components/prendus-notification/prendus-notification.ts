@@ -40,8 +40,8 @@ class PrendusNotification extends Polymer.Element implements ContainerElement {
     }
     openNotification(){
       if(this.notification){
-        //If a notifcation is more than 7 seconds, we need a modal or to take the person to another page
-        const notificationDuration = Math.max(((this.notification.message.length * 50) + 400), 3000);
+        //If a notification is more than 7 seconds, we need a modal or to take the person to another page
+        const notificationDuration = Math.max(((this.notification.message.length * 75) + 400), 3000);
         this._fireLocalAction("notificationMessage", this.notification.message);
         this._fireLocalAction("notificationType", this.notification.notificationType);
         this._fireLocalAction("duration", notificationDuration);

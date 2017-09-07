@@ -6,37 +6,37 @@ import {parse} from '../node_modules/assessml/assessml';
 
 export function compileToGuiQuestion(text: string, code: string): GuiQuestion {
     const amlAst = parse(text);
-    const jsAst = esprima.parse(code);
+    const { answer } = extractVariables(code);
 
     const answer1 = {
         type: AnswerTypes.MultipleChoice,
-        correct: jsAst.body[0].expression.right.left.left.left.right.value,
+        correct: answer.left.left.left.right.value,
         text: amlAst.ast.filter((astObject) => {
-            return astObject.varName === jsAst.body[0].expression.right.left.left.left.left.name;
+            return astObject.varName === answer.left.left.left.left.name;
         })[0].content[0].content
     };
 
     const answer2 = {
         type: AnswerTypes.MultipleChoice,
-        correct: jsAst.body[0].expression.right.left.left.right.right.value,
+        correct: answer.left.left.right.right.value,
         text: amlAst.ast.filter((astObject) => {
-            return astObject.varName === jsAst.body[0].expression.right.left.left.right.left.name;
+            return astObject.varName === answer.left.left.right.left.name;
         })[0].content[0].content
     };
 
     const answer3 = {
         type: AnswerTypes.MultipleChoice,
-        correct: jsAst.body[0].expression.right.left.right.right.value,
+        correct: answer.left.right.right.value,
         text: amlAst.ast.filter((astObject) => {
-            return astObject.varName === jsAst.body[0].expression.right.left.right.left.name;
+            return astObject.varName === answer.left.right.left.name;
         })[0].content[0].content
     };
 
     const answer4 = {
         type: AnswerTypes.MultipleChoice,
-        correct: jsAst.body[0].expression.right.right.right.value,
+        correct: answer.right.right.value,
         text: amlAst.ast.filter((astObject) => {
-            return astObject.varName === jsAst.body[0].expression.right.right.left.name;
+            return astObject.varName === answer.right.left.name;
         })[0].content[0].content
     };
 
@@ -45,3 +45,20 @@ export function compileToGuiQuestion(text: string, code: string): GuiQuestion {
         answers: [answer1, answer2, answer3, answer4]
     };
 }
+
+export function extractVariables(code: string): {[key: string]: any} {
+  const ast = esprima.parse(code);
+  return ast.body.filter(isVariable).reduce((vars, node) => {
+    return {...vars, [node.expression.left.name]: node.expression.right};
+  }, {});
+}
+
+function isVariable(node: object): boolean {
+  return node.type === 'ExpressionStatement'
+    && node.expression
+    && node.expression.type === 'AssignmentExpression'
+    && node.expression.left
+    && node.expression.left.type === 'Identifier'
+    && node.expression.right
+}
+

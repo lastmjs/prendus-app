@@ -4,17 +4,16 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="prendus-scaffold-new-question.html">
 <link rel="import" href="prendus-scaffold-distractors.html">
 <link rel="import" href="prendus-scaffold-comments.html">
-<link rel="import" href="prendus-scaffold-explanation.html">
-<link rel="import" href="prendus-scaffold-final-question.html">
-<link rel="import" href="prendus-scaffold-resource.html">
+<link rel="import" href="prendus-scaffold-example.html">
 <link rel="import" href="prendus-scaffold-concept.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
 
-<dom-module id="prendus-scaffold">
+<dom-module id="prendus-multiple-choice-scaffold">
     <template>
         <style include ="prendus-styles">
         .content {
@@ -45,7 +44,10 @@
         .centered {
           text-align: center;
         }
-
+        paper-textarea.has-suffix {
+          width: 95%;
+          display: inline-block;
+        }
         .big {
           font-size: 22px;
         }
@@ -62,7 +64,7 @@
         <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
         <div class="content">
           <div class="page">
-            <iron-pages id="iron-pages" selected="[[selectedIndex]]">
+            <iron-pages id="ironPages" selected="[[selectedIndex]]">
               <div>
                 <div class="prendus-card big">
                   For this assignment you will create an exam level
@@ -133,7 +135,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-concept my-index="2" selected-index="[[selectedIndex]]" concepts="[[assignment.concepts]]"></prendus-scaffold-concept>
+                <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]" on-concept-selected="_handleConcept"></prendus-scaffold-concept>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -150,7 +152,7 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-resource my-index="3" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
+                <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-change="_handleResource"></paper-input>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -165,7 +167,21 @@
                     </li>
                   </ol>
                 </div>
-                <prendus-scaffold-new-question my-index="4" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-new-question>
+                  <div>
+                    <paper-textarea id="question" class="has-suffix" on-value-changed="_handleQuestion" value="[[questionText]]" label="Question"></paper-textarea>
+                    <paper-icon-button icon="camera-enhance" on-click="_triggerQuestionPicture"></paper-icon-button>
+                    <span id="question-picture-preview"><prendus-image-preview file="[[questionPicture]]"></prendus-image-preview></span>
+                    <input hidden id="question-picture" type="file" accept="image/*" on-change="_handleQuestionPicture">
+                  </div>
+                  <div>
+                    <paper-textarea id="answer" class="has-suffix" on-value-changed="_handleAnswer" value="[[answer]]" label="Correct Answer"></paper-textarea>
+                    <paper-icon-button icon="camera-enhance" on-click="_triggerAnswerPicture"></paper-icon-button>
+                    <span id="answer-picture-preview"><prendus-image-preview file="[[answerPicture]]"></prendus-image-preview></span>
+                    <input hidden id="answer-picture" type="file" accept="image/*" on-change="_handleAnswerPicture">
+                  </div>
+                  <div>
+                    <paper-textarea id="solution" on-value-changed="_handleSolution" value="[[solution]]" label="Solution (Optional)"></paper-textarea>
+                  </div>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -173,31 +189,19 @@
                   thinking about common misconceptions students may have
                   about the content area of your question.
                 </div>
-                <prendus-scaffold-distractors my-index="5" selected-index="[[selectedIndex]]" number-of-answers="[[numberOfAnswers]]"></prendus-scaffold-distractors>
+                <prendus-scaffold-distractors question="[[_textAndPicture(questionText, questionPicture)]]" answer="[[_textAndPicture(answer, answerPicture)]]" init="[[distractors]]" on-distractors-changed="_handleDistractors" on-distractor-pictures-changed="_handleDistractorPictures"></prendus-scaffold-distractors>
               </div>
               <div>
                 <div class="prendus-card big">
                   Add comments to the question and answers that can be used as hints for other students are taking the question or feedback after the question is answered. These comments should help students identify misconceptions if they answered the question incorrectly and explain the reason the correct answer is right.
                 </div>
-                <prendus-scaffold-comments my-index="6" selected-index="[[selectedIndex]]"></prendus-scaffold-comments>
+                <prendus-scaffold-comments question="[[_textAndPicture(questionText, questionPicture)]]" answers="[[_scaffoldAnswersWithPictures(answer, distractors, hints, answerPicture, distractorPictures)]]" on-comments-changed="_handleHints"></prendus-scaffold-comments>
               </div>
-              <!-- <div>
-                <div class="prendus-card big">
-                  Finally, add an explanation about the question. Why does the question fit with the concept you selected? Explain any other pertinent information about the question.
-                </div>
-                <prendus-scaffold-explanation my-index="7" selected-index="[[selectedIndex]]"></prendus-scaffold-explanation>
-              </div> -->
               <div>
                 <div class="prendus-card centered">
                   <h3>Final Question</h3>
                 </div>
-                <prendus-scaffold-final-question assignment="[[assignment]]" my-index="7" selected-index="[[selectedIndex]]"></prendus-scaffold-final-question>
-              </div>
-              <div>
-                <div class="prendus-card centered">
-                  <h3>Question Submitted</h3>
-                  You have now submitted the first part of the assignment. Look at the course schedule to see when to rate questions other students have created for this assignment.
-                </div>
+                <prendus-scaffold-example question-scaffold="[[_scaffold(concept, resource, questionText, solution, answer, distractors, hints, questionPicture, answerPicture, distractorPictures)]]"></prendus-scaffold-example>
               </div>
             </iron-pages>
           </div>
@@ -206,11 +210,18 @@
               <button id="back-button" class="prendus-button prendus-button--recommended" on-click="back">Back</button>
             </div>
           </template>
-          <div class="next">
-            <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next" disabled="[[disableNext]]">Next</button>
-          </div>
+          <template is="dom-if" if="[[showNext(selectedIndex)]]">
+            <div class="next">
+              <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next">Next</button>
+            </div>
+          </template>
+          <template is="dom-if" if="[[!showNext(selectedIndex)]]">
+            <div class="next">
+              <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+            </div>
+          </template>
         </div>
     </template>
 
-    <script type="module" src="prendus-scaffold.ts"></script>
+    <script type="module" src="prendus-multiple-choice-scaffold.ts"></script>
 </dom-module>
