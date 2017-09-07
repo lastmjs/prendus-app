@@ -116,7 +116,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             const id = user ? user.id : null;
             const ltiJWT = getCookie('ltiJWT');
             const data = await GQLRequest(`
-                mutation update($id: ID!, $ltiJWT: String!) {
+                mutation update($id: ID!, $ltiJWT: String) {
                     updateUser(
                         id: $id
                         ltiJWT: $ltiJWT
