@@ -67,22 +67,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         navigate('/authenticate');
         return;
     }
-    //TODO place this code in each assignment component
-    await this.getCourseId();
-    const userOnCourse = await isUserOnCourse(this.user.id, this.userToken, this.assignmentId);
-    const userPaidForCourse = await hasUserPaidForCourse(this.user.id, this.userToken, this.assignmentId, this.courseId);
-    //TODO place this code in each assignment component
-    if (!userOnCourse) {
-        this.shadowRoot.querySelector("#unauthorizedAccessModal").open()
-        // alert('You are not authorized to access this assignment');
-        // navigate('/');
-        return;
-    }
-    if (!userPaidForCourse) {
-        navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-        return;
-    }
-    this._fireLocalAction('assignmentId', this.assignmentId)
+    
     await this.loadData();
   }
   async getCourseId() {
@@ -318,58 +303,3 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusAssignment.is, PrendusAssignment);
-
-//TODO place these in prendus-shared/services/utilities-service since it will be used in all of the assignment components
-async function isUserOnCourse(userId: string, userToken: string, assignmentId: string) {
-    const data = await GQLRequest(`
-        query enrolled($assignmentId: ID!, $userId: ID!) {
-            Assignment(
-                id: $assignmentId
-            ) {
-                course{
-                  author{
-                    id
-                  }
-                  enrolledStudents(
-                      filter: {
-                          id: $userId
-                      }
-                  ) {
-                      id
-                  }
-                }
-            }
-        }
-    `, {assignmentId, userId}, userToken, (error: any) => {});
-    return !!(data.Assignment.course.enrolledStudents[0] || (data.Assignment.course.author.id === userId));
-}
-
-async function hasUserPaidForCourse(userId: string, userToken: string, assignmentId: string, courseId: string) {
-    const data = await GQLRequest(`
-        query hasPaid($assignmentId: ID!, $userId: ID!) {
-            Assignment(
-                id: $assignmentId
-            ) {
-                course{
-                  author{
-                    id
-                  }
-                  purchases(
-                      filter: {
-                          AND: [{
-                                  user: {
-                                      id: $userId
-                                  }
-                              }, {
-                                  isPaid: true
-                              }
-                          ]
-                      }
-                  ) {
-                      id
-                  }
-                }
-            }
-        }
-    `, {assignmentId, userId}, userToken, (error: any) => {});
-    return !!(data.Assignment.course.purchases[0] || (data.Assignment.course.author.id === userId));
