@@ -61,7 +61,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     else //subsequent rounds mean a question was created
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.CREATED, ObjectType.CREATE);
     if (!data) //last round
-      LTIPassback(this.user.id, this.assignment.id, 'CREATE');
+      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
   }
 
   async _handleQuestion(e: CustomEvent) {

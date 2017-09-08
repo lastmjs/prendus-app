@@ -23,7 +23,7 @@ export const VerbType = {
   RESPONDED: "RESPONDED",
   GRADED: "GRADED",
   CREATED: "CREATED",
-
+  SUBMITTED: "SUBMITTED"
 };
 export const ObjectType = {
   CREATE: "CREATE",

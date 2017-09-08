@@ -7,7 +7,6 @@ import {Subject} from '../../typings/subject';
 import {Concept} from '../../typings/concept';
 import {User} from '../../typings/user';
 import {createUUID, navigate} from '../../services/utilities-service';
-import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType} from '../../services/constants-service';
 
 class PrendusAssignment extends Polymer.Element implements ContainerElement {
@@ -67,7 +66,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
         navigate('/authenticate');
         return;
     }
-    
+
     await this.loadData();
   }
   async getCourseId() {

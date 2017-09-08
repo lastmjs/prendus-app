@@ -360,15 +360,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
           }
         }
     }
-    async titleChanged(e: any){
-      if(typeof e.target !== 'undefined' && !e.target.invalid && this.course) {
-        this._fireLocalAction('course', {
-          ...this.course,
-          title: e.target.value
-        })
-        this.saveCourse();
-      }
-    }
     subscribeToData() {
         GQLSubscribe(`
             subscription changedAssignment {
@@ -422,6 +413,28 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
     }
     createAssignmentOnEnter(e: any){
       if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createAssignment();
+    }
+    async saveCourseTitle(){
+      const courseTitle = this.shadowRoot.querySelector('#course-title').value;
+      const data = await GQLRequest(`
+        mutation course($courseTitle: String!, $courseId: ID!) {
+          updateCourse(
+            id: $courseId
+            title: $courseTitle
+          ){
+            id
+          }
+        }
+      `, {courseTitle, courseId: this.courseId},
+        this.userToken, (error: any) => {
+          this.action = setNotification(error.message, NotificationType.ERROR)
+      });
+      this.action = setNotification('Course title updated', NotificationType.SUCCESS)
+      this._fireLocalAction('course', {
+        ...this.course,
+        title: courseTitle
+      });
+
     }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
