@@ -19,5 +19,5 @@ export async function sendStatement(userToken: string, userId: string, contextId
     (error: any) => {
       console.log(error);
     }
-  );
-};
+  )
+}
