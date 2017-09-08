@@ -70,6 +70,7 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   _handleConcept(e: CustomEvent) {
     this._fireLocalAction('concept', e.detail.concept);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(1));
   }
 
   _handleRubric(e: CustomEvent) {
@@ -88,7 +89,6 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
       return;
     this._fireLocalAction('picture', file);
-    this._fireLocalAction('pictureText', file.name);
   }
 
   exampleRubric(): Object[] {
@@ -97,18 +97,31 @@ class PrendusEssayScaffold extends Polymer.Element {
 
   setQuestionText(e: Event) {
     this._fireLocalAction('questionText', e.target.value);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(3));
   }
 
   setResource(e: Event) {
     this._fireLocalAction('resource', e.target.value);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(2));
+  }
+
+  stepCompleted(step: number): boolean {
+    switch (step) {
+      case 1: return this.concept && (this.concept.id || this.concept.title);
+      case 2: return this.resource;
+      case 3: return this.questionText;
+      default: return true;
+    }
   }
 
   back(): void {
     this._fireLocalAction('step', this.step - 1);
+    this._fireLocalAction('nextDisabled', false);
   }
 
   next(): void {
     this._fireLocalAction('step', this.step + 1);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(this.step));
   }
 
   async submit(): void {
@@ -153,7 +166,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     if (keys.includes('concept')) this.concept = componentState.concept;
     if (keys.includes('rubric')) this.rubric = componentState.rubric;
     if (keys.includes('picture')) this.picture = componentState.picture;
-    if (keys.includes('pictureText')) this.pictureText = componentState.pictureText;
+    if (keys.includes('nextDisabled')) this.nextDisabled = componentState.nextDisabled;
     this.userToken = state.userToken;
     this.user = state.user;
   }
