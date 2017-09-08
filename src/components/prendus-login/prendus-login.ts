@@ -93,7 +93,12 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           this.action = setUserInRedux(gqlUser.User);
           await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
-          deleteCookie('redirectUrl');
+
+          if (getCookie('redirectUrl')) {
+              deleteCookie('redirectUrl');
+              //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't
+              window.location.reload();
+          }
         }
         async function signinUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user

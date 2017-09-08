@@ -52,18 +52,22 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   _handleConcept(e: CustomEvent) {
     this._fireLocalAction('concept', e.detail.concept);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(1));
   }
 
   _handleResource(e: Event) {
     this._fireLocalAction('resource', e.target.value);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(2));
   }
 
   _handleQuestion(e: Event) {
     this._fireLocalAction('questionStem', {...this.questionStem, text: e.target.value});
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(3));
   }
 
   _handleAnswer(e: Event) {
     this._fireLocalAction('answer', {...this.answer, text: e.target.value});
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(3));
   }
 
   _handleSolution(e: Event) {
@@ -72,6 +76,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   _handleDistractors(e: CustomEvent) {
     this._fireLocalAction('distractors', e.detail.distractors);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(4));
   }
 
   _validPicture(e: CustomEvent): boolean {
@@ -94,6 +99,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (!this._validPicture(e)) return;
     const file = e.target.files[0];
     this._fireLocalAction('answer', {...this.answer, picture: file});
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(3));
   }
 
   _triggerQuestionPicture(e: Event) {
@@ -106,6 +112,18 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   _handleHints(e: CustomEvent) {
     this._fireLocalAction('hints', e.detail.comments);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(5));
+  }
+
+  stepCompleted(step: number): boolean {
+    switch(step) {
+      case 1: return this.concept && (this.concept.id || this.concept.title);
+      case 2: return this.resource;
+      case 3: return this.questionStem && this.questionStem.text && (this.answer.text || this.answer.picture);
+      case 4: return !this.distractors.some(distractor => !distractor || (!distractor.text && !distractor.picture));
+      case 5: return !this.hints.some(hint => !hint || !hint.length);
+      default: return true;
+    }
   }
 
   _initScaffold(question: number) {
@@ -117,6 +135,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('distractors', Array(3).fill({text: '', picture: null}));
     this._fireLocalAction('hints', ['Correct', 'Incorrect', 'Incorrect', 'Incorrect']);
     this._fireLocalAction('selectedIndex', 0);
+    //Can't be achieved through data binding. So we need this mutation
+    this.shadowRoot.getElementById('question-picture').value = '';
+    this.shadowRoot.getElementById('answer-picture').value = '';
   }
 
   _scaffold(concept: Concept, resource: string, questionStem: string, solution: string, answer: string, distractors: string[], hints: string[]): QuestionScaffold {
@@ -145,10 +166,12 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
 
   back(): void {
     this._fireLocalAction('selectedIndex', this.selectedIndex - 1);
+    this._fireLocalAction('nextDisabled', false);
   }
 
   next(): void {
     this._fireLocalAction('selectedIndex', this.selectedIndex + 1);
+    this._fireLocalAction('nextDisabled', !this.stepCompleted(this.selectedIndex));
   }
 
   async submit(): void {
@@ -158,7 +181,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
-    const questionPicture = this.questionStem.picture ? (await GQLSaveFile(this.question.picture)) : null;
+    const questionPicture = this.questionStem.picture ? (await GQLSaveFile(this.questionStem.picture)) : null;
     const answerPicture = this.answer.picture ? (await GQLSaveFile(this.answer.picture)) : null;
     const distractorPictures = await asyncMap(this.distractors.map(distractor => distractor.picture), GQLSaveFile);
     const imageIds = [questionPicture, answerPicture, ...distractorPictures].reduce((ids, picture) => picture ? [...ids, picture.id] : ids, []);
@@ -197,6 +220,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (keys.includes('solution')) this.solution = componentState.solution;
     if (keys.includes('distractors')) this.distractors = componentState.distractors;
     if (keys.includes('hints')) this.hints = componentState.hints;
+    if (keys.includes('nextDisabled')) this.nextDisabled = componentState.nextDisabled;
     this.userToken = state.userToken;
     this.user = state.user;
   }
@@ -206,7 +230,7 @@ function validate(concept: Concept, resource: string, questionStem: string, answ
     const empty = str => str == undefined || str.toString().trim() === '';
     const someEmpty = (bitOr, str) => bitOr || empty(str);
     const someEmptyAndNoPicture = (bitOr, obj) => bitOr || (empty(obj.text) && !obj.picture);
-    if (empty(concept.id) && empty(concept.title)) throw new Error('Concept must be entered or selected');
+    if (!concept || (empty(concept.id) && empty(concept.title))) throw new Error('Concept must be entered or selected');
     if (empty(resource)) throw new Error('Resource must not be empty');
     if (empty(questionStem.text)) throw new Error('Question text must not be empty');
     if (empty(answer.text) && !answer.picture) throw new Error('You must provide a correct answer');
