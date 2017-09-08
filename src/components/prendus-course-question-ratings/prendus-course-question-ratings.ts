@@ -9,7 +9,7 @@ import {QuestionRatingStats} from '../../typings/question-rating-stats';
 import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
-import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 import {setNotification, getAndSetUser} from '../../redux/actions'
 
@@ -27,6 +27,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   conceptId: string = 'ALL';
   sortField: string = 'Overall';
   sortAsc: boolean = false;
+  pageIndex: number;
+  pageAmount: number;
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -58,6 +60,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
+    this._fireLocalAction('pageAmount', 10);
+    this._fireLocalAction('pageIndex', 0);
     this._fireLocalAction('loaded', true);
   }
 
@@ -114,7 +118,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   async loadQuestions() {
     this.action = await getAndSetUser();
     const filter = this.filterByUser
-      ? `(filter: {author: {id: "${this.user.id}"}})`
+      ? `filter: {author: {id: "${this.user.id}"}}`
       : '';
     const data = await GQLRequest(`
         query getCourse($courseId: ID!) {
@@ -124,7 +128,11 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
             assignments {
               id
               title
-              questions${filter} {
+              questions(
+                  ${filter}
+                  first: ${this.pageAmount}
+                  skip: ${this.pageIndex}
+              ) {
                 id
                 author {
                   email
@@ -292,6 +300,23 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     })));
   }
 
+  async prevClick() {
+      if (this.pageIndex - this.pageAmount >= 0) {
+          this._fireLocalAction('pageIndex', this.pageIndex - this.pageAmount);
+          this._fireLocalAction('loaded', false);
+          await this.loadQuestions();
+          this._fireLocalAction('loaded', true);
+      }
+  }
+
+  async nextClick() {
+      //TODO we'll want to eventually stop this from going to far
+      this._fireLocalAction('pageIndex', this.pageIndex + this.pageAmount);
+      this._fireLocalAction('loaded', false);
+      await this.loadQuestions();
+      this._fireLocalAction('loaded', true);
+  }
+
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
@@ -305,6 +330,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
     if (keys.includes('sortField')) this.sortField = componentState.sortField;
     if (keys.includes('sortAsc')) this.sortAsc = componentState.sortAsc;
+    if (keys.includes('pageIndex')) this.pageIndex = componentState.pageIndex;
+    if (keys.includes('pageAmount')) this.pageAmount = componentState.pageAmount;
     this.userToken = state.userToken;
     this.user = state.user;
   }
