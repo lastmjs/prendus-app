@@ -64,6 +64,8 @@ class PrendusEssayScaffold extends Polymer.Element {
     this._fireLocalAction('rubric', {});
     this._fireLocalAction('concept', {});
     this._fireLocalAction('picture', null);
+    //Can't be done through data binding so we need this mutation
+    this.shadowRoot.getElementById('question-picture').value = '';
   }
 
   _handleConcept(e: CustomEvent) {
