@@ -72,7 +72,7 @@ class PrendusScaffoldConcept extends Polymer.Element {
     const concept = {
       title: e.target.value,
       subjectId: this.assignment.course.subject.id,
-      assignmentsIds: [this.assignment.id]
+      // assignmentsIds: [this.assignment.id]
     };
     this._fireLocalAction('selectedConcept', concept);
     this._notify(concept);
