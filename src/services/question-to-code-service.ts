@@ -8,10 +8,9 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   const answers: GuiAnswer[] = guiQuestion.answers;
   // use the first correct answer as the only correct answer
   const firstCorrectIndex: number = answers.findIndex((answer) => answer.correct === true);
-  const { questionPictureUrl } = guiQuestion;
   // define text string with question stem and radio buttons
-  const text: string  = `<p>${guiQuestion.stem}</p>`
-    + (questionPictureUrl ? `<p><img src="${questionPictureUrl}"/></p>` : '')
+  const text: string  = `<p>${guiQuestion.stem.text}</p>`
+    + (guiQuestion.stem.picture ? `<p><img src="${guiQuestion.stem.picture.url.replace(/files/, 'images')}/x300"/></p>` : '')
     + answers.reduce((prevText, answer, index) => {
       return prevText + `<p style="display: flex; align-items: start;">[*]${answer.text}`
         + (answer.picture ? `<span>&nbsp;<img src="${answer.picture.url.replace(/files/, 'images')}/x200"/></span>` : '')
@@ -42,6 +41,7 @@ export const generateEssay = (guiQuestion: GuiQuestion): { text: string, code: s
   const code: string = `
     gradingRubric = '${JSON.stringify(gradingRubric)}';
     evaluationRubric = '${JSON.stringify(evaluationRubric)}';
+    answer = true;
   `;
   return {
     text,
