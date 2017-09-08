@@ -1,6 +1,5 @@
 import {RootReducer} from '../../redux/reducers';
-import {GQLSubscribe} from '../../services/graphql-service';
-import {navigate} from '../../services/utilities-service';
+import {navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {Reducer} from '../../typings/reducer';
 import {State} from '../../typings/state';
 import {User} from '../../typings/user';
@@ -28,54 +27,195 @@ class PrendusApp extends Polymer.Element {
         this.action = await getAndSetUser();
     }
 
-    getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, viewAssignmentRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
+    getSelectedView(rootRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, scapholdDemoRouteActive: any) {
         this.action = checkForUserToken();
         if (rootRouteActive){
           if(this.userToken){
+            window.ga('set', 'page', '/courses');
+            window.ga('send', 'pageview');
             return 'coursesView';
           }else{
+            window.ga('set', 'page', '/');
+            window.ga('send', 'pageview');
             return 'rootView';
           }
         }
 
-        if (signupRouteActive) return 'signupView';
-        if (loginRouteActive) return 'loginView';
-        if (authenticateRouteActive) return 'authenticateView';
-        if (openSourceRouteActive) return 'openSourceView';
-        if (scapholdDemoRouteActive) return 'scapholdDemoView';
+        if (signupRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'signupView';
+        }
+        if (loginRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'loginView';
+        }
+        if (authenticateRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'authenticateView';
+        }
+        if (openSourceRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'openSourceView';
+        }
+        if (scapholdDemoRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'scapholdDemoView';
+        }
 
-        if (coursesRouteActive) return 'coursesView';
-        if (createCourseRouteActive) return 'createCourseView';
-        if (viewCourseRouteActive) return 'viewCourseView';
-        if (editCourseRouteActive) return 'editCourseView';
-        if (paymentCourseRouteActive) return 'paymentCourseView';
-        if (courseQuestionRatingsRouteActive) return 'courseQuestionRatingsView';
+        if (coursesRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'coursesView';
+        }
+        if (createCourseRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createCourseView';
+        }
+        if (viewCourseRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewCourseView';
+        }
+        if (editCourseRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editCourseView';
+        }
+        if (paymentCourseRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'paymentCourseView';
+        }
+        if (courseQuestionRatingsRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'courseQuestionRatingsView';
+        }
 
-        if (createAssignmentRouteActive) return 'createAssignmentView';
-        if (viewAssignmentRouteActive) return 'viewAssignmentView';
-        if (editAssignmentRouteActive) return 'editAssignmentView';
+        if (createAssignmentRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createAssignmentView';
+        }
+        if (assignmentCreateRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'assignmentCreateView';
+        }
+        if (assignmentReviewRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'assignmentReviewView';
+        }
+        if (assignmentGradeRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'assignmentGradeView';
+        }
+        if (assignmentQuizRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'assignmentQuizView';
+        }
+        if (editAssignmentRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editAssignmentView';
+        }
 
-        if (learningStructureRouteActive) return 'learningStructureView';
+        if (learningStructureRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'learningStructureView';
+        }
 
-        if (teacherApprovalRouteActive) return 'teacherApprovalView';
+        if (teacherApprovalRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'teacherApprovalView';
+        }
 
-        if (createDisciplineRouteActive) return 'createDisciplineView';
-        if (viewDisciplineRouteActive) return 'viewDisciplineView';
-        if (editDisciplineRouteActive) return 'editDisciplineView';
+        if (createDisciplineRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createDisciplineView';
+        }
+        if (viewDisciplineRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewDisciplineView';
+        }
+        if (editDisciplineRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editDisciplineView';
+        }
 
-        if (createSubjectRouteActive) return 'createSubjectView';
-        if (viewSubjectRouteActive) return 'viewSubjectView';
-        if (editSubjectRouteActive) return 'editSubjectView';
+        if (createSubjectRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createSubjectView';
+        }
+        if (viewSubjectRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewSubjectView';
+        }
+        if (editSubjectRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editSubjectView';
+        }
+        if (createConceptRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createConceptView';
+        }
+        if (viewConceptRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewConceptView';
+        }
+        if (editConceptRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editConceptView';
+        }
+        if (viewQuestionRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewQuestionView';
+        }
+        if (createQuestionRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'createQuestionView';
+        }
+        if (editQuestionRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editQuestionView';
+        }
+        if (editDemoQuestionRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'editDemoQuestionView';
+        }
+        if (examplesQuestionRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'examplesQuestionView';
+        }
+    }
 
-        if (createConceptRouteActive) return 'createConceptView';
-        if (viewConceptRouteActive) return 'viewConceptView';
-        if (editConceptRouteActive) return 'editConceptView';
-
-        if (viewQuestionRouteActive) return 'viewQuestionView';
-        if (createQuestionRouteActive) return 'createQuestionView';
-        if (editQuestionRouteActive) return 'editQuestionView';
-        if (editDemoQuestionRouteActive) return 'editDemoQuestionView';
-        if (examplesQuestionRouteActive) return 'examplesQuestionView';
+    _isStudent(user: User): boolean {
+      return user ? user.role === 'STUDENT' : true;
     }
 
     logout() {

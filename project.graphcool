@@ -65,6 +65,7 @@ type Assignment implements Node {
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
   numCreateQuestions: Int! @defaultValue(value: 1)
   numReviewQuestions: Int! @defaultValue(value: 3)
+  numGradeResponses: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
   numGradeResponses: Int! @defaultValue(value: 3)
 }
@@ -154,6 +155,15 @@ type UserRadio implements Node {
   varName: String!
   checked: Boolean!
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
+}
+
+type QuestionResponseRating implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
+  rater: User! @relation(name: "RaterOnQuestionResponseRating")
+  questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
 }
 
 type QuestionRating implements Node {
