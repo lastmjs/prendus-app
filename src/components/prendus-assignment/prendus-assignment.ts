@@ -162,11 +162,13 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   async updateAssignmentConcepts(e: any){
     // const selectedConcepts = this.shadowRoot.querySelector('#courseConcepts').selectedItems
     const conceptsIds = this.selectedConcepts.map(concept => concept.id);
+    const assignmentTitle = this.shadowRoot.querySelector('#assignment-title').value
     const data = await GQLRequest(`
-      mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!], $id: ID!) {
+      mutation updateAssignmentAndConnectConcepts($conceptsIds: [ID!], $id: ID!, $assignmentTitle: String!) {
         updateAssignment(
           id: $id
           conceptsIds: $conceptsIds
+          title: $assignmentTitle
         ) {
           id
           concepts{
@@ -175,7 +177,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
           }
         }
       }
-    `, {conceptsIds, id: this.assignmentId}, this.userToken, this._handleGQLError.bind(this));
+    `, {conceptsIds, id: this.assignmentId, assignmentTitle}, this.userToken, this._handleGQLError.bind(this));
     this._fireLocalAction('assignment', {
       ...this.assignment,
       concepts: data.updateAssignment.concepts

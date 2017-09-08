@@ -374,6 +374,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
                 }
             }
         `, this.componentId, (data: any) => {
+          //TODO no need to do another network request. Just load the assignment here
             if (this.courseId)
               this.loadData();
         });
