@@ -20,4 +20,4 @@ export async function sendStatement(userToken: string, userId: string, contextId
       console.log(error);
     }
   )
-}
+};
