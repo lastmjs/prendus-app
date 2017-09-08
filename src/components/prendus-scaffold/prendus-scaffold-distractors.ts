@@ -49,6 +49,12 @@ class PrendusScaffoldDistractors extends Polymer.Element {
 
   _init(init: string[]) {
     this._fireLocalAction('distractors', init);
+    init.forEach((distractor, i) => {
+      if (!distractor.picture) {//We can't clear this through data binding, so we need this mutation
+        const fileInput = this.shadowRoot.getElementById(`distractor-picture${i}`);
+        if (fileInput) fileInput.value = '';
+      }
+    });
   }
 
   _notify(distractors: string[]) {

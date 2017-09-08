@@ -117,6 +117,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     this._fireLocalAction('distractors', Array(3).fill({text: '', picture: null}));
     this._fireLocalAction('hints', ['Correct', 'Incorrect', 'Incorrect', 'Incorrect']);
     this._fireLocalAction('selectedIndex', 0);
+    //Can't be achieved through data binding. So we need this mutation
+    this.shadowRoot.getElementById('question-picture').value = '';
+    this.shadowRoot.getElementById('answer-picture').value = '';
   }
 
   _scaffold(concept: Concept, resource: string, questionStem: string, solution: string, answer: string, distractors: string[], hints: string[]): QuestionScaffold {
@@ -158,7 +161,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
-    const questionPicture = this.questionStem.picture ? (await GQLSaveFile(this.question.picture)) : null;
+    const questionPicture = this.questionStem.picture ? (await GQLSaveFile(this.questionStem.picture)) : null;
     const answerPicture = this.answer.picture ? (await GQLSaveFile(this.answer.picture)) : null;
     const distractorPictures = await asyncMap(this.distractors.map(distractor => distractor.picture), GQLSaveFile);
     const imageIds = [questionPicture, answerPicture, ...distractorPictures].reduce((ids, picture) => picture ? [...ids, picture.id] : ids, []);
