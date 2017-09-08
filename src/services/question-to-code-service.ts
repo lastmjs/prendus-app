@@ -50,5 +50,5 @@ export const generateEssay = (guiQuestion: GuiQuestion): { text: string, code: s
 }
 
 function rubricStr(rubric: Rubric): string {
-  return JSON.stringify(rubric).replace(/'/g, "\\'");
+  return JSON.stringify(rubric).replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/\n/g, '\\n');
 }
