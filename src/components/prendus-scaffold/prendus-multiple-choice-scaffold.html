@@ -152,7 +152,7 @@
                     </li>
                   </ol>
                 </div>
-                <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-change="_handleResource"></paper-input>
+                <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-value-changed="_handleResource"></paper-input>
               </div>
               <div>
                 <div class="prendus-card big">
@@ -227,7 +227,7 @@
           </template>
           <template is="dom-if" if="[[showNext(selectedIndex)]]">
             <div class="next">
-              <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next">Next</button>
+              <button id="next-button" class="prendus-button prendus-button--recommended" on-click="next" disabled$="[[nextDisabled]]">Next</button>
             </div>
           </template>
           <template is="dom-if" if="[[!showNext(selectedIndex)]]">
