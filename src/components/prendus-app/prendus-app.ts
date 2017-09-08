@@ -31,7 +31,7 @@ class PrendusApp extends Polymer.Element {
         this.action = checkForUserToken();
         if (rootRouteActive){
           if(this.userToken){
-            window.ga('set', 'page', '/develop');
+            window.ga('set', 'page', '/courses');
             window.ga('send', 'pageview');
             return 'coursesView';
           }else{
