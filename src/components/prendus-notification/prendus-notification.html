@@ -11,20 +11,24 @@
             display: block;
           }
           .error{
-            background-color: red;
+            background-color: #F44336;
+            color: black;
           }
           .success{
-            background-color: green;
+            background-color: #4CAF50;
+            color: black;
           }
           .warning{
-            background-color: yellow;
+            background-color: #FFEB3B;
+            color: black;
           }
           #toast{
             margin-left: 30px;
             margin-bottom: 30px;
           }
         </style>
-        <paper-toast id="toast" class="[[notificationType]]" text="[[notificationMessage]]" duration="[[duration]]"></paper-toast>
+        <!-- Anyone know how to bind to the class attribute instead of the property without using a polymer notation?  -->
+        <paper-toast id="toast" class$="[[notificationType]]" text="[[notificationMessage]]" duration="[[duration]]"></paper-toast>
     </template>
 
     <script type="module" src="prendus-notification.ts"></script>

@@ -1,12 +1,30 @@
 import {QuestionScaffold} from '../typings/question-scaffold';
 import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
+export function getStripeKey() {
+    if (window.process.env.NODE_ENV === 'production') {
+        return 'pk_live_WASRkEpDpsu2lp3lAuwVY8Q0';
+    }
+    else {
+        return 'pk_test_K1aLpc89HokLmD9GDjhWmqix';
+    }
+}
+
 export function getGraphcoolHTTPEndpoint() {
     if (window.process.env.NODE_ENV === 'production') {
         return 'https://api.graph.cool/simple/v1/cj48qaw2u6uyd01411y8gj8fr';
     }
     else {
         return 'https://api.graph.cool/simple/v1/cj36de9q4dem00134bhkwm44r';
+    }
+}
+
+export function getGraphcoolHTTPFileEndpoint() {
+    if (window.process.env.NODE_ENV === 'production') {
+        return 'https://api.graph.cool/file/v1/cj48qaw2u6uyd01411y8gj8fr';
+    }
+    else {
+        return 'https://api.graph.cool/file/v1/cj36de9q4dem00134bhkwm44r';
     }
 }
 

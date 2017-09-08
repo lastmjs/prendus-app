@@ -1,0 +1,6 @@
+{
+  "name": "lti-assignment",
+  "dependencies": {
+    "ims-lti": "^3.0.2"
+  }
+}

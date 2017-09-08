@@ -1,5 +1,5 @@
 # project: cj36de9q4dem00134bhkwm44r
-# version: 275
+# version: 387
 
 type File implements Node {
   id: ID! @isUnique
@@ -10,6 +10,7 @@ type File implements Node {
   secret: String! @isUnique
   size: Int!
   url: String! @isUnique
+  question: Question @relation(name: "ImagesOnQuestions")
 }
 
 type User implements Node {
@@ -17,19 +18,21 @@ type User implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   ownedCourses: [Course!]! @relation(name: "AuthorOnCourse")
-  ownedLessons: [Lesson!]! @relation(name: "AuthorOnLesson")
   ownedAssignments: [Assignment!]! @relation(name: "AuthorOnAssignment")
   ownedQuizzes: [Quiz!]! @relation(name: "AuthorOnQuiz")
   ownedQuestions: [Question!]! @relation(name: "AuthorOnQuestion")
   ownedQuestionResponses: [QuestionResponse!]! @relation(name: "AuthorOnQuestionResponse")
+  ownedQuestionResponseRatings: [QuestionResponseRating!]! @relation(name: "RaterOnQuestionResponseRating")
   email: String @isUnique
   password: String
   role: UserRole! @defaultValue(value: STUDENT)
   ltiJWT: String
   enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
+  enrolledCourses: [Course!]! @relation(name: "StudentsAndCourses")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
+  purchases: [Purchase!]! @relation(name: "UserPurchases")
 }
 
 type Course implements Node {
@@ -37,22 +40,15 @@ type Course implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   title: String!
-  lessons: [Lesson!]! @relation(name: "CourseOnLesson")
   assignments: [Assignment!]! @relation(name: "CourseOnAssignment")
   description: String
   dueDate: DateTime
   author: User! @relation(name: "AuthorOnCourse")
   discipline: Discipline @relation(name: "CourseDiscipline")
   subject: Subject @relation(name: "CourseSubject")
-}
-
-type Lesson implements Node {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  title: String!
-  course: Course! @relation(name: "CourseOnLesson")
-  author: User! @relation(name: "AuthorOnLesson")
+  enrolledStudents: [User!]! @relation(name: "StudentsAndCourses")
+  price: Int! @defaultValue(value: 1000)
+  purchases: [Purchase!]! @relation(name: "CoursePurchased")
 }
 
 type Assignment implements Node {
@@ -64,12 +60,14 @@ type Assignment implements Node {
   author: User! @relation(name: "AuthorOnAssignment")
   students: [User!]! @relation(name: "StudentsAndAssignments")
   questions: [Question!]! @relation(name: "AssignmentQuestions")
-  questionType: QuestionType!
+  questionType: QuestionType! @defaultValue(value: MULTIPLE_CHOICE)
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
   numCreateQuestions: Int! @defaultValue(value: 1)
   numReviewQuestions: Int! @defaultValue(value: 3)
+  numGradeResponses: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
+  numGradeResponses: Int! @defaultValue(value: 3)
 }
 
 type Quiz implements Node {
@@ -97,6 +95,7 @@ type Question implements Node {
   ratings: [QuestionRating!]! @relation(name: "QuestionOnQuestionRating")
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
+  images: [File!]! @relation(name: "ImagesOnQuestions")
 }
 
 type QuestionResponse implements Node {
@@ -104,19 +103,67 @@ type QuestionResponse implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   author: User! @relation(name: "AuthorOnQuestionResponse")
-  responseParts: [Response!]! @relation(name: "ResponsePartsOnQuestionResponse")
-  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponse")
+  userVariables: [UserVariable!]! @relation(name: "UserVariablesOnQuestionResponse")
+  userInputs: [UserInput!]! @relation(name: "UserInputsOnQuestionResponse")
+  userEssays: [UserEssay!]! @relation(name: "UserEssaysOnQuestionResponse")
+  userChecks: [UserCheck!]! @relation(name: "UserChecksOnQuestionResponse")
+  userRadios: [UserRadio!]! @relation(name: "UserRadiosOnQuestionResponse")
+  ratings: [QuestionResponseRating!]! @relation(name: "RatingsOnQuestionResponse")
   question: Question! @relation(name: "QuestionOnQuestionResponse")
 }
 
-type Response implements Node {
+type UserEssay implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  type: ResponseType!
-  name: String!
+  varName: String!
   value: String!
-  questionResponse: QuestionResponse! @relation(name: "ResponsePartsOnQuestionResponse")
+  questionResponse: QuestionResponse! @relation(name: "UserEssaysOnQuestionResponse")
+}
+
+type UserVariable implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  value: Float!
+  questionResponse: QuestionResponse! @relation(name: "UserVariablesOnQuestionResponse")
+}
+
+type UserInput implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  value: String!
+  questionResponse: QuestionResponse! @relation(name: "UserInputsOnQuestionResponse")
+}
+
+type UserCheck implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  checked: Boolean!
+  questionResponse: QuestionResponse! @relation(name: "UserChecksOnQuestionResponse")
+}
+
+type UserRadio implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  varName: String!
+  checked: Boolean!
+  questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
+}
+
+type QuestionResponseRating implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
+  rater: User! @relation(name: "RaterOnQuestionResponseRating")
+  questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
 }
 
 type QuestionRating implements Node {
@@ -129,6 +176,15 @@ type QuestionRating implements Node {
   updatedAt: DateTime!
 }
 
+type QuestionResponseRating implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
+  rater: User! @relation(name: "RaterOnQuestionResponseRating")
+  questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
+}
+
 type CategoryScore implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
@@ -136,7 +192,7 @@ type CategoryScore implements Node {
   category: String!
   score: Int!
   questionRating: QuestionRating @relation(name: "ScoresOnQuestionRating")
-  questionResponse: QuestionResponse @relation(name: "ScoresOnQuestionResponse")
+  questionResponseRating: QuestionResponseRating @relation(name: "ScoresOnQuestionResponseRating")
 }
 
 type AnswerComment implements Node {
@@ -195,6 +251,17 @@ type PrendusAnalytics implements Node {
   createdAt: DateTime!
   id: ID! @isUnique
   updatedAt: DateTime!
+}
+
+type Purchase implements Node {
+  id: ID! @isUnique
+  user: User! @relation(name: "UserPurchases")
+  amount: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: Course @relation(name: "CoursePurchased")
+  isPaid: Boolean! @defaultValue(value: false)
+  stripeTokenId: String!
 }
 
 enum UserRole {

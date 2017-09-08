@@ -1,4 +1,4 @@
-import {GQLQuery} from '../services/graphql-service';
+import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction} from '../typings/actions';
 import {State} from '../typings/state';
 import {Question} from '../typings/question';
@@ -45,14 +45,15 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
     const originalUserToken = window.localStorage.getItem('userToken');
 
     if (originalUserToken) {
-        const data = await GQLQuery(`
+        const data = await GQLRequest(`
             query {
                 user {
                     id
                     email
+                    role
                 }
             }
-        `, originalUserToken, (key: string, value: any) => {}, (error: any) => {
+        `, {}, originalUserToken, (error: any) => {
             throw error;
         });
 
@@ -89,13 +90,13 @@ export function setDisabledNext(disableNext: boolean): SetPropertyAction {
       value: disableNext
   };
 };
-export function setNotification(message: string, type: string): SetPropertyAction {
+export function setNotification(message: string, notificationType: string): SetPropertyAction {
   return {
       type: 'SET_PROPERTY',
       key: 'notification',
       value: {
         message,
-        type
+        notificationType
       }
   };
 };

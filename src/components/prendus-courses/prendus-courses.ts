@@ -1,11 +1,11 @@
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {ContainerElement} from '../../typings/container-element';
 import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
 import {State} from '../../typings/state';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {createUUID, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';
 
 class PrendusCourses extends Polymer.Element implements ContainerElement {
@@ -51,39 +51,41 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
 
     async loadData() {
-        await GQLQuery(`
-            query {
-                coursesFromUser${this.user ? this.user.id : null}: allCourses(filter: {
+        const id = (this.user ? this.user.id : null);
+        const courseKey = `coursesFromUser${this.user ? this.user.id : null}`;
+        const data = await GQLRequest(`
+            query courses($id: ID!){
+                ${courseKey}: allCourses(filter: {
                     author: {
-                        id: "${this.user ? this.user.id : null}"
+                        id: $id
                     }
                 }) {
                     id
                     title
                 }
             }
-        `, this.userToken, (key: string, value: any) => {
-            this.action = {
-                type: 'SET_PROPERTY',
-                key,
-                value
-            };
-        }, (error: any) => {
+        `, {id}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
+        if (!data) return;
+        this.action = {
+            type: 'SET_PROPERTY',
+            key: courseKey,
+            value: data[courseKey]
+        };
     }
     async openDeleteModal(e: any): void {
       e.stopPropagation();
 			e.preventDefault();
-      const data = await GQLMutate(`
-        mutation {
+      const data = await GQLRequest(`
+        mutation delete($id: ID!) {
           deleteCourse(
-            id: "${e.model.item.id}"
+            id: $id
           ) {
             id
           }
         }
-      `, this.userToken, (error: any) => {
+      `, {id: e.model.item.id} this.userToken, (error: any) => {
         this.action =  setNotification(error.message, NotificationType.ERROR)
       });
       this.loadData()
@@ -100,17 +102,17 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     async createCourse(){
       const title = this.shadowRoot.querySelector('#titleInput').value;
       if(title){
-        const data = await GQLMutate(`
-            mutation {
+        const data = await GQLRequest(`
+            mutation create($title: String!, $id: ID!) {
                 createCourse(
-                  title: "${title}"
-                  authorId: "${this.user.id}"
+                  title: $title
+                  authorId: $id
                 ){
                   id
                   title
                 }
             }
-        `, this.userToken, (error: any) => {
+        `, {title, id: this.user.id}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;
@@ -138,7 +140,9 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
             this.loadData();
         });
     }
-
+    submitOnEnter(e: any) {
+      if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createCourse();
+    }
     async stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;

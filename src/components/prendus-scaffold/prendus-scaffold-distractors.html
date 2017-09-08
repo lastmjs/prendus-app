@@ -4,6 +4,10 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../prendus-image-preview/prendus-image-preview.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 <dom-module id="prendus-scaffold-distractors">
@@ -47,12 +51,17 @@
           margin-bottom: 10px;
         }
 
+        paper-textarea.has-suffix {
+          width: 90%;
+          display: inline-block;
+        }
         </style>
 
         <div class="wrapper">
           <div class="prendus-card question">
             <h3>Question</h3>
-            [[currentQuestionScaffold.question]]
+            <div>[[question.text]]</div>
+            <span><prendus-image-preview file="[[question.picture]]"></prendus-image-preview></span>
           </div>
 
           <div class="row">
@@ -62,8 +71,9 @@
               </div>
               <div class="prendus-card">
                 <!-- This here so that when the controller is looking through all values, distractor0 will always have a value.-->
-                <paper-item id="distractor0" value="[[answer]]">
-                  [[answer]]
+                <paper-item id="distractor0" value="[[answer.text]]">
+                  <div>[[answer.text]]</div>
+                  <span><prendus-image-preview file="[[answer.picture]]"></prendus-image-preview></span>
                 </paper-item>
               </div>
             </div>
@@ -73,7 +83,10 @@
               </div>
               <template is="dom-repeat" items="[[distractors]]">
                 <div class="prendus-card distractor-card">
-                  <paper-textarea id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" on-input="enableNext"></paper-textarea>
+                  <paper-textarea class="has-suffix" id="distractor[[plusOne(index)]]" label="Incorrect Answer [[plusOne(index)]]" value="[[item.text]]" on-value-changed="_distractorsChanged"></paper-textarea>
+                  <paper-icon-button icon="camera-enhance" on-click="_triggerPicture"></paper-icon-button>
+                  <span id="distractor-picture-preview"><prendus-image-preview file="[[item.picture]]"></prendus-image-preview></span>
+                  <input hidden id="distractor-picture[[index]]" type="file" accept="image/*" on-change="_handlePicture">
                 </div>
               </template>
             </div>
