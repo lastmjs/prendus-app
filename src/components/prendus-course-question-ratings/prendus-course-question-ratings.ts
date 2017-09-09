@@ -58,8 +58,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('pageAmount', 10);
-    this._fireLocalAction('pageIndex', 0);
     this._fireLocalAction('loaded', true);
   }
 
@@ -115,7 +113,7 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
 
   async loadQuestions(pageAmount: number, pageIndex: number) {
     this.action = await getAndSetUser();
-    const filter = this.filterByUser;
+    const filter = this.filterByUser
       ? `filter: {author: {id: "${this.user.id}"}}`
       : '';
     const data = await GQLRequest(`
