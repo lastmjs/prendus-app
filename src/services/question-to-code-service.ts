@@ -17,7 +17,7 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
         + `[*]</p>`;
     }, '');
   // define code string with answers
-  const code: string = "evaluationRubric = '" + JSON.stringify(DEFAULT_EVALUATION_RUBRIC) + "'; "
+  const code: string = "evaluationRubric = '" + rubricStr(DEFAULT_EVALUATION_RUBRIC) + "'; "
     + answers.reduce((prevCode, answer, index) => {
         if (index === answers.length - 1) {
             return `${prevCode} radio${index + 1} === ${index === firstCorrectIndex ? 'true' : 'false'};`;
@@ -39,12 +39,16 @@ export const generateEssay = (guiQuestion: GuiQuestion): { text: string, code: s
     + (imageUrls.length ? `<p><img src="${imageUrls[0]}"/></p>` : '')
     + `<p>[essay]</p>`;
   const code: string = `
-    gradingRubric = '${JSON.stringify(gradingRubric)}';
-    evaluationRubric = '${JSON.stringify(evaluationRubric)}';
+    gradingRubric = '${rubricStr(gradingRubric)}';
+    evaluationRubric = '${rubricStr(evaluationRubric)}';
     answer = true;
   `;
   return {
     text,
     code
   };
+}
+
+function rubricStr(rubric: Rubric): string {
+  return JSON.stringify(rubric).replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/\n/g, '\\n');
 }

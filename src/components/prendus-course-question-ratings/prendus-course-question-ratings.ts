@@ -9,7 +9,7 @@ import {QuestionRatingStats} from '../../typings/question-rating-stats';
 import {Question} from '../../typings/question';
 import {Concept} from '../../typings/concept';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
-import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 import {setNotification, getAndSetUser} from '../../redux/actions'
 
@@ -111,10 +111,10 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       }`, this.componentId, this._updateData.bind(this));
   }
 
-  async loadQuestions() {
+  async loadQuestions(pageAmount: number, pageIndex: number) {
     this.action = await getAndSetUser();
     const filter = this.filterByUser
-      ? `(filter: {author: {id: "${this.user.id}"}})`
+      ? `filter: {author: {id: "${this.user.id}"}}`
       : '';
     const data = await GQLRequest(`
         query getCourse($courseId: ID!) {
@@ -124,7 +124,11 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
             assignments {
               id
               title
-              questions${filter} {
+              questions(
+                  ${filter}
+                  first: ${pageAmount}
+                  skip: ${pageIndex}
+              ) {
                 id
                 author {
                   email
@@ -149,22 +153,27 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       this.userToken,
       this._handleError.bind(this)
     );
-    this._fireLocalAction('course', data.course);
-    this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-    this._fireLocalAction('questionStats', this._computeQuestionStats(data.course.assignments));
+
+    const questionStats = this._computeQuestionStats(data.course.assignments);
+    if (questionStats.length !== 0) {
+        this._fireLocalAction('course', data.course);
+        this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
+        this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
+        await this.loadQuestions(pageAmount, pageIndex + pageAmount);
+    }
   }
 
   async _courseIdChanged() {
     this._fireLocalAction('courseId', this.courseId);
     this._fireLocalAction('loaded', false);
-    await this.loadQuestions();
+    await this.loadQuestions(20, 0);
     this._subscribeToData();
     this._fireLocalAction('loaded', true);
   }
 
   async _updateData(data) {
     this._fireLocalAction('loaded', false);
-    await this.loadQuestions();
+    await this.loadQuestions(20, 0);
     this._fireLocalAction('loaded', true);
   }
 

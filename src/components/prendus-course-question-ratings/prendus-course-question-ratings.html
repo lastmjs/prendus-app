@@ -3,6 +3,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-stacked-bar/prendus-stacked-bar.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 
 <dom-module id="prendus-course-question-ratings">
 
@@ -72,6 +73,7 @@
 
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
     <div>
       <h2 id="question-rating-table-header">Questions: [[course.title]]</h2>
       <label for="assignmentId">Assignment</label>
@@ -100,20 +102,32 @@
           </dom-repeat>
           <div id="Overall" class="table-cell column-header" scope="col" role="columnheader" aria-sort="descending"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Overall</span></div>
         </div>
-        <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
-          <template>
-            <div class="question-row" role="row">
-              <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
-              <div class="table-cell question-meta scroll">[[item.student]]</div>
-              <dom-repeat items="[[categories]]" as="category" hidden>
-                <template>
-                  <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.stats, category)]]"></prendus-stacked-bar></div>
-                </template>
-              </dom-repeat>
-              <div class="table-cell">[[item.overall]]</div>
-            </div>
-          </template>
-        </dom-repeat>
+
+        <dom-if if="[[loaded]]">
+            <template>
+                <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
+                  <template>
+                    <div class="question-row" role="row">
+                      <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
+                      <div class="table-cell question-meta scroll">[[item.student]]</div>
+                      <dom-repeat items="[[categories]]" as="category" hidden>
+                        <template>
+                          <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.stats, category)]]"></prendus-stacked-bar></div>
+                        </template>
+                      </dom-repeat>
+                      <div class="table-cell">[[item.overall]]</div>
+                    </div>
+                  </template>
+                </dom-repeat>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
       </div>
     </div>
 
