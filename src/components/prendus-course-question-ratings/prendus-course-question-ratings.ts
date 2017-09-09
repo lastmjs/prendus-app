@@ -27,8 +27,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
   conceptId: string = 'ALL';
   sortField: string = 'Overall';
   sortAsc: boolean = false;
-  pageIndex: number;
-  pageAmount: number;
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -115,9 +113,9 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       }`, this.componentId, this._updateData.bind(this));
   }
 
-  async loadQuestions() {
+  async loadQuestions(pageAmount: number, pageIndex: number) {
     this.action = await getAndSetUser();
-    const filter = this.filterByUser
+    const filter = this.filterByUser;
       ? `filter: {author: {id: "${this.user.id}"}}`
       : '';
     const data = await GQLRequest(`
@@ -130,8 +128,8 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
               title
               questions(
                   ${filter}
-                  first: ${this.pageAmount}
-                  skip: ${this.pageIndex}
+                  first: ${pageAmount}
+                  skip: ${pageIndex}
               ) {
                 id
                 author {
@@ -157,22 +155,27 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       this.userToken,
       this._handleError.bind(this)
     );
-    this._fireLocalAction('course', data.course);
-    this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-    this._fireLocalAction('questionStats', this._computeQuestionStats(data.course.assignments));
+
+    const questionStats = this._computeQuestionStats(data.course.assignments);
+    if (questionStats.length !== 0) {
+        this._fireLocalAction('course', data.course);
+        this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
+        this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
+        await this.loadQuestions(pageAmount, pageIndex + pageAmount);
+    }
   }
 
   async _courseIdChanged() {
     this._fireLocalAction('courseId', this.courseId);
     this._fireLocalAction('loaded', false);
-    await this.loadQuestions();
+    await this.loadQuestions(20, 0);
     this._subscribeToData();
     this._fireLocalAction('loaded', true);
   }
 
   async _updateData(data) {
     this._fireLocalAction('loaded', false);
-    await this.loadQuestions();
+    await this.loadQuestions(20, 0);
     this._fireLocalAction('loaded', true);
   }
 
@@ -300,23 +303,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     })));
   }
 
-  async prevClick() {
-      if (this.pageIndex - this.pageAmount >= 0) {
-          this._fireLocalAction('pageIndex', this.pageIndex - this.pageAmount);
-          this._fireLocalAction('loaded', false);
-          await this.loadQuestions();
-          this._fireLocalAction('loaded', true);
-      }
-  }
-
-  async nextClick() {
-      //TODO we'll want to eventually stop this from going to far
-      this._fireLocalAction('pageIndex', this.pageIndex + this.pageAmount);
-      this._fireLocalAction('loaded', false);
-      await this.loadQuestions();
-      this._fireLocalAction('loaded', true);
-  }
-
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
@@ -330,8 +316,6 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
     if (keys.includes('sortField')) this.sortField = componentState.sortField;
     if (keys.includes('sortAsc')) this.sortAsc = componentState.sortAsc;
-    if (keys.includes('pageIndex')) this.pageIndex = componentState.pageIndex;
-    if (keys.includes('pageAmount')) this.pageAmount = componentState.pageAmount;
     this.userToken = state.userToken;
     this.user = state.user;
   }
