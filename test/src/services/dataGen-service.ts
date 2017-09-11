@@ -16,7 +16,7 @@ export async function authenticateTestUser(role: string): {id: string, token: st
   }`, {role, email}, AUTH_TOKEN, handleError);
   return {
     id: data.createUser.id,
-    token: data.siginUser.token
+    token: data.signinUser.token
   }
 }
 
