@@ -222,7 +222,7 @@ class PrendusApp extends Polymer.Element {
       if (this.userToken){
         this.action = removeUser();
         this.action = removeUserToken();
-        navigate(`/signup`)
+        navigate(`/login`)
       }
     }
     //TODO put the route in redux
