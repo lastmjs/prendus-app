@@ -51,7 +51,6 @@ class PrendusTakeAssignment extends Polymer.Element {
       alert(err.message);
       return;
     }
-    this.shadowRoot.querySelector('#carousel').nextData();
   }
 
   continueToHome(){
@@ -77,6 +76,10 @@ class PrendusTakeAssignment extends Polymer.Element {
       key,
       value
     };
+  }
+
+  _nextClick() {
+      this.shadowRoot.querySelector('#carousel').nextData();
   }
 
   _handleError(err: any) {
