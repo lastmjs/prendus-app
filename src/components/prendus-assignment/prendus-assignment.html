@@ -40,6 +40,7 @@
           --paper-input-container-input: {
             font-size: 3em;
           };
+          width: 50%;
         }
         #dialogTitle{
           margin-top: 10px;
@@ -77,12 +78,15 @@
         .unauthorizedAccessModalListItem{
           margin-top: 30px;
         }
+        .setting-input{
+          width: 250px;
+        }
         </style>
         <dom-if if="[[loaded]]">
             <template>
                   <!-- <h1>Edit Assignment</h1> -->
                   <a href="course/[[courseId]]/edit" class="prendus-button">Return to Course</a>
-                  <paper-input id="assignment-title" class="edit-input" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title." on-focusout="saveData"></paper-input>
+                  <paper-input id="assignment-title" label="Assignment Title" value="[[assignment.title]]" maxlength="50" required auto-validate error-message="Please enter a title." on-focusout="saveData"></paper-input>
                   <br>
                   <div class="grid">
                     <div class="grid-cell">
@@ -96,7 +100,7 @@
                     </div>
                     <div class="grid-cell">
                       <h2>Options</h2>
-                      <paper-dropdown-menu id="questionTypes" label="Question Type" on-selected-item-changed="saveData">
+                      <paper-dropdown-menu class="setting-input" id="questionTypes" label="Question Type" on-selected-item-changed="saveData">
                         <paper-listbox slot="dropdown-content" attr-for-selected="id" selected="[[assignment.questionType]]">
                           <dom-repeat items="[[_questionTypes()]]">
                             <template>
@@ -105,10 +109,10 @@
                           </dom-repeat>
                         </paper-listbox>
                       </paper-dropdown-menu>
-                      <paper-input id="create" type="number" min="1" label="# Questions for Create Assignment" value="[[assignment.numCreateQuestions]]" on-change="saveData"></paper-input>
-                      <paper-input id="review" type="number" min="1" label="# Questions for Review Assignment" value="[[assignment.numReviewQuestions]]" on-change="saveData"></paper-input>
-                      <paper-input id="grade" type="number" min="1" label="# Responses for Grade Assignment" value="[[assignment.numGradeResponses]]" on-change="saveData" hidden$="[[!isEssayType(assignment.questionType)]]"></paper-input>
-                      <paper-input id="take" type="number" min="1" label="# Questions for Take Assignment" value="[[assignment.numResponseQuestions]]" on-change="saveData"></paper-input>
+                      <paper-input id="create" class="setting-input" type="number" min="1" label="Number of questions for students to create" value="[[assignment.numCreateQuestions]]" on-change="saveData"></paper-input>
+                      <paper-input id="review" class="setting-input" type="number" min="1" label="Number of questions for students to evaluate" value="[[assignment.numReviewQuestions]]" on-change="saveData"></paper-input>
+                      <paper-input id="take" class="setting-input" type="number" min="1" label="Number of questions for students to answer" value="[[assignment.numResponseQuestions]]" on-change="saveData"></paper-input>
+                      <paper-input id="grade" class="setting-input" type="number" min="1" label="Number of questions for students to grade" value="[[assignment.numGradeResponses]]" on-change="saveData" hidden$="[[!isEssayType(assignment.questionType)]]"></paper-input>
                     </div>
                   </div>
                   <paper-dialog id="assignmentConceptDialog" modal>

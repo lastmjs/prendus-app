@@ -280,6 +280,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     this._fireLocalAction('assignment', data.updateAssignment);
     this._fireLocalAction('selectedConcepts', data.updateAssignment.concepts);
     this._fireLocalAction('courseId', data.updateAssignment.course.id);
+    this.action = setNotification("Assignment Updated", NotificationType.SUCCESS);
   }
 
   stateChange(e: CustomEvent) {
