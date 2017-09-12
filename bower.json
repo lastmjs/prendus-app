@@ -1,6 +1,6 @@
 {
-  "name": "prendus",
-  "description": "Prendus question creation tool",
+  "name": "prendus-app",
+  "description": "The Prendus Application",
   "main": "index.html",
   "authors": [
     "Benjamin Mackley <benjaminmackley@gmail.com>",
