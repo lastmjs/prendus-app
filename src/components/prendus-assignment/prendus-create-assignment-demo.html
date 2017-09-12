@@ -4,6 +4,8 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-concept.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-edit-question.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 
 <dom-module id="prendus-create-assignment-demo">
     <template>
@@ -86,19 +88,66 @@
             </div>
 
             <div>
-                Step 2
+                <h1>Ask Question</h1>
+
+                <ul>
+                    <li>This will be used as an exam practice question for the class</li>
+                    <li>Create a question that could be on the exam</li>
+                    <li>Ask a question or provide a partial sentence</li>
+                    <li>The question should present a clear problem. A question like "Which one of these is not true" does not present a clear problem</li>
+                </ul>
+
+                <div>
+                    Question: <input type="text">
+                </div>
+
+                <prendus-edit-question></prendus-edit-question>
             </div>
 
             <div>
-                Step 3
+                <h1>Correctly Answer Question</h1>
+
+                <div>
+                    Correct answer: <input type="text">
+                </div>
+
+                <prendus-edit-question></prendus-edit-question>
             </div>
 
             <div>
-                Step 4
+                <h1>Incorrectly Answer Question</h1>
+
+                <ul>
+                    <li>Each alternative should seem like a valid answer</li>
+                    <li>Each alternative should look the same with its content and length</li>
+                    <li>All of the above and none of the above should not be used</li>
+                    <li>Hints should help students identify misconceptions</li>
+                </ul>
+
+                <div>
+                    Incorrect answer: <input type="text"> hint: <input type="text">
+                </div>
+
+                <div>
+                    Incorrect answer: <input type="text"> hint: <input type="text">
+                </div>
+
+                <div>
+                    Incorrect answer: <input type="text"> hint: <input type="text">
+                </div>
+
+                <prendus-edit-question></prendus-edit-question>
             </div>
 
             <div>
-                Step 5
+                <h1>Review Question</h1>
+
+                <ul>
+                    <li>Test your question out and see if it works</li>
+                    <li>If everything looks good, go ahead and submit</li>
+                </ul>
+
+                <prendus-view-question></prendus-view-question>
             </div>
         </iron-pages>
 
