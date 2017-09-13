@@ -6,7 +6,7 @@ import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
 
 class PrendusCreateAssignmentDemo extends Polymer.Element {
     componentId: string;
-    selected: SetComponentPropertyAction;
+    selected: number;
     action: SetComponentPropertyAction;
     question: {
         text: string;
@@ -160,6 +160,30 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     showEditQuestion(selected: number) {
         return selected !== 5;
+    }
+
+    nextClick(e: Event) {
+        this.action = fireLocalAction(this.componentId, 'selected', this.selected + 1);
+    }
+
+    prevClick(e: Event) {
+        this.action = fireLocalAction(this.componentId, 'selected', this.selected - 1);
+    }
+
+    submitClick(e: Event) {
+        alert('Submitted');
+    }
+
+    showPrevButton(selected: number) {
+        return selected !== 0;
+    }
+
+    showNextButton(selected: number) {
+        return selected !== 5;
+    }
+
+    showSubmitButton(selected: number) {
+        return selected === 5;
     }
 
     stateChange(e: CustomEvent) {
