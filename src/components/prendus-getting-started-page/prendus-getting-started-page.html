@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-getting-started-page">
+    <template>
+      <style include ="prendus-styles">
+
+    .page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+
+    }
+    .main-paragraph
+    {
+      padding:20px;
+      max-width: 60vw;
+    }
+    .sub-section{
+        flex-direction: column;
+    }
+    button {
+      align-self: center;
+    }
+      </style>
+      <div class="page">
+        <div class="main-paragraph">
+          <h1>How to get started</h1>
+          <h2>We like to keep it simple.
+            <ol>
+              <li> Click 'Getting Started'</li>
+              <li>Provide us with your name and school email (otherwise, we can’t verify instructors)</li>
+            </ol>
+          </h2>
+        </div>
+        <div class="sub-section">
+          <div class="sub-paragraph">
+            <h2>Students</h2>
+            <ol>
+              <li>Select your course </li>
+              <li>Check your email and click on the email verification link</li>
+              <li>Enter payment information</li>
+            </ol>
+              <button class="prendus-button" type="button" name="button">Getting started</button>
+          </div>
+          <br>
+          <br>
+          <div class="sub-paragraph">
+            <h2>Instructors</h2>
+            <ol>
+              <li>Select the approximate semester start date and enter the approximate number of students</li>
+              <li>Check your email and click on the email verification link</li>
+              <li>Set your course up</li>
+            </ol>
+              <button class="prendus-button" type="button" name="button">Getting started</button>
+          </div>
+        </div>
+      </div>
+
+
+    </template>
+
+    <script type="module" src="prendus-getting-started-page.ts"></script>
+</dom-module>
