@@ -2,6 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-concept.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-edit-question.html">
@@ -37,6 +38,12 @@
                 box-shadow: 0px 0px 3px grey;
                 color: black;
             }
+
+            .grid-container {
+                display: grid;
+                grid-template-columns: 40vw 40vw;
+                grid-column-gap: 5vw;
+            }
         </style>
 
         <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -51,107 +58,145 @@
         </paper-tabs>
 
         <iron-pages selected="[[selected]]">
-            <div>
-                <h1>Instructions</h1>
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Instructions</h1>
 
-                <p>
-                    For this assignment you will create an exam level question for you and your class to practice for the upcoming exam.
-                </p>
+                    <p>
+                        For this assignment you will create an exam level question for you and your class to practice for the upcoming exam.
+                    </p>
 
-                <p>
-                    We will guide you through the question creation process.
-                </p>
-            </div>
+                    <p>
+                        We will guide you through the question creation process.
+                    </p>
 
-            <div>
-                <h1>Tag Concept</h1>
-
-                <ul>
-                    <li>Select or enter a concept</li>
-                    <li>A concept is the topic of a question</li>
-                </ul>
-
-                <select>
-                    <option>Derivatives</option>
-                    <option>Integrals</option>
-                    <option>Series</option>
-                </select>
-
-                <h1>Add Resource</h1>
-
-                <ul>
-                    <li>Make sure the resource aligns with the selected concept</li>
-                    <li>Use any resource pertinent to the class or online - a textbook, YouTube link, Wikipedia article, etc</li>
-                    <li>Do not copy material directly from the resource. Anything plagiarized will be removed and your instructor will be notified</li>
-                </ul>
-                <input type="text">
-            </div>
-
-            <div>
-                <h1>Ask Question</h1>
-
-                <ul>
-                    <li>This will be used as an exam practice question for the class</li>
-                    <li>Create a question that could be on the exam</li>
-                    <li>Ask a question or provide a partial sentence</li>
-                    <li>The question should present a clear problem. A question like "Which one of these is not true" does not present a clear problem</li>
-                </ul>
-
-                <div>
-                    Question: <input type="text">
+                    <p>
+                        Feel free to use the editor directly at any point along the way.
+                    </p>
                 </div>
 
-                <prendus-edit-question></prendus-edit-question>
+                <div style="grid-column-start: 2">
+                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
+                </div>
             </div>
 
-            <div>
-                <h1>Correctly Answer Question</h1>
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Tag Concept</h1>
 
-                <div>
-                    Correct answer: <input type="text">
+                    <ul>
+                        <li>Select or enter a concept</li>
+                        <li>A concept is the topic of a question</li>
+                    </ul>
+
+                    <select>
+                        <option>Derivatives</option>
+                        <option>Integrals</option>
+                        <option>Series</option>
+                    </select>
+
+                    <h1>Add Resource</h1>
+
+                    <ul>
+                        <li>Make sure the resource aligns with the selected concept</li>
+                        <li>Use any resource pertinent to the class or online - a textbook, YouTube link, Wikipedia article, etc</li>
+                        <li>Do not copy material directly from the resource. Anything plagiarized will be removed and your instructor will be notified</li>
+                    </ul>
+
+                    <paper-input type="text" label="Resource (e.g., textbook page 100)"></paper-input>
                 </div>
 
-                <prendus-edit-question></prendus-edit-question>
+                <div style="grid-column-start: 2">
+                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
+                </div>
             </div>
 
-            <div>
-                <h1>Incorrectly Answer Question</h1>
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Ask Question</h1>
 
-                <ul>
-                    <li>Each alternative should seem like a valid answer</li>
-                    <li>Each alternative should look the same with its content and length</li>
-                    <li>All of the above and none of the above should not be used</li>
-                    <li>Hints should help students identify misconceptions</li>
-                </ul>
+                    <ul>
+                        <li>This will be used as an exam practice question for the class</li>
+                        <li>Create a question that could be on the exam</li>
+                        <li>Ask a question or provide a partial sentence</li>
+                        <li>The question should present a clear problem. A question like "Which one of these is not true" does not present a clear problem</li>
+                    </ul>
 
-                <div>
-                    Incorrect answer: <input type="text"> hint: <input type="text">
+                    <div>
+                        <paper-input id="questionInput" type="text" label="Type your question" on-value-changed="questionInputChanged"></paper-input>
+                    </div>
                 </div>
 
-                <div>
-                    Incorrect answer: <input type="text"> hint: <input type="text">
+                <div style="grid-column-start: 2">
+                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
                 </div>
-
-                <div>
-                    Incorrect answer: <input type="text"> hint: <input type="text">
-                </div>
-
-                <prendus-edit-question></prendus-edit-question>
             </div>
 
-            <div>
-                <h1>Review Question</h1>
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Correctly Answer Question</h1>
 
-                <ul>
-                    <li>Test your question out and see if it works</li>
-                    <li>If everything looks good, go ahead and submit</li>
-                </ul>
+                    <div>
+                        <paper-input id="correctAnswerInput" type="text" label="Type the correct answer" on-value-changed="correctAnswerInputChanged"></paper-input>
+                    </div>
+                </div>
 
-                <prendus-view-question></prendus-view-question>
+                <div style="grid-column-start: 2">
+                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Incorrectly Answer Question</h1>
+
+                    <ul>
+                        <li>Each alternative should seem like a valid answer</li>
+                        <li>Each alternative should look the same with its content and length</li>
+                        <li>All of the above and none of the above should not be used</li>
+                        <li>Hints should help students identify misconceptions</li>
+                    </ul>
+
+                    <div style="display: flex">
+                        <paper-input style="flex: 1" id="incorrectAnswerInput1" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput1Changed"></paper-input>
+                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
+                    </div>
+
+                    <div style="display: flex">
+                        <paper-input style="flex: 1" id="incorrectAnswerInput2" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput2Changed"></paper-input>
+                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
+                    </div>
+
+                    <div style="display: flex">
+                        <paper-input style="flex: 1" id="incorrectAnswerInput3" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput3Changed"></paper-input>
+                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
+                    </div>
+                </div>
+
+                <div style="grid-column-start: 2">
+                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <div style="grid-column-start: 1">
+                    <h1>Review Question</h1>
+
+                    <ul>
+                        <li>Test your question out and see if it works</li>
+                        <li>If everything looks good, go ahead and submit</li>
+                    </ul>
+                </div>
+
+                <div style="grid-column-start: 2">
+                    <div style="box-shadow: 0px 0px 3px grey; padding: calc(40px - 1vw);">
+                        <prendus-view-question question="[[question]]"></prendus-view-question>
+                    </div>
+                </div>
             </div>
         </iron-pages>
 
     </template>
 
-    <script src="prendus-create-assignment-demo.ts"></script>
+    <script type="module" src="prendus-create-assignment-demo.ts"></script>
 </dom-module>
