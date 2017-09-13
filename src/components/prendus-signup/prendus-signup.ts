@@ -14,7 +14,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     loaded: boolean;
     password: string;
     email: string;
-    confirmPassword: string;
+    confirmedPassword: string;
+    buttonEnabled: boolean;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -31,56 +32,57 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         this.componentId = createUUID();
     }
 
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this._fireLocalAction("loaded", true)
+        this._fireLocalAction("buttonEnabled", false)
+    }
+    _fireLocalAction(key: string, value: any) {
+      this.action = {
+          type: 'SET_COMPONENT_PROPERTY',
+        componentId: this.componentId,
+        key,
+        value
+      };
+    }
+    enableSignup(): boolean {
+      // if(!this.shadowRoot) return false;
+      // const email: string = this.shadowRoot.querySelector('#email').value;
+      // const password: string = this.shadowRoot.querySelector('#password').value;
+      // const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
+      if(!this.email || !this.password || !this.confirmedPassword) return false;
+      return	this.email.match(EMAIL_REGEX) !== null
+          &&	this.password !== ''
+          &&	this.confirmedPassword !== ''
+          &&	this.password === this.confirmedPassword;
     }
 
+    validateEmail(): void {
+      const emailElement: any = this.shadowRoot.querySelector('#email').value;
+      if(emailElement.match(EMAIL_REGEX) !== null) this._fireLocalAction("email", emailElement);
+      this._fireLocalAction("buttonEnabled", this.enableSignup())
+    }
     hardValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      emailElement.validate();
+      this.shadowRoot.querySelector('#email').validate();
     }
-
-    softValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+    validatePassword(): void {
+      const pass: any = this.shadowRoot.querySelector('#password').value;
+      if(pass && pass.length >= 6) this._fireLocalAction("password", pass)
+      this._fireLocalAction("buttonEnabled", this.enableSignup())
     }
     hardValidatePassword(): void {
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      passwordElement.validate();
+      this.shadowRoot.querySelector('#password').validate();
     }
-
-    softValidatePassword(): void {
-
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      if(this.password && this.password.length >= 6) passwordElement.invalid = false;
+    validateConfirmedPassword(): void {
+      const confirmedPass: any = this.shadowRoot.querySelector('#confirm-password').value;
+      if(confirmedPass && confirmedPass.length >=6) this._fireLocalAction("confirmedPassword", confirmedPass)
+      this._fireLocalAction("buttonEnabled", this.enableSignup())
     }
-
-    hardValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password !== this.confirmPassword) confirmPasswordElement.invalid = true;
+    hardValidateConfirmedPassword(): void {
+      this.shadowRoot.querySelector('#confirm-password').validate();
     }
-
-    softValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
-    }
-
-    enableSignup(email: string, password: string, confirmPassword: string): boolean {
-      return	email.match(EMAIL_REGEX) !== null
-          &&	password !== ''
-          &&	confirmPassword !== ''
-          &&	password === confirmPassword;
-    }
-
     createUserOnEnter(e: any): void {
-      if(e.keyCode === 13 && this.enableSignup(this.email, this.password, this.confirmPassword)) this.signupClick();
+      if(e.keyCode === 13 && this.enableSignup(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value, this.shadowRoot.querySelector('#confirm-password'))) this.signupClick();
     }
 
     async signupClick() {
@@ -91,7 +93,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: false
         };
 
-        const that = this;
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const signupData = await performSignupMutation(email, password, this.userToken);
@@ -127,7 +128,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         }
                 }
             `, {email, password, ltiJWT: getCookie('ltiJWT')}, userToken, (error: any) => {
-                that.action = setNotification(error.message, NotificationType.ERROR)
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
@@ -153,9 +154,14 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+        const componentState = state.components[this.componentId] || {};
+        const keys = Object.keys(componentState);
+        if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('email')) this.email = componentState.email;
+        if (keys.includes('password')) this.password = componentState.password;
+        if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
+        if (keys.includes('buttonEnabled')) this.buttonEnabled = componentState.buttonEnabled;
 
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.userToken = state.userToken;
     }
 }
 
