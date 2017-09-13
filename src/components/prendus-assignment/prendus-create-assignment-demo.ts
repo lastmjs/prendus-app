@@ -24,10 +24,37 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
     connectedCallback() {
         super.connectedCallback();
 
+        this.action = fireLocalAction(this.componentId, 'question', {
+            text: '',
+            code: 'answer = radio1 === true;'
+        });
         this.action = fireLocalAction(this.componentId, 'selected', 0);
         this.action = fireLocalAction(this.componentId, 'ast', {
             type: 'AST',
-            ast: []
+            ast: [{
+                type: 'CONTENT',
+                content: ''
+            }, {
+                // placeholder for a radio
+            }, {
+                type: 'CONTENT',
+                content: '<p></p>'
+            }, {
+                // placeholder for a radio
+            }, {
+                type: 'CONTENT',
+                content: '<p></p>'
+            }, {
+                // placeholder for a radio
+            }, {
+                type: 'CONTENT',
+                content: '<p></p>'
+            }, {
+                // placeholder for a radio
+            }, {
+                type: 'CONTENT',
+                content: '<p></p>'
+            }]
         });
     }
 
@@ -53,14 +80,13 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     questionInputChanged(e: Event) {
         const questionInput: HTMLInputElement = this.shadowRoot.querySelector('#questionInput');
-        const content: Content = {
-            type: 'CONTENT',
-            content: `<p>${questionInput.value}</p>`
-        };
 
         this.action = fireLocalAction(this.componentId, 'ast', {
             ...this.ast,
-            ast: [content, ...this.ast.ast.slice(1)]
+            ast: [{
+                ...this.ast.ast[0],
+                content: `<p>${questionInput.value}</p>`
+            }, ...this.ast.ast.slice(1)]
         });
 
         this.action = fireLocalAction(this.componentId, 'question', createNewQuestionFromAst(this.question, this.ast));
@@ -68,22 +94,17 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     correctAnswerInputChanged(e: Event) {
         const correctAnswerInput: HTMLInputElement = this.shadowRoot.querySelector('#correctAnswerInput');
-        const radio: Radio = {
-            type: 'RADIO',
-            content: [{
-                type: 'CONTENT',
-                content: correctAnswerInput.value
-            }],
-            varName: 'radio1'
-        };
-        const content: Content = {
-            type: 'CONTENT',
-            content: '<p></p>'
-        };
 
         this.action = fireLocalAction(this.componentId, 'ast', {
             ...this.ast,
-            ast: [...this.ast.ast.slice(0, 1), radio, content, ...this.ast.ast.slice(3)]
+            ast: [...this.ast.ast.slice(0, 1), {
+                type: 'RADIO',
+                varName: 'radio1',
+                content: [{
+                    type: 'CONTENT',
+                    content: correctAnswerInput.value
+                }]
+            }, ...this.ast.ast.slice(2)]
         });
 
         this.action = fireLocalAction(this.componentId, 'question', createNewQuestionFromAst(this.question, this.ast));
@@ -91,22 +112,17 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     incorrectAnswerInput1Changed(e: Event) {
         const incorrectAnswerInput1: HTMLInputElement = this.shadowRoot.querySelector('#incorrectAnswerInput1');
-        const radio: Radio = {
-            type: 'RADIO',
-            content: [{
-                type: 'CONTENT',
-                content: incorrectAnswerInput1.value
-            }],
-            varName: 'radio2'
-        };
-        const content: Content = {
-            type: 'CONTENT',
-            content: '<p></p>'
-        };
 
         this.action = fireLocalAction(this.componentId, 'ast', {
             ...this.ast,
-            ast: [...this.ast.ast.slice(0, 3), radio, content, ...this.ast.ast.slice(5)]
+            ast: [...this.ast.ast.slice(0, 3), {
+                type: 'RADIO',
+                varName: 'radio2',
+                content: [{
+                    type: 'CONTENT',
+                    content: incorrectAnswerInput1.value
+                }]
+            }, ...this.ast.ast.slice(4)]
         });
 
         this.action = fireLocalAction(this.componentId, 'question', createNewQuestionFromAst(this.question, this.ast));
@@ -114,22 +130,17 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     incorrectAnswerInput2Changed(e: Event) {
         const incorrectAnswerInput2: HTMLInputElement = this.shadowRoot.querySelector('#incorrectAnswerInput2');
-        const radio: Radio = {
-            type: 'RADIO',
-            content: [{
-                type: 'CONTENT',
-                content: incorrectAnswerInput2.value
-            }],
-            varName: 'radio3'
-        };
-        const content: Content = {
-            type: 'CONTENT',
-            content: '<p></p>'
-        };
 
         this.action = fireLocalAction(this.componentId, 'ast', {
             ...this.ast,
-            ast: [...this.ast.ast.slice(0, 5), radio, content, ...this.ast.ast.slice(7)]
+            ast: [...this.ast.ast.slice(0, 5), {
+                type: 'RADIO',
+                varName: 'radio3',
+                content: [{
+                    type: 'CONTENT',
+                    content: incorrectAnswerInput2.value
+                }]
+            }, ...this.ast.ast.slice(6)]
         });
 
         this.action = fireLocalAction(this.componentId, 'question', createNewQuestionFromAst(this.question, this.ast));
@@ -137,23 +148,19 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     incorrectAnswerInput3Changed(e: Event) {
         const incorrectAnswerInput3: HTMLInputElement = this.shadowRoot.querySelector('#incorrectAnswerInput3');
-        const radio: Radio = {
-            type: 'RADIO',
-            content: [{
-                type: 'CONTENT',
-                content: incorrectAnswerInput3.value
-            }],
-            varName: 'radio4'
-        };
-        const content: Content = {
-            type: 'CONTENT',
-            content: '<p></p>'
-        };
 
         this.action = fireLocalAction(this.componentId, 'ast', {
             ...this.ast,
-            ast: [...this.ast.ast.slice(0, 7), radio, content, ...this.ast.ast.slice(9)]
+            ast: [...this.ast.ast.slice(0, 7), {
+                type: 'RADIO',
+                varName: 'radio4',
+                content: [{
+                    type: 'CONTENT',
+                    content: incorrectAnswerInput3.value
+                }]
+            }, ...this.ast.ast.slice(8)]
         });
+
 
         this.action = fireLocalAction(this.componentId, 'question', createNewQuestionFromAst(this.question, this.ast));
     }
