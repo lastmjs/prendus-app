@@ -3,7 +3,7 @@ import {RootReducer} from '../../../../src/redux/reducers';
 import {PrendusCourseQuestionRatings} from '../../../../src/components/prendus-course-question-ratings/prendus-course-question-ratings';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../../../src/services/constants-service';
 import {CourseArb} from '../../services/arbitraries-service';
-import {saveArbitrary, authenticateTestUser, deleteTestUsers} from '../../services/dataGen-service';
+import {saveArbitrary, authenticateTestUser, deleteTestUsers, deleteArbitrary} from '../../services/dataGen-service';
 
 const jsc = require('jsverify');
 const courseArb = jsc.nonshrink(CourseArb);
@@ -16,6 +16,19 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
     super();
     this.componentId = createUUID();
     this.rootReducer = RootReducer;
+  }
+
+  authenticate(user) {
+    this.action = {
+      type: 'SET_PROPERTY',
+      key: 'userToken',
+      value: user.token
+    };
+    this.action = {
+      type: 'SET_PROPERTY',
+      key: 'user',
+      value: user
+    }
   }
 
   connectedCallback() {
@@ -34,24 +47,24 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
       try {
         const student = await authenticateTestUser('STUDENT');
         const instructor = await authenticateTestUser('INSTRUCTOR');
+        const courseData = await saveArbitrary(assignUserIds(course, instructor.id, student.id));
+        const table = new PrendusCourseQuestionRatings();
+        this.shadowRoot.appendChild(table);
+        this.authenticate(instructor);
+        const fulfilled = setUpListener(table);
+        table.courseId = courseData.Course.id;
+        console.log('waiting', new Date().getTime());
+        await fulfilled;
+        console.log('waited', new Date().getTime());
+        const success = verifyTable(table, courseData);
+        this.shadowRoot.removeChild(table);
+        await deleteArbitrary(courseData);
         await deleteTestUsers(student, instructor);
+        return success;
       } catch (e) {
         console.error(e);
-        return true;
+        return false;
       }
-      return true;
-      //      const courseData = await saveCourse(course);
-      //      const table = new PrendusCourseQuestionRatings();
-      //      this.shadowRoot.appendChild(table);
-      //      const fulfilled = setUpListener(table);
-      //      table.courseId = courseData.id;
-      //      console.log('awaiting', time());
-      //      await fulfilled;
-      //      console.log('waited', time());
-      //      const success = verifyTable(table, courseData);
-      //      this.shadowRoot.removeChild(table);
-      //      await deleteCourse(courseData);
-      //      return success;
     });
 
     //    test('Set course id with residual state', [coursesArb], async (courses: Courses) => {
@@ -112,9 +125,22 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
   }
 }
 
-// Arbitraries
-
 // Utils
+function assignUserIds(course: Course, instructorId: string, studentId: string): Course {
+  const updated = {...course};
+  updated.authorId = instructorId;
+  updated.assignments.forEach(assignment => {
+    assignment.authorId = instructorId;
+    assignment.questions.forEach(question => {
+      question.authorId = studentId;
+      question.ratings.forEach(rating => {
+        rating.raterId = studentId;
+      })
+    })
+  });
+  return updated;
+}
+
 function setUpListener(table: PrendusCourseQuestionRatings): Promise {
   let _resolve, listener;
   const promise = new Promise((resolve, reject) => {

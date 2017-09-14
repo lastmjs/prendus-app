@@ -85,7 +85,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
     this._fireLocalAction('loaded', true);
-    this.dispatchEvent(new CustomEvent('table-loaded'));
+    this.dispatchEvent(new CustomEvent('table-loaded', {composed: true}));
   }
 
   async _updateData(data: object) {

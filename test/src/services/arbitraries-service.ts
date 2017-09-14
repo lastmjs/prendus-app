@@ -47,8 +47,6 @@ export const AssignmentArb = jsc.record({
 export const CourseArb = jsc.record({
   type: jsc.constant('Course'),
   title: escapedString,
-  discipline: DisciplineArb,
-  subject: SubjectArb,
   assignments: jsc.small(jsc.nearray(AssignmentArb)),
 });
 

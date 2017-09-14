@@ -4,6 +4,21 @@ import {GQLArbitrary} from './services/arbitraries-service';
 
 const AUTH_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MDQxOTcxNzMsImNsaWVudElkIjoiY2o1bDg3cmQwMzVoaTAxMzQ0bzAwNW5maCIsInByb2plY3RJZCI6ImNqNW12aXNoaW5ucGYwMTM0OG04Z3p0YjAiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqNzBvNXJldTA0ZmEwMTk4a2ZlNnkwaXIifQ.LbuydRKQjQgbMiMggFU-wOr-IKSxzcO5ZA5mAZGEUjU';
 
+const dependencyTree = [
+  'Discipline',
+  'Subject',
+  'Concept',
+  'Question',
+  'CategoryScore',
+  'QuestionRating',
+  'Assignment',
+  'Course'
+];
+
+function dependencySort(typeA, typeB) {
+  return dependencyTree.indexOf(typeA) < dependencyTree.indexOf(typeB) ? 1 : -1;
+}
+
 export async function authenticateTestUser(role: string): {id: string, token: string} {
   const email = `test-${role}@test-prendus.com`;
   const data = await GQLRequest(`mutation create($role: UserRole!, $email: String!) {
@@ -23,7 +38,7 @@ export async function authenticateTestUser(role: string): {id: string, token: st
 export async function deleteTestUsers(...users: User[]) {
   const params = users.map((user, i) => `$user${i}: ID!`).join(', ');
   const query = `
-    del(${params}) {
+    mutation del(${params}) {
       ` + users.map((user, i) => `user${i}: deleteUser(id: $user${i}) { id }`) + `
     }
   `;
@@ -40,24 +55,51 @@ export async function saveArbitrary(arb: GQLArbitrary) {
   const query = arbToCreateQuery(arb);
   const variables = arbToVariables(arb);
   const data = await GQLRequest(query, variables, AUTH_TOKEN, handleError);
-  return data[arb.type];
+  return data;
 }
 
-export async function deleteArbitrary(typedIds: object) {
-  const flattened = flattenDeleteVariables(typedIds);
+export async function deleteArbitrary(arbData: object) {
+  const ids = extractIds(arbData);
+  const query = deleteQuery(ids);
+  await GQLRequest(query, ids, AUTH_TOKEN, handleError);
 }
 
-function flattenDeleteVariables(typedIds: object): {type: string, id: string}[] {
-  const fn = (obj: any, T: string) => flatten(
-    Object.keys(obj)
+function deleteQuery(ids: object): string {
+  const params = Object.keys(ids).map((k, i) => `$${k}: ID!`).join(', ');
+  const toType = str => str.replace(/\d+/g, '');
+  return `
+    mutation del(${params}) {
+      ` + Object.keys(ids)
+      .sort((a, b) => dependencySort(toType(a), toType(b)))
+      .map((k, i) => {
+        return `${k}: delete${toType(k)}(id: $${k}) {id}`;
+      }).join("\n")
+      + `
+    }
+  `;
+}
+
+function extractIdsRecursive(obj: object, T: string): object {
+  return Object.keys(obj)
     .filter(k => k != 'id')
     .map(k => {
       return Array.isArray(obj[k])
-        ? obj[k].map(el => fn(el, k))
-        : fn(obj[k], k)
-    })
-  ).concat({type: T, id: obj.id});
+        ? obj[k].map(el => extractIdsRecursive(el, k))
+        : extractIdsRecursive(obj[k], k)
+    }).concat({type: T, id: obj.id});
+}
 
+function extractIds(typedIds) {
+  return Object.keys(typedIds)
+    .map(T => extractIdsRecursive(typedIds[T], T))
+    .reduce(flatten, [])
+    .sort((a, b) => dependencySort(a.type, b.type))
+    .reduce((vars, typedId, i) => {
+      return {
+        ...vars,
+        [typedId.type + i]: typedId.id
+      }
+    }, {});
 }
 
 function arbToCreateQuery(arb: GQLArbitrary): string {
@@ -83,7 +125,7 @@ function arbParamType(containerType: string, fieldName: string, field: any): str
   if (field && typeof field === 'object')
     return `${containerType + fieldName + field.type}!`;
   if (typeof field === 'string')
-    return 'String!';
+    return fieldName.match(/^\w+Id/) ? 'ID!' : 'String!';
   return 'Int!';
 }
 
@@ -121,7 +163,7 @@ function handleError(err: any) {
   console.error(err);
 }
 
-function flatten(arr: any[]): any[] {
-  return arr ? Array.prototype.concat.apply([], arr) : arr;
+function flatten(arr: any[], el: any): any[] {
+  return arr.concat(Array.isArray(el) ? el.reduce(flatten, []) : el);
 }
 
