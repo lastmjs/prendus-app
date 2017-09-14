@@ -1,7 +1,6 @@
-import {createUUID} from '../../node_modules/prendus_shared/services/utilities-service';
+import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusStackedBar extends Polymer.Element {
-  data: number[];
   static get is() { return 'prendus-stacked-bar' }
 
   static get properties() {
@@ -29,13 +28,7 @@ class PrendusStackedBar extends Polymer.Element {
   }
 
   _scoresChanged(scores: CategoryScore[]) {
-    const data = scores.map(obj => obj.score).reduce((result, score) => {
-      const tailLen = score - result.length + 1;
-      const tail = tailLen > -1 ? Array(tailLen).fill(0) : [];
-      const updated = [...result, ...tail];
-      return [...updated.slice(0, score), updated[score]+1, ...updated.slice(score+1)];
-    }, []);
-    this._fireLocalAction('data', data);
+    this._fireLocalAction('data', barChartData(scores));
   }
 
   _computeWidth(data: number[], num: number) {
@@ -48,8 +41,19 @@ class PrendusStackedBar extends Polymer.Element {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
-    if (keys.includes('data')) this.data = componentState.data;
+    this.data = componentState.data;
   }
+}
+
+function barChartData(scores: CategoryScore[]): number[] {
+  return scores
+    ? scores.map(obj => obj.score).reduce((result, score) => {
+      const tailLen = score - result.length + 1;
+      const tail = tailLen > -1 ? Array(tailLen).fill(0) : [];
+      const updated = [...result, ...tail];
+      return [...updated.slice(0, score), updated[score]+1, ...updated.slice(score+1)];
+    }, [])
+    : [];
 }
 
 window.customElements.define(PrendusStackedBar.is, PrendusStackedBar)

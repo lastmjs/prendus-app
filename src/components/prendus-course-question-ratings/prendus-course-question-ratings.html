@@ -115,7 +115,7 @@
                           <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" scores="[[_prop(item.rawScores, category)]]"></prendus-stacked-bar></div>
                         </template>
                       </dom-repeat>
-                      <div class="table-cell">[[item.sortStats.Overall]]</div>
+                      <div class="table-cell">[[_precision(item.sortStats.Overall)]]</div>
                     </div>
                   </template>
                 </dom-repeat>

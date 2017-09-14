@@ -18,7 +18,7 @@ function flatten(acc: any[], elem: any): any[] {
  * Averages an array of numbers
  */
 function average(nums: number[]): number {
-  return nums.reduce(sum) / nums.length;
+  return nums.reduce(sum, 0) / (nums.length || 1);
 }
 
 /*
@@ -29,13 +29,22 @@ function averageScore(scores: CategoryScore[]): number {
 }
 
 /*
+ * Returns a callback that averages an array of CategoryScores and scales them to a value 0-10
+ */
+function scaledAverageScore(max: number) {
+  return (scores: CategoryScores[]): number {
+    return average(scores.map(node => node.score)) / max * 10;
+  }
+}
+
+/*
  * Maps an object with a callback
  */
 function mapObject(obj: object, cb: (any) => any): object {
-  return Object.keys(obj).reduce((result, val, k) => {
+  return Object.keys(obj).reduce((result, k) => {
     return {
       ...result,
-      [k]: cb(val)
+      [k]: cb(obj[k])
     }
   }, {});
 }
@@ -44,13 +53,13 @@ function mapObject(obj: object, cb: (any) => any): object {
  * Returns a reducer to group an array of objects by a property.
  * The reducer returns an object with the property value assigned to the grouped elements
  */
-function groupBy(prop: string): ({[key: string]: any[]}, object) => {[key: string]: any[]} {
+function groupBy(prop: string): (object, object) => object {
   return (result, obj) => {
     const k = obj[prop];
     if (!k) return result;
     return {
       ...result,
-      [k]: (result[k] || []).concat(obj[prop])
+      [k]: (result[k] || []).concat(obj)
     }
   }
 }
@@ -58,31 +67,39 @@ function groupBy(prop: string): ({[key: string]: any[]}, object) => {[key: strin
 /*
  * Constructs an object with category name keys assigned to arrays of corresponding category scores
  */
-function categoryScores(question: Question): number {
+export function categoryScores(question: Question): number {
   return question
     .ratings
     .map(rating => rating.scores)
-    .reduce(flatten)
+    .reduce(flatten, [])
+    .filter(score => Boolean(score))
     .reduce(groupBy('category'), {})
 }
 
 /*
  * Constructs an object with category name keys and average score values
  */
-function averageCategoryScores(question: Question) {
+export function averageCategoryScores(question: Question): object {
   return mapObject(
     categoryScores(question),
     averageScore
   )
 }
 
+export function scaledAverageCategoryScores(question: Question, max: number): object {
+  return mapObject(
+    categoryScores(question),
+    scaledAverageScore(max)
+  )
+}
+
 /*
  * Compute the overall rating of a question 0-10
  */
-function overallRating(question: Question): number {
+export function overallRating(question: Question, max: number): number {
   return average(
     Object.values(
-      averageCategoryScores(question)
+      scaledAverageCategoryScores(question, max)
     )
   );
 }
