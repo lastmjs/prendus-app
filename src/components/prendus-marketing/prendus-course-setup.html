@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-course-setup">
+    <template>
+      <style include ="prendus-styles">
+    .page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .main-paragraph
+    {
+      padding:20px;
+      max-width: 60vw;
+    }
+      </style>
+      <div class="page">
+        <div class="main-paragraph">
+          <h1>Course set up</h1>
+          <h2>
+            <ol>
+              <li>  Sign in and go to My Courses</li>
+              <li>Click Create a Course and type your course name</li>
+              <li>  Select or type your course’s discipline and subject</li>
+              <li>Click Create Assignment to name each assignment, then click Add Concept and enter each concept that you’d like students to write questions for</li>
+              <li>Modify the assignment to fit your needs, setting Allowable Question Types and Number of Questions to Answer</li>
+              <li>Copy the LTI Link and paste it in your Learning Management System</li>
+              <li>Assign due dates, etc. in your Learning Management System</li>
+            </ol>
+          </h2>
+        </div>
+      </div>
+
+    </template>
+
+    <script type="module" src="prendus-course-setup.ts"></script>
+</dom-module>
