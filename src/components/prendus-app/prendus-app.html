@@ -75,11 +75,14 @@
         <app-location id="appLocation" route="{{route}}" query-params="{{queryParams}}"></app-location>
 
         <app-route route="[[route]]" pattern="/" active="{{rootRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/what-is-prendus" active="{{whatIsPrendusRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/what-is-prendus" active="{{whatIsPrendusRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/how-it-works" active="{{howItWorksRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/course-set-up" active="{{courseSetUpRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/getting-started" active="{{gettingStartedRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/pricing" active="{{pricingRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/blooms-taxonomy" active="{{bloomsTaxonomyRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/research-background" active="{{researchBackgroundRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/login" active="{{loginRouteActive}}"></app-route>
@@ -143,13 +146,18 @@
           <app-toolbar>
         </app-header>
 
-        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, howItWorksRouteActive , courseSetUpRouteActive,gettingStartedRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
+        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, howItWorksRouteActive , courseSetUpRouteActive,gettingStartedRouteActive, pricingRouteActive, bloomsTaxonomyRouteActive, researchBackgroundRouteActive,coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, scapholdDemoRouteActive)]]">
 
             <prendus-home-page class="app-window landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
             <prendus-what-is-prendus-page class="app-window" show="whatIsPrendusView" data-path="../prendus-what-is-prendus-page/prendus-what-is-prendus-page.html"></prendus-what-is-prendus-page>
             <prendus-how-it-works-page class="app-window" show="howItWorksView" data-path="../prendus-how-it-works-page/prendus-how-it-works-page.html"></prendus-how-it-works-page>
             <prendus-course-set-up-page class="app-window" show="courseSetUpView" data-path="../prendus-course-set-up-page/prendus-course-set-up-page.html"></prendus-course-set-up-page>
             <prendus-getting-started-page class="app-window" show="gettingStartedView" data-path="../prendus-getting-started-page/prendus-getting-started-page.html"></prendus-getting-started-page>
+            <prendus-pricing-page class="app-window" show="pricingPageView" data-path="../prendus-pricing-page/prendus-pricing-page.html"></prendus-pricing-page>
+            <prendus-blooms-taxonomy class="app-window" show="bloomsTaxonomyView" data-path="../prendus-blooms-taxonomy/prendus-blooms-taxonomy.html"></prendus-blooms-taxonomy>
+            <prendus-research-background class="app-window" show="researchBackgroundView" data-path="../prendus-research-background/prendus-research-background.html"></prendus-research-background>
+
+
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
             <prendus-signup class="app-window" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>

@@ -1,0 +1,75 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-blooms-taxonomy">
+    <template>
+      <style include ="prendus-styles">
+
+    .page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .main-paragraph
+    {
+      width: 60vw;
+    }
+    .sub{
+      padding-top: 10vh;
+      display: flex;
+      align-items: center;
+    }
+    .text {
+      width: 50vw;
+    }
+    .image {
+      width: 50vw;
+      justify-content: center;
+      align-items: center;
+      align-self: center;
+    }
+    h1 {
+      text-align: center;
+    }
+
+      </style>
+      <div class="page">
+        <div class="main-paragraph">
+          <h1>Bloom's Taxonomy</h1>
+          <h3>In	the	1950’s,	Dr.	Benjamin	Bloom	and	a	team	of	educational	psychologists	developed	a	hierarchy	of
+            thinking,	which	came	to	be	known	as	Bloom’s	Taxonomy.	Over	the	years,	scholars	debated	its	structure,
+            which	led	to	its	revision.	The	revised	version	of	Bloom’s	Taxonomy	has	found	widespread	acceptance
+            among	educators	from	elementary	through	post-secondary	levels.
+            Below	is	how	Prendus	applies	it	for	students:</h3>
+        </div>
+        <div class="sub">
+          <div class="image">
+              <img src="../images/blooms-taxonomy-stack.png" alt="">
+          </div>
+          <div class="text">
+            <h2>
+              <ol>
+                <li>Create:	students	create	high-quality	questions
+                    in	Prendus.</li>
+                <li>Evaluate:	students	evaluate	questions
+                    created	in	their	class	community</li>
+                <li>Analyze:	students	analyze	and	practice	on
+                    analysis	level	questions	created	in	their	class</li>
+                <li>Apply:	students	practice	on	application	level
+                    questions.</li>
+                <li>Understand:	students	practice	on
+                    understanding	level	questions.</li>
+                <li>Remember:	students	practice	on
+                    remembering	level	questions.</li>
+              </ol>
+              </h2>
+          </div>
+        </div>
+      </div>
+
+    </template>
+
+    <script type="module" src="prendus-blooms-taxonomy.ts"></script>
+</dom-module>
