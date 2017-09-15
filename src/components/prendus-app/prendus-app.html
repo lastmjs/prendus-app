@@ -206,28 +206,32 @@
 
         <!-- <app-toolbar> -->
           <footer class="footer-items">
-            <div class="footer-child">
-              <h3>Product</h3>
-              <a>Why Prendus?</a>
-              <a>What is Prendus?</a>
-              <a>How Prendus works</a>
-            </div>
-            <div class="footer-child">
-              <h3>Company</h3>
-              <a>Meet the Founders</a>
-              <a>Blog</a>
-              <a>Contact</a>
-            </div>
-            <div class="footer-child">
-              <h3>Legal</h3>
-              <a target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
-              <a target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
-              <a href="/open-source">Open Source</a>
-              <!-- <a href="/terms-of-service">Terms&nbsp;<span id="terms-of-service" class="long-text">of Service</span></a>
-              <a href="/privacy-policy">Privacy&nbsp;<span id="privacy-policy" class="long-text">Policy</span></a>
-              <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
-            </div>
-            <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
+            <dom-if if="[[!user]]">
+              <template>
+                <div class="footer-child">
+                  <h3>Prendus</h3>
+                  <!-- <a>Why Prendus?</a> -->
+                  <a href="/what">What is Prendus?</a>
+                  <!-- <a>How Prendus works</a> -->
+                </div>
+                <div class="footer-child">
+                  <h3>Use Prendus</h3>
+                  <a href="/howitworks">How Prendus works</a>
+                  <a href="/setup">Setup Prendus</a>
+
+                </div>
+                <div class="footer-child">
+                  <h3>Legal</h3>
+                  <a target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
+                  <a target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
+                  <a href="/open-source">Open Source</a>
+                  <!-- <a href="/terms-of-service">Terms&nbsp;<span id="terms-of-service" class="long-text">of Service</span></a>
+                  <a href="/privacy-policy">Privacy&nbsp;<span id="privacy-policy" class="long-text">Policy</span></a>
+                  <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
+                </div>
+                <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
+              </template>
+            </dom-if>
           </footer>
         <!-- </app-toolbar> -->
         <prendus-notification notification="[[notification]]"></prendus-notification>
