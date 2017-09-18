@@ -49,21 +49,6 @@
   				width: 60px;
   				height: 60px;
   			}
-        .footer-items {
-  	      width: 100%;
-          height: auto;
-  	      display: flex;
-  	      justify-content: space-evenly;
-          font-size: 15px;
-          padding: 15px;
-  	    }
-        .footer-child{
-          display: flex;
-          height: auto;
-          flex-direction: column;
-          align-items: center;
-        }
-
         /*The code below wasn't actually doing anything because the viewport meta tag had not been added in the header of the index.html file. I added the viewport meta tag
           in order to get media queries working for the landing page which also caused the media query below to kick in. It looked super awkard and caused the page to offset
           and it wasn't even working before so i just commented it out. --- using media query below isn't neccessary, the same result can be achieved using css flexbox and/or css grid.
@@ -203,38 +188,6 @@
             <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
 
         </iron-lazy-pages>
-
-        <!-- <app-toolbar> -->
-          <footer class="footer-items">
-            <dom-if if="[[!user]]">
-              <template>
-                <div class="footer-child">
-                  <h3>Prendus</h3>
-                  <!-- <a>Why Prendus?</a> -->
-                  <a href="/what">What is Prendus?</a>
-                  <!-- <a>How Prendus works</a> -->
-                </div>
-                <div class="footer-child">
-                  <h3>Use Prendus</h3>
-                  <a href="/howitworks">How Prendus works</a>
-                  <a href="/assignment/demo">Try it out</a>
-                  <a href="/setup">Setup Prendus</a>
-
-                </div>
-                <div class="footer-child">
-                  <h3>Legal</h3>
-                  <a target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
-                  <a target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
-                  <a href="/open-source">Open Source</a>
-                  <!-- <a href="/terms-of-service">Terms&nbsp;<span id="terms-of-service" class="long-text">of Service</span></a>
-                  <a href="/privacy-policy">Privacy&nbsp;<span id="privacy-policy" class="long-text">Policy</span></a>
-                  <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
-                </div>
-                <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
-              </template>
-            </dom-if>
-          </footer>
-        <!-- </app-toolbar> -->
         <prendus-notification notification="[[notification]]"></prendus-notification>
     </template>
 

@@ -12,28 +12,45 @@
       height: 100vh;
       flex-direction: column;
     }
-    .main-paragraph
-    {
-      padding:20px;
-      max-width: 60vw;
+    .course-set-up-section{
+      margin-top: 20px;
     }
       </style>
-      <div class="page">
-        <div class="main-paragraph">
-          <h1>Course set up</h1>
-          <h2>
-            <ol>
-              <li>  Sign in and go to My Courses</li>
-              <li>Click Create a Course and type your course name</li>
-              <li>  Select or type your course’s discipline and subject</li>
-              <li>Click Create Assignment to name each assignment, then click Add Concept and enter each concept that you’d like students to write questions for</li>
-              <li>Modify the assignment to fit your needs, setting Allowable Question Types and Number of Questions to Answer</li>
-              <li>Copy the LTI Link and paste it in your Learning Management System</li>
-              <li>Assign due dates, etc. in your Learning Management System</li>
-            </ol>
-          </h2>
+      <h1>How to set up Prendus</h1>
+      <p>
+        There are two main steps in setting up a course. The first is creating the course. The second is adding assignments to the course. There is one final step in setting up a course that varies by learning management system (LMS). The process to authenticate students and automatically post grades in an LMS uses a protocol called Learning Tools Interoperabilty (LTI). The links used to set up assignments can be used in most, if not all LMS, although the process differs by University. Talk to your Prendus representative to get assistance on this process.
+      </p>
+      <section class="course-set-up-section">
+        <h2>Create Course</h2>
+        <ol>
+          <li>  Sign in and go to My Courses</li>
+          <li>Click Create a Course and type your course name</li>
+          <li>Select or type your course’s discipline and subject</li>
+        </ol>
+        <div>
+          <iframe id="create-course-video" width="560" height="315" src="https://www.youtube.com/embed/Uzjpd333ijc" frameborder="0" allowfullscreen></iframe>
         </div>
       </div>
+      <section class="course-set-up-section">
+        <h2>Create Assignments</h1>
+        <ol>
+          <li>Click Create Assignment to name each assignment </li>
+          <li>Click the pencil to edit a course</li>
+          <li>Each Assignment can have multiple concepts. Add custom concepts or select available concepts for the assignment. If you do not add any concepts to the assignment, students will create the concept aligned with their question during the question creation process. </li>
+          <li>Modify the assignment to fit your needs, setting Allowable Question Types and Number of Questions to Answer</li>
+        </ol>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/OasF4mhzQbo" frameborder="0" allowfullscreen></iframe>
+      </section>
+      <section class="course-set-up-section">
+        <h2>LTI Integration</h2>
+        <p>The next step to setting up a course occur outside of the system.</p>
+        <ul>
+          <li>If you need to set up Prendus as an external tool, use https://api.prendus.com/lti as the URL.</li>
+          <li>Copy the LTI Links for each assignment and paste it in your Learning Management System</li>
+          <li>Assign due dates in your Learning Management System as you would other assignments in the course</li>
+          <li>As a note, the typical process is for students to create a question, review a question, and then respond to questions in a quiz. This results in three available LTI links for each multiple-choice assignment. Essay assignments also have the option for students to grade other students on essay responses, resulting in four available links for students.</li>
+          <li>Any assignment can be customized to include any or all parts of the assignment. An essay assignment, for example, may have only one question that you as the instructor create. You may then want to just have students respond to the assignment and review it to give feedback to each other. In this case, you would only use the respond and grade LTI links.</li>
+      </section>
 
     </template>
 
