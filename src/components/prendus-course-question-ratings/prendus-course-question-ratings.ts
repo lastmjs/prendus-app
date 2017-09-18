@@ -1,32 +1,25 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
-import {Assignment} from '../../typings/assignment';
-import {Course} from '../../typings/course';
-import {QuestionRating} from '../../typings/question-rating';
-import {QuestionRatingStats} from '../../typings/question-rating-stats';
-import {Question} from '../../typings/question';
-import {Concept} from '../../typings/concept';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
+import {categoryScores, averageCategoryScores, overallRating} from '../../services/question-stats';
 import {setNotification, getAndSetUser} from '../../redux/actions'
 
-class PrendusCourseQuestionRatings extends Polymer.Element {
+export class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction;
   componentId: string;
-  userToken: string | null;
+  userToken: string;
   user: User;
   courseId: string;
   course: Course;
-  questionStats: QuestionRatingStats[];
+  questionStats: object[];
   categories: string[];
-  assignmentId: string = 'ALL';
-  conceptId: string = 'ALL';
-  sortField: string = 'Overall';
-  sortAsc: boolean = false;
+  assignmentId: string;
+  conceptId: string;
+  sortField: string;
+  sortAsc: boolean;
 
   static get is() { return 'prendus-course-question-ratings'; }
 
@@ -35,9 +28,13 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       courseId: {
         observer: '_courseIdChanged'
       },
-      filterByUser: {
-        type: Boolean,
-        value: false
+      filter: {
+        type: Object,
+        value: {
+          author: {
+            id: ""
+          }
+        }
       }
     }
   }
@@ -56,125 +53,44 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     };
   }
 
-  async connectedCallback() {
-    super.connectedCallback();
-    this._fireLocalAction('loaded', true);
-  }
-
   _handleError(error: any) {
-    //TODO: use notification service when finished
     this.action = setNotification(error.message, NotificationType.ERROR)
   }
 
-  _subscribeToData() {
-    GQLSubscribe(`
-      subscription {
-        Assignment(
-          filter: {
-            node: {
-              course: {
-                id: "${this.courseId}"
-              }
-            }, mutation_in: [CREATED, DELETED]
-          }
-        ) {node { id }}
-      }`, this.componentId, this._updateData.bind(this));
-    GQLSubscribe(`
-      subscription {
-        Question(
-          filter: {
-            node: {
-              assignment: {
-                course: {
-                  id: "${this.courseId}"
-                }
-              }
-            }, mutation_in: [CREATED, DELETED]
-          }
-        ) {node {id}}
-      }`, this.componentId, this._updateData.bind(this));
-    GQLSubscribe(`
-      subscription {
-        QuestionRating(
-          filter: {
-            node: {
-              question: {
-                assignment: {
-                  course: {
-                    id: "${this.courseId}"
-                  }
-                }
-              }
-            }, mutation_in: [CREATED]
-          }
-        ) {node {id}}
-      }`, this.componentId, this._updateData.bind(this));
-  }
-
-  async loadQuestions(pageAmount: number, pageIndex: number) {
-    this.action = await getAndSetUser();
-    const filter = this.filterByUser
-      ? `filter: {author: {id: "${this.user.id}"}}`
-      : '';
-    const data = await GQLRequest(`
-        query getCourse($courseId: ID!) {
-          course: Course(id: $courseId) {
-            id
-            title
-            assignments {
-              id
-              title
-              questions(
-                  ${filter}
-                  first: ${pageAmount}
-                  skip: ${pageIndex}
-              ) {
-                id
-                author {
-                  email
-                }
-                text
-                concept {
-                  id
-                  title
-                }
-                ratings {
-                  scores {
-                    category
-                    score
-                  }
-                }
-              }
-            }
-          }
-        }
-    `,
-      {courseId: this.courseId},
+  async loadData(pageAmount: number, pageIndex: number) {
+    const course = await loadCourse(
+      {
+        courseId: this.courseId,
+        filter: this.filter,
+        pageAmount,
+        pageIndex
+      },
       this.userToken,
       this._handleError.bind(this)
     );
-
-    const questionStats = this._computeQuestionStats(data.course.assignments);
+    const questionStats = computeTableStats(course.assignments);
     if (questionStats.length !== 0) {
-        this._fireLocalAction('course', data.course);
-        this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-        this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
-        await this.loadQuestions(pageAmount, pageIndex + pageAmount);
+      this._fireLocalAction('course', course);
+      this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
+      this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
+      await this.loadData(pageAmount, pageIndex + pageAmount);
     }
   }
 
   async _courseIdChanged() {
     this._fireLocalAction('courseId', this.courseId);
     this._fireLocalAction('loaded', false);
-    await this.loadQuestions(20, 0);
-    this._subscribeToData();
+    this.action = await getAndSetUser();
+    await this.loadData(20, 0);
+    //TODO: Fix permissions for subscription
+    //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
     this._fireLocalAction('loaded', true);
+    this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
-  async _updateData(data) {
-    this._fireLocalAction('loaded', false);
-    await this.loadQuestions(20, 0);
-    this._fireLocalAction('loaded', true);
+  async _updateData(data: object) {
+    //TODO: Fix permissions and then append the new question rating to the list
+    console.log(data);
   }
 
   _assignmentIdChanged(e) {
@@ -189,45 +105,49 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
     return flatten(assignments.map(assignment => assignment.questions));
   }
 
-  _makeFilter(assignmentId: string, conceptId: string): (question: QuestionRatingStats) => boolean {
-    return (question: QuestionRatingStats) => {
+  _concepts(assignments: Assignment[]): Concept[] {
+    return uniqueProp(this._questions(assignments).map(question => question.concept), 'id');
+  }
+
+  _questionOnly(text: string): string {
+    return truncate(parse(text, null).ast[0].content.replace(/<p>|<p style=".*">|<\/p>|<img.*\/>/g, ''));
+  }
+
+  _precision(num: number): string {
+    return num.toPrecision(2);
+  }
+
+  _prop(obj: object, prop: string): any {
+    return obj ? obj[prop] : null;
+  }
+
+  _makeFilter(assignmentId: string, conceptId: string): (question: object) => boolean {
+    return (question: object): boolean => {
       return (assignmentId === 'ALL' || question.assignmentId === assignmentId)
       && (conceptId === 'ALL' || conceptId === question.conceptId);
     };
   }
 
-  _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
+  _makeSorter(sortField: string, sortAsc: boolean): (a: object, b: object) => number {
     const first: number = sortAsc ? 1 : -1;
     const last: number = first > 0 ? -1 : 1;
-    return (a: QuestionRatingStats, b: QuestionRatingStats) => {
+    return (a: object, b: object): number => {
       if (sortField === 'Student') {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
         return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
       }
-      if (sortField === 'Overall') {
-        if (Number(a.overall) === Number(b.overall)) return 0;
-        return Number(a.overall) > Number(b.overall) ? first : last;
-      }
-      const aStats = a.stats[sortField] ? a.stats[sortField].reduce(weightedSum, 0) : 0;
-      const bStats = b.stats[sortField] ? b.stats[sortField].reduce(weightedSum, 0) : 0;
+      const aStats = a.sortStats[sortField] || 0;
+      const bStats = b.sortStats[sortField] || 0;
       if (aStats === bStats) return 0;
       return aStats > bStats ? first : last;
     };
   }
 
-  _findHeader(needle: string, haystack: any): any {
-    for (let i = 0; i < haystack.length; i++) {
-      if (haystack[i].innerHTML === needle)
-        return haystack[i];
-    }
-    return null;
-  }
-
   _toggleSort(e) {
     const field = e.target.innerHTML;
-    const headers = this.shadowRoot.querySelectorAll('.sortable');
-    const oldField = this._findHeader(this.sortField, headers);
-    const newField = this._findHeader(field, headers);
+    const headers = Array.from(this.shadowRoot.querySelectorAll('.sortable'));
+    const oldField = headers.find(header => header.innerHTML === this.sortField);
+    const newField = headers.find(header => header.innerHTML === field);
     if (this.sortField !== field) {
       oldField && oldField.parentNode.setAttribute('aria-sort', 'none');
       newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
@@ -244,87 +164,128 @@ class PrendusCourseQuestionRatings extends Polymer.Element {
       this._toggleSort(e);
   }
 
-  _concepts(assignments: Assignment[]): Concept[] {
-    return uniqueProp(this._questions(assignments).map(question => question.concept), 'id');
-  }
-
-  _questionOnly(text: string): string {
-    return this._truncate(parse(text, null).ast[0].content.replace(/<p>|<p style=".*">|<\/p>|<img.*\/>/g, ''));
-  }
-
-  _truncate(str: string): string {
-    if (str.length < 100) return str;
-    return str.substr(0, 100) + '...';
-  }
-
-  _prop(obj: Object, prop: string): any {
-    return obj[prop];
-  }
-
-  _barStats(stats: Object, category: string): number[] {
-    return stats[category] || [];
-  }
-
-  _overallScore(ratings): number {
-    const score = (Object.values(ratings).reduce((total, scores) => {
-      return total + scores.reduce(weightedSum, 0) / scores.reduce(sum, 0);
-    }, 0) / Object.values(ratings).length * 5) || 0;
-    return score.toPrecision(2);
-  }
-
-  _computeQuestionStats(assignments: Assignment[]): QuestionRatingStats[] {
-    // Here we need to make an array for each category for each question.
-    // The array will be assigned to an object where the key is the rubric category name
-    // The arrays values will represent the number of students who rated the question with
-    // a certain score in that category where the score is the index in the array
-    // So if 1 student gave a score of 0 in a category and 2 others gave a score of 1 then the
-    // category for that question: CategoryName: [1, 2]. We use that for the bar chart and the overall score
-    return flatten(assignments.map(assignment => assignment.questions.map(question => {
-      const stats = flatten(question.ratings.map(rating => rating.scores)).reduce((result, rating) => {
-        const existent = result[rating.category] || [];
-        const tailLen = rating.score + 1 - existent.length;
-        const data = tailLen > 0
-          ? [...existent, ...Array(tailLen).fill(0)]
-          : existent;
-        data[rating.score]++;
-        return {...result, [rating.category]: data};
-      }, {});
-      const overall = this._overallScore(stats);
-      return {
-        assignmentId: assignment.id,
-        conceptId: question.concept.id,
-        student: question.author.email,
-        text: question.text,
-        overall,
-        stats
-      }
-    })));
-  }
-
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('course')) this.course = componentState.course;
-    if (keys.includes('questionStats')) this.questionStats = componentState.questionStats;
-    if (keys.includes('categories')) this.categories = componentState.categories;
-    if (keys.includes('courseId')) this.courseId = componentState.courseId;
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('assignmentId')) this.assignmentId = componentState.assignmentId;
-    if (keys.includes('conceptId')) this.conceptId = componentState.conceptId;
-    if (keys.includes('sortField')) this.sortField = componentState.sortField;
-    if (keys.includes('sortAsc')) this.sortAsc = componentState.sortAsc;
+    this.course = componentState.course;
+    this.questionStats = componentState.questionStats;
+    this.categories = componentState.categories;
+    this.courseId = componentState.courseId;
+    this.loaded = componentState.loaded;
+    this.assignmentId = componentState.assignmentId || 'ALL';
+    this.conceptId = componentState.conceptId || 'ALL';
+    this.sortField = componentState.sortField || 'Overall';
+    this.sortAsc = componentState.sortAsc;
     this.userToken = state.userToken;
     this.user = state.user;
+    if (this.user && this.user.role === 'INSTRUCTOR') this.filter = {};
+    else if (this.user) this.filter.author.id = this.user.id;
   }
 }
 
-function sum (sum: number, num: number): number {
-  return sum + (Number(num) || 0);
+function computeTableStats(assignments: Assignment[]): object[] {
+  return flatten(assignments.map(assignment => assignment.questions.map(question => {
+    const rawScores = categoryScores(question);
+    const overall = overallRating(question, 2);
+    const averages = averageCategoryScores(question);
+    return {
+      assignmentId: assignment.id,
+      conceptId: question.concept.id,
+      student: question.author.email,
+      text: question.text,
+      sortStats: {
+        Overall: overall,
+        ...averages
+      },
+      rawScores
+    }
+  })));
 }
 
-function weightedSum (sum: number, num: number, i: number): number {
-  return sum + num * i;
+async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
+  const data = await GQLRequest(`
+      query getCourse($courseId: ID!, $filter: QuestionFilter, $pageAmount: Int!, $pageIndex: Int!) {
+        course: Course(id: $courseId) {
+          id
+          title
+          assignments {
+            id
+            title
+            questions(
+              filter: $filter
+              first: $pageAmount
+              skip: $pageIndex
+            ) {
+              id
+              author {
+                email
+              }
+              text
+              concept {
+                id
+                title
+              }
+              ratings {
+                scores {
+                  category
+                  score
+                }
+              }
+            }
+          }
+        }
+      }
+  `,
+    variables,
+    userToken,
+    cb
+  );
+
+  return data.course;
+}
+
+function subscribeToData(componentId: string, courseId: string, cb: (data: any) => void) {
+  GQLSubscribe(`
+    subscription {
+      QuestionRating(
+        filter: {
+          node: {
+            question: {
+              assignment: {
+                course: {
+                  id: "${courseId}"
+                }
+              }
+            }
+          }, mutation_in: [CREATED]
+        }
+      ) {
+        node {
+          id
+          scores {
+            category
+            score
+          }
+          question {
+            id
+            text
+            assignment {
+              id
+              title
+            }
+            concept {
+              id
+              title
+            }
+          }
+        }
+      }
+    }`, componentId, cb);
+}
+
+function truncate(str: string): string {
+  if (str.length < 100) return str;
+  return str.substr(0, 100) + '...';
 }
 
 function flatten(arr: any[]): any[] {
@@ -333,12 +294,12 @@ function flatten(arr: any[]): any[] {
   },[]);
 }
 
-function filterProp(prop: string, val: string): (obj: Object) => boolean {
+function filterProp(prop: string, val: string): (obj: object) => boolean {
   return obj => obj[prop] === val;
 }
 
-function uniqueProp(arr: Object[], prop: string): Object[] {
-  return arr.reduce((filtered: Object[], obj: Object) => {
+function uniqueProp(arr: object[], prop: string): object[] {
+  return arr.reduce((filtered: object[], obj: object) => {
     if (filtered.filter(filterProp(prop, obj[prop])).length === 0)
       filtered.push(obj);
     return filtered;
