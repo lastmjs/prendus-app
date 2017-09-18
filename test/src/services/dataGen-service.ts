@@ -19,7 +19,7 @@ function dependencySort(typeA, typeB) {
   return dependencyTree.indexOf(typeA) < dependencyTree.indexOf(typeB) ? 1 : -1;
 }
 
-export async function authenticateTestUser(role: string): {id: string, token: string} {
+export async function createTestUser(role: string): {id: string, token: string} {
   const email = `test-${role}@test-prendus.com`;
   const data = await GQLRequest(`mutation create($role: UserRole!, $email: String!) {
     createUser(role: $role, authProvider: { email: { email: $email, password: "test" } }) {

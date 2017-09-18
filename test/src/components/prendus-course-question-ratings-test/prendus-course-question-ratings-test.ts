@@ -3,7 +3,7 @@ import {RootReducer} from '../../../../src/redux/reducers';
 import {PrendusCourseQuestionRatings} from '../../../../src/components/prendus-course-question-ratings/prendus-course-question-ratings';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../../../src/services/constants-service';
 import {CourseArb} from '../../services/arbitraries-service';
-import {saveArbitrary, authenticateTestUser, deleteTestUsers, deleteArbitrary} from '../../services/dataGen-service';
+import {saveArbitrary, createTestUser, deleteTestUsers, deleteArbitrary} from '../../services/dataGen-service';
 
 const jsc = require('jsverify');
 const courseArb = jsc.nonshrink(CourseArb);
@@ -45,8 +45,8 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
 
     test('Set course id without residual state', [courseArb], async (course: Course) => {
       try {
-        const student = await authenticateTestUser('STUDENT');
-        const instructor = await authenticateTestUser('INSTRUCTOR');
+        const student = await createTestUser('STUDENT');
+        const instructor = await createTestUser('INSTRUCTOR');
         const courseData = await saveArbitrary(assignUserIds(course, instructor.id, student.id));
         const table = new PrendusCourseQuestionRatings();
         this.shadowRoot.appendChild(table);
