@@ -83,9 +83,11 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (!e.target || !e.target.files || !e.target.files[0])
       return false;
     const file = e.target.files[0];
-    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
-    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
-      return false;
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1).toLowerCase();
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg') {
+      this.action = setNotification('The file does not have an image file extension.', NotificationType.ERROR);
+      return;
+    }
     return true;
   }
 
