@@ -3,7 +3,7 @@ import {State} from '../../typings/state';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate, getCookie, deleteCookie} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
@@ -34,55 +34,36 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this._fireLocalAction("loaded", true)
-        this._fireLocalAction("buttonEnabled", false)
-    }
-    _fireLocalAction(key: string, value: any) {
-      this.action = {
-          type: 'SET_COMPONENT_PROPERTY',
-        componentId: this.componentId,
-        key,
-        value
-      };
-    }
-    enableSignup(): boolean {
-      // if(!this.shadowRoot) return false;
-      // const email: string = this.shadowRoot.querySelector('#email').value;
-      // const password: string = this.shadowRoot.querySelector('#password').value;
-      // const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
-      if(!this.email || !this.password || !this.confirmedPassword) return false;
-      return	this.email.match(EMAIL_REGEX) !== null
-          &&	this.password !== ''
-          &&	this.confirmedPassword !== ''
-          &&	this.password === this.confirmedPassword;
+        fireLocalAction("loaded", true)
+        fireLocalAction("buttonEnabled", false)
     }
 
     validateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email').value;
-      if(emailElement.match(EMAIL_REGEX) !== null) this._fireLocalAction("email", emailElement);
-      this._fireLocalAction("buttonEnabled", this.enableSignup())
+      const emailElement: string = this.shadowRoot.querySelector('#email').value;
+      if(emailElement.match(EMAIL_REGEX) !== null) fireLocalAction("email", emailElement);
+      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
       this.shadowRoot.querySelector('#email').validate();
     }
     validatePassword(): void {
-      const pass: any = this.shadowRoot.querySelector('#password').value;
-      if(pass && pass.length >= 6) this._fireLocalAction("password", pass)
-      this._fireLocalAction("buttonEnabled", this.enableSignup())
+      const pass: string = this.shadowRoot.querySelector('#password').value;
+      if(pass && pass.length >= 6) fireLocalAction("password", pass)
+      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidatePassword(): void {
       this.shadowRoot.querySelector('#password').validate();
     }
     validateConfirmedPassword(): void {
-      const confirmedPass: any = this.shadowRoot.querySelector('#confirm-password').value;
-      if(confirmedPass && confirmedPass.length >=6) this._fireLocalAction("confirmedPassword", confirmedPass)
-      this._fireLocalAction("buttonEnabled", this.enableSignup())
+      const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
+      if(confirmedPass && confirmedPass.length >=6) fireLocalAction("confirmedPassword", confirmedPass)
+      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidateConfirmedPassword(): void {
       this.shadowRoot.querySelector('#confirm-password').validate();
     }
     createUserOnEnter(e: any): void {
-      if(e.keyCode === 13 && this.enableSignup(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value, this.shadowRoot.querySelector('#confirm-password'))) this.signupClick();
+      if(e.keyCode === 13 && enableSignup(this.email, this.password, this.confirmedPassword)) this.signupClick();
     }
 
     async signupClick() {
@@ -166,3 +147,10 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusSignup.is, PrendusSignup);
+
+function enableSignup(email: string, password: string, confirmedPassword: string){
+  return	email.match(EMAIL_REGEX) !== null
+      &&	password !== ''
+      &&	confirmedPassword !== ''
+      &&	password === confirmedPassword;
+}
