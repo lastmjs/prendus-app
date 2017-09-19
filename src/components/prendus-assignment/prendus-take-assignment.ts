@@ -85,16 +85,15 @@ class PrendusTakeAssignment extends Polymer.Element {
       this.shadowRoot.querySelector('#carousel').nextData();
   }
   _openFlagQuestionModal(){
-    this._fireLocalAction('flagQuestionModalOpened', true)
+    this._fireLocalAction('flagQuestionModalOpened', true);
   }
   _closeFlagQuestionModal(){
-    this._fireLocalAction('flagQuestionModalOpened', false)
+    this._fireLocalAction('flagQuestionModalOpened', false);
   }
   _handleError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
   async createQuestionFlag(){
-    console.log('value', this.shadowRoot.querySelector('#flag-response').value, 'questionId', this.question.id)
     const comment = this.shadowRoot.querySelector('#flag-response').value
     const questionId = this.question.id;
     const data = await GQLRequest(`
@@ -106,9 +105,6 @@ class PrendusTakeAssignment extends Polymer.Element {
         id
       }
     }`, {comment, questionId}, this.userToken, this._handleError.bind(this));
-    if (!data) {
-      return [];
-    }
     this._fireLocalAction('flagQuestionModalOpened', false)
     this.action = setNotification("Question Flagged", NotificationType.ERROR);
     this.shadowRoot.querySelector('#carousel').nextData();
