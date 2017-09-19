@@ -146,12 +146,3 @@ export async function asyncForEach(collection: any[], behavior: any): Promise<vo
     await behavior(collection[0]);
     await asyncForEach(collection.slice(1), behavior);
 }
-
-export function fireLocalAction(key: string, value: any) {
-  this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-    componentId: this.componentId,
-    key,
-    value
-  };
-}

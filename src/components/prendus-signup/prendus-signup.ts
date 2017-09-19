@@ -34,30 +34,30 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     connectedCallback() {
         super.connectedCallback();
-        fireLocalAction("loaded", true)
-        fireLocalAction("buttonEnabled", false)
+        this.action = fireLocalAction(this.componentId, "loaded", true)
+        this.action = fireLocalAction(this.componentId, "buttonEnabled", false)
     }
 
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
-      if(emailElement.match(EMAIL_REGEX) !== null) fireLocalAction("email", emailElement);
-      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
       this.shadowRoot.querySelector('#email').validate();
     }
     validatePassword(): void {
       const pass: string = this.shadowRoot.querySelector('#password').value;
-      if(pass && pass.length >= 6) fireLocalAction("password", pass)
-      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidatePassword(): void {
       this.shadowRoot.querySelector('#password').validate();
     }
     validateConfirmedPassword(): void {
       const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
-      if(confirmedPass && confirmedPass.length >=6) fireLocalAction("confirmedPassword", confirmedPass)
-      fireLocalAction("buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      if(confirmedPass && confirmedPass.length >=6) this.action = fireLocalAction(this.componentId, "confirmedPassword", confirmedPass)
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
     }
     hardValidateConfirmedPassword(): void {
       this.shadowRoot.querySelector('#confirm-password').validate();
