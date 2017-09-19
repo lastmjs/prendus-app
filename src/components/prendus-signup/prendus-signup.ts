@@ -41,7 +41,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
       if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
       this.shadowRoot.querySelector('#email').validate();
@@ -49,7 +49,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     validatePassword(): void {
       const pass: string = this.shadowRoot.querySelector('#password').value;
       if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
     }
     hardValidatePassword(): void {
       this.shadowRoot.querySelector('#password').validate();
@@ -57,7 +57,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     validateConfirmedPassword(): void {
       const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
       if(confirmedPass && confirmedPass.length >=6) this.action = fireLocalAction(this.componentId, "confirmedPassword", confirmedPass)
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, confirmedPass))
     }
     hardValidateConfirmedPassword(): void {
       this.shadowRoot.querySelector('#confirm-password').validate();
