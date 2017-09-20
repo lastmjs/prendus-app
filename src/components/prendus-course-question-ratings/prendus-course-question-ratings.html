@@ -108,14 +108,14 @@
                 <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
                   <template>
                     <div class="question-row" role="row">
-                      <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
+                      <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.question.text)]]</div>
                       <div class="table-cell question-meta scroll">[[item.student]]</div>
                       <dom-repeat items="[[categories]]" as="category" hidden>
                         <template>
                           <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" scores="[[_prop(item.rawScores, category)]]"></prendus-stacked-bar></div>
                         </template>
                       </dom-repeat>
-                      <div class="table-cell">[[_precision(item.sortStats.Overall)]]</div>
+                      <div class="table-cell">[[_precision(item.sortStats.overall)]]</div>
                     </div>
                   </template>
                 </dom-repeat>

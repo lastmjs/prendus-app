@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores, averageCategoryScores, overallRating} from '../../services/question-stats';
@@ -44,15 +44,6 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
-  }
-
   _handleError(error: any) {
     this.action = setNotification(error.message, NotificationType.ERROR)
   }
@@ -70,21 +61,21 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     );
     const questionStats = computeTableStats(course.assignments);
     if (questionStats.length !== 0) {
-      this._fireLocalAction('course', course);
-      this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-      this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
+      this.action = fireLocalAction('course', course);
+      this.action = fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
+      this.action = fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
       await this.loadData(pageAmount, pageIndex + pageAmount);
     }
   }
 
   async _courseIdChanged() {
-    this._fireLocalAction('courseId', this.courseId);
-    this._fireLocalAction('loaded', false);
+    this.action = fireLocalAction('courseId', this.courseId);
+    this.action = fireLocalAction('loaded', false);
     this.action = await getAndSetUser();
     await this.loadData(20, 0);
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
-    this._fireLocalAction('loaded', true);
+    this.action = fireLocalAction('loaded', true);
     this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
@@ -94,11 +85,11 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _assignmentIdChanged(e) {
-    this._fireLocalAction('assignmentId', e.target.value);
+    this.action = fireLocalAction('assignmentId', e.target.value);
   }
 
   _conceptIdChanged(e) {
-    this._fireLocalAction('conceptId', e.target.value);
+    this.action = fireLocalAction('conceptId', e.target.value);
   }
 
   _questions(assignments: Assignment[]): Question[] {
@@ -136,13 +127,14 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
         return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
       }
-      const aStats = a.sortStats[sortField] || 0;
-      const bStats = b.sortStats[sortField] || 0;
+      const aStats = a.sortStats[sortField.toLowerCase()] || 0;
+      const bStats = b.sortStats[sortField.toLowerCase()] || 0;
       if (aStats === bStats) return 0;
       return aStats > bStats ? first : last;
     };
   }
 
+  //TODO: See if I can make aria attributes computed properties
   _toggleSort(e) {
     const field = e.target.innerHTML;
     const headers = Array.from(this.shadowRoot.querySelectorAll('.sortable'));
@@ -151,11 +143,11 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     if (this.sortField !== field) {
       oldField && oldField.parentNode.setAttribute('aria-sort', 'none');
       newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
-      this._fireLocalAction('sortField', field);
+      this.action = fireLocalAction('sortField', field);
     }
     else {
       newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
-      this._fireLocalAction('sortAsc', !this.sortAsc);
+      this.action = fireLocalAction('sortAsc', !this.sortAsc);
     }
   }
 
@@ -174,7 +166,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.loaded = componentState.loaded;
     this.assignmentId = componentState.assignmentId || 'ALL';
     this.conceptId = componentState.conceptId || 'ALL';
-    this.sortField = componentState.sortField || 'Overall';
+    this.sortField = componentState.sortField || 'overall';
     this.sortAsc = componentState.sortAsc;
     this.userToken = state.userToken;
     this.user = state.user;
@@ -183,20 +175,32 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 }
 
+function objectKeysToLowerCase(obj: object): object {
+  return Object.keys(obj)
+    .reduce((result, k) => {
+      return {
+        ...result,
+        [k.toLowerCase()]: obj[k]
+      }
+    }, {});
+}
+
 function computeTableStats(assignments: Assignment[]): object[] {
   return flatten(assignments.map(assignment => assignment.questions.map(question => {
     const rawScores = categoryScores(question);
     const overall = overallRating(question, 2);
     const averages = averageCategoryScores(question);
+    const sortStats = {
+      overall,
+      ...objectKeysToLowerCase(averages)
+    };
+    //make sort stats lookup case insensitive
     return {
+      question,
       assignmentId: assignment.id,
       conceptId: question.concept.id,
       student: question.author.email,
-      text: question.text,
-      sortStats: {
-        Overall: overall,
-        ...averages
-      },
+      sortStats,
       rawScores
     }
   })));
@@ -221,6 +225,7 @@ async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: 
                 email
               }
               text
+              code
               concept {
                 id
                 title
