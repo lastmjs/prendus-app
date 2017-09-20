@@ -80,11 +80,6 @@ class PrendusApp extends Polymer.Element {
           window.ga('send', 'pageview');
           return 'openSourceView';
         }
-        if(courseSetupRouteActive){
-          window.ga('set','page', this.route.path);
-          window.ga('send','pageview');
-          return 'courseSetUpView';
-        }
         if (coursesRouteActive){
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
