@@ -149,21 +149,33 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {
-    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`
+        query getAssignment($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         numResponseQuestions
         questionType
         questions(filter: {
-          author: {
-            id_not: $userId
-          }
+          AND: [{
+            author: {
+              id_not: $userId
+            }
+          }, {
+            	ratings_none: {
+                scores_some: {
+                  category: "Inclusion"
+                }
+              }
+          }, {
+            flags_none: {}
+          }]
         }) {
           id
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
+    }
+    `, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
     if (!data) {
       return;
     }
