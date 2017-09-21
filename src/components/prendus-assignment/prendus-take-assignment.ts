@@ -162,10 +162,12 @@ class PrendusTakeAssignment extends Polymer.Element {
               id_not: $userId
             }
           }, {
-            	ratings_none: {
+            ratings_some: {}
+          }, {
+            	ratings_every: {
                 scores_some: {
                   category: "Inclusion"
-                  score_lt: 1
+                  score_gt: 1
                 }
               }
           }, {
@@ -173,6 +175,13 @@ class PrendusTakeAssignment extends Polymer.Element {
           }]
         }) {
           id
+      		ratings {
+      			scores {
+      			  id
+              category
+              score
+      			}
+    			}
         }
       }
     }
