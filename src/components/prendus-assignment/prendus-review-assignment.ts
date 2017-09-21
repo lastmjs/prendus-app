@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
