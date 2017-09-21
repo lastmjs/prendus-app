@@ -165,6 +165,7 @@ class PrendusTakeAssignment extends Polymer.Element {
             	ratings_none: {
                 scores_some: {
                   category: "Inclusion"
+                  score_lt: 1
                 }
               }
           }, {
