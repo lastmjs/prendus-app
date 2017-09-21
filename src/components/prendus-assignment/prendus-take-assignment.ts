@@ -2,7 +2,8 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GQLVariables} from '../../typings/gql-variables';
-import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';

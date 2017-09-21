@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
@@ -169,6 +170,9 @@ class PrendusReviewAssignment extends Polymer.Element {
                   answerComments {
                     text
                   }
+                  _ratingsMeta {
+                    count
+                  }
                 }
               }
             }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
@@ -176,7 +180,7 @@ class PrendusReviewAssignment extends Polymer.Element {
               return;
             }
             this._fireLocalAction('assignment', data.Assignment);
-            this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
+            this._fireLocalAction('questions', randomWithUnreviewedFirst(data.Assignment.questions, data.Assignment.numReviewQuestions));
             this._fireLocalAction('loaded', true);
           }, 5000);
       });
@@ -204,6 +208,16 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function randomWithUnreviewedFirst(questions: Question[], num: number): Question[] {
+  const unreviewed = questions.filter(question => !question._ratingsMeta.count);
+  if (unreviewed.length >= num)
+    return shuffleArray(unreviewed).slice(0, num);
+  else if (!unreviewed.length)
+    return shuffleArray(questions).slice(0, num);
+  const reviewed = questions.filter(question => question._ratingsMeta.count);
+  return [...shuffleArray(unreviewed), ...shuffleArray(reviewed).slice(0, num-unreviewed.length)];
 }
 
 function validate(rubric: Rubric, ratings: CategoryScore[]) {
