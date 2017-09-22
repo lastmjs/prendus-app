@@ -1,7 +1,9 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
+import {Question} from '../../typings/question';
 import {GQLVariables} from '../../typings/gql-variables';
-import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
@@ -15,7 +17,9 @@ class PrendusTakeAssignment extends Polymer.Element {
   userToken: string;
   user: User;
   assignment: Assignment;
-
+  flagQuestionModalOpened: boolean;
+  question: Question;
+  questions:  Question[];
   static get is() { return 'prendus-take-assignment' }
 
   static get properties() {
@@ -81,11 +85,31 @@ class PrendusTakeAssignment extends Polymer.Element {
   _nextClick() {
       this.shadowRoot.querySelector('#carousel').nextData();
   }
-
+  _openFlagQuestionModal(){
+    this._fireLocalAction('flagQuestionModalOpened', true);
+  }
+  _closeFlagQuestionModal(){
+    this._fireLocalAction('flagQuestionModalOpened', false);
+  }
   _handleError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
-
+  async createQuestionFlag(){
+    const comment = this.shadowRoot.querySelector('#flag-response').value
+    const questionId = this.question.id;
+    const data = await GQLRequest(`
+      mutation questionFlag($comment: String!, $questionId: ID!){
+        createQuestionFlag(
+          comment: $comment
+          questionId: $questionId
+        ) {
+        id
+      }
+    }`, {comment, questionId}, this.userToken, this._handleError.bind(this));
+    this._fireLocalAction('flagQuestionModalOpened', false)
+    this.action = setNotification("Question Flagged", NotificationType.ERROR);
+    this.shadowRoot.querySelector('#carousel').nextData();
+  }
   //TODO: this seems to be getting called twice...
   async generateQuiz(assignmentId: string) {
       this._fireLocalAction('loaded', true);
@@ -126,21 +150,43 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {
-    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`
+        query getAssignment($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         numResponseQuestions
         questionType
         questions(filter: {
-          author: {
-            id_not: $userId
-          }
+          AND: [{
+            author: {
+              id_not: $userId
+            }
+          }, {
+            ratings_some: {}
+          }, {
+            	ratings_every: {
+                scores_some: {
+                  category: "Inclusion"
+                  score_gt: 1
+                }
+              }
+          }, {
+            flags_none: {}
+          }]
         }) {
           id
+      		ratings {
+      			scores {
+      			  id
+              category
+              score
+      			}
+    			}
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
+    }
+    `, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
     if (!data) {
       return;
     }
@@ -202,6 +248,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('error')) this.error = componentState.error;
+    if (keys.includes('flagQuestionModalOpened')) this.flagQuestionModalOpened = componentState.flagQuestionModalOpened;
     this.userToken = state.userToken;
     this.user = state.user;
   }

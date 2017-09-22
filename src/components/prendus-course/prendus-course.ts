@@ -450,8 +450,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
         if (Object.keys(state.components[this.componentId] || {}).includes('selectedSubjectId')) this.selectedSubjectId = state.components[this.componentId].selectedSubjectId;
         if (Object.keys(state.components[this.componentId] || {}).includes('customDiscipline')) this.customDiscipline = state.components[this.componentId].customDiscipline;
         if (Object.keys(state.components[this.componentId] || {}).includes('customSubject')) this.customSubject = state.components[this.componentId].customSubject;
-//this.assignments = state[`assignmentsFromCourse${this.courseId}`];
-        // this.course = state[`course${this.courseId}`];
         this.userToken = state.userToken;
         this.user = state.user;
     }
