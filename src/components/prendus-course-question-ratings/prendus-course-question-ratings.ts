@@ -48,10 +48,10 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.action = setNotification(error.message, NotificationType.ERROR)
   }
 
-  async loadData(pageAmount: number, pageIndex: number) {
+  async loadData(courseId: string, pageAmount: number, pageIndex: number) {
     const course = await loadCourse(
       {
-        courseId: this.courseId,
+        courseId,
         filter: this.filter,
         pageAmount,
         pageIndex
@@ -61,21 +61,21 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     );
     const questionStats = computeTableStats(course.assignments);
     if (questionStats.length !== 0) {
-      this.action = fireLocalAction('course', course);
-      this.action = fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-      this.action = fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
-      await this.loadData(pageAmount, pageIndex + pageAmount);
+      this.action = fireLocalAction(this.componentId, 'course', course);
+      this.action = fireLocalAction(this.componentId, 'categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
+      this.action = fireLocalAction(this.componentId, 'questionStats', [...(this.questionStats || []), ...questionStats]);
+      await this.loadData(courseId, pageAmount, pageIndex + pageAmount);
     }
   }
 
-  async _courseIdChanged() {
-    this.action = fireLocalAction('courseId', this.courseId);
-    this.action = fireLocalAction('loaded', false);
+  async _courseIdChanged(courseId, oldCourseId) {
+    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
     this.action = await getAndSetUser();
-    await this.loadData(20, 0);
+    await this.loadData(courseId, 20, 0);
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
-    this.action = fireLocalAction('loaded', true);
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
     this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
@@ -85,11 +85,11 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _assignmentIdChanged(e) {
-    this.action = fireLocalAction('assignmentId', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'assignmentId', e.target.value);
   }
 
   _conceptIdChanged(e) {
-    this.action = fireLocalAction('conceptId', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'conceptId', e.target.value);
   }
 
   _questions(assignments: Assignment[]): Question[] {
@@ -134,6 +134,15 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     };
   }
 
+  _viewQuestion(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'question', e.model.item.question);
+    this.shadowRoot.querySelector('#question-modal').open();
+  }
+
+  _closeQuestionModal(e: CustomEvent) {
+    this.shadowRoot.querySelector('#question-modal').close();
+  }
+
   //TODO: See if I can make aria attributes computed properties
   _toggleSort(e) {
     const field = e.target.innerHTML;
@@ -143,11 +152,11 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     if (this.sortField !== field) {
       oldField && oldField.parentNode.setAttribute('aria-sort', 'none');
       newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
-      this.action = fireLocalAction('sortField', field);
+      this.action = fireLocalAction(this.componentId, 'sortField', field);
     }
     else {
       newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
-      this.action = fireLocalAction('sortAsc', !this.sortAsc);
+      this.action = fireLocalAction(this.componentId, 'sortAsc', !this.sortAsc);
     }
   }
 
@@ -161,6 +170,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.course = componentState.course;
     this.questionStats = componentState.questionStats;
+    this.question= componentState.question;
     this.categories = componentState.categories;
     this.courseId = componentState.courseId;
     this.loaded = componentState.loaded;
@@ -190,11 +200,11 @@ function computeTableStats(assignments: Assignment[]): object[] {
     const rawScores = categoryScores(question);
     const overall = overallRating(question, 2);
     const averages = averageCategoryScores(question);
+    //make sort stats lookup case insensitive
     const sortStats = {
       overall,
       ...objectKeysToLowerCase(averages)
     };
-    //make sort stats lookup case insensitive
     return {
       question,
       assignmentId: assignment.id,
