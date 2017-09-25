@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {Concept} from '../../typings/concept';
-import {createUUID, shuffleArray, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {AnswerTypes} from '../../typings/answer-types';
 import {NotificationType} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
@@ -83,9 +84,11 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     if (!e.target || !e.target.files || !e.target.files[0])
       return false;
     const file = e.target.files[0];
-    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
-    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
-      return false;
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1).toLowerCase();
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg') {
+      this.action = setNotification('The file does not have an image file extension.', NotificationType.ERROR);
+      return;
+    }
     return true;
   }
 

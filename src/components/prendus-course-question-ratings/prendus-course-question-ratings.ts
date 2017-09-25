@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores, averageCategoryScores, overallRating} from '../../services/question-stats';
@@ -31,8 +31,10 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
       filter: {
         type: Object,
         value: {
-          author: {
-            id: ""
+          assignment: {
+            course: {
+              id: ""
+            }
           }
         }
       }
@@ -44,48 +46,38 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
-  }
-
   _handleError(error: any) {
     this.action = setNotification(error.message, NotificationType.ERROR)
   }
 
-  async loadData(pageAmount: number, pageIndex: number) {
-    const course = await loadCourse(
-      {
-        courseId: this.courseId,
-        filter: this.filter,
-        pageAmount,
-        pageIndex
-      },
+  async loadData(courseId: string, pageAmount: number, pageIndex: number) {
+    const data = await loadCourse(
+      {courseId, filter: this.filter, pageAmount, pageIndex},
       this.userToken,
       this._handleError.bind(this)
     );
-    const questionStats = computeTableStats(course.assignments);
+    const questionStats = computeTableStats(data.questions);
     if (questionStats.length !== 0) {
-      this._fireLocalAction('course', course);
-      this._fireLocalAction('categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-      this._fireLocalAction('questionStats', [...(this.questionStats || []), ...questionStats]);
-      await this.loadData(pageAmount, pageIndex + pageAmount);
+      this.action = fireLocalAction(this.componentId, 'course', data.course);
+      this.action = fireLocalAction(this.componentId, 'questionStats', [...(this.questionStats || []), ...questionStats]);
+      await this.loadData(courseId, pageAmount, pageIndex + pageAmount);
     }
   }
 
-  async _courseIdChanged() {
-    this._fireLocalAction('courseId', this.courseId);
-    this._fireLocalAction('loaded', false);
+  async _courseIdChanged(courseId, oldCourseId) {
+    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
+    this.action = fireLocalAction(this.componentId, 'assignmentId', 'ALL');
+    this.action = fireLocalAction(this.componentId, 'conceptId', 'ALL');
+    this.action = fireLocalAction(this.componentId, 'sortField', 'overall');
+    this.action = fireLocalAction(this.componentId, 'sortAsc', false);
+    this.action = fireLocalAction(this.componentId, 'categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
     this.action = await getAndSetUser();
-    await this.loadData(20, 0);
+    await this.loadData(courseId, 20, 0);
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
-    this._fireLocalAction('loaded', true);
-    this.dispatchEvent(new CustomEvent('table-loaded', {composed: true}));
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
   async _updateData(data: object) {
@@ -94,19 +86,19 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _assignmentIdChanged(e) {
-    this._fireLocalAction('assignmentId', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'assignmentId', e.target.value);
   }
 
   _conceptIdChanged(e) {
-    this._fireLocalAction('conceptId', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'conceptId', e.target.value);
   }
 
-  _questions(assignments: Assignment[]): Question[] {
-    return flatten(assignments.map(assignment => assignment.questions));
+  _assignments(questionStats: object[]): Assignment[] {
+    return uniqueProp(questionStats.map(stats => stats.question.assignment), 'id');
   }
 
-  _concepts(assignments: Assignment[]): Concept[] {
-    return uniqueProp(this._questions(assignments).map(question => question.concept), 'id');
+  _concepts(questionStats: object[]): Concept[] {
+    return uniqueProp(questionStats.map(stats => stats.question.concept), 'id');
   }
 
   _questionOnly(text: string): string {
@@ -117,14 +109,14 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return num.toPrecision(2);
   }
 
-  _prop(obj: object, prop: string): any {
-    return obj ? obj[prop] : null;
+  _rawScores(scores: object, category: string): any {
+    return scores ? scores[category] : null;
   }
 
-  _makeFilter(assignmentId: string, conceptId: string): (question: object) => boolean {
-    return (question: object): boolean => {
-      return (assignmentId === 'ALL' || question.assignmentId === assignmentId)
-      && (conceptId === 'ALL' || conceptId === question.conceptId);
+  _makeFilter(assignmentId: string, conceptId: string): (stats: object) => boolean {
+    return (stats: object): boolean => {
+      return (assignmentId === 'ALL' || stats.question.assignment.id === assignmentId)
+      && (conceptId === 'ALL' || conceptId === stats.question.concept.id);
     };
   }
 
@@ -136,27 +128,34 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
         return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
       }
-      const aStats = a.sortStats[sortField] || 0;
-      const bStats = b.sortStats[sortField] || 0;
+      const aStats = a.sortStats[sortField.toLowerCase()] || 0;
+      const bStats = b.sortStats[sortField.toLowerCase()] || 0;
       if (aStats === bStats) return 0;
       return aStats > bStats ? first : last;
     };
   }
 
+  _viewQuestion(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'question', e.model.item.question);
+    this.shadowRoot.querySelector('#question-modal').open();
+  }
+
+  _closeQuestionModal(e: CustomEvent) {
+    this.shadowRoot.querySelector('#question-modal').close();
+  }
+
   _toggleSort(e) {
     const field = e.target.innerHTML;
-    const headers = Array.from(this.shadowRoot.querySelectorAll('.sortable'));
-    const oldField = headers.find(header => header.innerHTML === this.sortField);
-    const newField = headers.find(header => header.innerHTML === field);
-    if (this.sortField !== field) {
-      oldField && oldField.parentNode.setAttribute('aria-sort', 'none');
-      newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'ascending' : 'descending');
-      this._fireLocalAction('sortField', field);
-    }
-    else {
-      newField && newField.parentNode.setAttribute('aria-sort', this.sortAsc ? 'descending' : 'ascending');
-      this._fireLocalAction('sortAsc', !this.sortAsc);
-    }
+    if (this.sortField !== field)
+      this.action = fireLocalAction(this.componentId, 'sortField', field);
+    else
+      this.action = fireLocalAction(this.componentId, 'sortAsc', !this.sortAsc);
+  }
+
+  _ariaSort(category: string, sortField: string, sortAsc: boolean): string {
+    if (category === sortField && sortAsc) return 'ascending';
+    else if (category === sortField && !sortAsc) return 'descending';
+    return 'none';
   }
 
   _checkToggleSort(e) {
@@ -169,37 +168,50 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.course = componentState.course;
     this.questionStats = componentState.questionStats;
+    this.question= componentState.question;
     this.categories = componentState.categories;
     this.courseId = componentState.courseId;
     this.loaded = componentState.loaded;
     this.assignmentId = componentState.assignmentId || 'ALL';
     this.conceptId = componentState.conceptId || 'ALL';
-    this.sortField = componentState.sortField || 'Overall';
+    this.sortField = componentState.sortField || 'overall';
     this.sortAsc = componentState.sortAsc;
     this.userToken = state.userToken;
     this.user = state.user;
-    if (this.user && this.user.role === 'INSTRUCTOR') this.filter = {};
-    else if (this.user) this.filter.author.id = this.user.id;
+    this.filter.assignment.course.id = this.courseId;
+    if (this.user && this.user.role !== 'INSTRUCTOR') {
+      this.filter.author = {};
+      this.filter.author.id = this.user.id;
+    }
   }
 }
 
-function computeTableStats(assignments: Assignment[]): object[] {
-  return flatten(assignments.map(assignment => assignment.questions.map(question => {
+function objectKeysToLowerCase(obj: object): object {
+  return Object.keys(obj)
+    .reduce((result, k) => {
+      return {
+        ...result,
+        [k.toLowerCase()]: obj[k]
+      }
+    }, {});
+}
+
+function computeTableStats(questions: Question[]): object[] {
+  return questions.map(question => {
     const rawScores = categoryScores(question);
-    const overall = overallRating(question, 2);
+    const overall = overallRating(question, 2); //TODO determine max score for each category in rubric
     const averages = averageCategoryScores(question);
+    //make sort stats lookup case insensitive
+    const sortStats = {
+      overall,
+      ...objectKeysToLowerCase(averages)
+    };
     return {
-      assignmentId: assignment.id,
-      conceptId: question.concept.id,
-      student: question.author.email,
-      text: question.text,
-      sortStats: {
-        Overall: overall,
-        ...averages
-      },
+      question,
+      sortStats,
       rawScores
     }
-  })));
+  });
 }
 
 async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
@@ -208,30 +220,27 @@ async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: 
         course: Course(id: $courseId) {
           id
           title
-          assignments {
+        }
+        questions: allQuestions(filter: $filter, first: $pageAmount, skip: $pageIndex) {
+          id
+          author {
+            email
+          }
+          text
+          code
+          ratings {
+            scores {
+              category
+              score
+            }
+          }
+          assignment {
             id
             title
-            questions(
-              filter: $filter
-              first: $pageAmount
-              skip: $pageIndex
-            ) {
-              id
-              author {
-                email
-              }
-              text
-              concept {
-                id
-                title
-              }
-              ratings {
-                scores {
-                  category
-                  score
-                }
-              }
-            }
+          }
+          concept {
+            id
+            title
           }
         }
       }
@@ -241,7 +250,7 @@ async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: 
     cb
   );
 
-  return data.course;
+  return data;
 }
 
 function subscribeToData(componentId: string, courseId: string, cb: (data: any) => void) {

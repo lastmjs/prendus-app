@@ -1,7 +1,7 @@
 {
-  "name": "prendus-graphql-demo",
+  "name": "prendus-app",
   "version": "0.4.0",
-  "description": "Testing ground for the future of GraphQL with Prendus",
+  "description": "The Prendus Application",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --watch-files",
     "test": "exit 0",
@@ -13,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lastmjs/prendus-graphql-demo.git"
+    "url": "git+https://github.com/lastmjs/prendus-app.git"
   },
   "author": "Jordan Last <jordan.michael.last@gmail.com>",
   "bugs": {
-    "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
+    "url": "https://github.com/lastmjs/prendus-app/issues"
   },
-  "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
+  "homepage": "https://github.com/lastmjs/prendus-app#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",

@@ -3,7 +3,7 @@ import {State} from '../../typings/state';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate, getCookie, deleteCookie} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
@@ -14,7 +14,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     loaded: boolean;
     password: string;
     email: string;
-    confirmPassword: string;
+    confirmedPassword: string;
+    buttonEnabled: boolean;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -31,56 +32,38 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         this.componentId = createUUID();
     }
 
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this.action = fireLocalAction(this.componentId, "loaded", true)
+        this.action = fireLocalAction(this.componentId, "buttonEnabled", false)
     }
 
+    validateEmail(): void {
+      const emailElement: string = this.shadowRoot.querySelector('#email').value;
+      if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
+    }
     hardValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      emailElement.validate();
+      this.shadowRoot.querySelector('#email').validate();
     }
-
-    softValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+    validatePassword(): void {
+      const pass: string = this.shadowRoot.querySelector('#password').value;
+      if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
     }
     hardValidatePassword(): void {
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      passwordElement.validate();
+      this.shadowRoot.querySelector('#password').validate();
     }
-
-    softValidatePassword(): void {
-
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      if(this.password && this.password.length >= 6) passwordElement.invalid = false;
+    validateConfirmedPassword(): void {
+      const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
+      if(confirmedPass && confirmedPass.length >=6) this.action = fireLocalAction(this.componentId, "confirmedPassword", confirmedPass)
+      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, confirmedPass))
     }
-
-    hardValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password !== this.confirmPassword) confirmPasswordElement.invalid = true;
+    hardValidateConfirmedPassword(): void {
+      this.shadowRoot.querySelector('#confirm-password').validate();
     }
-
-    softValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
-    }
-
-    enableSignup(email: string, password: string, confirmPassword: string): boolean {
-      return	email.match(EMAIL_REGEX) !== null
-          &&	password !== ''
-          &&	confirmPassword !== ''
-          &&	password === confirmPassword;
-    }
-
     createUserOnEnter(e: any): void {
-      if(e.keyCode === 13 && this.enableSignup(this.email, this.password, this.confirmPassword)) this.signupClick();
+      if(e.keyCode === 13 && enableSignup(this.email, this.password, this.confirmedPassword)) this.signupClick();
     }
 
     async signupClick() {
@@ -91,7 +74,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: false
         };
 
-        const that = this;
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const signupData = await performSignupMutation(email, password, this.userToken);
@@ -127,7 +109,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                         }
                 }
             `, {email, password, ltiJWT: getCookie('ltiJWT')}, userToken, (error: any) => {
-                that.action = setNotification(error.message, NotificationType.ERROR)
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
@@ -153,10 +135,22 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
+        const componentState = state.components[this.componentId] || {};
+        const keys = Object.keys(componentState);
+        if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('email')) this.email = componentState.email;
+        if (keys.includes('password')) this.password = componentState.password;
+        if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
+        if (keys.includes('buttonEnabled')) this.buttonEnabled = componentState.buttonEnabled;
 
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.userToken = state.userToken;
     }
 }
 
 window.customElements.define(PrendusSignup.is, PrendusSignup);
+
+function enableSignup(email: string, password: string, confirmedPassword: string){
+  return	email.match(EMAIL_REGEX) !== null
+      &&	password !== ''
+      &&	confirmedPassword !== ''
+      &&	password === confirmedPassword;
+}
