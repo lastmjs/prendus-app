@@ -47,7 +47,7 @@ class PrendusStackedBar extends Polymer.Element {
 
 function barChartData(scores: CategoryScore[]): number[] {
   return scores
-    ? scores.map(obj => obj.score).reduce((result, score) => {
+    ? scores.map(categoryScore => categoryScore.score).reduce((result, score) => {
       const tailLen = score - result.length + 1;
       const tail = tailLen > -1 ? Array(tailLen).fill(0) : [];
       const updated = [...result, ...tail];
