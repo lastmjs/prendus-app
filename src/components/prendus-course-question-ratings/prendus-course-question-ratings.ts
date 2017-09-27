@@ -32,16 +32,6 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return {
       courseId: {
         observer: '_courseIdChanged'
-      },
-      filter: {
-        type: Object,
-        value: {
-          assignment: {
-            course: {
-              id: ""
-            }
-          }
-        }
       }
     }
   }
@@ -55,20 +45,6 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.action = setNotification(error.message, NotificationType.ERROR)
   }
 
-  async loadData(courseId: string, pageAmount: number, pageIndex: number) {
-    const data = await loadCourse(
-      {courseId, filter: this.filter, pageAmount, pageIndex},
-      this.userToken,
-      this._handleError.bind(this)
-    );
-    const questionStats = computeTableStats(data.questions);
-    if (questionStats.length !== 0) {
-      this.action = fireLocalAction(this.componentId, 'course', data.course);
-      this.action = fireLocalAction(this.componentId, 'questionStats', [...(this.questionStats || []), ...questionStats]);
-      await this.loadData(courseId, pageAmount, pageIndex + pageAmount);
-    }
-  }
-
   async _courseIdChanged(courseId, oldCourseId) {
     this.action = fireLocalAction(this.componentId, 'courseId', courseId);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
@@ -78,11 +54,15 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'sortAsc', false);
     this.action = fireLocalAction(this.componentId, 'categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
     this.action = await getAndSetUser();
-    await this.loadData(courseId, 20, 0);
+    const data = await loadData(courseId, 20, 0, this.user, this.userToken, this._handleError.bind(this));
+    this.action = fireLocalAction(this.componentId, 'course', data.course);
+    this.action = fireLocalAction(this.componentId, 'questionStats', computeTableStats(data.questions));
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent('table-loaded'));
+    setTimeout(() => {
+      this.dispatchEvent(new CustomEvent('table-loaded'));
+    });
   }
 
   async _updateData(data: object) {
@@ -130,8 +110,8 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     const last: number = first > 0 ? -1 : 1;
     return (a: QuestionRatingStats, b: QuestionRatingStats): number => {
       if (sortField === 'Student') {
-        if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
-        return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
+        if (a.question.author.email.toLowerCase() === b.question.author.email.toLowerCase()) return 0;
+        return a.question.author.email.toLowerCase() > b.question.author.email.toLowerCase() ? first : last;
       }
       const aStats = a.sortStats[sortField.toLowerCase()] || 0;
       const bStats = b.sortStats[sortField.toLowerCase()] || 0;
@@ -183,11 +163,6 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.sortAsc = componentState.sortAsc;
     this.userToken = state.userToken;
     this.user = state.user;
-    this.filter.assignment.course.id = this.courseId;
-    if (this.user && this.user.role !== 'INSTRUCTOR') {
-      this.filter.author = {};
-      this.filter.author.id = this.user.id;
-    }
   }
 }
 
@@ -219,7 +194,31 @@ function computeTableStats(questions: Question[]): QuestionRatingStats[] {
   });
 }
 
-async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void): {course: Course, questions: Question[]} {
+function questionFilter(courseId, user) {
+  const filter = {
+    assignment: {
+      course: {
+        id: courseId
+      }
+    }
+  };
+  return user && user.role === 'INSTRUCTOR'
+    ? filter
+    : { ...filter, author: { id: user.id } };
+}
+
+
+async function loadData(courseId: string, pageAmount: number, pageIndex: number, user: object, userToken: string, cb: (err: any) => void, result: object) {
+  const filter = questionFilter(courseId, user);
+  const data = await loadCourse({courseId, filter, pageAmount, pageIndex}, userToken, cb);
+  const newResult = result ? {...result, questions: [...result.questions, ...data.questions]} : data;
+  if (data.questions.length !== 0) {
+    return loadData(courseId, pageAmount, pageIndex + pageAmount, filter, userToken, cb, newResult);
+  }
+  return newResult;
+}
+
+async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
   const data = await GQLRequest(`
       query getCourse($courseId: ID!, $filter: QuestionFilter, $pageAmount: Int!, $pageIndex: Int!) {
         course: Course(id: $courseId) {
