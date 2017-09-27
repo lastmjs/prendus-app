@@ -5,6 +5,11 @@ import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/consta
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores, averageCategoryScores, overallRating} from '../../services/question-stats';
 import {setNotification, getAndSetUser} from '../../redux/actions'
+import {
+  User,
+  QuestionRatingStats,
+  Course,
+} from '../../typings/index.d';
 
 export class PrendusCourseQuestionRatings extends Polymer.Element {
   loaded: boolean;
@@ -14,7 +19,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   user: User;
   courseId: string;
   course: Course;
-  questionStats: object[];
+  questionStats: QuestionRatingStats[];
   categories: string[];
   assignmentId: string;
   conceptId: string;
@@ -113,17 +118,17 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return scores ? scores[category] : null;
   }
 
-  _makeFilter(assignmentId: string, conceptId: string): (stats: object) => boolean {
-    return (stats: object): boolean => {
+  _makeFilter(assignmentId: string, conceptId: string): (stats: QuestionRatingStats) => boolean {
+    return (stats: QuestionRatingStats): boolean => {
       return (assignmentId === 'ALL' || stats.question.assignment.id === assignmentId)
       && (conceptId === 'ALL' || conceptId === stats.question.concept.id);
     };
   }
 
-  _makeSorter(sortField: string, sortAsc: boolean): (a: object, b: object) => number {
+  _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
     const first: number = sortAsc ? 1 : -1;
     const last: number = first > 0 ? -1 : 1;
-    return (a: object, b: object): number => {
+    return (a: QuestionRatingStats, b: QuestionRatingStats): number => {
       if (sortField === 'Student') {
         if (a.student.toLowerCase() === b.student.toLowerCase()) return 0;
         return a.student.toLowerCase() > b.student.toLowerCase() ? first : last;
@@ -144,7 +149,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.shadowRoot.querySelector('#question-modal').close();
   }
 
-  _toggleSort(e) {
+  _toggleSort(e: Event) {
     const field = e.target.innerHTML;
     if (this.sortField !== field)
       this.action = fireLocalAction(this.componentId, 'sortField', field);
@@ -158,7 +163,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return 'none';
   }
 
-  _checkToggleSort(e) {
+  _checkToggleSort(e: Event) {
     if (e.which === 13 || e.which === 32)
       this._toggleSort(e);
   }
@@ -196,7 +201,7 @@ function objectKeysToLowerCase(obj: object): object {
     }, {});
 }
 
-function computeTableStats(questions: Question[]): object[] {
+function computeTableStats(questions: Question[]): QuestionRatingStats[] {
   return questions.map(question => {
     const rawScores = categoryScores(question);
     const overall = overallRating(question, 2); //TODO determine max score for each category in rubric
@@ -214,7 +219,7 @@ function computeTableStats(questions: Question[]): object[] {
   });
 }
 
-async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
+async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void): {course: Course, questions: Question[]} {
   const data = await GQLRequest(`
       query getCourse($courseId: ID!, $filter: QuestionFilter, $pageAmount: Int!, $pageIndex: Int!) {
         course: Course(id: $courseId) {

@@ -1,4 +1,9 @@
-//TODO: TS types
+import {
+  Question,
+  CategoryScore,
+  QuestionRating,
+  QuestionRatingStats,
+} from '../typings/index.d';
 
 /*
  * Reducer to sum the numbers in an array
@@ -31,8 +36,8 @@ function averageScore(scores: CategoryScore[]): number {
 /*
  * Returns a callback that averages an array of CategoryScores and scales them to a value 0-10
  */
-function scaledAverageScore(max: number) {
-  return (scores: CategoryScores[]): number {
+function scaledAverageScore(max: number): (CategoryScore[]) => number {
+  return (scores: CategoryScore[]): number {
     return average(scores.map(node => node.score)) / max * 10;
   }
 }
