@@ -1,4 +1,4 @@
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusStackedBar extends Polymer.Element {
   static get is() { return 'prendus-stacked-bar' }
@@ -18,17 +18,8 @@ class PrendusStackedBar extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    }
-  }
-
   _scoresChanged(scores: CategoryScore[]) {
-    this._fireLocalAction('data', barChartData(scores));
+    this.action = fireLocalAction(this.componentId, 'data', barChartData(scores));
   }
 
   _computeWidth(data: number[], num: number) {
