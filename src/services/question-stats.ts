@@ -36,7 +36,7 @@ function averageScore(scores: CategoryScore[]): number {
 /*
  * Returns a callback that averages an array of CategoryScores and scales them to a value 0-10
  */
-function scaledAverageScore(max: number): (CategoryScore[]) => number {
+function scaledAverageScore(max: number): (scores: CategoryScores) => number {
   return (scores: CategoryScore[]): number {
     return average(scores.map(node => node.score)) / max * 10;
   }
@@ -45,7 +45,7 @@ function scaledAverageScore(max: number): (CategoryScore[]) => number {
 /*
  * Maps an object with a callback
  */
-function mapObject(obj: object, cb: (any) => any): object {
+function mapObject(obj: object, cb: (prop: any) => any): object {
   return Object.keys(obj).reduce((result, k) => {
     return {
       ...result,
