@@ -58,7 +58,7 @@ function mapObject(obj: object, cb: (prop: any) => any): object {
  * Returns a reducer to group an array of objects by a property.
  * The reducer returns an object with the property value assigned to the grouped elements
  */
-function groupBy(prop: string): (object, object) => object {
+function groupBy(prop: string): (result: object, obj: object) => object {
   return (result, obj) => {
     const k = obj[prop];
     if (!k) return result;
