@@ -2,7 +2,8 @@ import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../.
 import {User} from '../../typings/user';
 import {Question} from '../../typings/question';
 import {GQLVariables} from '../../typings/gql-variables';
-import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
@@ -149,21 +150,43 @@ class PrendusTakeAssignment extends Polymer.Element {
   }
 
   async _assignment(assignmentId: string): Promise<Assignment> {
-    const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    const data = await GQLRequest(`
+        query getAssignment($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
         title
         numResponseQuestions
         questionType
         questions(filter: {
-          author: {
-            id_not: $userId
-          }
+          AND: [{
+            author: {
+              id_not: $userId
+            }
+          }, {
+            ratings_some: {}
+          }, {
+            	ratings_every: {
+                scores_some: {
+                  category: "Inclusion"
+                  score_gt: 1
+                }
+              }
+          }, {
+            flags_none: {}
+          }]
         }) {
           id
+      		ratings {
+      			scores {
+      			  id
+              category
+              score
+      			}
+    			}
         }
       }
-    }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
+    }
+    `, {assignmentId, userId: this.user.id}, this.userToken, this._handleError.bind(this));
     if (!data) {
       return;
     }
