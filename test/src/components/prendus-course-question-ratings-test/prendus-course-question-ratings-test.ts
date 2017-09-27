@@ -1,4 +1,4 @@
-import {createUUID} from '../../../../src/node_modules/prendus-shared/services/utilities-service';
+import {createUUID, asyncMap, asyncForEach} from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 import {RootReducer} from '../../../../src/redux/reducers';
 import {PrendusCourseQuestionRatings} from '../../../../src/components/prendus-course-question-ratings/prendus-course-question-ratings';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../../../src/services/constants-service';
@@ -7,6 +7,7 @@ import {saveArbitrary, createTestUser, deleteTestUsers, deleteArbitrary} from '.
 
 const jsc = require('jsverify');
 const courseArb = jsc.nonshrink(CourseArb);
+const coursesArb = jsc.small(jsc.nearray(courseArb));
 
 class PrendusCourseQuestionRatingsTest extends Polymer.Element {
 
@@ -31,14 +32,10 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
     }
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key: 'table',
-      value: this.shadowRoot.querySelector('#table')
-    };
+  attachTable() {
+    const table = new PrendusCourseQuestionRatings();
+    this.shadowRoot.appendChild(table);
+    return table;
   }
 
   prepareTests(test) {
@@ -48,15 +45,9 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         const student = await createTestUser('STUDENT');
         const instructor = await createTestUser('INSTRUCTOR');
         const courseData = await saveArbitrary(assignUserIds(course, instructor.id, student.id));
-        const table = new PrendusCourseQuestionRatings();
-        this.shadowRoot.appendChild(table);
+        const table = this.attachTable();
         this.authenticate(instructor);
-        const fulfilled = setUpListener(table);
-        table.courseId = courseData.Course.id;
-        console.log('waiting', new Date().getTime());
-        await fulfilled;
-        console.log('waited', new Date().getTime());
-        const success = verifyTable(table, courseData);
+        const success = await changeCourseId(table, courseData);
         this.shadowRoot.removeChild(table);
         await deleteArbitrary(courseData);
         await deleteTestUsers(student, instructor);
@@ -67,61 +58,92 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
       }
     });
 
-    //    test('Set course id with residual state', [coursesArb], async (courses: Courses) => {
-    //      const coursesData = await saveCourses(courses);
-    //      console.log(coursesData);
-    //      let success = true;
-    //      coursesData.forEach(async (course) => {
-    //        const fulfilled = setUpListener(this.table);
-    //        this.table.courseId = courseId;
-    //        await fulfilled;
-    //        success = success && verifyTable(this.table, course);
-    //      });
-    //      await Promise.all(coursesData.map(deleteCourse));
-    //      return success;
-    //    });
+    test('Set course id with residual state', [coursesArb], async (courses: Courses) => {
+      try {
+        const student = await createTestUser('STUDENT');
+        const instructor = await createTestUser('INSTRUCTOR');
+        const coursesData = await asyncMap(
+          courses,
+          async course => saveArbitrary(assignUserIds(course, instructor.id, student.id))
+        );
+        const table = this.attachTable();
+        this.authenticate(instructor);
+        const results = await asyncMap(coursesData, async (data) => {
+          const result = await changeCourseId(table, data);
+          return result;
+        });
+        this.shadowRoot.removeChild(table);
+        const success = results.every(result => result);
+        await asyncForEach(coursesData, deleteArbitrary);
+        await deleteTestUsers(student, instructor);
+        return success;
+      } catch (e) {
+        console.error(e);
+        return false;
+      }
+    });
 
-    //    test('Set assignment id and concept id', [courseArb], async (course: Course) => {
-    //      const courseData = await saveCourse(course);
-    //      const fulfilled = setUpListener(this.table);
-    //      this.table.courseId = courseData.id;
-    //      await fulfilled;
-    //      let success = true;
-    //      const conceptIds = ['All', ...this.table._concepts(courseData.assignments).map(concept => concept.id)];
-    //      const assignmentIds = ['All', ...courseData.assignments.map(assignment => assignment.id)];
-    //      assignmentIds.forEach(assignmentId => {
-    //        conceptIds.forEach(conceptId => {
-    //          const filter = this.table._makeFilter(assignmentId, conceptId);
-    //          const filtered = this.table.questionStats.filter(filter);
-    //          success = success && verifyFilter(assignmentId, conceptId, filtered);
-    //        });
-    //      });
-    //      await deleteCourse(courseData);
-    //      return success;
-    //    });
-    //
-    //    test('Sort columns', [courseArb], async (course: Course) => {
-    //      const courseData = await saveCourse(course);
-    //      const fulfilled = setUpListener(this.table);
-    //      this.table.courseId = courseData.id;
-    //      await fulfilled;
-    //      let success = true;
-    //      const columns = ['Overall', 'Student', ...Object.keys(DEFAULT_EVALUATION_RUBRIC)];
-    //      columns.forEach(sortField => {
-    //        [true, false].forEach(sortAsc => {
-    //          const sort = this.table._makeSorter(sortField, sortAsc);
-    //          const sorted = this.table.questionStats.sort(sort);
-    //          success = success && verifySort(sortField, sortAsc, sorted);
-    //        });
-    //      });
-    //      await deleteCourse(courseData);
-    //      return success;
-    //    });
+    test('Set assignment id and concept id', [courseArb], async (course: Course) => {
+      try {
+        const student = await createTestUser('STUDENT');
+        const instructor = await createTestUser('INSTRUCTOR');
+        const courseData = await saveArbitrary(assignUserIds(course, instructor.id, student.id));
+        const table = this.attachTable();
+        this.authenticate(instructor);
+        const fulfilled = setUpListener(table);
+        table.courseId = courseData.Course.id;
+        await fulfilled;
+        const conceptIds = getConceptIds(courseData);
+        const assignmentIds = getAssignmentIds(courseData);
+        const results = assignmentIds.map(assignmentId => {
+          return conceptIds.map(conceptId => {
+            const filter = table._makeFilter(assignmentId, conceptId);
+            const filtered = table.questionStats.filter(filter);
+            return verifyFilter(assignmentId, conceptId, filtered);
+          })
+        }).reduce(flatten, []);
+        this.shadowRoot.removeChild(table);
+        const success = results.every(result => result);
+        await deleteArbitrary(courseData);
+        await deleteTestUsers(student, instructor);
+        return success;
+      } catch (e) {
+        console.error(e);
+        return false;
+      }
+    });
+
+    test('Sort columns', [courseArb], async (course: Course) => {
+      try {
+        const student = await createTestUser('STUDENT');
+        const instructor = await createTestUser('INSTRUCTOR');
+        const courseData = await saveArbitrary(assignUserIds(course, instructor.id, student.id));
+        const table = this.attachTable();
+        this.authenticate(instructor);
+        const fulfilled = setUpListener(table);
+        table.courseId = courseData.Course.id;
+        await fulfilled;
+        const columns = ['Overall', 'Student', ...Object.keys(DEFAULT_EVALUATION_RUBRIC)];
+        const results = columns.map(sortField => {
+          return [true, false].map(sortAsc => {
+            const sort = table._makeSorter(sortField, sortAsc);
+            const sorted = table.questionStats.sort(sort);
+            return verifySort(sortField, sortAsc, sorted);
+          });
+        }).reduce(flatten, []);
+        this.shadowRoot.removeChild(table);
+        const success = results.every(result => result);
+        await deleteArbitrary(courseData);
+        await deleteTestUsers(student, instructor);
+        return success;
+      } catch (e) {
+        console.error(e);
+        return false;
+      }
+    });
   }
 
   stateChange(e: Event) {
-    const state = e.detail.state.components[this.componentId];
-    state && (this.table = state.table);
   }
 }
 
@@ -141,6 +163,23 @@ function assignUserIds(course: Course, instructorId: string, studentId: string):
   return updated;
 }
 
+function getConceptIds(courseData): string[] {
+  return [
+    'ALL',
+    ...courseData.Course.Assignment
+      .map(assignment => assignment.Question)
+      .reduce(flatten, [])
+      .map(question => question.Concept.id)
+  ];
+}
+
+function getAssignmentIds(courseData): string[] {
+  return [
+    'ALL',
+    ...courseData.Course.Assignment.map(assignment => assignment.id)
+  ];
+}
+
 function setUpListener(table: PrendusCourseQuestionRatings): Promise {
   let _resolve, listener;
   const promise = new Promise((resolve, reject) => {
@@ -154,19 +193,41 @@ function setUpListener(table: PrendusCourseQuestionRatings): Promise {
   return promise;
 }
 
+function flatten(arr: any[], el: any): any[] {
+  return arr.concat(Array.isArray(el) ? el.reduce(flatten, []) : el);
+}
+
 // Properties
-function verifyTable(table: PrendusCourseQuestionRatings, course: Course): boolean {
-  return table.courseId === course.id
-    && table.assignmentId === 'All'
-    && table.conceptId === 'All'
+async function changeCourseId(table: PrendusCourseQuestionRatings, courseData: object): boolean {
+  const fulfilled = setUpListener(table);
+  table.courseId = courseData.Course.id;
+  await fulfilled;
+  return verifyTable(table, courseData);
+}
+
+function verifyTable(table: PrendusCourseQuestionRatings, courseData: object): boolean {
+  //TODO: Fix bug with graphcool filter not updating
+  const questions = courseData
+    .Course
+    .Assignment
+    .map(assignment => assignment.Question)
+    .reduce(flatten, []);
+  return table.courseId === courseData.Course.id
+    && table.course.id === courseData.Course.id
+    && questions.every(
+      question => table
+      .questionStats
+      .map(stats => stats.question.id)
+      .indexOf(question.id) > -1)
+    && table.assignmentId === 'ALL'
+    && table.conceptId === 'ALL'
     && table.sortAsc === false
-    && table.sortField === 'Overall'
-    && deepEqual(table.course, course)
+    && table.sortField === 'overall'
 }
 
 function verifyFilter(assignmentId: number, conceptId: number, filtered: QuestionRatingStats[]): boolean {
-  return (assignmentId === 'All' || !filtered.some(stats => stats.assignmentId != assignmentId))
-    && (conceptId === 'All' || !filtered.some(stats => stats.conceptId != conceptId));
+  return (assignmentId === 'ALL' || !filtered.some(stats => stats.question.assignment.id != assignmentId))
+    && (conceptId === 'ALL' || !filtered.some(stats => stats.question.concept.id != conceptId));
 }
 
 function weightedSum(sum, num, i) {
@@ -177,16 +238,16 @@ function verifySort(sortField: number, sortAsc: number, sorted: QuestionRatingSt
   return sorted.reduce((result, next, i) => {
     if (!i) return true;
     const prev = sorted[i-1];
-    const prevStat = prev.stats[sortField] ? prev.stats[sortField].reduce(weightedSum, 0) : 0;
-    const nextStat = next.stats[sortField] ? next.stats[sortField].reduce(weightedSum, 0) : 0;
+    const prevStat = prev.sortStats[sortField.toLowerCase()] || 0;
+    const nextStat = next.sortStats[sortField.toLowerCase()] || 0;
     if (sortAsc) {
-      if (sortField === 'Student') return result && prev.student.toLowerCase() <= next.student.toLowerCase();
-      else if (sortField === 'Overall') return result && Number(prev.overall) <= Number(next.overall);
+      if (sortField === 'Student')
+        return result && prev.question.author.email.toLowerCase() <= next.question.author.email.toLowerCase();
       return result && prevStat <= nextStat;
     }
     else {
-      if (sortField === 'Student') return result && prev.student.toLowerCase() >= next.student.toLowerCase();
-      else if (sortField === 'Overall') return result && Number(prev.overall) >= Number(next.overall);
+      if (sortField === 'Student')
+        return result && prev.question.author.email.toLowerCase() >= next.question.author.email.toLowerCase();
       return result && prevStat >= nextStat;
     }
   }, true);

@@ -134,7 +134,7 @@
                         <span>[[_questionOnly(item.question.text)]]</span>
                         <a class="view-question-link" on-click="_viewQuestion">View</a>
                       </div>
-                      <div class="table-cell question-meta scroll">[[item.student]]</div>
+                      <div class="table-cell question-meta scroll">[[item.question.author.email]]</div>
                       <dom-repeat items="[[categories]]" as="category" hidden>
                         <template>
                           <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" scores="[[_rawScores(item.rawScores, category)]]"></prendus-stacked-bar></div>

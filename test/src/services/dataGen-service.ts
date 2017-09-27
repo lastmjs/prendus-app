@@ -24,6 +24,7 @@ export async function createTestUser(role: string): {id: string, token: string} 
   const data = await GQLRequest(`mutation create($role: UserRole!, $email: String!) {
     createUser(role: $role, authProvider: { email: { email: $email, password: "test" } }) {
       id
+      role
     }
     signinUser(email: { email: $email, password: "test" }) {
       token
@@ -31,6 +32,7 @@ export async function createTestUser(role: string): {id: string, token: string} 
   }`, {role, email}, AUTH_TOKEN, handleError);
   return {
     id: data.createUser.id,
+    role: data.createUser.role,
     token: data.signinUser.token
   }
 }
