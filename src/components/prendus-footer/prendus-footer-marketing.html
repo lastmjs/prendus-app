@@ -1,4 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 
@@ -11,9 +14,15 @@
           height: auto;
           display: flex;
           justify-content: space-evenly;
-          font-size: 15px;
+          font-size: 18px;
           padding: 15px;
           color: black;
+        }
+        .social-icons{
+          padding: 5px;
+          height: 23px;
+          width: 23px;
+          cursor: pointer;
         }
         .footer-child{
           display: flex;
@@ -29,8 +38,9 @@
               <!-- <a>Why Prendus?</a> -->
               <!-- <a href="/what">What is Prendus?</a> -->
               <!-- <a>How Prendus works</a> -->
-              <div>sales@prendus.com</div>
-              <div>support@prendus.com</div>
+              <div>
+                <a target="_blank" href="https://www.facebook.com/PrendusLearning/"><img class="social-icons" src="../images/facebook-icon.png"></a>
+                <a target="_blank" href="https://twitter.com/PrendusLearning"><img class="social-icons" src="../images/twitter-icon.png"></a></div>
               <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
             </div>
             <div class="footer-child">

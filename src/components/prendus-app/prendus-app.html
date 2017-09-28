@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/iron-lazy-pages/iron-lazy-pages.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-footer/prendus-footer-main.html">
+<link rel="import" href="../prendus-footer/prendus-footer-marketing.html">
 <!--Do not lazy load the open source component, we need it to comply-->
 <link rel="import" href="../prendus-open-source/prendus-open-source.html">
 <link rel="import" href="../prendus-notification/prendus-notification.html">
@@ -49,10 +51,6 @@
   				width: 60px;
   				height: 60px;
   			}
-        /*The code below wasn't actually doing anything because the viewport meta tag had not been added in the header of the index.html file. I added the viewport meta tag
-          in order to get media queries working for the landing page which also caused the media query below to kick in. It looked super awkard and caused the page to offset
-          and it wasn't even working before so i just commented it out. --- using media query below isn't neccessary, the same result can be achieved using css flexbox and/or css grid.
-
   			@media (max-width: 768px) {
   				.app-window {
   					padding: 10px 20px;
@@ -114,7 +112,7 @@
         <app-route route="[[route]]" pattern="/question/:questionId/demo" data="{{editDemoQuestionRouteData}}" active="{{editDemoQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/examples" data="{{examplesQuestionRouteData}}" active="{{examplesQuestionRouteActive}}"></app-route>
 
-        <app-header id  ="prendus-navbar">
+        <app-header id ="prendus-navbar">
           <app-toolbar>
             <a id="home-link" href="/"><img id="logo" src="../../images/navbar-logo.png" alt="Prendus"></a>
             <dom-if if="[[user]]">
@@ -189,6 +187,16 @@
             <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
 
         </iron-lazy-pages>
+        <dom-if if="[[user]]">
+          <template>
+            <prendus-footer-main></prendus-footer-main>
+          </template>
+        </dom-if>
+        <dom-if if="[[!user]]">
+          <template>
+            <prendus-footer-marketing></prendus-footer-marketing>
+          </template>
+        </dom-if>
         <prendus-notification notification="[[notification]]"></prendus-notification>
     </template>
 
