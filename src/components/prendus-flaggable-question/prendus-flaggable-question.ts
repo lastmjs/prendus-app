@@ -21,7 +21,7 @@ class PrendusFlaggableQuestion extends Polymer.Element {
   }
 
   _handleResponse(e: CustomEvent) {
-    this.dispatchEvent(e);
+    this.dispatchEvent(new CustomEvent('question-response', {detail: e.detail});
   }
 
   _openFlagQuestionModal(e) {

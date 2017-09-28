@@ -76,16 +76,11 @@
         top: 10%;
         left: 50%;
         transform: translateX(-50%);
+        min-width: 30%;
+        min-height: 30%;
       }
 
       .question-text {
-        position: relative;
-      }
-
-      .question-text .view-question-link {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
         cursor: pointer;
       }
 
@@ -130,9 +125,8 @@
                 <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
                   <template>
                     <div class="question-row" role="row">
-                      <div class="table-cell question-meta question-text" role="rowheader">
-                        <span>[[_questionOnly(item.question.text)]]</span>
-                        <a class="view-question-link" on-click="_viewQuestion">View</a>
+                      <div class="table-cell question-meta" role="rowheader">
+                        <a class="question-text" on-click="_viewQuestion">[[_questionOnly(item.question.text)]]</a>
                       </div>
                       <div class="table-cell question-meta scroll">[[item.question.author.email]]</div>
                       <dom-repeat items="[[categories]]" as="category" hidden>
