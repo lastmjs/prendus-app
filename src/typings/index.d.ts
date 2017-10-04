@@ -144,28 +144,28 @@ export interface UserEssay {
 }
 
 export interface QuestionResponseRating {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  scores: CategoryScore[];
-  rater: User;
-  questionResponse: QuestionResponse;
+  readonly id: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly scores: CategoryScore[];
+  readonly rater: User;
+  readonly questionResponse: QuestionResponse;
 }
 
 export interface Course {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  assignments: Assignment[];
-  author: User;
-  description: string;
-  dueDate: Date;
-  subject: Subject;
-  title: string;
-  discipline: Discipline;
-  enrolledStudents: User[];
-  price: number;
-  purchases: Purchase[];
+  readonly id: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly assignments: Assignment[];
+  readonly author: User;
+  readonly description: string;
+  readonly dueDate: Date;
+  readonly subject: Subject;
+  readonly title: string;
+  readonly discipline: Discipline;
+  readonly enrolledStudents: User[];
+  readonly price: number;
+  readonly purchases: Purchase[];
 }
 
 export interface Assignment {
