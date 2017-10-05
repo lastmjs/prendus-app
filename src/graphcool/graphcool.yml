@@ -30,6 +30,12 @@ functions:
                 src: ./functions/authenticate/authenticate.js
         type: resolver
         schema: ./functions/authenticate/authenticate.graphql
+    add-lti-user:
+        handler:
+            code:
+                src: ./functions/add-lti-user/add-lti-user.js
+        type: resolver
+        schema: ./functions/add-lti-user/add-lti-user.graphql
 
 
 # Model/Relation permissions are used to limit the API access
