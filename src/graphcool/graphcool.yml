@@ -24,6 +24,12 @@ functions:
                 src: ./functions/signup/signup.js
         type: resolver
         schema: ./functions/signup/signup.graphql
+    authenticate:
+        handler:
+            code:
+                src: ./functions/authenticate/authenticate.js
+        type: resolver
+        schema: ./functions/authenticate/authenticate.graphql
 
 
 # Model/Relation permissions are used to limit the API access
