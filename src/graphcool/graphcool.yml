@@ -17,16 +17,13 @@
 # In the types.graphql you define your data schema
 types: ./types.graphql
 
-
-# uncomment this:
-
-# functions:
-#   hello:
-#     handler:
-#       code:
-#         src: ./functions/hello.js
-#     type: resolver
-#     schema: ./functions/hello.graphql
+functions:
+    signup:
+        handler:
+            code:
+                src: ./functions/signup/signup.js
+        type: resolver
+        schema: ./functions/signup/signup.graphql
 
 
 # Model/Relation permissions are used to limit the API access
@@ -41,7 +38,7 @@ permissions:
 # Your root tokens used for functions to get full access to the API
 # Read more here:
 # https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
-rootTokens: []
+rootTokens: [cloudFunctionsRootToken]
 
 
 # Organize your code into modules

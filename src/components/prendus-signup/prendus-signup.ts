@@ -79,8 +79,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         const signupData = await performSignupMutation(email, password, this.userToken);
         // deleteCookie('ltiJWT');
         // if (this.ltiUserId) await performLTIUserLinkMutation(this.ltiUserId, signupData.createUser.id, this.userToken);
-        const loginData = await performLoginMutation(email, password, this.userToken);
-        this.action = persistUserToken(loginData.signinUser.token);
+        // const loginData = await performLoginMutation(email, password, this.userToken);
+        this.action = persistUserToken(signupData.signupUser.token);
         this.action = await getAndSetUser();
         navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
         deleteCookie('redirectUrl');
@@ -95,38 +95,14 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         async function performSignupMutation(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLRequest(`
-                mutation signup($email: String!, $password: String!, $ltiJWT: String) {
-                    createUser(
-                            authProvider: {
-                                email: {
-                                    email: $email
-                                    password: $password
-                                }
-                            }
-                            ltiJWT: $ltiJWT
-                        ) {
-                            id
-                        }
-                }
-            `, {email, password, ltiJWT: getCookie('ltiJWT')}, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
-            });
-
-            return data;
-        }
-
-        async function performLoginMutation(email: string, password: string, userToken: string | null) {
-            const data = await GQLRequest(`
-                mutation signin($email: String!, $password: String!) {
-                    signinUser(email: {
-                        email: $email
-                        password: $password
-                    }) {
+                mutation signupUser($email: String!, $password: String!) {
+                    signupUser(email: $email, password: $password) {
+                        id
                         token
                     }
                 }
             `, {email, password}, userToken, (error: any) => {
-                that.action = setNotification(error.message, NotificationType.ERROR)
+                this.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
