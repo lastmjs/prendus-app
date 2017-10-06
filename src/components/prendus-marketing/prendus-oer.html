@@ -14,7 +14,6 @@
         }
         .section-heading{
           padding-top: 5vh;
-          padding-bottom: 4vh;
         }
         .section-column-layout{
           display: flex;
@@ -25,7 +24,8 @@
           font-size: 18px;
           line-height: 150%;
           text-justify: auto;
-          padding-bottom: 5%;
+          padding-bottom: 5vh;
+          padding-top: 5vh;
         }
         @media screen and (max-width:700px) {
           .section-column-layout { flex-wrap: wrap;  }
@@ -38,7 +38,7 @@
         #assessment{
           background-color: var(--prendus-primary-color-light);
         }
-        #affordability{
+        .prendus-blue-background{
           background-color: var(--prendus-primary-color);
           color: white;
         }
@@ -70,12 +70,20 @@
           background-repeat: no-repeat;
         }
         #huge-text{
+          display: flex;
           font-size: 15vw;
-          padding-bottom: 10vh;
+        }
+        #huge-text-explanation{
+          /*so that the huge-text doesnt overlap t*/
+          margin-top: 7vw;
         }
         #open-pedagogy-comparison{
           width: 80%;
-          margin-bottom: -5vh;
+        }
+        .prendus-border{
+          border-style: solid;
+          border-color: white;
+          border-width: 1px;
         }
       </style>
       <section id="header">
@@ -115,24 +123,36 @@
           </div>
         </div>
       </section>
-      <section id="affordability">
+
+      <section class="prendus-blue-background">
         <h1 class="section-heading">An Affordable Blend of Practical and Pedagogical</h1>
         <div class="section-column-layout">
           <div>
             <div id="huge-text">
               $10
             </div>
+            <div id="huge-text-explanation">
+              *Per student, per course.
+            </div>
           </div>
           <iframe class="three-column-flex-layout" width="560px" height="315px"  src="https://www.youtube.com/embed/qANw5mYHzio" frameborder="0" allowfullscreen></iframe>
         </div>
-
       </section>
+
       <section id="comparison-table">
         <h1 class="section-heading">Going beyond a textbook replacement</h1>
         <div class="section-column-layout">
           <img id="open-pedagogy-comparison" src="../../images/open-pedagogy-comparison.png"/>
         </div>
       </section>
+
+      <section class="prendus-blue-background">
+        <div class="section-column-layout">
+          <h1 class="call-to-action-heading">Ready to try Prendus? </h1>
+          <a href="/signup" class="prendus-button prendus-button--recommended prendus-border">Get Started</a>
+        </div>
+      </section>
+
     </template>
 
     <script type="module" src="prendus-oer.ts"></script>
