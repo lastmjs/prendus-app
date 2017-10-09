@@ -70,7 +70,7 @@ class PrendusCoursePayment extends Polymer.Element {
             token: async (token: stripe.StripeTokenResponse) => {
                 this.action = fireLocalAction(this.componentId, 'loaded', false);
                 await initiatePayment(token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken, this.user ? this.user.email : 'user is null');
-                // navigate(decodeURIComponent(this.redirectUrl) || '/');
+                // navigate(decodeURIComponent(this.redirectUrl || '/'));
                 window.location.href = decodeURIComponent(this.redirectUrl || '/'); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
             }
         };
