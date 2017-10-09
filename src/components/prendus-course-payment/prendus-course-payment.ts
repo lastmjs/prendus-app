@@ -4,7 +4,7 @@ import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../.
 import {State} from '../../typings/state';
 import {createUUID, navigate} from '../../services/utilities-service';
 import {Course} from '../../typings/course';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser} from '../../redux/actions';
 import {getStripeKey} from '../../services/utilities-service';
@@ -133,16 +133,20 @@ async function subscribeToPurchaseIsPaid(componentId: string, courseId: string, 
 }
 
 async function loadCourse(courseId: string | null, userToken: string | null): Promise<GQLCourse> {
-    const data = await GQLQuery(`
-        query {
+    const data = await GQLRequest(`
+        query($courseId: ID!) {
             Course(
-                id: "${courseId}"
+                id: $courseId
             ) {
                 price
                 title
             }
         }
-    `, userToken, () => {}, () => {});
+    `, {
+        courseId
+    }, userToken, (error: any) => {
+        alert(error);
+    });
 
     return data.Course;
 }
@@ -157,7 +161,7 @@ function fireLocalAction(componentId: string, key: string, value: any): SetCompo
 }
 
 async function initiatePayment(tokenId: string, courseId: string, amount: number, userId: string, userToken: string | null): Promise<void> {
-    await GQLMutate(`
+    await GQLRequest(`
         mutation {
             createPurchase(
                 userId: "${userId}"
@@ -168,7 +172,7 @@ async function initiatePayment(tokenId: string, courseId: string, amount: number
                 id
             }
         }
-    `, userToken, (error: any) => {
-        console.log(error);
+    `, {}, userToken, (error: any) => {
+        alert(error);
     });
 }
