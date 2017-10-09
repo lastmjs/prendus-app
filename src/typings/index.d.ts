@@ -1,5 +1,4 @@
 //Database types
-
 export const enum PrendusApproved {
   YES,
   NO,
@@ -68,12 +67,6 @@ export interface QuestionRating {
   readonly question: Question;
   readonly user: User;
   readonly scores: CategoryScore[];
-}
-
-export interface QuestionRatingStats {
-  readonly question: Question;
-  readonly rawScores: CategoryScore[];
-  readonly sortStats: {[category: string]: number};
 }
 
 export interface CategoryScore {
@@ -247,4 +240,21 @@ export interface Purchase {
   readonly course: Course;
   readonly isPaid: boolean;
   readonly stripeTokenId: string;
+}
+
+//Other types
+export interface QuestionRatingStats {
+  readonly question: Question;
+  readonly rawScores: {
+    [category: string]: CategoryScore[]
+  };
+}
+
+export interface Rubric = {
+  [category: string]: {
+    [scale: string]: {
+      readonly description: string,
+      readonly points: string
+    }
+  }
 }

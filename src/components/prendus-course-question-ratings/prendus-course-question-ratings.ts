@@ -1,89 +1,150 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
-import {DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
+import {
+  SetPropertyAction,
+  SetComponentPropertyAction
+} from '../../typings/actions';
+import {
+  GQLRequest,
+  GQLSubscribe
+} from '../../node_modules/prendus-shared/services/graphql-service';
+import {
+  createUUID,
+  fireLocalAction
+} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  DEFAULT_EVALUATION_RUBRIC,
+  NotificationType
+} from '../../services/constants-service';
 import {parse} from '../../node_modules/assessml/assessml';
-import {categoryScores, averageCategoryScores, overallRating} from '../../services/question-stats';
-import {setNotification, getAndSetUser} from '../../redux/actions'
+import {
+  categoryScores,
+  averageCategoryScores,
+  overallRating
+} from '../../services/question-stats';
+import {setNotification} from '../../redux/actions'
 import {
   User,
   QuestionRatingStats,
   Course,
+  Rubric,
 } from '../../typings/index.d';
 
 export class PrendusCourseQuestionRatings extends Polymer.Element {
-  loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
-  componentId: string;
-  userToken: string;
-  user: User;
-  courseId: string;
-  course: Course;
-  questionStats: QuestionRatingStats[];
-  categories: string[];
-  assignmentId: string;
-  conceptId: string;
-  sortField: string;
-  sortAsc: boolean;
-
-  static get is() { return 'prendus-course-question-ratings'; }
-
-  static get properties() {
-    return {
-      courseId: {
-        observer: '_courseIdChanged'
-      }
-    }
-  }
 
   constructor() {
     super();
     this.componentId = createUUID();
   }
 
-  _handleError(error: any) {
-    this.action = setNotification(error.message, NotificationType.ERROR)
+  static get is() { return 'prendus-course-question-ratings'; }
+
+  static get properties() {
+    return {
+      sortField: String,
+      sortAsc: Boolean,
+      rubric: Object,
+      user: Object,
+      userToken: String,
+      orderBy: {
+        type: String,
+        computed: '_computeOrderBy(sortField, sortAsc)'
+      },
+      filter: {
+        type: Object,
+        computed: '_computeFilter(courseId, user, assignmentId, conceptId)'
+      },
+      fetchQuestions: {
+        type: Function,
+        computed: '_computeFetchQuestions(courseId, orderBy, filter, userToken)'
+      },
+      categories: {
+        type: Object,
+        computed: '_computeCategories(rubric)'
+      },
+      courseId: {
+        type: String,
+        observer: '_courseIdChanged'
+      },
+    }
   }
 
-  async _courseIdChanged(courseId, oldCourseId) {
-    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
-    this.action = fireLocalAction(this.componentId, 'loaded', false);
+  //Computed Properties
+  _computeOrderBy(sortField: string, sortAsc: boolean): string {
+    return categoryCamelCase(sortField) + (sortAsc ? '_ASC' : '_DESC');
+  }
+
+  _computeCategories(rubric: Rubric): string[] {
+    return Object.keys(rubric);
+  }
+
+  _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string): object {
+    const filter = {
+      assignment: {
+        course: {
+          id: courseId
+        }
+      },
+      author: {},
+      concept: {}
+    };
+    if (!user || user.role !== 'INSTRUCTOR')
+      filter.author.id = (user || {}).id;
+    if (assignmentId !== 'ALL')
+      filter.assignment.id = assignmentId;
+    if (conceptId !== 'ALL')
+      filter.concept.id = conceptId;
+    return filter;
+  }
+
+  _computeFetchQuestions(courseId: string, orderBy: string, filter: object, userToken: string): (i: number, n: number) => Promise<object> {
+    if (!orderBy || !filter || !userToken)
+      return undefined;
+    return async (pageIndex, pageAmount) => loadCourse({
+      courseId,
+      orderBy,
+      filter,
+      pageIndex,
+      pageAmount
+    }, userToken, this._handleError.bind(this));
+  }
+
+  _ariaSort(category: string, sortField: string, sortAsc: boolean): string {
+    if (category === sortField && sortAsc) return 'ascending';
+    else if (category === sortField && !sortAsc) return 'descending';
+    return 'none';
+  }
+
+  async _courseIdChanged(courseId) {
     this.action = fireLocalAction(this.componentId, 'assignmentId', 'ALL');
     this.action = fireLocalAction(this.componentId, 'conceptId', 'ALL');
     this.action = fireLocalAction(this.componentId, 'sortField', 'overall');
     this.action = fireLocalAction(this.componentId, 'sortAsc', false);
-    this.action = fireLocalAction(this.componentId, 'categories', Object.keys(DEFAULT_EVALUATION_RUBRIC));
-    this.action = await getAndSetUser();
-    const data = await loadData(courseId, 20, 0, this.user, this.userToken, this._handleError.bind(this));
-    this.action = fireLocalAction(this.componentId, 'course', data.course);
-    this.action = fireLocalAction(this.componentId, 'questionStats', computeTableStats(data.questions));
+    this.action = fireLocalAction(this.componentId, 'questionStats', []);
+    this.action = fireLocalAction(this.componentId, 'rubric', DEFAULT_EVALUATION_RUBRIC);
     //TODO: Fix permissions for subscription
     //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
-    setTimeout(() => {
-      this.dispatchEvent(new CustomEvent('table-loaded'));
-    });
   }
 
+  //Event Handlers
   async _updateData(data: object) {
     //TODO: Fix permissions and then append the new question rating to the list
     console.log(data);
   }
 
-  _assignmentIdChanged(e) {
+  _appendQuestions(e: CustomEvent) {
+    const { items, init } = e.detail;
+    this.action = fireLocalAction(this.componentId, 'course', items.course);
+    const questionStats = computeTableStats(items.questions);
+    this.action = init
+      ? fireLocalAction(this.componentId, 'questionStats', questionStats)
+      : fireLocalAction(this.componentId, 'questionStats', [...this.questionStats, ...questionStats]);
+  }
+
+  _assignmentIdChanged(e: Event) {
     this.action = fireLocalAction(this.componentId, 'assignmentId', e.target.value);
   }
 
-  _conceptIdChanged(e) {
+  _conceptIdChanged(e: Event) {
     this.action = fireLocalAction(this.componentId, 'conceptId', e.target.value);
-  }
-
-  _assignments(questionStats: object[]): Assignment[] {
-    return uniqueProp(questionStats.map(stats => stats.question.assignment), 'id');
-  }
-
-  _concepts(questionStats: object[]): Concept[] {
-    return uniqueProp(questionStats.map(stats => stats.question.concept), 'id');
   }
 
   _questionOnly(text: string): string {
@@ -96,28 +157,6 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _rawScores(scores: object, category: string): any {
     return scores ? scores[category] : null;
-  }
-
-  _makeFilter(assignmentId: string, conceptId: string): (stats: QuestionRatingStats) => boolean {
-    return (stats: QuestionRatingStats): boolean => {
-      return (assignmentId === 'ALL' || stats.question.assignment.id === assignmentId)
-      && (conceptId === 'ALL' || conceptId === stats.question.concept.id);
-    };
-  }
-
-  _makeSorter(sortField: string, sortAsc: boolean): (a: QuestionRatingStats, b: QuestionRatingStats) => number {
-    const first: number = sortAsc ? 1 : -1;
-    const last: number = first > 0 ? -1 : 1;
-    return (a: QuestionRatingStats, b: QuestionRatingStats): number => {
-      if (sortField === 'Student') {
-        if (a.question.author.email.toLowerCase() === b.question.author.email.toLowerCase()) return 0;
-        return a.question.author.email.toLowerCase() > b.question.author.email.toLowerCase() ? first : last;
-      }
-      const aStats = a.sortStats[sortField.toLowerCase()] || 0;
-      const bStats = b.sortStats[sortField.toLowerCase()] || 0;
-      if (aStats === bStats) return 0;
-      return aStats > bStats ? first : last;
-    };
   }
 
   _viewQuestion(e: CustomEvent) {
@@ -137,15 +176,13 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'sortAsc', !this.sortAsc);
   }
 
-  _ariaSort(category: string, sortField: string, sortAsc: boolean): string {
-    if (category === sortField && sortAsc) return 'ascending';
-    else if (category === sortField && !sortAsc) return 'descending';
-    return 'none';
-  }
-
   _checkToggleSort(e: Event) {
     if (e.which === 13 || e.which === 32)
       this._toggleSort(e);
+  }
+
+  _handleError(error: any) {
+    this.action = setNotification(error.message, NotificationType.ERROR)
   }
 
   stateChange(e: CustomEvent) {
@@ -155,83 +192,82 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.questionStats = componentState.questionStats;
     this.question= componentState.question;
     this.categories = componentState.categories;
-    this.courseId = componentState.courseId;
-    this.loaded = componentState.loaded;
     this.assignmentId = componentState.assignmentId || 'ALL';
     this.conceptId = componentState.conceptId || 'ALL';
     this.sortField = componentState.sortField || 'overall';
     this.sortAsc = componentState.sortAsc;
+    this.rubric = componentState.rubric;
     this.userToken = state.userToken;
     this.user = state.user;
   }
 }
 
-function objectKeysToLowerCase(obj: object): object {
-  return Object.keys(obj)
-    .reduce((result, k) => {
-      return {
-        ...result,
-        [k.toLowerCase()]: obj[k]
-      }
-    }, {});
-}
-
 function computeTableStats(questions: Question[]): QuestionRatingStats[] {
   return questions.map(question => {
     const rawScores = categoryScores(question);
-    const overall = overallRating(question, 2); //TODO determine max score for each category in rubric
-    const averages = averageCategoryScores(question);
-    //make sort stats lookup case insensitive
-    const sortStats = {
-      overall,
-      ...objectKeysToLowerCase(averages)
-    };
     return {
       question,
-      sortStats,
       rawScores
     }
   });
 }
 
-function questionFilter(courseId, user) {
-  const filter = {
-    assignment: {
-      course: {
-        id: courseId
-      }
-    }
-  };
-  return user && user.role === 'INSTRUCTOR'
-    ? filter
-    : { ...filter, author: { id: user.id } };
+function categoryCamelCase(category: string) {
+  //This assumes the whitespace separated Prendus default category names because eventually this function won't be needed when graph.cool has a better order by api
+  return category
+    .replace(/^(\w)/, (m, c) => c.toLowerCase())
+    .replace(/\s+(\w)/g, (m, c) => c.toUpperCase());
 }
 
+function truncate(str: string): string {
+  if (str.length < 100) return str;
+  return str.substr(0, 100) + '...';
+}
 
-async function loadData(courseId: string, pageAmount: number, pageIndex: number, user: object, userToken: string, cb: (err: any) => void, result: object) {
-  const filter = questionFilter(courseId, user);
-  const data = await loadCourse({courseId, filter, pageAmount, pageIndex}, userToken, cb);
-  const newResult = result ? {...result, questions: [...result.questions, ...data.questions]} : data;
-  if (data.questions.length !== 0) {
-    return loadData(courseId, pageAmount, pageIndex + pageAmount, filter, userToken, cb, newResult);
-  }
-  return newResult;
+function flatten(arr: any[]): any[] {
+  return arr.reduce((acc, elem) => {
+    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
+  },[]);
+}
+
+function filterProp(prop: string, val: string): (obj: object) => boolean {
+  return obj => obj[prop] === val;
+}
+
+function uniqueProp(arr: object[], prop: string): object[] {
+  return arr.reduce((filtered: object[], obj: object) => {
+    if (filtered.filter(filterProp(prop, obj[prop])).length === 0)
+      filtered.push(obj);
+    return filtered;
+  }, []);
 }
 
 async function loadCourse(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
+  console.log(variables);
   const data = await GQLRequest(`
-      query getCourse($courseId: ID!, $filter: QuestionFilter, $pageAmount: Int!, $pageIndex: Int!) {
+      query getCourse($courseId: ID!, $filter: QuestionFilter, $orderBy: QuestionOrderBy, $pageAmount: Int!, $pageIndex: Int!) {
         course: Course(id: $courseId) {
           id
           title
+          assignments {
+            id
+            title
+          }
+          subject {
+            concepts {
+              id
+              title
+            }
+          }
         }
-        questions: allQuestions(filter: $filter, first: $pageAmount, skip: $pageIndex) {
+        questions: allQuestions(filter: $filter, orderBy: $orderBy, first: $pageAmount, skip: $pageIndex) {
           id
           author {
             email
           }
           text
           code
+          overall
           ratings {
             scores {
               category
@@ -294,29 +330,6 @@ function subscribeToData(componentId: string, courseId: string, cb: (data: any) 
         }
       }
     }`, componentId, cb);
-}
-
-function truncate(str: string): string {
-  if (str.length < 100) return str;
-  return str.substr(0, 100) + '...';
-}
-
-function flatten(arr: any[]): any[] {
-  return arr.reduce((acc, elem) => {
-    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
-  },[]);
-}
-
-function filterProp(prop: string, val: string): (obj: object) => boolean {
-  return obj => obj[prop] === val;
-}
-
-function uniqueProp(arr: object[], prop: string): object[] {
-  return arr.reduce((filtered: object[], obj: object) => {
-    if (filtered.filter(filterProp(prop, obj[prop])).length === 0)
-      filtered.push(obj);
-    return filtered;
-  }, []);
 }
 
 window.customElements.define(PrendusCourseQuestionRatings.is, PrendusCourseQuestionRatings);
