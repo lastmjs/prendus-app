@@ -3,5 +3,5 @@ type AddLTIUserPayload {
 }
 
 extend type Mutation {
-    addLTIUser(ltiUserId: ID!, userId: ID!, jwt: String!): AddLTIUserPayload
+    addLTIUser(userId: ID!, jwt: String!): AddLTIUserPayload
 }

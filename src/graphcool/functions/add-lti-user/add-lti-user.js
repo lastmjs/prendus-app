@@ -7,36 +7,36 @@ module.exports = function(event) {
         return { error: 'Email Authentication not configured correctly.'}
     }
 
-    if (event.data.jwt) {
-        const graphcool = fromEvent(event);
-        const api = graphcool.api('simple/v1');
-        const payload = JWT.verify(event.data.jwt, event.context.graphcool.pat);
-        const ltiUserId = payload.ltiUserId;
-        const assignmentId = payload.assignmentId;
-        const lisPersonContactEmailPrimary = payload.lisPersonContactEmailPrimary;
+    const graphcool = fromEvent(event);
+    const api = graphcool.api('simple/v1');
+    const jwt = event.data.jwt;
+    const payload = JWT.verify(jwt, event.context.graphcool.pat);
+    const userId = event.data.userId;
+    const ltiUserId = payload.ltiUserId;
+    const assignmentId = payload.assignmentId;
+    const lisPersonContactEmailPrimary = payload.lisPersonContactEmailPrimary;
 
-        return new Promise((resolve, reject) => {
-            getCourseId(api, assignmentId)
-            .then((courseId) => {
-                createLTIUser(api, ltiUserId, event.data.userId, lisPersonContactEmailPrimary)
-                .then((data) => {
-                    return enrollUserOnCourse(api, event.data.userId, courseId);
-                })
-                .then((data) => {
-                    return payForCourseIfFree(api, event.data.userId, courseId);
-                })
-                .then((data) => {
-                   resolve(data);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+    return new Promise((resolve, reject) => {
+        getCourseId(api, assignmentId)
+        .then((courseId) => {
+            createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary)
+            .then((data) => {
+                return enrollUserOnCourse(api, userId, courseId);
+            })
+            .then((data) => {
+                return payForCourseIfFree(api, userId, courseId);
+            })
+            .then((data) => {
+               resolve(data);
             })
             .catch((error) => {
                 reject(error);
             });
+        })
+        .catch((error) => {
+            reject(error);
         });
-    }
+    });
 };
 
 function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
@@ -104,7 +104,7 @@ function getCourseId(api, assignmentId) {
             return Promise.reject(result.error);
         }
         else {
-            return result.Assignment.id;
+            return result.Assignment.course.id;
         }
     });
 }

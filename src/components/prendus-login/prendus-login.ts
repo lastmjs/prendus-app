@@ -76,7 +76,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     	// }
     async loginClick() {
         //need to scope this so that we can access it to log errors
-        const that = this;
+        const that = this; //TODO that = this should never happen
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const data = await signinUser(email, password, this.userToken);
@@ -91,7 +91,25 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           };
           this.action = persistUserToken(data.authenticateUser.token);
           this.action = setUserInRedux(gqlUser.User);
-        //   await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
+
+          const ltiJWT = getCookie('ltiJWT');
+          deleteCookie('ltiJWT');
+
+          if (ltiJWT) {
+              await GQLRequest(`
+                  mutation addLTIUser($userId: ID!, $jwt: String!) {
+                      addLTIUser(userId: $userId, jwt: $jwt) {
+                          id
+                      }
+                  }
+              `, {
+                  userId: this.user ? this.user.id : 'user is null',
+                  jwt: ltiJWT
+              }, this.userToken, (error: any) => {
+                  this.action = setNotification(error.message, NotificationType.ERROR);
+              });
+          }
+
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
           if (getCookie('redirectUrl')) {
@@ -113,24 +131,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             });
             return data;
         }
-
-        // async function addLtiJwtToUser(user: User | null, userToken: string | null)  {
-        //     const id = user ? user.id : null;
-        //     const ltiJWT = getCookie('ltiJWT');
-        //     const data = await GQLRequest(`
-        //         mutation update($id: ID!, $ltiJWT: String) {
-        //             updateUser(
-        //                 id: $id
-        //                 ltiJWT: $ltiJWT
-        //             ) {
-        //                 id
-        //             }
-        //         }
-        //     `, {id, ltiJWT}, userToken, (error: any) => {
-        //       that.action = setNotification(error.message, NotificationType.ERROR)
-        //     });
-        //     return data;
-        // }
 
         async function getUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
