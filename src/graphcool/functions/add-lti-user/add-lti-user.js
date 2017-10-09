@@ -4,7 +4,7 @@ const fromEvent = require('graphcool-lib').fromEvent;
 module.exports = function(event) {
     if (!event.context.graphcool.pat) {
         console.log('Please provide a valid root token!')
-        return { error: 'Email Authentication not configured correctly.'}
+        return { error: 'Add LTI User not configured correctly.'}
     }
 
     const graphcool = fromEvent(event);

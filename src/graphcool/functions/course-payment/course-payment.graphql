@@ -1,0 +1,7 @@
+type CoursePaymentPayload {
+    id: ID!
+}
+
+extend type Mutation {
+    coursePayment(userId: ID!, courseId: ID!, stripeTokenId: String!, amount: Int!, userEmail: String!): CoursePaymentPayload
+}

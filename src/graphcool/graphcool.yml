@@ -36,6 +36,14 @@ functions:
                 src: ./functions/add-lti-user/add-lti-user.js
         type: resolver
         schema: ./functions/add-lti-user/add-lti-user.graphql
+    course-payment:
+        handler:
+            code:
+                src: ./functions/course-payment/course-payment.js
+                environment:
+                    STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
+        type: resolver
+        schema: ./functions/course-payment/course-payment.graphql
 
 
 # Model/Relation permissions are used to limit the API access

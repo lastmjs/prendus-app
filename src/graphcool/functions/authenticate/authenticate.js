@@ -24,8 +24,8 @@
     SOFTWARE.
 */
 
-const fromEvent = require('graphcool-lib').fromEvent
-const bcrypt = require('bcrypt')
+const fromEvent = require('graphcool-lib').fromEvent;
+const bcrypt = require('bcrypt');
 
 function getGraphcoolUser(api, email) {
   return api.request(`

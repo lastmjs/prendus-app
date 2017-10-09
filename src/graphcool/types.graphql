@@ -256,7 +256,6 @@ type Purchase implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   course: Course @relation(name: "CoursePurchased")
-  isPaid: Boolean! @defaultValue(value: false)
   stripeTokenId: String!
 }
 
