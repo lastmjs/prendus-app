@@ -70,6 +70,7 @@
         <app-route route="[[route]]" pattern="/course-setup" active="{{courseSetupRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/how-it-works" active="{{howItWorksRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/research" active="{{researchRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/oer" active="{{oerRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/login" active="{{loginRouteActive}}"></app-route>
@@ -133,7 +134,7 @@
           <app-toolbar>
         </app-header>
 
-        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive)]]">
+        <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive)]]">
 
             <prendus-home-page class="app-window landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
             <prendus-what-is-prendus class="app-window" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
@@ -141,6 +142,7 @@
             <prendus-how-it-works class="app-window landing" show="howItWorksView" data-path="../prendus-marketing/prendus-how-it-works.html"></prendus-how-it-works>
             <prendus-course-setup class="app-window" show="courseSetupView" data-path="../prendus-marketing/prendus-course-setup.html"></prendus-course-setup>
             <prendus-research class="app-window" show="researchView" data-path="../prendus-marketing/prendus-research-background.html"></prendus-research>
+            <prendus-oer class="app-window landing" show="oerView" data-path="../prendus-marketing/prendus-oer.html"></prendus-oer>
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
             <prendus-signup class="app-window" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
