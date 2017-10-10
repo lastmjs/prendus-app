@@ -96,71 +96,68 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   async loadAssignment(assignmentId: string) {
       this._fireLocalAction('loaded', true);
-      setTimeout(() => {
+      setTimeout(async () => {
           this._fireLocalAction('loaded', false);
 
-          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
-          setTimeout(async () => {
-              this.action = checkForUserToken();
-            this.action = await getAndSetUser();
+          this.action = checkForUserToken();
+        this.action = await getAndSetUser();
 
-            if (!this.user) {
-                navigate('/authenticate');
-                return;
-            }
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
 
-            const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-            const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
 
-            if (!userOnCourse) {
-                this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-                return;
-            }
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+            return;
+        }
 
-            if (!userPaidForCourse) {
-                navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-                return;
-            }
+        if (!userPaidForCourse) {
+            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
 
-            const data = await GQLRequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
-              assignment: Assignment(id: $assignmentId) {
-                id
-                title
-                questionType
-                numGradeResponses
+        const data = await GQLRequest(`query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
+          assignment: Assignment(id: $assignmentId) {
+            id
+            title
+            questionType
+            numGradeResponses
+          }
+          essays: allUserEssays(filter: {
+            questionResponse: {
+              author: {
+                id_not: $userId
               }
-              essays: allUserEssays(filter: {
-                questionResponse: {
-                  author: {
-                    id_not: $userId
-                  }
-                  question: {
-                    assignment: {
-                      id: $assignmentId
-                    }
-                  }
-                }
-              }) {
-                value
-                questionResponse {
-                  id
-                  question {
-                    text
-                    code
-                  }
+              question: {
+                assignment: {
+                  id: $assignmentId
                 }
               }
-            }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-            if (!data) {
-              return;
             }
+          }) {
+            value
+            questionResponse {
+              id
+              question {
+                text
+                code
+              }
+            }
+          }
+        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+        if (!data) {
+          return;
+        }
 
-            const { assignment, essays } = data;
-            const responses = essays ? shuffleArray(essays).slice(0, assignment.numGradeResponses): [];
-            this._fireLocalAction('assignment', assignment);
-            this._fireLocalAction('responses', responses);
-            this._fireLocalAction('loaded', true);
-          }, 5000);
+        const { assignment, essays } = data;
+        const responses = essays ? shuffleArray(essays).slice(0, assignment.numGradeResponses): [];
+        this._fireLocalAction('assignment', assignment);
+        this._fireLocalAction('responses', responses);
+        this._fireLocalAction('loaded', true);
       });
   }
 

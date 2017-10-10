@@ -2,12 +2,13 @@ import {html} from '../../node_modules/lit-html/lit-html';
 import {render} from '../../node_modules/lit-html/lib/lit-extended';
 import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions';
 import {State} from '../../typings/state';
-import {createUUID, navigate} from '../../services/utilities-service';
+import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {Course} from '../../typings/course';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {User} from '../../typings/user';
-import {checkForUserToken, getAndSetUser} from '../../redux/actions';
+import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {getStripeKey} from '../../services/utilities-service';
+import {NotificationType} from '../../services/constants-service';
 
 interface GQLCourse {
     price: number;
@@ -16,7 +17,7 @@ interface GQLCourse {
 class PrendusCoursePayment extends Polymer.Element {
     stripeCheckoutHandler: StripeCheckoutHandler;
     courseId: string | null;
-    action: SetComponentPropertyAction | SetPropertyAction | DefaultAction;
+    action: any;
     state: State;
     componentId: string;
     course: GQLCourse | null;
@@ -48,19 +49,13 @@ class PrendusCoursePayment extends Polymer.Element {
         this.action = fireLocalAction(this.componentId, 'loaded', false);
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        this.action = fireLocalAction(this.componentId, 'course', await loadCourse(this.courseId, this.userToken));
-        if (this.courseId && this.redirectUrl) {
-            await subscribeToPurchaseIsPaid(this.componentId, this.courseId || 'courseId is null', this.user ? this.user.id : 'user is null', this.redirectUrl || 'redirectUrl is null');
-        }
+        this.action = fireLocalAction(this.componentId, 'course', await loadCourse(this, this.courseId, this.userToken));
         this.action = fireLocalAction(this.componentId, 'loaded', true);
     }
 
     async redirectUrlSet() {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        if (this.courseId && this.redirectUrl) {
-            await subscribeToPurchaseIsPaid(this.componentId, this.courseId || 'courseId is null', this.user ? this.user.id : 'user is null', this.redirectUrl || 'redirectUrl is null');
-        }
     }
 
     connectedCallback() {
@@ -75,7 +70,9 @@ class PrendusCoursePayment extends Polymer.Element {
             zipCode: true,
             token: async (token: stripe.StripeTokenResponse) => {
                 this.action = fireLocalAction(this.componentId, 'loaded', false);
-                await initiatePayment(token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken);
+                await initiatePayment(this, token.id, this.courseId || 'courseId is null', this.course ? this.course.price : 0, this.user ? this.user.id : 'user is null', this.userToken, this.user ? this.user.email : 'user is null');
+                // navigate(decodeURIComponent(this.redirectUrl || '/'));
+                window.location.href = decodeURIComponent(this.redirectUrl || '/'); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
             }
         };
         this.stripeCheckoutHandler = StripeCheckout.configure(options);
@@ -104,71 +101,45 @@ class PrendusCoursePayment extends Polymer.Element {
 
 window.customElements.define(PrendusCoursePayment.is, PrendusCoursePayment);
 
-async function subscribeToPurchaseIsPaid(componentId: string, courseId: string, userId: string, redirectUrl: string) {
-    await GQLSubscribe(`
-        subscription changedPurchase {
-            Purchase(
-                filter: {
-                    mutation_in: [UPDATED]
-                    updatedFields_contains: "isPaid"
-                    node: {
-                        course: {
-                            id: "${courseId}"
-                        }
-                        user: {
-                            id: "${userId}"
-                        }
-                    }
-                }
-            ) {
-                node {
-                    id
-                }
-            }
-        }
-    `, componentId, (data: any) => {
-        // navigate(decodeURIComponent(redirectUrl) || '/');
-        window.location.href = decodeURIComponent(redirectUrl); //TODO we are only doing a hard refresh for now...I believe the assignment components haven't been designed to respond to dynamic property changes
-    });
-}
-
-async function loadCourse(courseId: string | null, userToken: string | null): Promise<GQLCourse> {
-    const data = await GQLQuery(`
-        query {
+async function loadCourse(context: PrendusCoursePayment, courseId: string | null, userToken: string | null): Promise<GQLCourse> {
+    const data = await GQLRequest(`
+        query($courseId: ID!) {
             Course(
-                id: "${courseId}"
+                id: $courseId
             ) {
                 price
                 title
             }
         }
-    `, userToken, () => {}, () => {});
+    `, {
+        courseId
+    }, userToken, (error: any) => {
+        context.action = setNotification(error.message, NotificationType.ERROR);
+    });
 
     return data.Course;
 }
 
-function fireLocalAction(componentId: string, key: string, value: any): SetComponentPropertyAction {
-    return {
-        type: 'SET_COMPONENT_PROPERTY',
-        componentId,
-        key,
-        value
-    };
-}
-
-async function initiatePayment(tokenId: string, courseId: string, amount: number, userId: string, userToken: string | null): Promise<void> {
-    await GQLMutate(`
-        mutation {
-            createPurchase(
-                userId: "${userId}"
-                amount: ${amount}
-                courseId: "${courseId}"
-                stripeTokenId: "${tokenId}"
+async function initiatePayment(context: PrendusCoursePayment, stripeTokenId: string, courseId: string, amount: number, userId: string, userToken: string | null, userEmail: string): Promise<void> {
+    await GQLRequest(`
+        mutation($userId: ID!, $courseId: ID!, $stripeTokenId: String!, $amount: Int!, $userEmail: String!) {
+            coursePayment(
+                userId: $userId
+                courseId: $courseId
+                stripeTokenId: $stripeTokenId
+                amount: $amount
+                userEmail: $userEmail
             ) {
                 id
             }
         }
-    `, userToken, (error: any) => {
-        console.log(error);
+    `, {
+        courseId,
+        userId,
+        amount,
+        stripeTokenId,
+        userEmail
+    }, userToken, (error: any) => {
+        context.action = setNotification(error.message, NotificationType.ERROR);
     });
 }

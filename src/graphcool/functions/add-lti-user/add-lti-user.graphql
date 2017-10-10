@@ -1,0 +1,7 @@
+type AddLTIUserPayload {
+    id: ID!
+}
+
+extend type Mutation {
+    addLTIUser(userId: ID!, jwt: String!): AddLTIUserPayload
+}
