@@ -1,5 +1,6 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
+import {User} from '../../typings/user';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
@@ -16,6 +17,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     email: string;
     confirmedPassword: string;
     buttonEnabled: boolean;
+    user: User | null;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -76,12 +78,28 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
-        const signupData = await performSignupMutation(email, password, this.userToken);
-        // deleteCookie('ltiJWT');
-        // if (this.ltiUserId) await performLTIUserLinkMutation(this.ltiUserId, signupData.createUser.id, this.userToken);
-        // const loginData = await performLoginMutation(email, password, this.userToken);
+        const signupData = await performSignupMutation(this, email, password, this.userToken);
         this.action = persistUserToken(signupData.signupUser.token);
         this.action = await getAndSetUser();
+
+        const ltiJWT = getCookie('ltiJWT');
+        deleteCookie('ltiJWT');
+
+        if (ltiJWT) {
+            await GQLRequest(`
+                mutation addLTIUser($userId: ID!, $jwt: String!) {
+                    addLTIUser(userId: $userId, jwt: $jwt) {
+                        id
+                    }
+                }
+            `, {
+                userId: this.user ? this.user.id : 'user is null',
+                jwt: ltiJWT
+            }, this.userToken, (error: any) => {
+                this.action = setNotification(error.message, NotificationType.ERROR);
+            });
+        }
+
         navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
         deleteCookie('redirectUrl');
 
@@ -92,7 +110,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             value: true
         };
 
-        async function performSignupMutation(email: string, password: string, userToken: string | null) {
+        async function performSignupMutation(context: PrendusSignup, email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLRequest(`
                 mutation signupUser($email: String!, $password: String!) {
@@ -102,7 +120,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
                     }
                 }
             `, {email, password}, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
+                context.action = setNotification(error.message, NotificationType.ERROR)
             });
 
             return data;
@@ -118,7 +136,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('password')) this.password = componentState.password;
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
         if (keys.includes('buttonEnabled')) this.buttonEnabled = componentState.buttonEnabled;
-
+        this.user = state.user;
+        this.userToken = state.userToken;
     }
 }
 

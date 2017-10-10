@@ -16,40 +16,39 @@ module.exports = function(event) {
     const assignmentId = payload.assignmentId;
     const lisPersonContactEmailPrimary = payload.lisPersonContactEmailPrimary;
 
-    return new Promise((resolve, reject) => {
-        getCourseId(api, assignmentId)
-        .then((courseId) => {
-            createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary)
-            .then((data) => {
-                return enrollUserOnCourse(api, userId, courseId);
-            })
-            .then((data) => {
-                return payForCourseIfFree(api, userId, courseId);
-            })
-            .then((data) => {
-               resolve(data);
+    return getCourseId(api, assignmentId)
+            .then((courseId) => {
+                return createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary)
+                        .then((ltiUserId) => {
+                            return enrollUserOnCourse(api, userId, courseId)
+                                    .then((data) => {
+                                        return payForCourseIfFree(api, userId, courseId);
+                                    })
+                                    .then((data) => {
+                                        return {
+                                            id: ltiUserId
+                                        };
+                                    });
+                        });
             })
             .catch((error) => {
-                reject(error);
+                return {
+                    error
+                };
             });
-        })
-        .catch((error) => {
-            reject(error);
-        });
-    });
 };
 
 function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
     return api.request(`
-      mutation {
-          createLTIUser(
-              ltiUserId: "${ltiUserId}"
-              userId: "${userId}"
-              lisPersonContactEmailPrimary: "${lisPersonContactEmailPrimary}"
-          ) {
-              id
+          mutation {
+              createLTIUser(
+                  ltiUserId: "${ltiUserId}"
+                  userId: "${userId}"
+                  lisPersonContactEmailPrimary: "${lisPersonContactEmailPrimary}"
+              ) {
+                  id
+              }
           }
-      }
     `)
     .then((result) => {
         if (result.error) {
@@ -124,52 +123,59 @@ function payForCourseIfFree(api, userId, courseId) {
             return Promise.reject(result.error);
         }
         else {
-            if (result.Course.price === 0) {
-                return api.request(`
-                    query {
-                        allPurchases(filter: {
-                            user: {
-                                id: "${userId}"
-                            }
-                            course: {
-                                id: "${courseId}"
-                            }
-                        })
-                    }
-                `)
-                .then((result) => {
-                    if (result.error) {
-                        return Promise.reject(result.error);
-                    }
-                    else {
-                        if (result.allPurchases.length === 0) {
-                            return api.request(`
-                                mutation {
-                                	createPurchase(
-                                	       userId: "${userId}"
-                                           amount: 0
-                                           courseId: "${courseId}"
-                                           isPaid: true
-                                           stripeTokenId: "there is no stripeTokenId for a free course"
-                                	) {
-                                		course {
-                                            price
-                                        }
-                                	}
-                                }
-                            `)
-                            .then((result) => {
-                                if (result.error) {
-                                    return Promise.reject(result.error);
-                                }
-                                else {
-                                    return result.createPurchase.course.price;
-                                }
-                            });
-                        }
-                    }
-                });
-            }
+            return result.Course.price;
         }
-    });
+    })
+    .then((price) => {
+        if (price === 0) {
+            return api.request(`
+                query {
+                    allPurchases(filter: {
+                        user: {
+                            id: "${userId}"
+                        }
+                        course: {
+                            id: "${courseId}"
+                        }
+                    }) {
+                        id
+                    }
+                }
+            `)
+            .then((result) => {
+                if (result.error) {
+                    return Promise.reject(result.error);
+                }
+                else {
+                    return result.allPurchases;
+                }
+            })
+            .then((allPurchases) => {
+                if (allPurchases.length === 0) {
+                    return api.request(`
+                        mutation {
+                            createPurchase(
+                                   userId: "${userId}"
+                                   amount: 0
+                                   courseId: "${courseId}"
+                                   stripeTokenId: "there is no stripeTokenId for a free course"
+                            ) {
+                                course {
+                                    price
+                                }
+                            }
+                        }
+                    `)
+                    .then((result) => {
+                        if (result.error) {
+                            return Promise.reject(result.error);
+                        }
+                        else {
+                            return result.createPurchase.course.price;
+                        }
+                    });
+                }
+            });
+        }
+    })
 }
