@@ -61,7 +61,11 @@ permissions:
 
 # User Permissions
 
+# User Create
+
 - operation: User.create
+
+# User Read
 
 - operation: User.read
   fields:
@@ -74,6 +78,8 @@ permissions:
   authenticated: true
   query: ./permission-queries/user/user-read-role-email.graphql
 
+# User Update
+
 - operation: User.update
   authenticated: true
   query: ./permission-queries/user/user-update-all.graphql
@@ -84,13 +90,52 @@ permissions:
   authenticated: true
   query: ./permission-queries/user/user-update-role.graphql
 
+# User Delete
+
 - operation: User.delete
   authenticated: true
   query: ./permission-queries/user/user-delete.graphql
 
 # Course Permissions
 
+# Course Create
+
 - operation: Course.create
+  authenticated: true
+  query: ./permission-queries/course/course-create.graphql
+
+# Course Read
+
+- operation: Course.read
+  fields:
+    - id
+
+- operation: Course.read
+  authenticated: true
+  query: ./permission-queries/course/course-read-all.graphql
+
+- operation: Course.read
+  fields:
+    - title
+    - price
+  authenticated: true
+  query: ./permission-queries/course/course-read-title-price.graphql
+
+# Course Update
+
+- operation: Course.update
+  fields:
+    - title
+    - description
+    - dueDate
+  authenticated: true
+  query: ./permission-queries/course/course-update-title-description-duedate.graphql
+
+# Course Delete
+
+- operation: Course.delete
+  authenticated: true
+  query: ./permission-queries/course/course-delete.graphql
 
 # Your root tokens used for functions to get full access to the API
 # Read more here:

@@ -1,0 +1,27 @@
+query ($user_id: ID!, $node_id: ID!, $node_price: Int!) {
+  SomeUserExists(
+    filter: {
+      id: $user_id,
+      OR:[{
+        role: ADMIN
+      }, {
+        ownedCourses_some: {
+          id: $node_id
+        }
+      }, {
+      	AND: [{
+          enrolledCourses_some: {
+          	id: $node_id
+          }
+        }, {
+          purchases_some:{
+            course: {
+              id:$node_id
+            }
+            amount: $node_price
+          }
+        }]
+      }]
+    }
+  )
+}
