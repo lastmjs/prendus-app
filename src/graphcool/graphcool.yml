@@ -42,6 +42,20 @@ functions:
                     STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
         type: resolver
         schema: ./functions/course-payment/course-payment.graphql
+    request-password-reset:
+        handler:
+            code:
+                src: ./functions/request-password-reset/request-password-reset.js
+                environment:
+                    MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
+        type: resolver
+        schema: ./functions/request-password-reset/request-password-reset.graphql
+    reset-password:
+        handler:
+            code:
+                src: ./functions/reset-password/reset-password.js
+        type: resolver
+        schema: ./functions/reset-password/reset-password.graphql
 
 permissions:
 - operation: User.delete
