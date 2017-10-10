@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../prendus-stacked-bar/prendus-stacked-bar.html">
+
+<dom-module id="prendus-course-question-ratings-row">
+  <template>
+    <style>
+      .question-row {
+        display: grid;
+        grid-auto-rows: 4vw;
+        grid-template-columns: 5fr; /* 3fr;*/
+        grid-auto-columns: 1fr;
+        grid-auto-flow: column;
+        margin-bottom: 5px;
+        padding: 5px;
+        box-shadow: 0 5px 2px grey;
+      }
+
+      .question-row .table-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5%;
+        overflow: hidden;
+      }
+
+      .question-meta {
+        justify-content: normal !important;
+      }
+
+      .scroll {
+        overflow-x: auto !important;
+      }
+
+      #question-modal {
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 30%;
+        min-height: 30%;
+      }
+
+      .question-text {
+        cursor: pointer;
+      }
+
+      .question-text:hover {
+        text-decoration: underline;
+      }
+    </style>
+
+    <div class="question-row" role="row">
+      <div class="table-cell question-meta" role="rowheader">
+        <a class="question-text" on-click="_viewQuestion">[[_questionOnly(question.text)]]</a>
+      </div>
+      <div class="table-cell question-meta scroll">[[question.author.email]]</div>
+      <dom-repeat items="[[_categories]]" as="category">
+        <template>
+          <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" scores="[[_scores(_rawScores, category)]]"></prendus-stacked-bar></div>
+        </template>
+      </dom-repeat>
+      <div class="table-cell">[[_precision(question.overall)]]</div>
+    </div>
+
+    <paper-dialog id="question-modal" modal>
+      <paper-dialog-scrollable>
+        <prendus-flaggable-question question="[[question]]" on-question-flagged="_closeQuestionModal"></prendus-flaggable-question>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button class="prendus-button prendus-button--minor" dialog-dismiss>Close</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script type="module" src="prendus-course-question-ratings-row.ts"></script>
+</dom-module>

@@ -1,40 +1,35 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 
 <dom-module id="prendus-infinite-list">
 
   <template>
-    <style>
-      :host {
-        height: 100%;
-      }
-      #list {
-        height: 30vw;
-        overflow: auto;
-      }
-      #loading {
-        font-size: large;
-        padding: 10px;
+    <style is="custom-style">
+      .loading {
+        font-size: xx-large;
+        padding: 30px;
         text-align: center;
       }
-      [hidden] {
-        display: none;
+      #list {
+        height: 40vw;
+        overflow: auto;
       }
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <iron-scroll-threshold
       id="threshold"
       on-lower-trigger="loadMore"
-      lower-threshold="20"
+      lower-threshold="[[lowerThreshold]]"
       scroll-target="[[list]]"
     >
-      <div id="list">
+      <iron-list id="list" as="[[as]]" index-as="[[indexAs]]" items="[[items]]">
         <slot></slot>
-        <div id="loading" hidden$="[[!loading]]">
+        <div class="loading" hidden$="[[!loading]]">
           Loading...
         </div>
-      </div>
+      </iron-list>
     </iron-scroll-threshold>
   </template>
 
