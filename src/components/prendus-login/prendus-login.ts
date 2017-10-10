@@ -59,21 +59,37 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
   	loginOnEnter(e: any) {
   		if(e.keyCode === 13 && this.enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
   	}
-      //Implement these once GraphCool has feature to reset password.
-    	// openResetPasswordDialog(): void {
-    	// 	this.shadowRoot.querySelector('#reset-password-dialog').open()
-    	// }
-      //
-    	// enableResetPassword(resetPasswordEmail: string): boolean {
-    	// 	return resetPasswordEmail.match(ConstantsService.EMAIL_REGEX) !== null;
-    	// }
-      //
-    	// resetPasswordOnEnter(e: any): void {
-    	// 	if(e.keyCode === 13) {
-    	// 		if(this.enableResetPassword(this.resetPasswordEmail)) this.sendResetEmail(e);
-    	// 		else e.preventDefault();
-    	// 	}
-    	// }
+
+    	openResetPasswordDialog(): void {
+    		this.shadowRoot.querySelector('#reset-password-dialog').open();
+    	}
+
+    	enableResetPassword(resetPasswordEmail: string): boolean {
+    		return resetPasswordEmail.match(EMAIL_REGEX) !== null;
+    	}
+
+    	async resetPasswordOnEnter(e: any): void {
+    		if(e.keyCode === 13) {
+                const email = this.shadowRoot.querySelector('#reset-password-email').value;
+    			if (this.enableResetPassword(email)) {
+                    await GQLRequest(`
+                        mutation($email: String!) {
+                            requestPasswordReset(email: $email) {
+                                email
+                            }
+                        }
+                    `, {
+                        email
+                    }, this.userToken, (error: any) => {
+                        this.action = setNotification(error.message, NotificationType.ERROR);
+                    });
+
+                    this.shadowRoot.querySelector('#reset-password-email').value = '';
+                    this.shadowRoot.querySelector('#reset-password-dialog').close();
+                }
+    		}
+    	}
+
     async loginClick() {
         //need to scope this so that we can access it to log errors
         const that = this; //TODO that = this should never happen
