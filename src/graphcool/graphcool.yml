@@ -76,11 +76,9 @@ permissions:
 # User Permissions
 
 # User Create
-
 - operation: User.create
 
 # User Read
-
 - operation: User.read
   fields:
     - id
@@ -93,7 +91,6 @@ permissions:
   query: ./permission-queries/user/user-read-role-email.graphql
 
 # User Update
-
 - operation: User.update
   authenticated: true
   query: ./permission-queries/user/user-update-all.graphql
@@ -105,7 +102,6 @@ permissions:
   query: ./permission-queries/user/user-update-role.graphql
 
 # User Delete
-
 - operation: User.delete
   authenticated: true
   query: ./permission-queries/user/user-delete.graphql
@@ -113,13 +109,11 @@ permissions:
 # Course Permissions
 
 # Course Create
-
 - operation: Course.create
   authenticated: true
   query: ./permission-queries/course/course-create.graphql
 
 # Course Read
-
 - operation: Course.read
   fields:
     - id
@@ -136,7 +130,6 @@ permissions:
   query: ./permission-queries/course/course-read-title-price.graphql
 
 # Course Update
-
 - operation: Course.update
   fields:
     - title
@@ -146,7 +139,6 @@ permissions:
   query: ./permission-queries/course/course-update-title-description-duedate.graphql
 
 # Course Delete
-
 - operation: Course.delete
   authenticated: true
   query: ./permission-queries/course/course-delete.graphql
@@ -182,34 +174,74 @@ permissions:
 # QuestionResponse Delete
 
 # UserEssay Permissions
+
 # UserEssay Create
+- operation: UserEssay.create
+
 # UserEssay Read
+- operation: UserEssay.read
+
 # UserEssay Update
+- operation: UserEssay.update
+
 # UserEssay Delete
+- operation: UserEssay.delete
 
 # UserVariable Permissions
+
 # UserVariable Create
+- operation: UserVariable.create
+
 # UserVariable Read
+- operation: UserVariable.read
+
 # UserVariable Update
+- operation: UserVariable.update
+
 # UserVariable Delete
+- operation: UserVariable.delete
 
 # UserInput Permissions
+
 # UserInput Create
+- operation: UserInput.create
+
 # UserInput Read
+- operation: UserInput.read
+
 # UserInput Update
+- operation: UserInput.update
+
 # UserInput Delete
+- operation: UserInput.delete
 
 # UserCheck Permissions
+
 # UserCheck Create
+- operation: UserCheck.create
+
 # UserCheck Read
+- operation: UserCheck.read
+
 # UserCheck Update
+- operation: UserCheck.update
+
 # UserCheck Delete
+- operation: UserCheck.delete
 
 # UserRadio Permissions
+
 # UserRadio Create
+- operation: UserRadio.create
+
 # UserRadio Read
+- operation: UserRadio.read
+
 # UserRadio Update
+- operation: UserRadio.update
+
 # UserRadio Delete
+- operation: UserRadio.delete
 
 # QuestionRating Permissions
 # QuestionRating Create
@@ -218,22 +250,46 @@ permissions:
 # QuestionRating Delete
 
 # QuestionResponseRating Permissions
+
 # QuestionResponseRating Create
+- operation: QuestionResponseRating.create
+
 # QuestionResponseRating Read
+- operation: QuestionResponseRating.read
+
 # QuestionResponseRating Update
+- operation: QuestionResponseRating.update
+
 # QuestionResponseRating Delete
+- operation: QuestionResponseRating.delete
 
 # CategoryScore Permissions
+
 # CategoryScore Create
+- operation: CategoryScore.create
+
 # CategoryScore Read
+- operation: CategoryScore.read
+
 # CategoryScore Update
+- operation: CategoryScore.update
+
 # CategoryScore Delete
+- operation: CategoryScore.delete
 
 # AnswerComment Permissions
+
 # AnswerComment Create
+- operation: Answercomment.create
+
 # AnswerComment Read
+- operation: Answercomment.read
+
 # AnswerComment Update
+- operation: Answercomment.update
+
 # AnswerComment Delete
+- operation: Answercomment.delete
 
 # Discipline Permissions
 # Discipline Create
