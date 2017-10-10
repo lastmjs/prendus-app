@@ -23,7 +23,6 @@ type User implements Node {
   email: String @isUnique
   password: String
   role: UserRole! @defaultValue(value: STUDENT)
-  ltiJWT: String
   enrolledCourses: [Course!]! @relation(name: "StudentsAndCourses")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")

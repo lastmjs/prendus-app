@@ -13,8 +13,6 @@
 #
 # Happy Coding!
 
-
-# In the types.graphql you define your data schema
 types: ./types.graphql
 
 functions:
@@ -45,14 +43,12 @@ functions:
         type: resolver
         schema: ./functions/course-payment/course-payment.graphql
 
-
-# Model/Relation permissions are used to limit the API access
-# To take the burden of thinking about those while development, we
-# preconfigured the wildcard ("*") permission that allows everything
-# Read more here:
-# https://docs-next.graph.cool/reference/auth/authorization/overview-iegoo0heez
 permissions:
-- operation: "*"
+- operation: User.delete
+  authenticated: true
+  query: ./permission-queries/user-delete.graphql
+
+- operation: User.read
 
 
 # Your root tokens used for functions to get full access to the API
