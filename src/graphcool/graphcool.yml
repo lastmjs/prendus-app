@@ -59,6 +59,20 @@ functions:
 
 permissions:
 
+# File Permissions
+
+# File Create
+- operation: File.create
+
+# File Read
+- operation: File.read
+
+# File Update
+- operation: File.update
+
+# File Delete
+- operation: File.delete
+
 # User Permissions
 
 # User Create
@@ -136,6 +150,126 @@ permissions:
 - operation: Course.delete
   authenticated: true
   query: ./permission-queries/course/course-delete.graphql
+
+# Assignment Permissions
+# Assignment Create
+# Assignment Read
+# Assignment Update
+# Assignment Delete
+
+# Quiz Permissions
+# Quiz Create
+# Quiz Read
+# Quiz Update
+# Quiz Delete
+
+# Question Permissions
+# Question Create
+# Question Read
+# Question Update
+# Question Delete
+
+# QuestionFlag Permissions
+# QuestionFlag Create
+# QuestionFlag Read
+# QuestionFlag Update
+# QuestionFlag Delete
+
+# QuestionResponse Permissions
+# QuestionResponse Create
+# QuestionResponse Read
+# QuestionResponse Update
+# QuestionResponse Delete
+
+# UserEssay Permissions
+# UserEssay Create
+# UserEssay Read
+# UserEssay Update
+# UserEssay Delete
+
+# UserVariable Permissions
+# UserVariable Create
+# UserVariable Read
+# UserVariable Update
+# UserVariable Delete
+
+# UserInput Permissions
+# UserInput Create
+# UserInput Read
+# UserInput Update
+# UserInput Delete
+
+# UserCheck Permissions
+# UserCheck Create
+# UserCheck Read
+# UserCheck Update
+# UserCheck Delete
+
+# UserRadio Permissions
+# UserRadio Create
+# UserRadio Read
+# UserRadio Update
+# UserRadio Delete
+
+# QuestionRating Permissions
+# QuestionRating Create
+# QuestionRating Read
+# QuestionRating Update
+# QuestionRating Delete
+
+# QuestionResponseRating Permissions
+# QuestionResponseRating Create
+# QuestionResponseRating Read
+# QuestionResponseRating Update
+# QuestionResponseRating Delete
+
+# CategoryScore Permissions
+# CategoryScore Create
+# CategoryScore Read
+# CategoryScore Update
+# CategoryScore Delete
+
+# AnswerComment Permissions
+# AnswerComment Create
+# AnswerComment Read
+# AnswerComment Update
+# AnswerComment Delete
+
+# Discipline Permissions
+# Discipline Create
+# Discipline Read
+# Discipline Update
+# Discipline Delete
+
+# Subject Permissions
+# Subject Create
+# Subject Read
+# Subject Update
+# Subject Delete
+
+# Concept Permissions
+# Concept Create
+# Concept Read
+# Concept Update
+# Concept Delete
+
+# LTIUser Permissions
+# LTIUser Create
+# LTIUser Read
+# LTIUser Update
+# LTIUser Delete
+
+# PrendusAnalytics Permissions
+# PrendusAnalytics Create
+# PrendusAnalytics Read
+# PrendusAnalytics Update
+# PrendusAnalytics Delete
+
+# Purchase Permissions
+# Purchase Create
+# Purchase Read
+# Purchase Update
+# Purchase Delete
 
 # Your root tokens used for functions to get full access to the API
 # Read more here:
