@@ -1,0 +1,7 @@
+query ($node_id: ID!) {
+  SomeUserExists(
+    filter: {
+      id: $node_id
+    }
+  )
+}

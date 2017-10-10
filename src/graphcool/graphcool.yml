@@ -58,12 +58,41 @@ functions:
         schema: ./functions/reset-password/reset-password.graphql
 
 permissions:
+
 - operation: User.delete
   authenticated: true
-  query: ./permission-queries/user-delete.graphql
+  query: ./permission-queries/user/user-delete-all.graphql
 
 - operation: User.read
+  fields:
+    - id
 
+- operation: User.update
+  authenticated: true
+  query: ./permission-queries/user/user-update-all.graphql
+
+- operation: User.create
+
+- operation: User.update
+  fields:
+    - role
+  authenticated: true
+  query: ./permission-queries/user/user-update-role.graphql
+
+- operation: User.read
+  fields:
+    - createdAt
+    - updatedAt
+    - role
+    - email
+  authenticated: true
+  query: ./permission-queries/user/user-read-createdat-updatedat-role-email.graphql
+
+- operation: User.read
+  fields:
+    - password
+  authenticated: true
+  query: ./permission-queries/user/user-read-password.graphql    
 
 # Your root tokens used for functions to get full access to the API
 # Read more here:
