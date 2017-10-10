@@ -1,6 +1,3 @@
-# project: cj36de9q4dem00134bhkwm44r
-# version: 387
-
 type File implements Node {
   id: ID! @isUnique
   createdAt: DateTime!
@@ -26,7 +23,6 @@ type User implements Node {
   email: String @isUnique
   password: String
   role: UserRole! @defaultValue(value: STUDENT)
-  enrolledAssignments: [Assignment!]! @relation(name: "StudentsAndAssignments")
   enrolledCourses: [Course!]! @relation(name: "StudentsAndCourses")
   ltiUsers: [LTIUser!]! @relation(name: "UserOnLTIUser")
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
@@ -57,14 +53,12 @@ type Assignment implements Node {
   title: String!
   course: Course @relation(name: "CourseOnAssignment")
   author: User! @relation(name: "AuthorOnAssignment")
-  students: [User!]! @relation(name: "StudentsAndAssignments")
   questions: [Question!]! @relation(name: "AssignmentQuestions")
   questionType: QuestionType! @defaultValue(value: MULTIPLE_CHOICE)
   concepts: [Concept!]! @relation(name: "AssignmentOnConcepts")
   quiz: Quiz @relation(name: "AssignmentOnQuiz")
   numCreateQuestions: Int! @defaultValue(value: 1)
   numReviewQuestions: Int! @defaultValue(value: 3)
-  numGradeResponses: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
   numGradeResponses: Int! @defaultValue(value: 3)
 }
@@ -95,6 +89,16 @@ type Question implements Node {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
+  visibility: QuestionVisibility! @defaultValue(value: COURSE)
+  flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
+}
+
+type QuestionFlag implements Node {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  question: Question! @relation(name: "FlagOnQuestion")
+  comment: String!
 }
 
 type QuestionResponse implements Node {
@@ -156,20 +160,11 @@ type UserRadio implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
 }
 
-type QuestionResponseRating implements Node {
-  id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionResponseRating")
-  rater: User! @relation(name: "RaterOnQuestionResponseRating")
-  questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
-}
-
 type QuestionRating implements Node {
   id: ID! @isUnique
   scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionRating")
   rater: User! @relation(name: "RaterOnQuestionRating")
-  ratingJson: Json!
+  ratingJson: Json
   question: Question! @relation(name: "QuestionOnQuestionRating")
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -239,6 +234,7 @@ type LTIUser implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User! @relation(name: "UserOnLTIUser")
+  lisPersonContactEmailPrimary: String!
 }
 
 type PrendusAnalytics implements Node {
@@ -255,11 +251,10 @@ type PrendusAnalytics implements Node {
 type Purchase implements Node {
   id: ID! @isUnique
   user: User! @relation(name: "UserPurchases")
-  amount: Float!
+  amount: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: Course @relation(name: "CoursePurchased")
-  isPaid: Boolean! @defaultValue(value: false)
   stripeTokenId: String!
 }
 
@@ -292,4 +287,9 @@ enum ResponseType {
 enum QuestionType {
   MULTIPLE_CHOICE
   ESSAY
+}
+
+enum QuestionVisibility {
+  COURSE
+  PUBLIC
 }
