@@ -23,7 +23,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",
-    "graphcool": "^0.6.0-beta.3",
+    "graphcool": "^0.7.0-beta.3",
     "guesswork": "^0.2.4",
     "oss-attribution-generator": "^1.2.0",
     "scram-engine": "^0.6.14"

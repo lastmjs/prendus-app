@@ -1,7 +1,11 @@
-query ($node_id: ID!) {
+query ($node_id: ID!, $user_id: ID!) {
   SomeUserExists(
     filter: {
-      id: $node_id
+      AND:[{
+        id: $node_id
+      }, {
+        id: $user_id
+      }]
     }
   )
 }
