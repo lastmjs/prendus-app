@@ -123,6 +123,10 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     console.log(data);
   }
 
+  _tableLoaded(e: CustomEvent) {
+    this.dispatch(new CustomEvent('table-loaded'));
+  }
+
   _assignmentIdChanged(e: Event) {
     this.action = fireLocalAction(this.componentId, 'assignmentId', e.target.value);
   }
@@ -207,7 +211,6 @@ async function loadCourse(courseId: string, userToken: string, cb: (err: any) =>
 
 
 async function loadQuestions(variables: GQLVariables, userToken: string, cb: (err: any) => void) {
-  console.log(variables);
   const data = await GQLRequest(`
       query getQuestions($filter: QuestionFilter, $orderBy: QuestionOrderBy, $pageAmount: Int!, $pageIndex: Int!) {
         questions: allQuestions(filter: $filter, orderBy: $orderBy, first: $pageAmount, skip: $pageIndex) {

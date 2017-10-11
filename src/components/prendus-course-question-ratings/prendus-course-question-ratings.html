@@ -112,7 +112,7 @@
         </div>
 
         <!-- Table Body -->
-        <prendus-infinite-list next="[[fetchQuestions]]" on-items-loaded="_appendQuestions">
+        <prendus-infinite-list next="[[fetchQuestions]]" on-items-loaded="_tableLoaded">
           <template>
             <prendus-course-question-ratings-row categories="[[categories]]" question="[[item]]"></prendus-course-question-ratings-row>
           </template>

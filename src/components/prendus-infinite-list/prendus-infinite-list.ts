@@ -56,6 +56,7 @@ class PrendusInfiniteList extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'items', items);
     this.action = fireLocalAction(this.componentId, 'cursor', this.pageSize);
     this.action = fireLocalAction(this.componentId, 'loading', false);
+    this.dispatch(new CustomEvent('items-loaded'));
   }
 
   async loadMore(e: CustomEvent) {
@@ -69,6 +70,7 @@ class PrendusInfiniteList extends Polymer.Element {
     else
       threshold.clearLower();
     this.action = fireLocalAction(this.componentId, 'loading', false);
+    this.dispatch(new CustomEvent('items-loaded'));
   }
 
   stateChange(e: CustomEvent) {

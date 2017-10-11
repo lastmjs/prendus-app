@@ -3,6 +3,7 @@ import {RootReducer} from '../../../../src/redux/reducers';
 import {PrendusCourseQuestionRatings} from '../../../../src/components/prendus-course-question-ratings/prendus-course-question-ratings';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../../../src/services/constants-service';
 import {CourseArb} from '../../services/arbitraries-service';
+import {averageCategoryScores} from '../../../../src/services/question-stats';
 import {saveArbitrary, createTestUser, deleteTestUsers, deleteArbitrary} from '../../services/dataGen-service';
 
 const jsc = require('jsverify');
@@ -95,13 +96,16 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await fulfilled;
         const conceptIds = getConceptIds(courseData);
         const assignmentIds = getAssignmentIds(courseData);
-        const results = assignmentIds.map(assignmentId => {
-          return conceptIds.map(conceptId => {
-            const filter = table._makeFilter(assignmentId, conceptId);
-            const filtered = table.questionStats.filter(filter);
+        const results = (await asyncMap(assignmentIds, async assignmentId => {
+          return asyncMap(conceptIds, async conceptId => {
+            const loaded = setUpListener(table);
+            table.assignmentId = assignmentId;
+            table.conceptId = conceptId;
+            await loaded;
+            const filtered = table.shadowRoot.querySelector('prendus-infinite-list').items;
             return verifyFilter(assignmentId, conceptId, filtered);
           })
-        }).reduce(flatten, []);
+        })).reduce(flatten, []);
         this.shadowRoot.removeChild(table);
         const success = results.every(result => result);
         await deleteArbitrary(courseData);
@@ -124,13 +128,16 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         table.courseId = courseData.Course.id;
         await fulfilled;
         const columns = ['Overall', 'Student', ...Object.keys(DEFAULT_EVALUATION_RUBRIC)];
-        const results = columns.map(sortField => {
-          return [true, false].map(sortAsc => {
-            const sort = table._makeSorter(sortField, sortAsc);
-            const sorted = table.questionStats.sort(sort);
+        const results = (await asyncMap(columns, async sortField => {
+          return asyncMap([true, false], async sortAsc => {
+            const loaded = setUpListener(table);
+            table.sortField = sortField;
+            table.sortAsc = sortAsc;
+            await loaded;
+            const sorted = table.shadowRoot.querySelector('prendus-infinite-list').items;
             return verifySort(sortField, sortAsc, sorted);
           });
-        }).reduce(flatten, []);
+        })).reduce(flatten, []);
         this.shadowRoot.removeChild(table);
         const success = results.every(result => result);
         await deleteArbitrary(courseData);
@@ -216,8 +223,10 @@ function verifyTable(table: PrendusCourseQuestionRatings, courseData: object): b
     && table.course.id === courseData.Course.id
     && questions.every(
       question => table
-      .questionStats
-      .map(stats => stats.question.id)
+      .shadowRoot
+      .querySelector('prendus-infinite-list')
+      .items
+      .map(q => q.id)
       .indexOf(question.id) > -1)
     && table.assignmentId === 'ALL'
     && table.conceptId === 'ALL'
@@ -225,21 +234,21 @@ function verifyTable(table: PrendusCourseQuestionRatings, courseData: object): b
     && table.sortField === 'overall'
 }
 
-function verifyFilter(assignmentId: number, conceptId: number, filtered: QuestionRatingStats[]): boolean {
-  return (assignmentId === 'ALL' || !filtered.some(stats => stats.question.assignment.id != assignmentId))
-    && (conceptId === 'ALL' || !filtered.some(stats => stats.question.concept.id != conceptId));
+function verifyFilter(assignmentId: number, conceptId: number, filtered: Question[]): boolean {
+  return (assignmentId === 'ALL' || !filtered.some(question => question.assignment.id != assignmentId))
+    && (conceptId === 'ALL' || !filtered.some(question => question.concept.id != conceptId));
 }
 
 function weightedSum(sum, num, i) {
   return sum + num*i;
 }
 
-function verifySort(sortField: number, sortAsc: number, sorted: QuestionRatingStats[]): boolean {
+function verifySort(sortField: number, sortAsc: number, sorted: Question[]): boolean {
   return sorted.reduce((result, next, i) => {
     if (!i) return true;
     const prev = sorted[i-1];
-    const prevStat = prev.sortStats[sortField.toLowerCase()] || 0;
-    const nextStat = next.sortStats[sortField.toLowerCase()] || 0;
+    const prevStat = averageCategoryScores(prev)[sortField.toLowerCase()] || 0;
+    const nextStat = averageCategoryScores(next)[sortField.toLowerCase()] || 0;
     if (sortAsc) {
       if (sortField === 'Student')
         return result && prev.question.author.email.toLowerCase() <= next.question.author.email.toLowerCase();
