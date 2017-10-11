@@ -367,22 +367,70 @@ permissions:
 - operation: Answercomment.delete
 
 #### Discipline Permissions
+
 # Discipline Create
+- operation: Discipline.create
+  authenticated: true
+  query: ./permission-queries/discipline/discipline-create.graphql
+
 # Discipline Read
+- operation: Discipline.read
+
 # Discipline Update
+- operation: Discipline.update
+  authenticated: true
+  query: ./permission-queries/discipline/discipline-update-all-1.graphql
+
+- operation: Discipline.update
+  authenticated: true
+  query: ./permission-queries/discipline/discipline-update-all-2.graphql
+
 # Discipline Delete
+- operation: Discipline.delete
+  authenticated: true
+  query: ./permission-queries/discipline/discipline-delete.graphql
 
 #### Subject Permissions
+
 # Subject Create
+- operation: Subject.create
+  authenticated: true
+  query: ./permission-queries/subject/subject-create.graphql
+
 # Subject Read
+- operation: Subject.read
+
 # Subject Update
+- operation: Subject.update
+  authenticated: true
+  query: ./permission-queries/subject/subject-update-all-1.graphql
+
+- operation: Subject.update
+  authenticated: true
+  query: ./permission-queries/subject/subject-update-all-2.graphql
+
 # Subject Delete
+- operation: Subject.delete
+  authenticated: true
+  query: ./permission-queries/subject/subject-delete.graphql
 
 #### Concept Permissions
+
 # Concept Create
+- operation: Concept.create
+  authenticated: true
+
 # Concept Read
+- operation: Concept.read
+
 # Concept Update
+- operation: Concept.update
+  authenticated: true
+
 # Concept Delete
+- operation: Concept.delete
+  authenticated: true
+  query: ./permission-queries/concept/concept-delete.graphql
 
 #### LTIUser Permissions
 # LTIUser Create
