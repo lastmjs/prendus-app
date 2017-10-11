@@ -307,10 +307,22 @@ permissions:
 - operation: UserRadio.delete
 
 #### QuestionRating Permissions
+
 # QuestionRating Create
+- operation: QuestionRating.create
+  authenticated: true
+  query: ./permission-queries/question-rating/question-rating-create.graphql
+
 # QuestionRating Read
+- operation: QuestionRating.read
+
 # QuestionRating Update
+- operation: QuestionRating.update
+  authenticated: true
+  query: ./permission-queries/question-rating/question-rating-update-all.graphql
+
 # QuestionRating Delete
+- operation: QuestionRating.delete
 
 #### QuestionResponseRating Permissions
 
