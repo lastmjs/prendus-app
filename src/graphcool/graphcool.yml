@@ -59,7 +59,7 @@ functions:
 
 permissions:
 
-# File Permissions
+#### File Permissions
 
 # File Create
 - operation: File.create
@@ -73,7 +73,7 @@ permissions:
 # File Delete
 - operation: File.delete
 
-# User Permissions
+#### User Permissions
 
 # User Create
 - operation: User.create
@@ -106,7 +106,7 @@ permissions:
   authenticated: true
   query: ./permission-queries/user/user-delete.graphql
 
-# Course Permissions
+#### Course Permissions
 
 # Course Create
 - operation: Course.create
@@ -143,37 +143,100 @@ permissions:
   authenticated: true
   query: ./permission-queries/course/course-delete.graphql
 
-# Assignment Permissions
+#### Assignment Permissions
+
 # Assignment Create
+- operation: Assignment.create
+  authenticated: true
+  query: ./permission-queries/assignment/assignment-create.graphql
+
 # Assignment Read
+- operation: Assignment.read
+  fields:
+    - id
+
+- operation: Assignment.read
+  authenticated: true
+  query: ./permission-queries/assignment/assignment-read-all.graphql
+
 # Assignment Update
+- operation: Assignment.update
+  authenticated: true
+  query: ./permission-queries/assignment/assignment-update-all.graphql
+
 # Assignment Delete
+- operation: Assignment.delete
+  authenticated: true
+  query: ./permission-queries/assignment/assignment-delete.graphql
 
-# Quiz Permissions
+#### Quiz Permissions
+
 # Quiz Create
+- operation: Quiz.create
+
 # Quiz Read
+- operation: Quiz.read
+
 # Quiz Update
+- operation: Quiz.update
+
 # Quiz Delete
+- operation: Quiz.delete
 
-# Question Permissions
+#### Question Permissions
+
 # Question Create
+- operation: Question.create
+  authenticated: true
+
 # Question Read
+- operation: Question.read
+  query: ./permission-queries/question/question-read-all-unauthenticated.graphql
+
+- operation: Question.read
+  authenticated: true
+  query: ./permission-queries/question/question-read-all-authenticated.graphql
+
 # Question Update
+- operation: Question.update
+  authenticated: true
+  query: ./permission-queries/question/question-update-all.graphql
+
 # Question Delete
+- operation: Question.delete
+  authenticated: true
+  query: ./permission-queries/question/question-delete.graphql
 
-# QuestionFlag Permissions
+#### QuestionFlag Permissions
+
 # QuestionFlag Create
-# QuestionFlag Read
-# QuestionFlag Update
-# QuestionFlag Delete
+- operation: QuestionFlag.create
 
-# QuestionResponse Permissions
+# QuestionFlag Read
+- operation: QuestionFlag.read
+
+# QuestionFlag Update
+- operation: QuestionFlag.update
+
+# QuestionFlag Delete
+- operation: QuestionFlag.delete
+
+#### QuestionResponse Permissions
+
 # QuestionResponse Create
+- operation: QuestionResponse.create
+  authenticated: true
+  query: ./permission-queries/question-response/question-response-create.graphql
+
 # QuestionResponse Read
+- operation: QuestionResponse.read
+  authenticated: true
+  query: ./permission-queries/question-response/question-response-read-all.graphql
+
 # QuestionResponse Update
 # QuestionResponse Delete
 
-# UserEssay Permissions
+#### UserEssay Permissions
 
 # UserEssay Create
 - operation: UserEssay.create
@@ -187,7 +250,7 @@ permissions:
 # UserEssay Delete
 - operation: UserEssay.delete
 
-# UserVariable Permissions
+#### UserVariable Permissions
 
 # UserVariable Create
 - operation: UserVariable.create
@@ -201,7 +264,7 @@ permissions:
 # UserVariable Delete
 - operation: UserVariable.delete
 
-# UserInput Permissions
+#### UserInput Permissions
 
 # UserInput Create
 - operation: UserInput.create
@@ -215,7 +278,7 @@ permissions:
 # UserInput Delete
 - operation: UserInput.delete
 
-# UserCheck Permissions
+#### UserCheck Permissions
 
 # UserCheck Create
 - operation: UserCheck.create
@@ -229,7 +292,7 @@ permissions:
 # UserCheck Delete
 - operation: UserCheck.delete
 
-# UserRadio Permissions
+#### UserRadio Permissions
 
 # UserRadio Create
 - operation: UserRadio.create
@@ -243,13 +306,13 @@ permissions:
 # UserRadio Delete
 - operation: UserRadio.delete
 
-# QuestionRating Permissions
+#### QuestionRating Permissions
 # QuestionRating Create
 # QuestionRating Read
 # QuestionRating Update
 # QuestionRating Delete
 
-# QuestionResponseRating Permissions
+#### QuestionResponseRating Permissions
 
 # QuestionResponseRating Create
 - operation: QuestionResponseRating.create
@@ -263,7 +326,7 @@ permissions:
 # QuestionResponseRating Delete
 - operation: QuestionResponseRating.delete
 
-# CategoryScore Permissions
+#### CategoryScore Permissions
 
 # CategoryScore Create
 - operation: CategoryScore.create
@@ -277,7 +340,7 @@ permissions:
 # CategoryScore Delete
 - operation: CategoryScore.delete
 
-# AnswerComment Permissions
+#### AnswerComment Permissions
 
 # AnswerComment Create
 - operation: Answercomment.create
@@ -291,37 +354,37 @@ permissions:
 # AnswerComment Delete
 - operation: Answercomment.delete
 
-# Discipline Permissions
+#### Discipline Permissions
 # Discipline Create
 # Discipline Read
 # Discipline Update
 # Discipline Delete
 
-# Subject Permissions
+#### Subject Permissions
 # Subject Create
 # Subject Read
 # Subject Update
 # Subject Delete
 
-# Concept Permissions
+#### Concept Permissions
 # Concept Create
 # Concept Read
 # Concept Update
 # Concept Delete
 
-# LTIUser Permissions
+#### LTIUser Permissions
 # LTIUser Create
 # LTIUser Read
 # LTIUser Update
 # LTIUser Delete
 
-# PrendusAnalytics Permissions
+#### PrendusAnalytics Permissions
 # PrendusAnalytics Create
 # PrendusAnalytics Read
 # PrendusAnalytics Update
 # PrendusAnalytics Delete
 
-# Purchase Permissions
+#### Purchase Permissions
 # Purchase Create
 # Purchase Read
 # Purchase Update
