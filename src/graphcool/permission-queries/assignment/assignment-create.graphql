@@ -1,0 +1,20 @@
+{
+ SomeUserExists(
+   filter: {
+     AND: [{
+       id: $user_id,
+       OR: [{
+         ownedCourses_some:{
+           id: $input_courseId
+           author: {
+             id: $input_authorId
+           }
+         }
+       },
+         {
+         role:ADMIN
+       }]
+     }]
+   }
+ )
+}
