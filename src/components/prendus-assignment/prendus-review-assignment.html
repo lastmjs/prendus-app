@@ -50,10 +50,10 @@
                 <br>
                 <prendus-view-question question="[[question]]"></prendus-view-question>
                 <br>
-                <dom-if if="[[isEssayType(assignment.questionType)]]">
+                <dom-if if="[[_essayType]]">
                   <template>
                     <h3>Grading Rubric</h3>
-                    <prendus-rubric-table rubric="[[_parseRubric(question.code, 'gradingRubric')]]"></prendus-rubric-table>
+                    <prendus-rubric-table rubric="[[_gradingRubric]]"></prendus-rubric-table>
                   </template>
                 </dom-if>
                 <br>
