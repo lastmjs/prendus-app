@@ -243,13 +243,6 @@ export interface Purchase {
 }
 
 //Other types
-export interface QuestionRatingStats {
-  readonly question: Question;
-  readonly rawScores: {
-    [category: string]: CategoryScore[]
-  };
-}
-
 export interface Rubric = {
   [category: string]: {
     [scale: string]: {

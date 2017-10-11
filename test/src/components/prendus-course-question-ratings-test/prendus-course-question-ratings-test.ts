@@ -239,10 +239,6 @@ function verifyFilter(assignmentId: number, conceptId: number, filtered: Questio
     && (conceptId === 'ALL' || !filtered.some(question => question.concept.id != conceptId));
 }
 
-function weightedSum(sum, num, i) {
-  return sum + num*i;
-}
-
 function verifySort(sortField: number, sortAsc: number, sorted: Question[]): boolean {
   return sorted.reduce((result, next, i) => {
     if (!i) return true;

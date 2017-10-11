@@ -31,7 +31,6 @@ class PrendusStackedBar extends Polymer.Element {
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
     this.data = componentState.data;
   }
 }
