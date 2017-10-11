@@ -439,14 +439,38 @@ permissions:
 # LTIUser Delete
 
 #### PrendusAnalytics Permissions
+
 # PrendusAnalytics Create
+- operation: PrendusAnalytics.create
+  authenticated: true
+
 # PrendusAnalytics Read
+- operation: PrendusAnalytics.read
+  authenticated: true
+  query: ./permission-queries/prendus-analytics/prendus-analytics-read-all.graphql
+
 # PrendusAnalytics Update
+- operation: PrendusAnalytics.update
+  authenticated: true
+
 # PrendusAnalytics Delete
+- operation: PrendusAnalytics.delete
+  authenticated: true
+  query: ./permission-queries/prendus-analytics/prendus-analytics-delete.graphql
 
 #### Purchase Permissions
+
 # Purchase Create
+
 # Purchase Read
+- operation: Purchase.read
+  fields:
+    - id
+
+- operation: Purchase.read
+  authenticated: true
+  query: ./permission-queries/purchase/purchase-read-all.graphql
+
 # Purchase Update
 # Purchase Delete
 
