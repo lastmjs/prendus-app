@@ -1,0 +1,33 @@
+{
+ SomeUserExists(
+   filter: {
+     AND: [{
+       id: $user_id,
+       OR: [{
+         enrolledCourses_some:{
+          	assignments_some:{
+              questions_some: {
+                id: $input_questionId
+              }
+            }
+        	purchases_some: {
+            user: {
+              id: $user_id
+            }
+          }
+         }
+      },{
+        ownedCourses_some: {
+          assignments_some:{
+           questions_some: {
+            id: $input_questionId
+          }
+          }
+        }
+      }, {
+         role:ADMIN
+       }]
+     }]
+   }
+ )
+}
