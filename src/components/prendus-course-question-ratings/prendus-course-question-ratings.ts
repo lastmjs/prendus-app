@@ -30,16 +30,16 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return {
       sortField: String,
       sortAsc: Boolean,
-      rubric: Object,
-      user: Object,
-      userToken: String,
+      assignmentId: String,
+      conceptId: String,
+      authorEmail: String,
       orderBy: {
         type: String,
         computed: '_computeOrderBy(sortField, sortAsc)'
       },
       filter: {
         type: Object,
-        computed: '_computeFilter(courseId, user, assignmentId, conceptId)'
+        computed: '_computeFilter(courseId, user, assignmentId, conceptId, authorEmail)'
       },
       fetchQuestions: {
         type: Function,
@@ -65,7 +65,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return ['Student', ...Object.keys(rubric), 'Overall'];
   }
 
-  _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string): object {
+  _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
     const filter = {
       assignment: {
         course: {
@@ -75,6 +75,8 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
       author: {},
       concept: {}
     };
+    if (authorEmail)
+      filter.author.email = authorEmail;
     if (!user || user.role !== 'INSTRUCTOR')
       filter.author.id = (user || {}).id;
     if (assignmentId !== 'ALL')
