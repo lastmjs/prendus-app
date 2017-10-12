@@ -110,7 +110,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'course', course);
     this.action = fireLocalAction(this.componentId, 'assignmentId', 'ALL');
     this.action = fireLocalAction(this.componentId, 'conceptId', 'ALL');
-    this.action = fireLocalAction(this.componentId, 'sortField', 'overall');
+    this.action = fireLocalAction(this.componentId, 'sortField', 'Overall');
     this.action = fireLocalAction(this.componentId, 'sortAsc', false);
     this.action = fireLocalAction(this.componentId, 'rubric', DEFAULT_EVALUATION_RUBRIC);
     //TODO: Fix permissions for subscription
@@ -124,7 +124,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _tableLoaded(e: CustomEvent) {
-    this.dispatch(new CustomEvent('table-loaded'));
+    this.dispatchEvent(new CustomEvent('table-loaded'));
   }
 
   _assignmentIdChanged(e: Event) {
@@ -133,6 +133,15 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
 
   _conceptIdChanged(e: Event) {
     this.action = fireLocalAction(this.componentId, 'conceptId', e.target.value);
+  }
+
+  _viewQuestion(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'question', e.detail.question);
+    this.shadowRoot.querySelector('#question-modal').open();
+  }
+
+  _closeQuestion(e: CustomEvent) {
+    this.shadowRoot.querySelector('#question-modal').close();
   }
 
   _toggleSort(e: Event) {
@@ -160,6 +169,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.sortField = state.sortField || 'overall';
     this.sortAsc = state.sortAsc;
     this.rubric = state.rubric;
+    this.question = state.question;
   }
 }
 

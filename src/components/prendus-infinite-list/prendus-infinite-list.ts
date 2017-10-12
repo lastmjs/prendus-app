@@ -56,21 +56,21 @@ class PrendusInfiniteList extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'items', items);
     this.action = fireLocalAction(this.componentId, 'cursor', this.pageSize);
     this.action = fireLocalAction(this.componentId, 'loading', false);
-    this.dispatch(new CustomEvent('items-loaded'));
+    this.dispatchEvent(new CustomEvent('items-loaded'));
   }
 
   async loadMore(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loading', true);
     const items = await this.next(this.cursor, this.pageSize);
-    this.action = fireLocalAction(this.componentId, 'items', [...this.items, ...items]);
+    this.push('items', ...items); //Mutation necessary to keep scroll position in the list
     this.action = fireLocalAction(this.componentId, 'cursor', this.cursor + this.pageSize);
     const threshold = this.shadowRoot.querySelector('#threshold');
-    if (!items.length)
+    if (items.length < this.pageSize)
       this.action = fireLocalAction(this.componentId, 'lowerThreshold', null);
     else
       threshold.clearLower();
     this.action = fireLocalAction(this.componentId, 'loading', false);
-    this.dispatch(new CustomEvent('items-loaded'));
+    this.dispatchEvent(new CustomEvent('items-loaded'));
   }
 
   stateChange(e: CustomEvent) {

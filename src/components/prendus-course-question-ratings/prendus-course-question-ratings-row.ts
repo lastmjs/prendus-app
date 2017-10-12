@@ -33,11 +33,13 @@ class PrendusCourseQuestionRatingsRow extends Polymer.Element {
   }
 
   _viewQuestion(e: CustomEvent) {
-    this.shadowRoot.querySelector('#question-modal').open();
-  }
-
-  _closeQuestionModal(e: CustomEvent) {
-    this.shadowRoot.querySelector('#question-modal').close();
+    this.dispatchEvent(
+      new CustomEvent('view-question', {
+        detail: {
+          question: this.question
+        }
+      })
+    );
   }
 
   _questionOnly(text: string): string {

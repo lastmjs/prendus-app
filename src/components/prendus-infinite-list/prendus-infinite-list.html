@@ -2,6 +2,7 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
 <dom-module id="prendus-infinite-list">
 
@@ -16,6 +17,9 @@
         height: 40vw;
         overflow: auto;
       }
+      #progress {
+        width: 100%;
+      }
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <iron-scroll-threshold
@@ -24,11 +28,9 @@
       lower-threshold="[[lowerThreshold]]"
       scroll-target="[[list]]"
     >
+      <paper-progress id="progress" hidden$="[[!loading]]" indeterminate></paper-progress>
       <iron-list id="list" as="[[as]]" index-as="[[indexAs]]" items="[[items]]">
         <slot></slot>
-        <div class="loading" hidden$="[[!loading]]">
-          Loading...
-        </div>
       </iron-list>
     </iron-scroll-threshold>
   </template>

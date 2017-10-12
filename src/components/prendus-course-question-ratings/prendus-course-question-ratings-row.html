@@ -1,9 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../prendus-stacked-bar/prendus-stacked-bar.html">
 
 <dom-module id="prendus-course-question-ratings-row">
@@ -66,15 +62,6 @@
       </dom-repeat>
       <div class="table-cell">[[_precision(question.overall)]]</div>
     </div>
-
-    <paper-dialog id="question-modal" modal>
-      <paper-dialog-scrollable>
-        <prendus-flaggable-question question="[[question]]" on-question-flagged="_closeQuestionModal"></prendus-flaggable-question>
-      </paper-dialog-scrollable>
-      <div class="buttons">
-        <paper-button class="prendus-button prendus-button--minor" dialog-dismiss>Close</paper-button>
-      </div>
-    </paper-dialog>
 
   </template>
 
