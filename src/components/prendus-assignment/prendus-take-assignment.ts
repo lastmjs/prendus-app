@@ -113,39 +113,36 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   async generateQuiz(assignmentId: string) {
       this._fireLocalAction('loaded', true);
-      setTimeout(() => {
+      setTimeout(async () => {
           this._fireLocalAction('loaded', false);
 
-          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
-          setTimeout(async () => {
-              this.action = checkForUserToken();
-              this.action = await getAndSetUser();
+          this.action = checkForUserToken();
+          this.action = await getAndSetUser();
 
-              if (!this.user) {
-                  navigate('/authenticate');
-                  return;
-              }
+          if (!this.user) {
+              navigate('/authenticate');
+              return;
+          }
 
-              const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-              const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+          const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+          const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
 
-              if (!userOnCourse) {
-                  this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-                  return;
-              }
+          if (!userOnCourse) {
+              this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+              return;
+          }
 
-              if (!userPaidForCourse) {
-                  navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-                  return;
-              }
+          if (!userPaidForCourse) {
+              navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+              return;
+          }
 
-              const assignment = await this._assignment(assignmentId);
-              this._fireLocalAction('assignment', assignment);
-              const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
-              const questions = await this._createQuiz(questionIds, this.user.id);
-              this._fireLocalAction('questions', questions);
-              this._fireLocalAction('loaded', true);
-          }, 5000);
+          const assignment = await this._assignment(assignmentId);
+          this._fireLocalAction('assignment', assignment);
+          const questionIds = shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions).map(question => question.id);
+          const questions = await this._createQuiz(questionIds, this.user.id);
+          this._fireLocalAction('questions', questions);
+          this._fireLocalAction('loaded', true);
       });
   }
 

@@ -81,59 +81,56 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   async loadAssignment(assignmentId: string) {
       this._fireLocalAction('loaded', true);
-      setTimeout(() => {
+      setTimeout(async () => {
           this._fireLocalAction('loaded', false);
-          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
-          setTimeout(async () => {
-              this.action = checkForUserToken();
-              this.action = await getAndSetUser();
+          this.action = checkForUserToken();
+          this.action = await getAndSetUser();
 
-              if (!this.user) {
-                  navigate('/authenticate');
-                  return;
+          if (!this.user) {
+              navigate('/authenticate');
+              return;
+          }
+
+          const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+          const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+
+          if (!userOnCourse) {
+              this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+              return;
+          }
+
+          if (!userPaidForCourse) {
+              navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+              return;
+          }
+
+          const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
+            Assignment(id: $assignmentId) {
+              id
+              title
+              numCreateQuestions
+              questionType
+              concepts {
+                id
+                title
               }
-
-              const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-              const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
-
-              if (!userOnCourse) {
-                  this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-                  return;
-              }
-
-              if (!userPaidForCourse) {
-                  navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-                  return;
-              }
-
-              const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
-                Assignment(id: $assignmentId) {
+              course {
+                subject {
                   id
-                  title
-                  numCreateQuestions
-                  questionType
-                  concepts {
-                    id
-                    title
-                  }
-                  course {
-                    subject {
-                      id
-                    }
-                  }
                 }
-              }`, {assignmentId}, this.userToken, this._handleGQLError.bind(this));
-              if (!data) {
-                return;
               }
+            }
+          }`, {assignmentId}, this.userToken, this._handleGQLError.bind(this));
+          if (!data) {
+            return;
+          }
 
-              // Create array of "questions" just to create carousel events to create multiple questions
-              // avoid 0 because question is evaluated as a boolean
-              const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
-              this._fireLocalAction('assignment', data.Assignment);
-              this._fireLocalAction('questions', questions);
-              this._fireLocalAction('loaded', true);
-          }, 5000);
+          // Create array of "questions" just to create carousel events to create multiple questions
+          // avoid 0 because question is evaluated as a boolean
+          const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
+          this._fireLocalAction('assignment', data.Assignment);
+          this._fireLocalAction('questions', questions);
+          this._fireLocalAction('loaded', true);
       });
   }
 

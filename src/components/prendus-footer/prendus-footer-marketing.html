@@ -1,0 +1,72 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-footer-marketing">
+    <template>
+      <style include ="prendus-styles">
+
+        .footer-items {
+          width: 100vw;
+          height: auto;
+          display: flex;
+          justify-content: space-evenly;
+          font-size: 18px;
+          padding: 15px;
+          color: #9D9E9E;
+          background-color: #2e3137;
+        }
+        a{
+          color: #9D9E9E;
+          visited: white;
+        }
+        .social-icons{
+          padding: 5px;
+          height: 23px;
+          width: 23px;
+          cursor: pointer;
+        }
+        .footer-child{
+          display: flex;
+          height: auto;
+          flex-direction: column;
+          align-items: center;
+        }
+      </style>
+      <div>
+        <footer class="footer-items">
+            <div class="footer-child">
+              <h3>Prendus</h3>
+              <!-- <a>Why Prendus?</a> -->
+              <!-- <a href="/what">What is Prendus?</a> -->
+              <!-- <a>How Prendus works</a> -->
+              <div>
+                <a target="_blank" href="https://www.facebook.com/PrendusLearning/"><img class="social-icons" src="../images/facebook-icon.png"></a>
+                <a target="_blank" href="https://twitter.com/PrendusLearning"><img class="social-icons" src="../images/twitter-icon.png"></a></div>
+              <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
+            </div>
+            <div class="footer-child">
+              <h3>Use Prendus</h3>
+              <a href="/how-it-works">How Prendus works</a>
+              <a href="/assignment/demo">Test beta version</a>
+              <a href="/course-setup">Prendus setup</a>
+
+            </div>
+            <div class="footer-child">
+              <h3>Legal</h3>
+              <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms of Use</a>
+              <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>
+              <a href="/open-source">Open Source</a>
+              <!-- <a href="/terms-of-service">Terms&nbsp;<span id="terms-of-service" class="long-text">of Service</span></a>
+              <a href="/privacy-policy">Privacy&nbsp;<span id="privacy-policy" class="long-text">Policy</span></a>
+              <a href="/open-source"><span id="open-source" class="long-text">Open Source</span></a> -->
+            </div>
+        </footer>
+      </div>
+    </template>
+
+    <script type="module" src="prendus-footer-marketing.ts"></script>
+</dom-module>

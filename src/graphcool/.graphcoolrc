@@ -1,0 +1,5 @@
+targets:
+  dev: shared-eu-west-1/cj8dlzxgn0oyr0144574u2ivb
+  default: dev
+clusters:
+  default: shared-eu-west-1

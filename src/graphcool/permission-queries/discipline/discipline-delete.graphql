@@ -1,0 +1,8 @@
+{
+  SomeUserExists(
+    filter: {
+      id: $node_id
+      role:ADMIN
+    }
+  )
+}

@@ -59,29 +59,45 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
   	loginOnEnter(e: any) {
   		if(e.keyCode === 13 && this.enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
   	}
-      //Implement these once GraphCool has feature to reset password.
-    	// openResetPasswordDialog(): void {
-    	// 	this.shadowRoot.querySelector('#reset-password-dialog').open()
-    	// }
-      //
-    	// enableResetPassword(resetPasswordEmail: string): boolean {
-    	// 	return resetPasswordEmail.match(ConstantsService.EMAIL_REGEX) !== null;
-    	// }
-      //
-    	// resetPasswordOnEnter(e: any): void {
-    	// 	if(e.keyCode === 13) {
-    	// 		if(this.enableResetPassword(this.resetPasswordEmail)) this.sendResetEmail(e);
-    	// 		else e.preventDefault();
-    	// 	}
-    	// }
+
+    	openResetPasswordDialog(): void {
+    		this.shadowRoot.querySelector('#reset-password-dialog').open();
+    	}
+
+    	enableResetPassword(resetPasswordEmail: string): boolean {
+    		return resetPasswordEmail.match(EMAIL_REGEX) !== null;
+    	}
+
+    	async resetPasswordOnEnter(e: any): void {
+    		if(e.keyCode === 13) {
+                const email = this.shadowRoot.querySelector('#reset-password-email').value;
+    			if (this.enableResetPassword(email)) {
+                    await GQLRequest(`
+                        mutation($email: String!) {
+                            requestPasswordReset(email: $email) {
+                                email
+                            }
+                        }
+                    `, {
+                        email
+                    }, this.userToken, (error: any) => {
+                        this.action = setNotification(error.message, NotificationType.ERROR);
+                    });
+
+                    this.shadowRoot.querySelector('#reset-password-email').value = '';
+                    this.shadowRoot.querySelector('#reset-password-dialog').close();
+                }
+    		}
+    	}
+
     async loginClick() {
         //need to scope this so that we can access it to log errors
-        const that = this;
+        const that = this; //TODO that = this should never happen
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
         const data = await signinUser(email, password, this.userToken);
         if(data){
-          const gqlUser = await getUser(email, password, data.signinUser.token)
+          const gqlUser = await getUser(email, password, data.authenticateUser.token)
           const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
           const ownedCourses = gqlUser.User.ownedCourses;
           this.action = {
@@ -89,9 +105,27 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
               key: coursesRedux,
               value: ownedCourses
           };
-          this.action = persistUserToken(data.signinUser.token);
+          this.action = persistUserToken(data.authenticateUser.token);
           this.action = setUserInRedux(gqlUser.User);
-          await addLtiJwtToUser(this.user, this.userToken); //TODO this will run every time the user logs in, even if they aren't linking their account. This is a waste of resources, but it is simple. It allows us to get rid of the linkLTIAccount query param
+
+          const ltiJWT = getCookie('ltiJWT');
+          deleteCookie('ltiJWT');
+
+          if (ltiJWT) {
+              await GQLRequest(`
+                  mutation addLTIUser($userId: ID!, $jwt: String!) {
+                      addLTIUser(userId: $userId, jwt: $jwt) {
+                          id
+                      }
+                  }
+              `, {
+                  userId: this.user ? this.user.id : 'user is null',
+                  jwt: ltiJWT
+              }, this.userToken, (error: any) => {
+                  this.action = setNotification(error.message, NotificationType.ERROR);
+              });
+          }
+
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
           if (getCookie('redirectUrl')) {
@@ -103,33 +137,12 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         async function signinUser(email: string, password: string, userToken: string | null) {
             // signup the user and login the user
             const data = await GQLRequest(`
-                mutation signin($email: String!, $password: String!) {
-                    signinUser(email: {
-                        email: $email
-                        password: $password
-                    }) {
+                mutation authenticateUser($email: String!, $password: String!) {
+                    authenticateUser(email: $email, password: $password) {
                         token
                     }
                 }
             `, {email, password}, userToken, (error: any) => {
-              that.action = setNotification(error.message, NotificationType.ERROR)
-            });
-            return data;
-        }
-
-        async function addLtiJwtToUser(user: User | null, userToken: string | null)  {
-            const id = user ? user.id : null;
-            const ltiJWT = getCookie('ltiJWT');
-            const data = await GQLRequest(`
-                mutation update($id: ID!, $ltiJWT: String) {
-                    updateUser(
-                        id: $id
-                        ltiJWT: $ltiJWT
-                    ) {
-                        id
-                    }
-                }
-            `, {id, ltiJWT}, userToken, (error: any) => {
               that.action = setNotification(error.message, NotificationType.ERROR)
             });
             return data;
