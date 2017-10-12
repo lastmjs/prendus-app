@@ -151,14 +151,17 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   stateChange(e: CustomEvent) {
-    const state = e.detail.state.components[this.componentId] || {};
-    this.course = state.course;
-    this.assignmentId = state.assignmentId || 'ALL';
-    this.conceptId = state.conceptId || 'ALL';
-    this.sortField = state.sortField || 'Overall';
-    this.sortAsc = state.sortAsc;
-    this.rubric = state.rubric;
-    this.question = state.question;
+    const state = e.detail.state;
+    const componentState = state.components[this.componentId] || {};
+    this.course = componentState.course;
+    this.assignmentId = componentState.assignmentId || 'ALL';
+    this.conceptId = componentState.conceptId || 'ALL';
+    this.sortField = componentState.sortField || 'Overall';
+    this.sortAsc = componentState.sortAsc;
+    this.rubric = componentState.rubric;
+    this.question = componentState.question;
+    this.user = state.user;
+    this.userToken = state.userToken;
   }
 }
 
