@@ -1,0 +1,15 @@
+{
+	SomeUserExists(filter:{
+    id: $user_id
+    OR:[{
+      role: ADMIN
+    }, {
+      purchases_some: {
+        id: $node_id
+        user: {
+          id: $user_id
+        }
+      }
+    }]
+  })
+}

@@ -1,29 +1,29 @@
 {
-  "name": "prendus-graphql-demo",
+  "name": "prendus-app",
   "version": "0.4.0",
-  "description": "Testing ground for the future of GraphQL with Prendus",
+  "description": "The Prendus Application",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --watch-files",
     "test": "exit 0",
-    "pull-graphcool": "graphcool pull --project cj36de9q4dem00134bhkwm44r",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
     "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components",
-    "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window"
+    "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window",
+    "graphcool-deploy": "cd src/graphcool && graphcool deploy"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lastmjs/prendus-graphql-demo.git"
+    "url": "git+https://github.com/lastmjs/prendus-app.git"
   },
   "author": "Jordan Last <jordan.michael.last@gmail.com>",
   "bugs": {
-    "url": "https://github.com/lastmjs/prendus-graphql-demo/issues"
+    "url": "https://github.com/lastmjs/prendus-app/issues"
   },
-  "homepage": "https://github.com/lastmjs/prendus-graphql-demo#readme",
+  "homepage": "https://github.com/lastmjs/prendus-app#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",
-    "graphcool": "^1.2.1",
+    "graphcool": "^0.7.0-beta.5",
     "guesswork": "^0.2.4",
     "oss-attribution-generator": "^1.2.0",
     "scram-engine": "^0.6.14"

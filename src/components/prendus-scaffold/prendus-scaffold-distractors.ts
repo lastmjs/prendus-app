@@ -1,5 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {setNotification} from '../../redux/actions';
+import {NotificationType} from '../../services/constants-service';
 
 /*
  * This component takes a question and answer and displays text inputs to type incorrect answers.
@@ -77,9 +79,11 @@ class PrendusScaffoldDistractors extends Polymer.Element {
     if (!e.target || !e.target.files || !e.target.files[0])
       return;
     const file = e.target.files[0];
-    const ext = file.name.substr(file.name.lastIndexOf('.') + 1);
-    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg')
+    const ext = file.name.substr(file.name.lastIndexOf('.') + 1).toLowerCase();
+    if (ext !== 'png' && ext !== 'gif' && ext !== 'jpeg' && ext !== 'jpg') {
+      this.action = setNotification('The file does not have an image file extension.', NotificationType.ERROR);
       return;
+    }
     const i = e.model.itemsIndex;
     const distractors = [
       ...this.distractors.slice(0, i),

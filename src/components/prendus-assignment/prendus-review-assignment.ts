@@ -1,6 +1,7 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, shuffleArray, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
@@ -120,65 +121,65 @@ class PrendusReviewAssignment extends Polymer.Element {
   async loadAssignment(assignmentId: string): Assignment {
       this._fireLocalAction('loaded', true);
 
-      setTimeout(() => {
+      setTimeout(async () => {
           this._fireLocalAction('loaded', false);
 
-          //TODO This setTimeout is a huge hack until we subscribe to adding the user on a course
-          setTimeout(async () => {
-              this.action = checkForUserToken();
-            this.action = await getAndSetUser();
+          this.action = checkForUserToken();
+        this.action = await getAndSetUser();
 
-            if (!this.user) {
-                navigate('/authenticate');
-                return;
-            }
+        if (!this.user) {
+            navigate('/authenticate');
+            return;
+        }
 
-            const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-            const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
+        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
+        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
 
-            if (!userOnCourse) {
-                this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-                return;
-            }
+        if (!userOnCourse) {
+            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
+            return;
+        }
 
-            if (!userPaidForCourse) {
-                navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-                return;
-            }
+        if (!userPaidForCourse) {
+            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+            return;
+        }
 
 
-            const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
-              Assignment(id: $assignmentId) {
-                id
-                title
-                questionType
-                numReviewQuestions
-                questions(filter: {
-                  author: {
-                    id_not: $userId
-                  }
-                }) {
-                  id
-                  text
-                  code
-                  explanation
-                  concept {
-                    title
-                  }
-                  resource
-                  answerComments {
-                    text
-                  }
-                }
+        const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+          Assignment(id: $assignmentId) {
+            id
+            title
+            questionType
+            numReviewQuestions
+            questions(filter: {
+              author: {
+                id_not: $userId
               }
-            }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-            if (!data) {
-              return;
+            }) {
+              id
+              text
+              code
+              explanation
+              concept {
+                title
+              }
+              resource
+              answerComments {
+                text
+              }
+              _ratingsMeta {
+                count
+              }
             }
-            this._fireLocalAction('assignment', data.Assignment);
-            this._fireLocalAction('questions', shuffleArray(data.Assignment.questions).slice(0, data.Assignment.numReviewQuestions));
-            this._fireLocalAction('loaded', true);
-          }, 5000);
+          }
+        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
+        if (!data) {
+          return;
+        }
+        this._fireLocalAction('assignment', data.Assignment);
+        this._fireLocalAction('questions', randomWithUnreviewedFirst(data.Assignment.questions, data.Assignment.numReviewQuestions));
+        this._fireLocalAction('loaded', true);
       });
   }
 
@@ -204,6 +205,16 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.user = state.user;
   }
 
+}
+
+function randomWithUnreviewedFirst(questions: Question[], num: number): Question[] {
+  const unreviewed = questions.filter(question => !question._ratingsMeta.count);
+  if (unreviewed.length >= num)
+    return shuffleArray(unreviewed).slice(0, num);
+  else if (!unreviewed.length)
+    return shuffleArray(questions).slice(0, num);
+  const reviewed = questions.filter(question => question._ratingsMeta.count);
+  return [...shuffleArray(unreviewed), ...shuffleArray(reviewed).slice(0, num-unreviewed.length)];
 }
 
 function validate(rubric: Rubric, ratings: CategoryScore[]) {
