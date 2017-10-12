@@ -1,0 +1,26 @@
+subscription {
+  QuestionRating(filter: {
+    mutation_in: [CREATED]
+  }) {
+    node {
+      id
+      scores {
+        category
+        score
+      }
+      question {
+        id
+        overall
+        language
+        learningCategory
+        conceptAlignment
+        inclusion
+        plagiarism
+        difficulty
+        _ratingsMeta {
+          count
+        }
+      }
+    }
+  }
+}
