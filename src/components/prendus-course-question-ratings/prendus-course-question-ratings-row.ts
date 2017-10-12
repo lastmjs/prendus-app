@@ -1,7 +1,21 @@
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores} from '../../services/question-stats';
+import {
+  Question,
+  CategoryScore,
+  SetComponentPropertyAction,
+} from '../../typings/index.d';
 
+const STUDENT = 'Student';
+const OVERALL = 'Overall';
 class PrendusCourseQuestionRatingsRow extends Polymer.Element {
+  action: SetComponentPropertyAction;
+  question: Question;
+  categories: string[];
+  _categories: string[];
+  _rawScores: {
+    [category: string]: CategoryScore[]
+  };
 
   static get is() { return 'prendus-course-question-ratings-row' }
 
@@ -25,7 +39,7 @@ class PrendusCourseQuestionRatingsRow extends Polymer.Element {
   }
 
   _computeCategories(categories: string[]): string[] {
-    return categories.filter(category => category !== 'Student' && category !== 'Overall');
+    return categories.filter(category => category !== STUDENT && category !== OVERALL);
   }
 
   _scores(scores: object, category: string) {
