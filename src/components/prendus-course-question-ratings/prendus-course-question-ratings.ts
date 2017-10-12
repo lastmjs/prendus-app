@@ -15,9 +15,24 @@ import {
   User,
   Course,
   Rubric,
+  SetPropertyAction
 } from '../../typings/index.d';
 
 export class PrendusCourseQuestionRatings extends Polymer.Element {
+  action: SetPropertyAction;
+  user: User;
+  userToken: string;
+  sortField: string;
+  sortAsc: boolean;
+  assignmentId: string;
+  conceptId: string;
+  authorEmail: string;
+  orderBy: object;
+  filter: object;
+  fetchQuestions: (pageIndex: number, pageAmount: number) => any[];
+  categories: string[];
+  rubric: Rubric;
+  courseId: string;
 
   constructor() {
     super();
