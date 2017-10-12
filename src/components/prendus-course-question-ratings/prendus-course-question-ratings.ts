@@ -11,6 +11,8 @@ import {
   KeyCode,
   NotificationType,
   Role,
+  GQL_SORT_ASC,
+  GQL_SORT_DESC
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions'
 import {
@@ -80,7 +82,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
 
   //Computed Properties
   _computeOrderBy(sortField: string, sortAsc: boolean): string {
-    return categoryCamelCase(sortField) + (sortAsc ? '_ASC' : '_DESC');
+    return categoryCamelCase(sortField) + (sortAsc ? GQL_SORT_ASC : GQL_SORT_DESC);
   }
 
   _computeCategories(rubric: Rubric): string[] {

@@ -67,6 +67,7 @@
 
       <h2 id="question-rating-table-header">Questions: [[course.title]]</h2>
 
+      <!-- Using template with is because <dom-repeat> does not work in <select> tags -->
       <!-- Assignment Filter -->
       <label for="assignmentId">Assignment</label>
       <select id="assignmentId" on-change="_assignmentIdChanged">
