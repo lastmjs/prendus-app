@@ -2,6 +2,14 @@ import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/ser
 
 class PrendusInfiniteList extends Polymer.Element {
   action: SetComponentPropertyAction;
+  next: (i: number, n: number) => any[];
+  cursor: number;
+  pageSize: number;
+  items: any[];
+  as: string;
+  indexAs: string;
+  lowerThreshold: number;
+  loading: boolean;
 
   static get is() { return 'prendus-infinite-list' }
 
@@ -31,6 +39,11 @@ class PrendusInfiniteList extends Polymer.Element {
         type: String,
         value: 'index'
       },
+      lowerThreshold: {
+        type: Number,
+        value: 100,
+        observer: '_lowerThresholdChanged'
+      },
       loading: Boolean
     }
   }
@@ -40,17 +53,22 @@ class PrendusInfiniteList extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  ready() {
-    super.ready();
+  connectedCallback() {
+    super.connectedCallback();
     const list = this.shadowRoot.querySelector('#list');
     this.action = fireLocalAction(this.componentId, 'list', list);
     const template = this.querySelector('template');
     if (template)
-      list.appendChild(template);
+      list.appendChild(template); //This is necessary because iron-list requires a template child but can't see our light-dom
+  }
+
+  _lowerThresholdChanged(lowerThreshold: number) {
+    if (lowerThreshold)
+      this.action = fireLocalAction(this.componentId, '_lowerThreshold', lowerThreshold);
   }
 
   async _init(next: (i: number, n: number) => any[]) {
-    this.action = fireLocalAction(this.componentId, 'lowerThreshold', 20);
+    this.action = fireLocalAction(this.componentId, 'lowerThreshold', this._lowerThreshold);
     this.action = fireLocalAction(this.componentId, 'loading', true);
     const items = await next(0, this.pageSize);
     this.action = fireLocalAction(this.componentId, 'items', items);
@@ -80,6 +98,7 @@ class PrendusInfiniteList extends Polymer.Element {
     this.items = state.items;
     this.list = state.list;
     this.lowerThreshold = state.lowerThreshold;
+    this._lowerThreshold = state._lowerThreshold;
   }
 }
 

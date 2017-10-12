@@ -8,18 +8,25 @@ import {
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {
   DEFAULT_EVALUATION_RUBRIC,
-  NotificationType
+  KeyCode,
+  NotificationType,
+  Role,
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions'
 import {
   User,
   Course,
   Rubric,
-  SetPropertyAction
+  SetComponentPropertyAction,
+  SetPropertyAction,
 } from '../../typings/index.d';
 
+const STUDENT = 'Student';
+const OVERALL = 'Overall';
+const ALL = 'ALL';
+
 export class PrendusCourseQuestionRatings extends Polymer.Element {
-  action: SetPropertyAction;
+  action: SetComponentPropertyAction | SetPropertyAction;
   user: User;
   userToken: string;
   sortField: string;
@@ -77,7 +84,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _computeCategories(rubric: Rubric): string[] {
-    return ['Student', ...Object.keys(rubric), 'Overall'];
+    return [STUDENT, ...Object.keys(rubric), OVERALL];
   }
 
   _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
@@ -92,11 +99,11 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     };
     if (authorEmail)
       filter.author.email = authorEmail;
-    if (!user || user.role !== 'INSTRUCTOR')
+    if (!user || user.role !== Role.INSTRUCTOR)
       filter.author.id = (user || {}).id;
-    if (assignmentId !== 'ALL')
+    if (assignmentId !== ALL)
       filter.assignment.id = assignmentId;
-    if (conceptId !== 'ALL')
+    if (conceptId !== ALL)
       filter.concept.id = conceptId;
     return filter;
   }
@@ -121,9 +128,9 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   async _courseIdChanged(courseId) {
     const course = await loadCourse(courseId, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'course', course);
-    this.action = fireLocalAction(this.componentId, 'assignmentId', 'ALL');
-    this.action = fireLocalAction(this.componentId, 'conceptId', 'ALL');
-    this.action = fireLocalAction(this.componentId, 'sortField', 'Overall');
+    this.action = fireLocalAction(this.componentId, 'assignmentId', ALL);
+    this.action = fireLocalAction(this.componentId, 'conceptId', ALL);
+    this.action = fireLocalAction(this.componentId, 'sortField', OVERALL);
     this.action = fireLocalAction(this.componentId, 'sortAsc', false);
     this.action = fireLocalAction(this.componentId, 'rubric', DEFAULT_EVALUATION_RUBRIC);
   }
@@ -151,7 +158,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _toggleSort(e: Event) {
-    const field = e.target.innerHTML.trim();
+    const field = this.categories[e.model.itemsIndex];
     if (this.sortField !== field)
       this.action = fireLocalAction(this.componentId, 'sortField', field);
     else
@@ -159,7 +166,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _checkToggleSort(e: Event) {
-    if (e.which === 13 || e.which === 32)
+    if (e.which === KeyCode.ENTER || e.which === KeyCode.SPACE)
       this._toggleSort(e);
   }
 
@@ -171,9 +178,9 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.course = componentState.course;
-    this.assignmentId = componentState.assignmentId || 'ALL';
-    this.conceptId = componentState.conceptId || 'ALL';
-    this.sortField = componentState.sortField || 'Overall';
+    this.assignmentId = componentState.assignmentId || ALL;
+    this.conceptId = componentState.conceptId || ALL;
+    this.sortField = componentState.sortField || OVERALL;
     this.sortAsc = componentState.sortAsc;
     this.rubric = componentState.rubric;
     this.question = componentState.question;

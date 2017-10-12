@@ -1,11 +1,17 @@
-import {SetComponentPropertyAction} from '../../typings/actions';
+import {
+  SetComponentPropertyAction,
+  SetPropertyAction,
+  Question
+} from '../../typings/index.d';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 
 class PrendusFlaggableQuestion extends Polymer.Element {
-  action: SetComponentPropertyAction;
+  action: SetComponentPropertyAction | SetPropertyAction;
+  question: Question;
+  loaded: boolean;
 
   static get is() { return 'prendus-flaggable-question' }
 
