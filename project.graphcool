@@ -96,6 +96,13 @@ type Question implements Node {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
+  overall: Int! @defaultValue(value: 0)
+  difficulty: Int! @defaultValue(value: 0)
+  language: Int! @defaultValue(value: 0)
+  learningCategory: Int! @defaultValue(value: 0)
+  plagiarism: Int! @defaultValue(value: 0)
+  inclusion: Int! @defaultValue(value: 0)
+  conceptAlignment: Int! @defaultValue(value: 0)
 }
 
 type QuestionResponse implements Node {

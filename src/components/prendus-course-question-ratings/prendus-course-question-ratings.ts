@@ -1,8 +1,4 @@
 import {
-  SetPropertyAction,
-  SetComponentPropertyAction
-} from '../../typings/actions';
-import {
   GQLRequest,
   GQLSubscribe
 } from '../../node_modules/prendus-shared/services/graphql-service';
@@ -113,16 +109,9 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'sortField', 'Overall');
     this.action = fireLocalAction(this.componentId, 'sortAsc', false);
     this.action = fireLocalAction(this.componentId, 'rubric', DEFAULT_EVALUATION_RUBRIC);
-    //TODO: Fix permissions for subscription
-    //subscribeToData(this.componentId, this.courseId, this._updateData.bind(this));
   }
 
   //Event Handlers
-  async _updateData(data: object) {
-    //TODO: Fix permissions and then append the new question rating to the list
-    console.log(data);
-  }
-
   _tableLoaded(e: CustomEvent) {
     this.dispatchEvent(new CustomEvent('table-loaded'));
   }
@@ -166,7 +155,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     this.course = state.course;
     this.assignmentId = state.assignmentId || 'ALL';
     this.conceptId = state.conceptId || 'ALL';
-    this.sortField = state.sortField || 'overall';
+    this.sortField = state.sortField || 'Overall';
     this.sortAsc = state.sortAsc;
     this.rubric = state.rubric;
     this.question = state.question;
@@ -254,45 +243,6 @@ async function loadQuestions(variables: GQLVariables, userToken: string, cb: (er
   );
 
   return data.questions;
-}
-
-function subscribeToData(componentId: string, courseId: string, cb: (data: any) => void) {
-  GQLSubscribe(`
-    subscription {
-      QuestionRating(
-        filter: {
-          node: {
-            question: {
-              assignment: {
-                course: {
-                  id: "${courseId}"
-                }
-              }
-            }
-          }, mutation_in: [CREATED]
-        }
-      ) {
-        node {
-          id
-          scores {
-            category
-            score
-          }
-          question {
-            id
-            text
-            assignment {
-              id
-              title
-            }
-            concept {
-              id
-              title
-            }
-          }
-        }
-      }
-    }`, componentId, cb);
 }
 
 window.customElements.define(PrendusCourseQuestionRatings.is, PrendusCourseQuestionRatings);
