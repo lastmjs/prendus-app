@@ -2,8 +2,11 @@
 export const MAX_NUM_ATTEMPTS_REACHED = 'Maximum number of attempts reached';
 export const NO_ANSWER_FEEDBACK_ALLOWED = 'No answer feedback allowed';
 export const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-export const = GQL_SORT_DESC = '_DESC';
-export const = GQL_SORT_ASC = '_ASC';
+export const GQL_SORT_DESC = '_DESC';
+export const GQL_SORT_ASC = '_ASC';
+export const ARIA_SORT_ASC = 'ascending';
+export const ARIA_SORT_DESC = 'descending';
+export const ARIA_SORT_NONE = 'none';
 export const Role = {
   INSTRUCTOR: 'INSTRUCTOR',
   STUDENT: 'STUDENT',

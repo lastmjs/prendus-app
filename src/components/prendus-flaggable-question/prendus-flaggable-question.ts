@@ -41,15 +41,7 @@ class PrendusFlaggableQuestion extends Polymer.Element {
   async _createQuestionFlag(){
     const comment = this.shadowRoot.querySelector('#flag-response').value;
     const questionId = this.question.id;
-    const data = await GQLRequest(`
-      mutation questionFlag($comment: String!, $questionId: ID!){
-        createQuestionFlag(
-          comment: $comment
-          questionId: $questionId
-        ) {
-        id
-      }
-    }`, {comment, questionId}, this.userToken, this._handleError.bind(this));
+    await flagQuestion(comment, questionId, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'flagQuestionModalOpened', false)
     this.action = setNotification("Question Flagged", NotificationType.ERROR);
     this.shadowRoot.querySelector('#flagQuestionModal').close();
@@ -62,6 +54,18 @@ class PrendusFlaggableQuestion extends Polymer.Element {
     this.loaded = componentState.loaded;
     this.userToken = state.userToken;
   }
+}
+
+async function flagQuestion(comment: string, questionId: string, userToken: string, cb: (err: any) => void) {
+  return GQLRequest(`
+    mutation questionFlag($comment: String!, $questionId: ID!){
+      createQuestionFlag(
+        comment: $comment
+        questionId: $questionId
+      ) {
+      id
+    }
+  }`, {comment, questionId}, userToken, cb);
 }
 
 window.customElements.define(PrendusFlaggableQuestion.is, PrendusFlaggableQuestion)

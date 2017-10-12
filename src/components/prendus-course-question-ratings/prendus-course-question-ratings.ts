@@ -12,7 +12,10 @@ import {
   NotificationType,
   Role,
   GQL_SORT_ASC,
-  GQL_SORT_DESC
+  GQL_SORT_DESC,
+  ARIA_SORT_ASC,
+  ARIA_SORT_NONE,
+  ARIA_SORT_DESC,
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions'
 import {
@@ -122,9 +125,9 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _ariaSort(category: string, sortField: string, sortAsc: boolean): string {
-    if (category === sortField && sortAsc) return 'ascending';
-    else if (category === sortField && !sortAsc) return 'descending';
-    return 'none';
+    if (category === sortField && sortAsc) return ARIA_SORT_ASC;
+    else if (category === sortField && !sortAsc) return ARIA_SORT_DESC;
+    return ARIA_SORT_NONE;
   }
 
   async _courseIdChanged(courseId) {
