@@ -91,6 +91,13 @@ type Question implements Node {
   images: [File!]! @relation(name: "ImagesOnQuestions")
   visibility: QuestionVisibility! @defaultValue(value: COURSE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
+  overall: Int! @defaultValue(value: 0)
+  language: Int! @defaultValue(value: 0)
+  learningCategory: Int! @defaultValue(value: 0)
+  conceptAlignment: Int! @defaultValue(value: 0)
+  difficulty: Int! @defaultValue(value: 0)
+  plagiarism: Int! @defaultValue(value: 0)
+  inclusion: Int! @defaultValue(value: 0)
 }
 
 type QuestionFlag implements Node {
