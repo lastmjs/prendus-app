@@ -56,6 +56,14 @@ functions:
                 src: ./functions/reset-password/reset-password.js
         type: resolver
         schema: ./functions/reset-password/reset-password.graphql
+    assignment-lti-launch:
+        handler:
+            code:
+                src: ./functions/assignment-lti-launch/assignment-lti-launch.js
+                environment:
+                    PRENDUS_LTI_SECRET: ${env:PRENDUS_LTI_SECRET}
+        type: resolver
+        schema: ./functions/assignment-lti-launch/assignment-lti-launch.graphql
 
 permissions:
 

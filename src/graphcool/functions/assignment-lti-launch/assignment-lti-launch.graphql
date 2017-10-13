@@ -1,0 +1,10 @@
+type AssignmentLTILaunchPayload {
+    ltiJWT: String
+    ltiSessionIdJWT: String!
+    clientRedirectUrl: String!
+    serverRedirectUrl: String!
+}
+
+extend type Mutation {
+    assignmentLTILaunch(ltiUserId: String!, assignmentId: String!, assignmentType: String!, lisPersonContactEmailPrimary: String!, oauthConsumerKey: String!, requestBody: String!): AssignmentLTILaunchPayload
+}

@@ -1,10 +1,12 @@
 const JWT = require('jsonwebtoken');
 const fromEvent = require('graphcool-lib').fromEvent;
-module.exports = function (event) {
+
+module.exports = function(event) {
     if (!event.context.graphcool.pat) {
-        console.log('Please provide a valid root token!');
-        return { error: 'add-lti-user not configured correctly.' };
+        console.log('Please provide a valid root token!')
+        return { error: 'add-lti-user not configured correctly.'}
     }
+
     const graphcool = fromEvent(event);
     const api = graphcool.api('simple/v1');
     const jwt = event.data.jwt;
@@ -13,27 +15,29 @@ module.exports = function (event) {
     const ltiUserId = payload.ltiUserId;
     const assignmentId = payload.assignmentId;
     const lisPersonContactEmailPrimary = payload.lisPersonContactEmailPrimary;
+
     return getCourseId(api, assignmentId)
-        .then((courseId) => {
-        return createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary)
-            .then((ltiUserId) => {
-            return enrollUserOnCourse(api, userId, courseId)
-                .then((data) => {
-                return payForCourseIfFree(api, userId, courseId);
+            .then((courseId) => {
+                return createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary)
+                        .then((ltiUserId) => {
+                            return enrollUserOnCourse(api, userId, courseId)
+                                    .then((data) => {
+                                        return payForCourseIfFree(api, userId, courseId);
+                                    })
+                                    .then((data) => {
+                                        return {
+                                            id: ltiUserId
+                                        };
+                                    });
+                        });
             })
-                .then((data) => {
+            .catch((error) => {
                 return {
-                    id: ltiUserId
+                    error
                 };
             });
-        });
-    })
-        .catch((error) => {
-        return {
-            error
-        };
-    });
 };
+
 function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
     return api.request(`
           mutation {
@@ -46,7 +50,7 @@ function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
               }
           }
     `)
-        .then((result) => {
+    .then((result) => {
         if (result.error) {
             return Promise.reject(result.error);
         }
@@ -55,6 +59,7 @@ function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
         }
     });
 }
+
 function enrollUserOnCourse(api, userId, courseId) {
     return api.request(`
         mutation {
@@ -71,7 +76,7 @@ function enrollUserOnCourse(api, userId, courseId) {
             }
         }
     `)
-        .then((result) => {
+    .then((result) => {
         if (result.error) {
             return Promise.reject(result.error);
         }
@@ -80,6 +85,7 @@ function enrollUserOnCourse(api, userId, courseId) {
         }
     });
 }
+
 function getCourseId(api, assignmentId) {
     return api.request(`
       query {
@@ -92,7 +98,7 @@ function getCourseId(api, assignmentId) {
           }
       }
     `)
-        .then((result) => {
+    .then((result) => {
         if (result.error) {
             return Promise.reject(result.error);
         }
@@ -101,6 +107,7 @@ function getCourseId(api, assignmentId) {
         }
     });
 }
+
 function payForCourseIfFree(api, userId, courseId) {
     return api.request(`
       query {
@@ -111,7 +118,7 @@ function payForCourseIfFree(api, userId, courseId) {
           }
       }
     `)
-        .then((result) => {
+    .then((result) => {
         if (result.error) {
             return Promise.reject(result.error);
         }
@@ -119,7 +126,7 @@ function payForCourseIfFree(api, userId, courseId) {
             return result.Course.price;
         }
     })
-        .then((price) => {
+    .then((price) => {
         if (price === 0) {
             return api.request(`
                 query {
@@ -135,7 +142,7 @@ function payForCourseIfFree(api, userId, courseId) {
                     }
                 }
             `)
-                .then((result) => {
+            .then((result) => {
                 if (result.error) {
                     return Promise.reject(result.error);
                 }
@@ -143,7 +150,7 @@ function payForCourseIfFree(api, userId, courseId) {
                     return result.allPurchases;
                 }
             })
-                .then((allPurchases) => {
+            .then((allPurchases) => {
                 if (allPurchases.length === 0) {
                     return api.request(`
                         mutation {
@@ -159,7 +166,7 @@ function payForCourseIfFree(api, userId, courseId) {
                             }
                         }
                     `)
-                        .then((result) => {
+                    .then((result) => {
                         if (result.error) {
                             return Promise.reject(result.error);
                         }
@@ -170,5 +177,5 @@ function payForCourseIfFree(api, userId, courseId) {
                 }
             });
         }
-    });
+    })
 }
