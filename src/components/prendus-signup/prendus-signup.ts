@@ -16,7 +16,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     password: string;
     email: string;
     confirmedPassword: string;
-    buttonEnabled: boolean;
+    signupButtonEnabled: boolean;
     user: User | null;
 
     static get is() { return 'prendus-signup'; }
@@ -37,13 +37,13 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     connectedCallback() {
         super.connectedCallback();
         this.action = fireLocalAction(this.componentId, "loaded", true)
-        this.action = fireLocalAction(this.componentId, "buttonEnabled", false)
+        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
     }
 
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
       if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
       this.shadowRoot.querySelector('#email').validate();
@@ -51,7 +51,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     validatePassword(): void {
       const pass: string = this.shadowRoot.querySelector('#password').value;
       if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
     }
     hardValidatePassword(): void {
       this.shadowRoot.querySelector('#password').validate();
@@ -59,7 +59,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     validateConfirmedPassword(): void {
       const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
       if(confirmedPass && confirmedPass.length >=6) this.action = fireLocalAction(this.componentId, "confirmedPassword", confirmedPass)
-      this.action = fireLocalAction(this.componentId, "buttonEnabled", enableSignup(this.email, this.password, confirmedPass))
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(this.email, this.password, confirmedPass))
     }
     hardValidateConfirmedPassword(): void {
       this.shadowRoot.querySelector('#confirm-password').validate();
@@ -103,12 +103,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
         deleteCookie('redirectUrl');
 
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        fireLocalAction(this.componentId, 'loaded', true)
 
         async function performSignupMutation(context: PrendusSignup, email: string, password: string, userToken: string | null) {
             // signup the user and login the user
@@ -135,7 +130,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('email')) this.email = componentState.email;
         if (keys.includes('password')) this.password = componentState.password;
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
-        if (keys.includes('buttonEnabled')) this.buttonEnabled = componentState.buttonEnabled;
+        if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
         this.user = state.user;
         this.userToken = state.userToken;
     }
@@ -145,7 +140,7 @@ window.customElements.define(PrendusSignup.is, PrendusSignup);
 
 function enableSignup(email: string, password: string, confirmedPassword: string){
   return	email.match(EMAIL_REGEX) !== null
-      &&	password !== ''
-      &&	confirmedPassword !== ''
+      &&	password.length >= 6
+      &&	confirmedPassword.length >= 6
       &&	password === confirmedPassword;
 }

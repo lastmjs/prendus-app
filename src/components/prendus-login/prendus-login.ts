@@ -15,6 +15,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     linkLtiAccount: boolean;
     loaded: boolean;
     redirectUrl: string;
+    loginDisabled: boolean;
     resetPasswordDialogOpen: boolean;
     emailElementInvalid: boolean;
     submitPasswordDisabled: boolean;
@@ -36,6 +37,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     async connectedCallback() {
         super.connectedCallback();
         this.action = fireLocalAction(this.componentId, 'loaded', true)
+        this.action = fireLocalAction(this.componentId, 'loginDisabled', true)
         this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false)
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', true);
     }
@@ -47,18 +49,30 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
   	softValidateEmail(): void {
   		const emailElement: any = this.shadowRoot.querySelector('#email');
-  		if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false; //TODO data binding with redux
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+  		if(emailElement.value && emailElement.value.match(EMAIL_REGEX) !== null) emailElement.invalid = false; //TODO data binding with redux
+      this._enableLogIn(emailElement.value, passwordElement.value)
+    }
+    hardValidatePassword(): void {
+  		const passwordElement: any = this.shadowRoot.querySelector('#password');
+  		passwordElement.validate();
   	}
 
-    //TODO add loading indication to user
-  	loginOnEnter(e: any) {
-  		if(e.keyCode === 13 && this.enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
-  	}
-    enableLogIn(email: string, password: string){
+  	softValidatePassword(): void {
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+  		if(passwordElement.value && passwordElement.value.match(EMAIL_REGEX) !== null) passwordElement.invalid = false; //TODO data binding with redux
+      const emailElement: any = this.shadowRoot.querySelector('#email');
+      this._enableLogIn(emailElement.value, passwordElement.value)
+    }
+    _enableLogIn(email: string, password: string){
       if(email && password){
-        return 	email.match(EMAIL_REGEX) !== null && password.length >= 6;
+        this.action = fireLocalAction(this.componentId, 'loginDisabled', 	email.match(EMAIL_REGEX) === null || password.length <= 6);
       }
     }
+    //TODO add loading indication to user
+  	loginOnEnter(e: any) {
+  		if(e.keyCode === 13 && this._enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
+  	}
   	openResetPasswordDialog(): void {
       this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', true);
   	}
@@ -82,7 +96,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
     async resetPassword() {
       const email = this.shadowRoot.querySelector('#reset-password-email').value;
-      this.shadowRoot.querySelector('#reset-password-email').value = ''; //TODO data binding
       this.action = fireLocalAction(this.componentId, 'loaded', false);
       await GQLRequest(`
           mutation($email: String!) {
@@ -101,14 +114,17 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     async loginClick() {
         //need to scope this so that we can access it to log errors
-        const that = this; //TODO that = this should never happen
+        this.action = fireLocalAction(this.componentId, 'loaded', false);
         const email: string = this.shadowRoot.querySelector('#email').value;
         const password: string = this.shadowRoot.querySelector('#password').value;
-        const data = await _signinUser(email, password, this.userToken);
-        if(!data){
+        const data = await this._signinUser(email, password, this.userToken);
+        console.log(data)
+        if(!data.authenticateUser){
+          this.action = fireLocalAction(this.componentId, 'loaded', true);
+          console.log('we got data')
           return;
         }
-        const gqlUser = await _getUser(email, password, data.authenticateUser.token)
+        const gqlUser = await this._getUser(email, password, data.authenticateUser.token)
         const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
         const ownedCourses = gqlUser.User.ownedCourses;
         this.action = {
@@ -124,7 +140,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         };
         const ltiJWT = getCookie('ltiJWT');
         deleteCookie('ltiJWT');
-        _addLTIUser(ltiJWT);
+        this._addLTIUser(ltiJWT);
         navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
         if (getCookie('redirectUrl')) {
@@ -132,12 +148,61 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't
             window.location.reload();
         }
+        this.action = fireLocalAction(this.componentId, 'loaded', true);
+    }
+    async _getUser(email: string, password: string, userToken: string | null) {
+        const data = await GQLRequest(`
+          query user($email: String!) {
+            User(email:$email) {
+                id
+                email
+                ownedCourses{
+                  id
+                  title
+                }
+            }
+          }
+        `, {email}, userToken, (error: any) => {
+          this.action = setNotification(error.message, NotificationType.ERROR)
+        });
+        return data;
+    };
+
+    async _addLTIUser(ltiJWT: string){
+      if (ltiJWT) {
+          await GQLRequest(`
+              mutation addLTIUser($userId: ID!, $jwt: String!) {
+                  addLTIUser(userId: $userId, jwt: $jwt) {
+                      id
+                  }
+              }
+          `, {
+              userId: this.user ? this.user.id : 'user is null',
+              jwt: ltiJWT
+          }, this.userToken, (error: any) => {
+              this.action = setNotification(error.message, NotificationType.ERROR);
+          });
+      }
+    }
+    async _signinUser(email: string, password: string, userToken: string | null) {
+        // signup the user and login the user
+        const data = await GQLRequest(`
+            mutation authenticateUser($email: String!, $password: String!) {
+                authenticateUser(email: $email, password: $password) {
+                    token
+                }
+            }
+        `, {email, password}, userToken, (error: any) => {
+          this.action = setNotification(error.message, NotificationType.ERROR)
+        });
+        return data;
     }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         const componentState = state.components[this.componentId] || {};
         const keys = Object.keys(componentState);
         if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('loginDisabled')) this.loginDisabled = componentState.loginDisabled;
         if (keys.includes('resetPasswordDialogOpen')) this.resetPasswordDialogOpen = componentState.resetPasswordDialogOpen;
         if (keys.includes('emailElementInvalid')) this.emailElementInvalid = componentState.emailElementInvalid;
         if (keys.includes('submitPasswordDisabled')) this.submitPasswordDisabled = componentState.submitPasswordDisabled;
@@ -147,51 +212,3 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusLogin.is, PrendusLogin);
-
-async function _getUser(email: string, password: string, userToken: string | null) {
-    const data = await GQLRequest(`
-      query user($email: String!) {
-        User(email:$email) {
-            id
-            email
-            ownedCourses{
-              id
-              title
-            }
-        }
-      }
-    `, {email}, userToken, (error: any) => {
-      this.action = setNotification(error.message, NotificationType.ERROR)
-    });
-    return data;
-}
-
-async function _addLTIUser(ltiJWT: string){
-  if (ltiJWT) {
-      await GQLRequest(`
-          mutation addLTIUser($userId: ID!, $jwt: String!) {
-              addLTIUser(userId: $userId, jwt: $jwt) {
-                  id
-              }
-          }
-      `, {
-          userId: this.user ? this.user.id : 'user is null',
-          jwt: ltiJWT
-      }, this.userToken, (error: any) => {
-          this.action = setNotification(error.message, NotificationType.ERROR);
-      });
-  }
-}
-async function _signinUser(email: string, password: string, userToken: string | null) {
-    // signup the user and login the user
-    const data = await GQLRequest(`
-        mutation authenticateUser($email: String!, $password: String!) {
-            authenticateUser(email: $email, password: $password) {
-                token
-            }
-        }
-    `, {email, password}, userToken, (error: any) => {
-      this.action = setNotification(error.message, NotificationType.ERROR)
-    });
-    return data;
-}

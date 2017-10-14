@@ -21,6 +21,7 @@
         paper-card {
           width: 100%;
           max-width: 320px;
+          padding: 5vh;
         }
 
         #create-account {
@@ -39,12 +40,12 @@
             <template>
               <paper-card id="login-container" heading="Log in">
                 <form id="login-form" class="card-content" is="iron-form" on-keydown="loginOnEnter">
-                  <paper-input id="email" name="email" label="Email" value="{{email}}" required on-change="hardValidateEmail" on-keyup="softValidateEmail" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address."></paper-input>
-                  <paper-input id="password" name="password" label="Password" value="{{password}}" type="password" required auto-validate error-message="Please enter your password."></paper-input>
+                  <paper-input id="email" name="email" label="Email" required on-change="hardValidateEmail" on-keyup="softValidateEmail" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address."></paper-input>
+                  <paper-input id="password" name="password" label="Password" type="password" on-change="hardValidatePassword" on-keyup="softValidatePassword" required auto-validate error-message="Please enter your password. 6 characters or more required"></paper-input>
                 </form>
                 <div class="card-actions">
                   <!-- <button class="prendus-button prendus-button--minor" on-tap="openResetPasswordDialog">Forgot password</button> -->
-        					<button class="prendus-button prendus-button--recommended" disabled="[[!enableLogIn(email, password)]]" on-click="loginClick">Log in</button>
+        					<button class="prendus-button prendus-button--recommended" disabled="[[loginDisabled]]" on-click="loginClick">Log in</button>
                 </div>
                 <div id="create-account">Don't have an account? <a href="/signup">Sign up</a></div>
                 <div id="forgotPassword" on-click="openResetPasswordDialog">Forgot password?</div>
