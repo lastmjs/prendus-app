@@ -35,37 +35,7 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <dom-if if="[[loaded]]">
-        <template>
-            <h2>[[assignment.title]] Review Assignment</h2>
-
-            <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
-              <div hidden$="[[!question]]">
-                <h3>Concept</h3>
-                <div class="prendus-card">[[question.concept.title]]</div>
-                <h3>Resource</h3>
-                <div class="prendus-card">[[question.resource]]</div>
-                <br>
-                <h3>Question as seen in quiz</h3>
-                <br>
-                <prendus-view-question question="[[question]]"></prendus-view-question>
-                <br>
-                <dom-if if="[[_essayType]]">
-                  <template>
-                    <h3>Grading Rubric</h3>
-                    <prendus-rubric-table rubric="[[_gradingRubric]]"></prendus-rubric-table>
-                  </template>
-                </dom-if>
-                <br>
-                <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
-              </div>
-              <div hidden$="[[question]]">
-                <h4>Done</h4>
-                <p>You have completed this assignment</p>
-              </div>
-            </prendus-carousel>
-        </template>
-    </dom-if>
+    <h2>[[assignment.title]] Review Assignment</h2>
 
     <dom-if if="[[!loaded]]">
         <template>
@@ -73,12 +43,46 @@
         </template>
     </dom-if>
 
+    <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
+      <dom-if if="[[question]]">
+          <template>
+            <div>
+              <h3>Concept</h3>
+              <div class="prendus-card">[[question.concept.title]]</div>
+              <h3>Resource</h3>
+              <div class="prendus-card">[[question.resource]]</div>
+              <br>
+              <h3>Question as seen in quiz</h3>
+              <br>
+              <prendus-view-question question="[[question]]"></prendus-view-question>
+              <br>
+              <dom-if if="[[_essayType]]">
+                <template>
+                  <h3>Grading Rubric</h3>
+                  <prendus-rubric-table rubric="[[_gradingRubric]]"></prendus-rubric-table>
+                </template>
+              </dom-if>
+              <br>
+              <prendus-rubric-dropdowns id="rubricDropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
+            </div>
+          </template>
+      </dom-if>
+      <dom-if if="[[!question]]">
+          <template>
+            <div>
+              <h4>Done</h4>
+              <p>[[_completionReason]]</p>
+            </div>
+          </template>
+      </dom-if>
+    </prendus-carousel>
+
     <paper-dialog id="unauthorizedAccessModal" modal>
         <div class="content">
           <h1>Unauthorized to Access this page</h1>
           <p class="unauthorizedAccessModalListItem">If you are using this in a course, launch from your Learning Management System to properly access the course.</p>
           <p class="unauthorizedAccessModalListItem">If you are unsure of how to access the content through your LMS, contact your intructor to get added to the course</p>
-          <p class="unauthorizedAccessModalListItem">For customer assistance, please contact Prendus help at prendushe
+          <p class="unauthorizedAccessModalListItem">For customer assistance, please contact Prendus help at benjaminprendus@gmail.com
         <div>
         <div id="continueButton" class="buttons">
           <button class="prendus-button prendus-button--recommended" on-click="continueToHome">Go To Homepage</button>

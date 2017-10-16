@@ -1,7 +1,9 @@
 import {
   Rubric,
   CategoryScore,
-  Question
+  Question,
+  SetComponentPropertyAction,
+  Assignment,
 } from '../../typings/index.d';
 import {
   createUUID,
@@ -18,23 +20,30 @@ import {
   VerbType,
   ObjectType
 } from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {
+  setNotification,
+  getAndSetUser,
+} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
+  action: SetComponentPropertyAction;
+  user: User;
+  userToken: string;
+  assignmentId: string;
+  assignment: Assignment;
+  question: Question;
+  questions: Question[];
+  ratings: CategoryScore[];
+  rubric: Rubric;
+  loaded: boolean = false;
 
   static get is() { return 'prendus-review-assignment' }
 
   static get properties() {
     return {
-      user: Object,
-      userToken: String,
-      assignment: Object,
-      questions: Array,
-      question: Object,
-      rubric: Object,
-      ratings: Array,
+      assignmentId: String,
       _essayType: {
         type: Boolean,
         value: false,
@@ -44,11 +53,21 @@ class PrendusReviewAssignment extends Polymer.Element {
         type: Object,
         computed: '_computeGradingRubric(question)'
       },
-      assignmentId: {
+      _completionReason: {
         type: String,
-        observer: '_assignmentIdChanged'
+        computed: '_computeCompletionReason(assignment, questions)'
+      },
+      questions: {
+        type: Array,
+        computed: '_computeQuestions(assignment)'
       }
     }
+  }
+
+  static get observers() {
+    return [
+      '_computeAssignment(assignmentId, user, userToken)'
+    ]
   }
 
   constructor() {
@@ -57,7 +76,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _computeEssayType(assignment: Assignment): boolean {
-    return assignment.questionType === QuestionType.ESSAY;
+    return assignment && assignment.questionType === QuestionType.ESSAY;
   }
 
   _computeGradingRubric(question: Question): Rubric {
@@ -65,11 +84,32 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'gradingRubric');
   }
 
+  _computeCompletionReason(assignment: Assignment, questions: Question[]): string {
+    return questions && questions.length > assignment.numReviewQuestions
+      ? 'You have completed this assignment'
+      : 'There are not enough questions to take the assignment yet';
+  }
+
+  async _computeAssignment(assignmentId: string, user: User, userToken: string) {
+    if (!assignmentId || !user || !userToken) return;
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
+    const assignment = await loadAssignment(assignmentId, user.id, userToken, this._handleGQLError.bind(this));
+    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
+  }
+
+  _computeQuestions(assignment: Assignment): Question[] {
+    return assignment && assignment.questions.length > assignment.numReviewQuestions
+      ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
+      : [];
+  }
+
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
   async _handleNextRequest(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
     try {
       validate(this.rubric, this.ratings);
       await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
@@ -77,6 +117,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     } catch (err) {
       this.action = setNotification(err.message, NotificationType.ERROR);
     }
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
   _handleNextQuestion(e: CustomEvent) {
@@ -100,22 +141,16 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'ratings', e.detail.scores);
   }
 
-  async _assignmentIdChanged(assignmentId: string) {
-    const assignment = await loadAssignment(assignment, this.user.id, this.userToken, this._handleGQLError.bind(this));
-    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
-    this.action = fireLocalAction(this.componentId, 'questions', randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions));
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
-  }
-
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
-    this.questions = componentState.questions;
     this.question = componentState.question;
     this.rubric = componentState.rubric;
     this.ratings = componentState.ratings;
+    this.user = state.user;
+    this.userToken = state.userToken;
   }
 
 }
@@ -155,7 +190,7 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
   return data.Assignment;
 }
 
-async function submit(questionId: string, raterId: string, ratings: CategoryScore[], userToken: string, cb: (err: any) => void) {
+function submit(questionId: string, raterId: string, ratings: CategoryScore[], userToken: string, cb: (err: any) => void) {
   const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
     createQuestionRating (
       raterId: $raterId
@@ -170,7 +205,7 @@ async function submit(questionId: string, raterId: string, ratings: CategoryScor
     ratings,
     raterId
   };
-  await GQLRequest(query, variables, userToken, cb);
+  return GQLRequest(query, variables, userToken, cb);
 }
 
 function parseRubric(code: string, varName: string): Rubric {
