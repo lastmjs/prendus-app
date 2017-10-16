@@ -216,5 +216,5 @@ async function sendResetPasswordEmail(email: string){
       }
   `, {
       email
-  }, null, (error: any) => {});
+  }, null, (error: any) => {}); //we don't want to show any error because they shouldn't know if an email doesn't exist. So we can't show any errors. 
 }
