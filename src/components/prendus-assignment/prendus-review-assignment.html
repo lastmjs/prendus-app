@@ -43,6 +43,7 @@
         </template>
     </dom-if>
 
+    <div hidden$="[[!loaded]]">
     <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
       <dom-if if="[[question]]">
           <template>
@@ -76,6 +77,7 @@
           </template>
       </dom-if>
     </prendus-carousel>
+    </div>
 
     <paper-dialog id="unauthorizedAccessModal" modal>
         <div class="content">
