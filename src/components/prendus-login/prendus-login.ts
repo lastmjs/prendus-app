@@ -17,7 +17,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     redirectUrl: string;
     loginDisabled: boolean;
     resetPasswordDialogOpen: boolean;
-    emailElementInvalid: boolean;
     submitPasswordDisabled: boolean;
 
     static get is() { return 'prendus-login'; }
@@ -43,51 +42,38 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
 
     hardValidateEmail(): void {
+      //validate is a method on the polymer input component
   		const emailElement: any = this.shadowRoot.querySelector('#email');
   		emailElement.validate();
   	}
-
-  	softValidateEmail(): void {
-  		const emailElement: any = this.shadowRoot.querySelector('#email');
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-  		if(emailElement.value && emailElement.value.match(EMAIL_REGEX) !== null) emailElement.invalid = false; //TODO data binding with redux
-      this._enableLogIn(emailElement.value, passwordElement.value)
-    }
     hardValidatePassword(): void {
+      //validate is a method on the polymer input component
   		const passwordElement: any = this.shadowRoot.querySelector('#password');
   		passwordElement.validate();
   	}
-
-  	softValidatePassword(): void {
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-  		if(passwordElement.value && passwordElement.value.match(EMAIL_REGEX) !== null) passwordElement.invalid = false; //TODO data binding with redux
+  	softValidate(): void {
       const emailElement: any = this.shadowRoot.querySelector('#email');
-      this._enableLogIn(emailElement.value, passwordElement.value)
-    }
-    _enableLogIn(email: string, password: string){
-      if(email && password){
-        this.action = fireLocalAction(this.componentId, 'loginDisabled', 	email.match(EMAIL_REGEX) === null || password.length <= 6);
-      }
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+      this.action = fireLocalAction(this.componentId, 'loginDisabled', enableLogin(emailElement, passwordElement));
     }
     //TODO add loading indication to user
   	loginOnEnter(e: any) {
-  		if(e.keyCode === 13 && !this._enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
-  	}
+      const emailElement: any = this.shadowRoot.querySelector('#email');
+      const passwordElement: any = this.shadowRoot.querySelector('#password');
+  		if(e.keyCode === 13 && enableLogin(emailElement, passwordElement)) this.loginClick();
+    }
   	openResetPasswordDialog(): void {
       this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', true);
   	}
     closeResetPasswordDialog(): void {
       this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false);
   	}
-  	enableResetPassword(resetPasswordEmail: string): boolean {
-  		return resetPasswordEmail ? resetPasswordEmail.match(EMAIL_REGEX) !== null : false;
-  	}
 
   	async checkPasswordResetAndSubmitIfEnter(e: any): void {
       const email = this.shadowRoot.querySelector('#reset-password-email').value;
       if (this.enableResetPassword(email)) {
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', false);
-    		if(e.keyCode === 13) { //TODO check first
+    		if(e.keyCode === 13) {
           this.resetPassword();
       	};
       }else{
@@ -153,7 +139,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
         if (keys.includes('loaded')) this.loaded = componentState.loaded;
         if (keys.includes('loginDisabled')) this.loginDisabled = componentState.loginDisabled;
         if (keys.includes('resetPasswordDialogOpen')) this.resetPasswordDialogOpen = componentState.resetPasswordDialogOpen;
-        if (keys.includes('emailElementInvalid')) this.emailElementInvalid = componentState.emailElementInvalid;
         if (keys.includes('submitPasswordDisabled')) this.submitPasswordDisabled = componentState.submitPasswordDisabled;
         this.userToken = state.userToken;
         this.user = state.user;
@@ -161,6 +146,14 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusLogin.is, PrendusLogin);
+
+function enableLogin(emailElement: any, passwordElement: any){
+  return emailElement.value && passwordElement.value ? emailElement.value.match(EMAIL_REGEX) === null || passwordElement.value.length <= 6 : true;
+}
+
+function enableResetPassword(resetPasswordEmail: string): boolean {
+  return resetPasswordEmail ? resetPasswordEmail.match(EMAIL_REGEX) !== null : false;
+}
 
 async function signinUser(email: string, password: string, userToken: string | null) {
     // signup the user and login the user

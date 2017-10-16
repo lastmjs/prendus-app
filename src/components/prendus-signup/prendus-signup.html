@@ -9,7 +9,6 @@
 
 <dom-module id="prendus-signup">
     <template>
-        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style include="prendus-styles">
         :host {
           width: 100%;
@@ -28,6 +27,7 @@
           margin-top: 5vh;
         }
         </style>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <dom-if if="[[loaded]]">
           <template>
             <paper-card id="sign-up-container" heading="Sign Up">
