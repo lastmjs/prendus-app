@@ -71,7 +71,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
     //TODO add loading indication to user
   	loginOnEnter(e: any) {
-  		if(e.keyCode === 13 && this._enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
+  		if(e.keyCode === 13 && !this._enableLogIn(this.shadowRoot.querySelector('#email').value, this.shadowRoot.querySelector('#password').value)) this.loginClick();
   	}
   	openResetPasswordDialog(): void {
       this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', true);
@@ -95,107 +95,56 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
       }
     }
     async resetPassword() {
-      const email = this.shadowRoot.querySelector('#reset-password-email').value;
-      this.action = fireLocalAction(this.componentId, 'loaded', false);
-      await GQLRequest(`
-          mutation($email: String!) {
-              requestPasswordReset(email: $email) {
-                  email
-              }
-          }
-      `, {
-          email
-      }, this.userToken, (error: any) => {});
-      this.action = fireLocalAction(this.componentId, 'loaded', true);
-      this.closeResetPasswordDialog();
-      //Eventually redirect to another landing page that says they will get an email if the
-      this.action = setNotification("If the email entered exists you will receive instructions on how to reset your password", NotificationType.SUCCESS);
+        const email = this.shadowRoot.querySelector('#reset-password-email').value;
+        this.action = fireLocalAction(this.componentId, 'loaded', false);
+        sendResetPasswordEmail(email);
+        this.action = fireLocalAction(this.componentId, 'loaded', true);
+        this.closeResetPasswordDialog();
+        //Eventually redirect to another landing page that says they will get an email if the
+        this.action = setNotification("If the email entered exists you will receive instructions on how to reset your password", NotificationType.SUCCESS);
     }
 
     async loginClick() {
         //need to scope this so that we can access it to log errors
-        this.action = fireLocalAction(this.componentId, 'loaded', false);
-        const email: string = this.shadowRoot.querySelector('#email').value;
-        const password: string = this.shadowRoot.querySelector('#password').value;
-        const data = await this._signinUser(email, password, this.userToken);
-        console.log(data)
-        if(!data.authenticateUser){
-          this.action = fireLocalAction(this.componentId, 'loaded', true);
-          console.log('we got data')
-          return;
-        }
-        const gqlUser = await this._getUser(email, password, data.authenticateUser.token)
-        const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
-        const ownedCourses = gqlUser.User.ownedCourses;
-        this.action = {
-            type: 'SET_PROPERTY',
-            key: coursesRedux,
-            value: ownedCourses
-        };
-        this.action = persistUserToken(data.authenticateUser.token);
-        this.action = {
-          type: 'SET_PROPERTY',
-          key: 'user',
-          value: gqlUser.User
-        };
-        const ltiJWT = getCookie('ltiJWT');
-        deleteCookie('ltiJWT');
-        this._addLTIUser(ltiJWT);
-        navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
-
-        if (getCookie('redirectUrl')) {
-            deleteCookie('redirectUrl');
-            //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't
-            window.location.reload();
-        }
-        this.action = fireLocalAction(this.componentId, 'loaded', true);
-    }
-    async _getUser(email: string, password: string, userToken: string | null) {
-        const data = await GQLRequest(`
-          query user($email: String!) {
-            User(email:$email) {
-                id
-                email
-                ownedCourses{
-                  id
-                  title
-                }
-            }
+        try{
+          this.action = fireLocalAction(this.componentId, 'loaded', false);
+          const email: string = this.shadowRoot.querySelector('#email').value;
+          const password: string = this.shadowRoot.querySelector('#password').value;
+          const data = await signinUser(email, password, this.userToken);
+          if(!data.authenticateUser){
+            this.action = fireLocalAction(this.componentId, 'loaded', true);
+            console.log('we got data')
+            return;
           }
-        `, {email}, userToken, (error: any) => {
-          this.action = setNotification(error.message, NotificationType.ERROR)
-        });
-        return data;
-    };
+          const gqlUser = await getUser(email, password, data.authenticateUser.token)
+          const coursesRedux = `coursesFromUser${gqlUser.User.id}`;
+          const ownedCourses = gqlUser.User.ownedCourses;
+          this.action = {
+              type: 'SET_PROPERTY',
+              key: coursesRedux,
+              value: ownedCourses
+          };
+          this.action = persistUserToken(data.authenticateUser.token);
+          this.action = {
+            type: 'SET_PROPERTY',
+            key: 'user',
+            value: gqlUser.User
+          };
+          const ltiJWT = getCookie('ltiJWT');
+          deleteCookie('ltiJWT');
+          addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
+          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
-    async _addLTIUser(ltiJWT: string){
-      if (ltiJWT) {
-          await GQLRequest(`
-              mutation addLTIUser($userId: ID!, $jwt: String!) {
-                  addLTIUser(userId: $userId, jwt: $jwt) {
-                      id
-                  }
-              }
-          `, {
-              userId: this.user ? this.user.id : 'user is null',
-              jwt: ltiJWT
-          }, this.userToken, (error: any) => {
-              this.action = setNotification(error.message, NotificationType.ERROR);
-          });
-      }
-    }
-    async _signinUser(email: string, password: string, userToken: string | null) {
-        // signup the user and login the user
-        const data = await GQLRequest(`
-            mutation authenticateUser($email: String!, $password: String!) {
-                authenticateUser(email: $email, password: $password) {
-                    token
-                }
-            }
-        `, {email, password}, userToken, (error: any) => {
+          if (getCookie('redirectUrl')) {
+              deleteCookie('redirectUrl');
+              //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't
+              window.location.reload();
+          }
+          this.action = fireLocalAction(this.componentId, 'loaded', true);
+        }catch(error){
           this.action = setNotification(error.message, NotificationType.ERROR)
-        });
-        return data;
+          this.action = fireLocalAction(this.componentId, 'loaded', true);
+        }
     }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
@@ -212,3 +161,67 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 }
 
 window.customElements.define(PrendusLogin.is, PrendusLogin);
+
+async function signinUser(email: string, password: string, userToken: string | null) {
+    // signup the user and login the user
+    const data = await GQLRequest(`
+        mutation authenticateUser($email: String!, $password: String!) {
+            authenticateUser(email: $email, password: $password) {
+                token
+            }
+        }
+    `, {email, password}, userToken, (error: any) => {
+      error.message = "Password or email information incorrect"
+      throw error;
+    });
+    return data;
+}
+
+async function getUser(email: string, password: string, userToken: string | null) {
+    const data = await GQLRequest(`
+      query user($email: String!) {
+        User(email:$email) {
+            id
+            email
+            ownedCourses{
+              id
+              title
+            }
+        }
+      }
+    `, {email}, userToken, (error: any) => {
+      error.message = "An unexpected error occurred fetching user data. Please reload and try again."
+      throw error;
+    });
+    return data;
+}
+//TODO put this in Prendus Shared. Used in the signup component too
+async function addLTIUser(ltiJWT: string, user: User, userToken: string){
+  if (ltiJWT) {
+      await GQLRequest(`
+          mutation addLTIUser($userId: ID!, $jwt: String!) {
+              addLTIUser(userId: $userId, jwt: $jwt) {
+                  id
+              }
+          }
+      `, {
+          userId: user ? user.id : 'user is null',
+          jwt: ltiJWT
+      }, userToken, (error: any) => {
+        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help"
+        throw error;
+      });
+  }
+}
+
+async function sendResetPasswordEmail(email: string){
+  await GQLRequest(`
+      mutation($email: String!) {
+          requestPasswordReset(email: $email) {
+              email
+          }
+      }
+  `, {
+      email
+  }, null, (error: any) => {});
+}

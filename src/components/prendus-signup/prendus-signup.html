@@ -31,9 +31,11 @@
         <dom-if if="[[loaded]]">
           <template>
             <paper-card id="sign-up-container" heading="Sign Up">
-              <paper-input id="email" name="email" label="Email" required on-focusout="hardValidateEmail" on-keyup="validateEmail" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address."></paper-input>
-              <paper-input id="password" name="password" label="Password" type="password" required  minlength="6" on-focusout="hardValidatePassword" on-keyup="validatePassword" error-message="Please enter a password with at least 6 characters."></paper-input>
-              <paper-input id="confirm-password" name="confirm-password" label="Confirm Password" type="password" required minlength="6" on-focusout="hardValidateConfirmedPassword" on-keyup="validateConfirmedPassword" error-message="Passwords do not match."></paper-input>
+              <form on-keydown="createUserOnEnter">
+                <paper-input id="email" name="email" label="Email" required on-focusout="hardValidateEmail" on-keyup="validateEmail" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address."></paper-input>
+                <paper-input id="password" name="password" label="Password" type="password" required  minlength="6" on-focusout="hardValidatePassword" on-keyup="validatePassword" error-message="Please enter a password with at least 6 characters."></paper-input>
+                <paper-input id="confirm-password" name="confirm-password" label="Confirm Password" type="password" required minlength="6" on-focusout="hardValidateConfirmedPassword" on-keyup="validateConfirmedPassword" error-message="Passwords do not match."></paper-input>
+              </form>
               <div class="giveMeSomeSpace">By clicking the Signup button below, I agree to the <a href="https://github.com/Prendus/content/blob/master/terms-of-use.md" target="_blank">Terms of Use</a> and the <a href="https://github.com/Prendus/content/blob/master/privacy-policy.md" target="_blank">Privacy Policy</a></div>
             <div>
               <button class="giveMeSomeSpace prendus-button prendus-button--recommended" disabled="[[!signupButtonEnabled]]" on-click="signupClick">Submit</button>
