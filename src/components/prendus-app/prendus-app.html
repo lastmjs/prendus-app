@@ -34,6 +34,13 @@
           max-width: 80%;
   				width: 100%;
   			}
+        .authentication-pages {
+          box-sizing: border-box;
+          margin: auto;
+          margin: 10vh;
+          max-width: 80%;
+          width: 100%;
+        }
         .app-window-wide {
           max-width: 1200px;
         }
@@ -55,6 +62,9 @@
   				.app-window {
   					padding: 10px 20px;
   				}
+          .authentication-pages {
+            padding: 3vh 3vw;
+          }
   			}
         */
       </style>
@@ -146,8 +156,8 @@
             <prendus-oer class="app-window landing" show="oerView" data-path="../prendus-marketing/prendus-oer.html"></prendus-oer>
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
-            <prendus-signup class="app-window" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
-            <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
+            <prendus-signup class="authentication-pages" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
+            <prendus-login class="authentication-pages" show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
             <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]" data-path="../prendus-authenticate/prendus-authenticate.html"></prendus-authenticate>
             <prendus-password-reset show="passwordResetView" active="[[passwordResetRouteActive]]" jwt="[[passwordResetRouteData.jwt]]" data-path="../prendus-password-reset/prendus-password-reset.html"></prendus-password-reset>
 

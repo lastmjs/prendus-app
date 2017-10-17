@@ -18,10 +18,10 @@
         h2{
           padding-top: 3vh;
         }
-        paper-card {
+        #login-card{
           width: 100%;
-          max-width: 320px;
-          padding: 5vh;
+          max-width: 400px;
+          padding: 3vh;
         }
 
         #create-account {
@@ -38,7 +38,8 @@
 
         <dom-if if="[[loaded]]">
             <template>
-              <paper-card id="login-container" heading="Log in">
+              <paper-card id="login-card">
+                <h1>Log in</h1>
                 <form id="login-form" class="card-content" is="iron-form" on-keydown="loginOnEnter">
                   <paper-input id="email" name="email" label="Email" required on-change="hardValidateEmail" on-keyup="softValidate" pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$" error-message="Please enter a valid email address." invalid="[[emailElementInvalid]]"></paper-input>
                   <paper-input id="password" name="password" label="Password" type="password" on-change="hardValidatePassword" on-keyup="softValidate" required auto-validate error-message="Please enter your password. 6 characters or more required"></paper-input>

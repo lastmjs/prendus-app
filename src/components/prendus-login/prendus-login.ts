@@ -54,13 +54,15 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
   	softValidate(): void {
       const emailElement: any = this.shadowRoot.querySelector('#email');
       const passwordElement: any = this.shadowRoot.querySelector('#password');
-      this.action = fireLocalAction(this.componentId, 'loginDisabled', enableLogin(emailElement, passwordElement));
+      this.action = fireLocalAction(this.componentId, 'loginDisabled', checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement));
     }
     //TODO add loading indication to user
   	loginOnEnter(e: any) {
+      console.log('login on enter', e.keyCode)
       const emailElement: any = this.shadowRoot.querySelector('#email');
       const passwordElement: any = this.shadowRoot.querySelector('#password');
-  		if(e.keyCode === 13 && enableLogin(emailElement, passwordElement)) this.loginClick();
+      console.log(!checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement))
+  		if(e.keyCode === 13 && !checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement)) this.loginClick();
     }
   	openResetPasswordDialog(): void {
       this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', true);
@@ -99,7 +101,6 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           const data = await signinUser(email, password, this.userToken);
           if(!data.authenticateUser){
             this.action = fireLocalAction(this.componentId, 'loaded', true);
-            console.log('we got data')
             return;
           }
           const gqlUser = await getUser(email, password, data.authenticateUser.token)
@@ -147,7 +148,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
 window.customElements.define(PrendusLogin.is, PrendusLogin);
 
-function enableLogin(emailElement: any, passwordElement: any){
+function checkIfLoginButtonShouldBeDisabled(emailElement: any, passwordElement: any){
   return emailElement.value && passwordElement.value ? emailElement.value.match(EMAIL_REGEX) === null || passwordElement.value.length <= 6 : true;
 }
 
@@ -216,5 +217,5 @@ async function sendResetPasswordEmail(email: string){
       }
   `, {
       email
-  }, null, (error: any) => {}); //we don't want to show any error because they shouldn't know if an email doesn't exist. So we can't show any errors. 
+  }, null, (error: any) => {}); //we don't want to show any error because they shouldn't know if an email doesn't exist. So we can't show any errors.
 }
