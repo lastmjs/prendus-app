@@ -72,15 +72,10 @@ class PrendusGradeAssignment extends Polymer.Element {
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.GRADE);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.GRADED, ObjectType.GRADE);
-    if (response) {
-      //force rubric dropdowns to reset
-      this._fireLocalAction('rubric', null);
-      setTimeout(() => {
-        this._fireLocalAction('rubric', this._parseRubric(response.questionResponse.question.code));
-      });
-    } else {
+    if (response)
+      this.shadowRoot.querySelector('#dropdowns').reset();
+    else
       LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.GRADE);
-    }
   }
 
   _parseRubric(code: string): Rubric {

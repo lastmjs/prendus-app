@@ -2,7 +2,6 @@
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
@@ -40,7 +39,7 @@
                 <p><img class="question-picture" src$="[[_questionPicture(response.questionResponse.question.text)]]"></p>
                 <h4>Response</h4>
                 <p>[[response.value]]</p>
-                <prendus-rubric-dropdowns rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
+                <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
               </div>
               <div hidden$="[[response]]">
                 <h3>Done</h3>
