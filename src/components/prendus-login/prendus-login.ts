@@ -58,10 +58,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
     //TODO add loading indication to user
   	loginOnEnter(e: any) {
-      console.log('login on enter', e.keyCode)
       const emailElement: any = this.shadowRoot.querySelector('#email');
       const passwordElement: any = this.shadowRoot.querySelector('#password');
-      console.log(!checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement))
   		if(e.keyCode === 13 && !checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement)) this.loginClick();
     }
   	openResetPasswordDialog(): void {
