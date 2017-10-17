@@ -37,23 +37,27 @@ class PrendusReviewAssignment extends Polymer.Element {
   questions: Question[];
   ratings: CategoryScore[];
   rubric: Rubric;
-  loaded: boolean = false;
+  loaded: boolean;
+  unauthorized: boolean;
+  essayType: boolean;
+  gradingRubric: Rubric;
+  completionReason: string;
 
   static get is() { return 'prendus-review-assignment' }
 
   static get properties() {
     return {
       assignmentId: String,
-      _essayType: {
+      essayType: {
         type: Boolean,
         value: false,
         computed: '_computeEssayType(assignment)'
       },
-      _gradingRubric: {
+      gradingRubric: {
         type: Object,
         computed: '_computeGradingRubric(question)'
       },
-      _completionReason: {
+      completionReason: {
         type: String,
         computed: '_computeCompletionReason(assignment, questions)'
       },
@@ -79,7 +83,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     return assignment && assignment.questionType === QuestionType.ESSAY;
   }
 
-  _computeGradingRubric(question: Question): Rubric {
+  _computeGradingRubric(question: Question): Rubric | null {
     if (!question || !question.code) return null;
     return parseRubric(question.code, 'gradingRubric');
   }
@@ -149,6 +153,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.question = componentState.question;
     this.rubric = componentState.rubric;
     this.ratings = componentState.ratings;
+    this.unauthorized = componentState.unauthorized;
     this.user = state.user;
     this.userToken = state.userToken;
   }
