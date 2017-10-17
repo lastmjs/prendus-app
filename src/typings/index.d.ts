@@ -243,13 +243,18 @@ export interface Purchase {
 }
 
 //Other types
-export interface Rubric = {
-  [category: string]: {
-    [scale: string]: {
-      readonly description: string,
-      readonly points: string
-    }
-  }
+
+export interface RubricScale {
+  readonly description: string;
+  readonly points: string;
+}
+
+export interface RubricCategory {
+  readonly [scale: string]: RubricScale;
+}
+
+export interface Rubric {
+  readonly [category: string]: RubricCategory;
 }
 
 export interface Action {

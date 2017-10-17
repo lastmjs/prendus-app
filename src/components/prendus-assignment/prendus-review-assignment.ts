@@ -131,14 +131,10 @@ class PrendusReviewAssignment extends Polymer.Element {
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (data) {
-      this.action = fireLocalAction(this.componentId, 'rubric', null); //to clear rubric dropdown selections
-      setTimeout(() => {
-        this.action = fireLocalAction(this.componentId, 'rubric', parseRubric(data.code, 'evaluationRubric'));
-      });
-    } else if (this.questions.length) {
+    if (data)
+      this.shadowRoot.querySelector('#dropdowns').reset();
+    else if (this.questions.length)
       LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
-    }
   }
 
   _handleRatings(e: CustomEvent) {

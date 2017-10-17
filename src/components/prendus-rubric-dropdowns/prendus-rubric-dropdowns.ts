@@ -1,13 +1,19 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  SetComponentPropertyAction,
+  CategoryScore,
+  Rubric
+} from '../../typings/actions';
+import {
+  createUUID,
+  fireLocalAction
+} from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
-  scores: {[key: string]: number};
+  action: SetComponentPropertyAction;
+  rubric: Rubric;
+  scores: CategoryScore[];
   componentId: string;
-  userToken: string | null;
-  user: User;
 
   static get is() { return 'prendus-rubric-dropdowns' }
 
@@ -25,20 +31,19 @@ class PrendusRubricDropdowns extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
+  connectedCallback() {
+    super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
   reset() {
-    const scores = Object.keys(this.rubric || {}).reduce((result, category) => {
-      return {...result, [category]: -1 }
-    }, {});
-    this._fireLocalAction('scores', scores);
+    const rubric = this.rubric;
+    this.action = fireLocalAction(this.componentId, 'rubric', null);
+    setTimeout(() => {
+      this.action = fireLocalAction(this.componentId, 'rubric', rubric);
+    });
+    const scores = Object.keys(rubric || {}).map(resetScores);
+    this.action = fireLocalAction(this.componentId, 'scores', scores);
     this._notify(scores);
   }
 
@@ -63,22 +68,14 @@ class PrendusRubricDropdowns extends Polymer.Element {
   _scoreCategory(e) {
     const { category, option } = e.model;
     const { points } = this.rubric[category][option];
-    const newScores = {...this.scores, [category]: points };
-    this._fireLocalAction('scores', newScores);
+    const newScores = this.scores.map(scoreCategory(category, Number(points)));
+    this.action = fireLocalAction(this.componentId, 'scores', newScores);
     this._notify(newScores);
   }
 
   _notify(scores: object) {
-    const formatted = Object.keys(scores).map(category => {
-      return {category, score: Number(scores[category]}
-    }));
-    const evt = new CustomEvent('scores-changed', {composed: true, detail: {scores: formatted}});
+    const evt = new CustomEvent('scores-changed', {detail: {scores}});
     this.dispatchEvent(evt);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._fireLocalAction('loaded', true);
   }
 
   categoryId(category: string, option: string): string {
@@ -88,13 +85,21 @@ class PrendusRubricDropdowns extends Polymer.Element {
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('scores')) this.scores = componentState.scores;
-    this.userToken = state.userToken;
-    this.user = state.user;
+    this.loaded = componentState.loaded;
+    this.scores = componentState.scores;
+    this.rubric = componentState.rubric;
   }
 
+}
+
+function scoreCategory(category: string, points: number): (categoryScore: CategoryScore) => CategoryScore {
+  return (categoryScore) => categoryScore.category === category
+    ? { category, score: points }
+    : categoryScore;
+}
+
+function resetScores(category) {
+  return {category, score: -1};
 }
 
 window.customElements.define(PrendusRubricDropdowns.is, PrendusRubricDropdowns)
