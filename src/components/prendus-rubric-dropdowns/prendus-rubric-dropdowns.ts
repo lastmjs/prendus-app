@@ -1,8 +1,8 @@
 import {
   SetComponentPropertyAction,
-  CategoryScore,
-  Rubric
-} from '../../typings/actions';
+  Rubric,
+  CategoryScore
+} from '../../typings/index.d';
 import {
   createUUID,
   fireLocalAction
@@ -36,19 +36,19 @@ class PrendusRubricDropdowns extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  reset() {
-    const rubric = this.rubric;
-    this.action = fireLocalAction(this.componentId, 'rubric', null);
-    setTimeout(() => {
-      this.action = fireLocalAction(this.componentId, 'rubric', rubric);
+  resetDropdowns() {
+    const dropdowns = this.shadowRoot.querySelectorAll('paper-dropdown-menu paper-listbox');
+    if (!dropdowns) return;
+    Array.from(dropdowns).forEach(dropdown => {
+      dropdown.selected = null;
     });
-    const scores = Object.keys(rubric || {}).map(resetScores);
-    this.action = fireLocalAction(this.componentId, 'scores', scores);
-    this._notify(scores);
   }
 
   _initScores(rubric: Rubric) {
-    this.reset();
+    this.resetDropdowns();
+    const scores = Object.keys(rubric || {}).map(resetScores);
+    this.action = fireLocalAction(this.componentId, 'scores', scores);
+    this._notify(scores);
   }
 
   _categories(rubric: Rubric): string[] {
@@ -83,13 +83,12 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   stateChange(e: CustomEvent) {
+    console.log(e.detail.state);
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.scores = componentState.scores;
-    this.rubric = componentState.rubric;
   }
-
 }
 
 function scoreCategory(category: string, points: number): (categoryScore: CategoryScore) => CategoryScore {

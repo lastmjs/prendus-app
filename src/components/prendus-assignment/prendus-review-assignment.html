@@ -23,6 +23,8 @@
       </template>
     </dom-if>
 
+    <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
+
     <div hidden$="[[!loaded]]">
       <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
         <dom-if if="[[question]]">
@@ -37,14 +39,12 @@
               <br>
               <prendus-view-question question="[[question]]"></prendus-view-question>
               <br>
-              <dom-if if="[[essayType]]">
-                <template>
-                  <h3>Grading Rubric</h3>
-                  <prendus-rubric-table rubric="[[gradingRubric]]"></prendus-rubric-table>
-                </template>
-              </dom-if>
+              <div hidden$="[[!essayType]]">
+                <h3>Grading Rubric</h3>
+                <prendus-rubric-table rubric="[[gradingRubric]]"></prendus-rubric-table>
+              </div>
               <br>
-              <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
+              <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
             </div>
           </template>
         </dom-if>
@@ -58,8 +58,6 @@
         </dom-if>
       </prendus-carousel>
     </div>
-
-    <prendus-unauthorized-modal unauthorized="[[unauthorized]]"></prendus-unauthorized-modal>
 
   </template>
 

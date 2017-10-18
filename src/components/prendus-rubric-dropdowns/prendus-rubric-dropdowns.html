@@ -25,11 +25,11 @@
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <div class="flex-container">
-      <dom-repeat id="categories" items="[[_categories(rubric)]]" as="category" hidden>
+      <dom-repeat id="categories" items="[[_categories(rubric)]]" as="category">
         <template>
           <paper-dropdown-menu class="flex-item" label="[[category]]">
             <paper-listbox slot="dropdown-content">
-              <dom-repeat items="[[_options(rubric, category)]]" as="option" hidden>
+              <dom-repeat items="[[_options(rubric, category)]]" as="option">
                 <template>
                   <paper-item id="[[categoryId(category, option)]]" on-click="_scoreCategory">[[option]]</paper-item>
                 </template>
@@ -38,9 +38,9 @@
           </paper-dropdown-menu>
         </template>
       </dom-repeat>
-      <dom-repeat items="[[_categories(rubric)]]" as="category" hidden>
+      <dom-repeat items="[[_categories(rubric)]]" as="category">
         <template>
-          <dom-repeat items="[[_options(rubric, category)]]" as="option" hidden>
+          <dom-repeat items="[[_options(rubric, category)]]" as="option">
             <template>
               <paper-tooltip for="[[categoryId(category, option)]]" animation-delay="300">[[_description(rubric, category, option)]]</paper-tooltip>
             </template>

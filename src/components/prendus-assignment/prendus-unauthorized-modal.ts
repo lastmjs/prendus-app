@@ -11,33 +11,29 @@ import {
 const hasAssignment = assignmentId => course => course.assignments.some(assignment => assignment.id === assignmentId);
 
 class PrendusUnauthorizedModal extends Polymer.Element {
-  unauthorized: boolean;
+  authorized: boolean;
   user: User;
   assignmentId: string;
-  needsToPay: boolean;
-  needsToEnroll: boolean;
+  enrolled: boolean;
+  payed: boolean;
 
   static get is() { return 'prendus-unauthorized-modal' }
 
   static get properties() {
     return {
       assignmentId: String,
-      needsToPay: {
+      enrolled: {
         type: Boolean,
-        value: false,
-        computed: '_computeNeedsToPay(user, assignmentId)'
+        computed: '_computeEnrolled(user, assignmentId)'
       },
-      needsToEnroll: {
+      payed: {
         type: Boolean,
-        value: false,
-        computed: '_computeNeedsToEnroll(user, assignmentId)'
+        computed: '_computePayed(user, assignmentId)'
       },
-      unauthorized: {
+      authorized: {
         type: Boolean,
-        value: false,
-        notify: true,
-        computed: '_computeUnauthorized(needsToPay, needsToEnroll)',
-        observer: '_unauthorizedChanged'
+        computed: '_computeAuthorized(enrolled, payed)',
+        observer: '_authorizedChanged'
       }
     }
   }
@@ -47,25 +43,28 @@ class PrendusUnauthorizedModal extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _computeNeedsToPay(assignmentId: string, user: User) {
-    if (!assignmentId || !user) return;
-    return !user.purchases.some(p => hasAssignment(assignmentId)(p.course));
+  _computePayed(user: User, assignmentId: string): boolean {
+    if (!assignmentId || !user) return undefined;
+    return user.purchases.some(p => hasAssignment(assignmentId)(p.course));
   }
 
-  _computeNeedsToEnroll(assignmentId: string, user: User) {
-    if (!assignmentId || !user) return;
-    return !user.enrolledCourses.some(hasAssignment(assignmentId));
+  _computeEnrolled(user: User, assignmentId: string): boolean {
+    if (!assignmentId || !user) return undefined;
+    return user.enrolledCourses.some(hasAssignment(assignmentId));
   }
 
-  _computeUnauthorized(needsToPay: boolean, needsToEnroll: boolean) {
-    return needsToPay || needsToEnroll;
+  _computeAuthorized(enrolled: boolean, payed: boolean): boolean {
+    return true;
+    return enrolled && payed;
   }
 
-  _unauthorizedChanged(unauthorized) {
-    if (unauthorized)
+  _authorizedChanged(authorized: boolean) {
+    if (!authorized)
       this.shadowRoot.querySelector('#modal').open();
-    else
+    else {
+      this.dispatchEvent(new CustomEvent('authorized'));
       this.shadowRoot.querySelector('#modal').close();
+    }
   }
 
   _toHome(e: Event) {
@@ -75,10 +74,6 @@ class PrendusUnauthorizedModal extends Polymer.Element {
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
-    const componentState = state.components[this.componentId] || {};
-    this.unauthorized = componentState.unauthorized;
-    this.needsToEnroll = componentState.needsToEnroll;
-    this.needsToPay = componentState.needsToPay;
     this.user = state.user;
   }
 }

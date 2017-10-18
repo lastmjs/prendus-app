@@ -108,7 +108,6 @@ class PrendusRubricTable extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.categories = componentState.categories;
-    this.rubric = componentState.rubric;
   }
 }
 

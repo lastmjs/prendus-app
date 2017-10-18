@@ -38,7 +38,6 @@ class PrendusReviewAssignment extends Polymer.Element {
   ratings: CategoryScore[];
   rubric: Rubric;
   loaded: boolean;
-  unauthorized: boolean;
   essayType: boolean;
   gradingRubric: Rubric;
   completionReason: string;
@@ -57,6 +56,11 @@ class PrendusReviewAssignment extends Polymer.Element {
         type: Object,
         computed: '_computeGradingRubric(question)'
       },
+      evaluationRubric: {
+        type: Object,
+        value: {},
+        computed: '_computeEvaluationRubric(question)'
+      },
       completionReason: {
         type: String,
         computed: '_computeCompletionReason(assignment, questions)'
@@ -66,12 +70,6 @@ class PrendusReviewAssignment extends Polymer.Element {
         computed: '_computeQuestions(assignment)'
       }
     }
-  }
-
-  static get observers() {
-    return [
-      '_computeAssignment(assignmentId, user, userToken)'
-    ]
   }
 
   constructor() {
@@ -88,22 +86,26 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'gradingRubric');
   }
 
+  _computeEvaluationRubric(question: Question): Rubric | null {
+    if (!question || !question.code) return null;
+    return parseRubric(question.code, 'evaluationRubric');
+  }
+
   _computeCompletionReason(assignment: Assignment, questions: Question[]): string {
     return questions && questions.length > assignment.numReviewQuestions
       ? 'You have completed this assignment'
       : 'There are not enough questions to take the assignment yet';
   }
 
-  async _computeAssignment(assignmentId: string, user: User, userToken: string) {
-    if (!assignmentId || !user || !userToken) return;
+  async _loadAssignment(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const assignment = await loadAssignment(assignmentId, user.id, userToken, this._handleGQLError.bind(this));
+    const assignment = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
   _computeQuestions(assignment: Assignment): Question[] {
-    return assignment && assignment.questions.length > assignment.numReviewQuestions
+    return assignment && assignment.questions.length >= assignment.numReviewQuestions
       ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
       : [];
   }
@@ -115,7 +117,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   async _handleNextRequest(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
     try {
-      validate(this.rubric, this.ratings);
+      validate(this.evaluationRubric, this.ratings);
       await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
       this.shadowRoot.querySelector('#carousel').nextData();
     } catch (err) {
@@ -131,9 +133,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (data)
-      this.shadowRoot.querySelector('#dropdowns').reset();
-    else if (this.questions.length)
+    if (!data && this.questions.length)
       LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
   }
 
@@ -147,9 +147,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
     this.question = componentState.question;
-    this.rubric = componentState.rubric;
     this.ratings = componentState.ratings;
-    this.unauthorized = componentState.unauthorized;
     this.user = state.user;
     this.userToken = state.userToken;
   }
@@ -165,7 +163,7 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
       numReviewQuestions
       questions(filter: {
         author: {
-          id_not: $userId
+          id: $userId
         }
       }) {
         id
