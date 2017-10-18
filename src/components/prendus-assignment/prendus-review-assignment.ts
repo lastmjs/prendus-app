@@ -232,9 +232,7 @@ function randomWithUnreviewedFirst(questions: Question[], num: number): Question
 }
 
 function validate(rubric: Rubric, ratings: CategoryScore[]) {
-  if (!ratings) throw new Error('You must rate the question');
-  if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
-  if (ratings.some(score => !rubric.hasOwnProperty(score.category) || score.score < 0))
+  if (ratings.some(score => score.score < 0))
     throw new Error('You must rate each category');
 }
 
