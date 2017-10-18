@@ -47,11 +47,23 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
     if (originalUserToken) {
         const data = await GQLRequest(`
             query {
-                user {
+              user {
+                id
+                email
+                role
+                enrolledCourses {
+                  assignments {
                     id
-                    email
-                    role
+                  }
                 }
+                purchases {
+                  course {
+                    assignments {
+                      id
+                    }
+                  }
+                }
+              }
             }
         `, {}, originalUserToken, (error: any) => {
             throw error;

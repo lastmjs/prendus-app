@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
@@ -15,6 +16,7 @@
         margin-top: 30px;
       }
     </style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <paper-dialog id="modal" modal>
         <div class="content">
           <h1>Unauthorized to Access this page</h1>
