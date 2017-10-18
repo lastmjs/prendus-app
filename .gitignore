@@ -3,4 +3,5 @@
 /src/node_modules
 /npm-debug.log
 /src/dist
-/src/graphcool/functions/*/*.js
+/src/graphcool/node_modules
+/src/graphcool/build.zip

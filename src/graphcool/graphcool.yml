@@ -15,53 +15,65 @@
 
 types: ./types.graphql
 
+# Your root tokens used for functions to get full access to the API
+# Read more here:
+# https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
+rootTokens: [cloudFunctionsRootToken]
+
+
+# Organize your code into modules
+# You can find modules from the community here:
+# https://github.com/graphcool/modules
+# modules: {}
+
 functions:
-    signup:
-        handler:
-            code:
-                src: ./functions/signup/signup.js
-        type: resolver
-        schema: ./functions/signup/signup.graphql
-    authenticate:
-        handler:
-            code:
-                src: ./functions/authenticate/authenticate.js
-        type: resolver
-        schema: ./functions/authenticate/authenticate.graphql
-    add-lti-user:
-        handler:
-            code:
-                src: ./functions/add-lti-user/add-lti-user.js
-        type: resolver
-        schema: ./functions/add-lti-user/add-lti-user.graphql
-    course-payment:
-        handler:
-            code:
-                src: ./functions/course-payment/course-payment.js
-                environment:
-                    STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
-        type: resolver
-        schema: ./functions/course-payment/course-payment.graphql
-    request-password-reset:
-        handler:
-            code:
-                src: ./functions/request-password-reset/request-password-reset.js
-                environment:
-                    MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
-        type: resolver
-        schema: ./functions/request-password-reset/request-password-reset.graphql
-    reset-password:
-        handler:
-            code:
-                src: ./functions/reset-password/reset-password.js
-        type: resolver
-        schema: ./functions/reset-password/reset-password.graphql
+    # signup:
+    #     handler:
+    #         code:
+    #             src: ./functions/signup/signup.js
+    #     type: resolver
+    #     schema: ./functions/signup/signup.graphql
+    # authenticate:
+    #     handler:
+    #         code:
+    #             src: ./functions/authenticate/authenticate.js
+    #     type: resolver
+    #     schema: ./functions/authenticate/authenticate.graphql
+    # add-lti-user:
+    #     handler:
+    #         code:
+    #             src: ./functions/add-lti-user/add-lti-user.js
+    #     type: resolver
+    #     schema: ./functions/add-lti-user/add-lti-user.graphql
+    # course-payment:
+    #     handler:
+    #         code:
+    #             src: ./functions/course-payment/course-payment.js
+    #             environment:
+    #                 STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
+    #     type: resolver
+    #     schema: ./functions/course-payment/course-payment.graphql
+    # request-password-reset:
+    #     handler:
+    #         code:
+    #             src: ./functions/request-password-reset/request-password-reset.js
+    #             environment:
+    #                 MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
+    #     type: resolver
+    #     schema: ./functions/request-password-reset/request-password-reset.graphql
+    # reset-password:
+    #     handler:
+    #         code:
+    #             src: ./functions/reset-password/reset-password.js
+    #     type: resolver
+    #     schema: ./functions/reset-password/reset-password.graphql
     assignment-lti-launch:
         handler:
             code:
-                src: ./functions/assignment-lti-launch/assignment-lti-launch.js
+                src: ./functions/assignment-lti-launch/assignment-lti-launch.ts
                 environment:
                     PRENDUS_LTI_SECRET: ${env:PRENDUS_LTI_SECRET}
+                    PRENDUS_CLIENT_ORIGIN: ${env:PRENDUS_CLIENT_ORIGIN}
         type: resolver
         schema: ./functions/assignment-lti-launch/assignment-lti-launch.graphql
 
@@ -363,16 +375,16 @@ permissions:
 #### AnswerComment Permissions
 
 # AnswerComment Create
-- operation: Answercomment.create
+- operation: AnswerComment.create
 
 # AnswerComment Read
-- operation: Answercomment.read
+- operation: AnswerComment.read
 
 # AnswerComment Update
-- operation: Answercomment.update
+- operation: AnswerComment.update
 
 # AnswerComment Delete
-- operation: Answercomment.delete
+- operation: AnswerComment.delete
 
 #### Discipline Permissions
 
@@ -481,14 +493,3 @@ permissions:
 
 # Purchase Update
 # Purchase Delete
-
-# Your root tokens used for functions to get full access to the API
-# Read more here:
-# https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
-rootTokens: [cloudFunctionsRootToken]
-
-
-# Organize your code into modules
-# You can find modules from the community here:
-# https://github.com/graphcool/modules
-modules: {}

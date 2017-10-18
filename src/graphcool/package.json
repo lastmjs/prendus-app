@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "graphcool-lib": "0.0.3",
+    "ims-lti": "^3.0.2",
+    "jsonwebtoken": "^8.1.0"
+  }
+}

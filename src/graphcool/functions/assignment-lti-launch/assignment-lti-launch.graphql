@@ -6,5 +6,5 @@ type AssignmentLTILaunchPayload {
 }
 
 extend type Mutation {
-    assignmentLTILaunch(ltiUserId: String!, assignmentId: String!, assignmentType: String!, lisPersonContactEmailPrimary: String!, oauthConsumerKey: String!, requestBody: String!): AssignmentLTILaunchPayload
+    assignmentLTILaunch(assignmentId: String!, assignmentType: String!, requestBody: String!, path: String!, method: String!): AssignmentLTILaunchPayload
 }
