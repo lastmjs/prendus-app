@@ -83,7 +83,6 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   stateChange(e: CustomEvent) {
-    console.log(e.detail.state);
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;

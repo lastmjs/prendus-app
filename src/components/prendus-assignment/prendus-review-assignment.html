@@ -25,39 +25,43 @@
 
     <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
 
-    <div hidden$="[[!loaded]]">
-      <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
-        <dom-if if="[[question]]">
-          <template>
-            <div>
-              <h3>Concept</h3>
-              <div class="prendus-card">[[question.concept.title]]</div>
-              <h3>Resource</h3>
-              <div class="prendus-card">[[question.resource]]</div>
-              <br>
-              <h3>Question as seen in quiz</h3>
-              <br>
-              <prendus-view-question question="[[question]]"></prendus-view-question>
-              <br>
-              <div hidden$="[[!essayType]]">
-                <h3>Grading Rubric</h3>
-                <prendus-rubric-table rubric="[[gradingRubric]]"></prendus-rubric-table>
+    <dom-if if="[[loaded]]">
+      <template>
+        <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
+          <dom-if if="[[question]]">
+            <template>
+              <div>
+                <h3>Concept</h3>
+                <div class="prendus-card">[[question.concept.title]]</div>
+                <h3>Resource</h3>
+                <div class="prendus-card">[[question.resource]]</div>
+                <br>
+                <h3>Question as seen in quiz</h3>
+                <br>
+                <prendus-view-question question="[[question]]"></prendus-view-question>
+                <br>
+                <dom-if if="[[essayType]]">
+                  <template>
+                    <h3>Grading Rubric</h3>
+                    <prendus-rubric-table rubric="[[gradingRubric]]"></prendus-rubric-table>
+                  </template>
+                </dom-if>
+                <br>
+                <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
               </div>
-              <br>
-              <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
-            </div>
-          </template>
-        </dom-if>
-        <dom-if if="[[!question]]">
-          <template>
-            <div>
-              <h4>Done</h4>
-              <p>[[completionReason]]</p>
-            </div>
-          </template>
-        </dom-if>
-      </prendus-carousel>
-    </div>
+            </template>
+          </dom-if>
+          <dom-if if="[[!question]]">
+            <template>
+              <div>
+                <h4>Done</h4>
+                <p>[[completionReason]]</p>
+              </div>
+            </template>
+          </dom-if>
+        </prendus-carousel>
+      </template>
+    </dom-if>
 
   </template>
 
