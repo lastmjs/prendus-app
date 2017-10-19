@@ -51,18 +51,6 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
                 id
                 email
                 role
-                enrolledCourses {
-                  assignments {
-                    id
-                  }
-                }
-                purchases {
-                  course {
-                    assignments {
-                      id
-                    }
-                  }
-                }
               }
             }
         `, {}, originalUserToken, (error: any) => {

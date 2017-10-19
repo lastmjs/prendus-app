@@ -1,19 +1,23 @@
 import {
   SetComponentPropertyAction,
-  User
+  User,
+  Course
 } from '../../typings/index.d';
 import {
   navigate,
   createUUID,
   fireLocalAction
 } from '../../node_modules/prendus-shared/services/utilities-service';
-
-const hasAssignment = assignmentId => course => course.assignments.some(assignment => assignment.id === assignmentId);
+import {
+  GQLRequest
+} from '../../node_modules/prendus-shared/services/graphql-service';
 
 class PrendusUnauthorizedModal extends Polymer.Element {
   authorized: boolean;
+  _user: User;
   user: User;
   assignmentId: string;
+  course: Course;
   enrolled: boolean;
   payed: boolean;
 
@@ -24,11 +28,16 @@ class PrendusUnauthorizedModal extends Polymer.Element {
       assignmentId: String,
       enrolled: {
         type: Boolean,
-        computed: '_computeEnrolled(user, assignmentId)'
+        computed: '_computeEnrolled(user, course)'
       },
       payed: {
         type: Boolean,
-        computed: '_computePayed(user, assignmentId)'
+        computed: '_computePayed(user, course)'
+      },
+      authenticated: {
+        type: Boolean,
+        computed: '_computeAuthenticated(_user)',
+        observer: '_authenticatedChanged'
       },
       authorized: {
         type: Boolean,
@@ -38,24 +47,70 @@ class PrendusUnauthorizedModal extends Polymer.Element {
     }
   }
 
+  static get observers() {
+    return [
+      '_computeUser(_user, assignmentId, userToken)'
+    ]
+  }
+
   constructor() {
     super();
     this.componentId = createUUID();
   }
 
-  _computePayed(user: User, assignmentId: string): boolean {
-    if (!assignmentId || !user) return undefined;
-    return user.purchases.some(p => hasAssignment(assignmentId)(p.course));
+  async _computeUser(_user: User, assignmentId: string, userToken: string): User {
+    if (!_user || !assignmentId || !userToken) return;
+
+    const data = await GQLRequest(`
+      query authorizationData($userId: ID!, $assignmentId: ID!) {
+        assignment: Assignment(id: $assignmentId) {
+          course {
+            id
+          }
+        }
+        user: User(id: $userId) {
+          enrolledCourses {
+            id
+          }
+          purchases {
+            course {
+              id
+            }
+          }
+        }
+      }
+    `, { userId: _user.id, assignmentId }, userToken, () => {});
+    this.action = fireLocalAction(this.componentId, 'user', data.user);
+    this.action = fireLocalAction(this.componentId, 'course', data.assignment.course);
   }
 
-  _computeEnrolled(user: User, assignmentId: string): boolean {
-    if (!assignmentId || !user) return undefined;
-    return user.enrolledCourses.some(hasAssignment(assignmentId));
+  _computeAuthenticated(_user: User): boolean {
+    if (_user === undefined)
+      return undefined;
+    else if (_user === null)
+      return false;
+    return true;
+  }
+
+  _computePayed(user: User, course: Course): boolean {
+    if (!course || !user)
+      return undefined;
+    return user.purchases.some(p => p.course.id === course.id);
+  }
+
+  _computeEnrolled(user: User, course: Course): boolean {
+    if (!course || !user)
+      return undefined;
+    return user.enrolledCourses.some(c => c.id === course.id);
   }
 
   _computeAuthorized(enrolled: boolean, payed: boolean): boolean {
-    return true;
     return enrolled && payed;
+  }
+
+  _authenticatedChanged(authenticated: boolean) {
+    if (!authenticated)
+      navigate('/authenticate');
   }
 
   _authorizedChanged(authorized: boolean) {
@@ -74,7 +129,11 @@ class PrendusUnauthorizedModal extends Polymer.Element {
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
-    this.user = state.user;
+    const componentState = state.components[this.componentId] || {};
+    this.user = componentState.user;
+    this.course = componentState.course;
+    this._user = state.user;
+    this.userToken = state.userToken;
   }
 }
 
