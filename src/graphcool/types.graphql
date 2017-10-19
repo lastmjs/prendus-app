@@ -258,6 +258,14 @@ type Purchase @model {
   stripeTokenId: String!
 }
 
+type LTISession @model {
+    id: ID! @isUnique
+    ltiUserId: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    serializedOutcomeService: Json!
+}
+
 enum UserRole {
   INSTRUCTOR
   STUDENT

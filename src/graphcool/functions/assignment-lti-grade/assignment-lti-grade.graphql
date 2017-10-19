@@ -1,0 +1,7 @@
+type AssignmentLTIGradePayload {
+    success: Boolean!
+}
+
+extend type Mutation {
+    assignmentLTIGrade(ltiSessionIdJWT: String!): AssignmentLTIGradePayload
+}

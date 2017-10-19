@@ -18,7 +18,8 @@ types: ./types.graphql
 # Your root tokens used for functions to get full access to the API
 # Read more here:
 # https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
-rootTokens: [cloudFunctionsRootToken]
+rootTokens:
+- cloudFunctionsRootToken
 
 
 # Organize your code into modules
@@ -30,13 +31,13 @@ functions:
     # signup:
     #     handler:
     #         code:
-    #             src: ./functions/signup/signup.js
+    #             src: ./functions/signup/signup.ts
     #     type: resolver
     #     schema: ./functions/signup/signup.graphql
     # authenticate:
     #     handler:
     #         code:
-    #             src: ./functions/authenticate/authenticate.js
+    #             src: ./functions/authenticate/authenticate.ts
     #     type: resolver
     #     schema: ./functions/authenticate/authenticate.graphql
     # add-lti-user:
@@ -74,8 +75,19 @@ functions:
                 environment:
                     PRENDUS_LTI_SECRET: ${env:PRENDUS_LTI_SECRET}
                     PRENDUS_CLIENT_ORIGIN: ${env:PRENDUS_CLIENT_ORIGIN}
+                    PRENDUS_CLIENT_DOMAIN: ${env:PRENDUS_CLIENT_DOMAIN}
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/assignment-lti-launch/assignment-lti-launch.graphql
+    assignment-lti-grade:
+        handler:
+            code:
+                src: ./functions/assignment-lti-grade/assignment-lti-grade.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/assignment-lti-grade/assignment-lti-grade.graphql
 
 permissions:
 

@@ -1,7 +1,7 @@
 type AssignmentLTILaunchPayload {
-    ltiJWT: String
-    ltiSessionIdJWT: String!
-    clientRedirectUrl: String!
+    ltiJWTCookie: String
+    ltiSessionIdJWTCookie: String!
+    clientRedirectUrlCookie: String!
     serverRedirectUrl: String!
 }
 
