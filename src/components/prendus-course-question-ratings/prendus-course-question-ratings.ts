@@ -201,24 +201,6 @@ function categoryCamelCase(category: string) {
     .replace(/\s+(\w)/g, (m, c) => c.toUpperCase());
 }
 
-function flatten(arr: any[]): any[] {
-  return arr.reduce((acc, elem) => {
-    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
-  },[]);
-}
-
-function filterProp(prop: string, val: string): (obj: object) => boolean {
-  return obj => obj[prop] === val;
-}
-
-function uniqueProp(arr: object[], prop: string): object[] {
-  return arr.reduce((filtered: object[], obj: object) => {
-    if (filtered.filter(filterProp(prop, obj[prop])).length === 0)
-      filtered.push(obj);
-    return filtered;
-  }, []);
-}
-
 async function loadCourse(courseId: string, userToken: string, cb: (err: any) => void): Course {
   const data = await GQLRequest(`
   query getCourse($courseId: ID!) {
