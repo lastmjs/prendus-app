@@ -48,13 +48,13 @@ class PrendusRubricTable extends Polymer.Element {
   _initCategories(rubric: Rubric) {
     const categories = categoriesForHtml(rubric);
     if (!categories.length && this.editable)
-      this.action = fireLocalAction(this.componentId, 'categories', templateRubric());
+      this.action = fireLocalAction(this.componentId, 'categories', [templateCategory()]);
     else
       this.action = fireLocalAction(this.componentId, 'categories', categories);
   }
 
   addCategory() {
-    this.action = fireLocalAction(this.componentId, 'categories', this.categories.concat(templateRubric());
+    this.action = fireLocalAction(this.componentId, 'categories', [...this.categories, templateCategory()]);
   }
 
   removeCategory() {
@@ -65,7 +65,7 @@ class PrendusRubricTable extends Polymer.Element {
   addScale(e: Event) {
     const newCategories = this.categories.map((category, i) =>
       i === e.model.itemsIndex
-        ? {...category, options: category.options.concat(templateOption())}
+        ? {...category, options: [...category.options, templateOption()]}
         : category
     );
     this.action = fireLocalAction(this.componentId, 'categories', newCategories);
@@ -115,13 +115,11 @@ class PrendusRubricTable extends Polymer.Element {
   }
 }
 
-function templateRubric(): object[] {
-  return [
-    {
-      name: '',
-      options: [templateOption()]
-    }
-  ];
+function templateCategory(): object[] {
+  return {
+    name: '',
+    options: [templateOption()]
+  }
 }
 
 function templateOption(): object[] {
