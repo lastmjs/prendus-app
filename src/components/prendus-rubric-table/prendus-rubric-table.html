@@ -76,14 +76,14 @@
         <div class="grid-cell col-header">Points</div>
       </div>
 
-      <dom-if if="[[editable]]" hidden>
+      <dom-if if="[[editable]]">
         <template>
-          <dom-repeat id="categories" items="[[categories]]" as="category" hidden>
+          <dom-repeat id="categories" items="[[categories]]" as="category">
             <template>
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell"><input type="text" placeholder="Category..." value="[[category.name]]" on-change="setCategory"></div>
                 <div class="grid">
-                  <dom-repeat items="[[category.options]]" as="option" hidden>
+                  <dom-repeat items="[[category.options]]" as="option">
                     <template>
                       <div class="grid-row grid-inner-row">
                         <div class="grid-cell"><input type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
@@ -111,14 +111,14 @@
         </template>
       </dom-if>
 
-      <dom-if if="[[!editable]]" hidden>
+      <dom-if if="[[!editable]]">
         <template>
-          <dom-repeat items="[[categories]]" as="category" hidden>
+          <dom-repeat items="[[categories]]" as="category">
             <template>
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell">[[category.name]]</div>
                 <div class="grid">
-                  <dom-repeat items="[[category.options]]" as="option" hidden>
+                  <dom-repeat items="[[category.options]]" as="option">
                     <template>
                       <div class="grid-row grid-inner-row">
                         <div class="grid-cell">[[option.name]]</div>

@@ -23,11 +23,9 @@
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <dom-if if="[[!finished]]">
-      <template>
-        <h3>[[label]] [[_plusOne(currentIndex)]]/[[data.length]]</h3>
-      </template>
-    </dom-if>
+    <div hidden$="[[finished]]">
+      <h3>[[label]] [[_plusOne(currentIndex)]]/[[data.length]]</h3>
+    </div>
     <br>
 
     <slot></slot>

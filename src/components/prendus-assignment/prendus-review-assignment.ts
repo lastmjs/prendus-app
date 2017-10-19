@@ -37,7 +37,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   questions: Question[];
   ratings: CategoryScore[];
   rubric: Rubric;
-  loaded: boolean;
+  loaded: boolean = false;
   essayType: boolean;
   gradingRubric: Rubric;
   completionReason: string;
@@ -100,6 +100,8 @@ class PrendusReviewAssignment extends Polymer.Element {
   async _loadAssignment(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
     const assignment = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
+    if (assignment.rated.length)
+      this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
@@ -180,6 +182,15 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
         _ratingsMeta {
           count
         }
+      }
+      rated: questions(filter: {
+        ratings_some: {
+          rater: {
+            id: $userId
+          }
+        }
+      }) {
+        id
       }
     }
   }`, {assignmentId, userId}, userToken, cb);
