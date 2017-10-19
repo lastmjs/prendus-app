@@ -72,9 +72,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.GRADE);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.GRADED, ObjectType.GRADE);
-    if (response)
-      this.shadowRoot.querySelector('#dropdowns').reset();
-    else
+    if (!response && this.responses.length)
       LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.GRADE);
   }
 
