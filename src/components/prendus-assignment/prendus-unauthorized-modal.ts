@@ -36,20 +36,15 @@ class PrendusUnauthorizedModal extends Polymer.Element {
       },
       authenticated: {
         type: Boolean,
-        computed: '_computeAuthenticated(_user)',
-        observer: '_authenticatedChanged'
+        computed: '_computeAuthenticated(_user)'
       },
-      authorized: {
-        type: Boolean,
-        computed: '_computeAuthorized(enrolled, payed)',
-        observer: '_authorizedChanged'
-      }
     }
   }
 
   static get observers() {
     return [
-      '_computeUser(_user, assignmentId, userToken)'
+      '_computeUser(_user, assignmentId, userToken)',
+      '_computeView(authenticated, payed, enrolled)'
     ]
   }
 
@@ -58,28 +53,10 @@ class PrendusUnauthorizedModal extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  async _computeUser(_user: User, assignmentId: string, userToken: string): User {
+  async _computeUser(_user: User, assignmentId: string, userToken: string) {
     if (!_user || !assignmentId || !userToken) return;
 
-    const data = await GQLRequest(`
-      query authorizationData($userId: ID!, $assignmentId: ID!) {
-        assignment: Assignment(id: $assignmentId) {
-          course {
-            id
-          }
-        }
-        user: User(id: $userId) {
-          enrolledCourses {
-            id
-          }
-          purchases {
-            course {
-              id
-            }
-          }
-        }
-      }
-    `, { userId: _user.id, assignmentId }, userToken, () => {});
+    const data = await getAuthorizationData(_user.id, assignmentId, userToken);
     this.action = fireLocalAction(this.componentId, 'user', data.user);
     this.action = fireLocalAction(this.componentId, 'course', data.assignment.course);
   }
@@ -104,19 +81,15 @@ class PrendusUnauthorizedModal extends Polymer.Element {
     return user.enrolledCourses.some(c => c.id === course.id);
   }
 
-  _computeAuthorized(enrolled: boolean, payed: boolean): boolean {
-    return enrolled && payed;
-  }
-
-  _authenticatedChanged(authenticated: boolean) {
-    if (!authenticated)
+  _computeView(authenticated: boolean, payed: boolean, enrolled: boolean) {
+    console.log(authenticated, payed, enrolled);
+    if (authenticated === false)
       navigate('/authenticate');
-  }
-
-  _authorizedChanged(authorized: boolean) {
-    if (!authorized)
+    else if (payed === false)
+      navigate(`/course/${this.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+    else if (enrolled === false)
       this.shadowRoot.querySelector('#modal').open();
-    else {
+    else if (authenticated && payed && enrolled) {
       this.dispatchEvent(new CustomEvent('authorized'));
       this.shadowRoot.querySelector('#modal').close();
     }
@@ -130,11 +103,33 @@ class PrendusUnauthorizedModal extends Polymer.Element {
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    this.user = componentState.user;
+    this.user = componentState.user; //local user with authorization data
     this.course = componentState.course;
-    this._user = state.user;
+    this._user = state.user; //redux user
     this.userToken = state.userToken;
   }
+}
+
+function getAuthorizationData(userId: string, assignmentId: string, userToken: string): object {
+  return GQLRequest(`
+    query authorizationData($userId: ID!, $assignmentId: ID!) {
+      assignment: Assignment(id: $assignmentId) {
+        course {
+          id
+        }
+      }
+      user: User(id: $userId) {
+        enrolledCourses {
+          id
+        }
+        purchases {
+          course {
+            id
+          }
+        }
+      }
+    }
+  `, { userId, assignmentId }, userToken, () => {});
 }
 
 window.customElements.define(PrendusUnauthorizedModal.is, PrendusUnauthorizedModal);
