@@ -82,7 +82,6 @@ class PrendusUnauthorizedModal extends Polymer.Element {
   }
 
   _computeView(authenticated: boolean, payed: boolean, enrolled: boolean) {
-    console.log(authenticated, payed, enrolled);
     if (authenticated === false)
       navigate('/authenticate');
     else if (payed === false)
