@@ -51,10 +51,10 @@ export default async (event: any) => {
         const ltiSessionIdJWT = JWT.sign({
             ltiSessionId
         }, process.env.PRENDUS_JWT_SECRET);
-        const ltiSessionIdJWTCookie = `ltiSessionIdJWT=${ltiSessionIdJWT}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}`;
+        const ltiSessionIdJWTCookie = `ltiSessionIdJWT=${ltiSessionIdJWT}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}; Path=/`;
         const ltiUser = await getLTIUser(api, ltiUserId);
         const clientRedirectUrl = `assignment/${assignmentId}/${assignmentType.toLowerCase()}`;
-        const clientRedirectUrlCookie = `redirectUrl=${clientRedirectUrl}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}`;
+        const clientRedirectUrlCookie = `redirectUrl=${clientRedirectUrl}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}; Path=/`;
 
         return {
             data: await generateReturnValues(api, ltiUser, courseId, ltiSessionIdJWTCookie, clientRedirectUrlCookie, assignmentId, assignmentType, ltiUserId, lisPersonContactEmailPrimary, process.env.PRENDUS_JWT_SECRET)
@@ -161,7 +161,7 @@ async function generateReturnValues(api: any, ltiUser: any, courseId: string, lt
 
         //TODO we are only adding the cookie syntax in here until a more elegant solution is provided by AWS API Gateway or graph.cool (we'll be dropping AWS API Gateway as soon as graph.cool supports setting headers and gives full access to the response body)
         return {
-            ltiJWTCookie: `ltiJWT=${ltiJWT}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}`,
+            ltiJWTCookie: `ltiJWT=${ltiJWT}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}; Path=/`,
             ltiSessionIdJWTCookie,
             clientRedirectUrlCookie,
             serverRedirectUrl: `${process.env.PRENDUS_CLIENT_ORIGIN}/authenticate`
