@@ -69,8 +69,20 @@ class PrendusTakeAssignment extends Polymer.Element {
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ, VerbType.STARTED, ObjectType.QUIZ);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ, VerbType.RESPONDED, ObjectType.QUIZ);
-    if (!data)
-      LTIPassback(this.userToken, this.user.id, this.assignment.id, ContextType.QUIZ);
+    if (!data) {
+        this.gradePassback();
+    }
+  }
+
+  async gradePassback() {
+      try {
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+      }
+      catch(error) {
+          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+          await this.gradePassback();
+      }
   }
 
   _fireLocalAction(key: string, value: any) {

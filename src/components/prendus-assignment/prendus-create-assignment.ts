@@ -61,7 +61,18 @@ class PrendusCreateAssignment extends Polymer.Element {
     else //subsequent rounds mean a question was created
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.CREATED, ObjectType.CREATE);
     if (!data) //last round
-      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+        this.gradePassback();
+  }
+
+  async gradePassback() {
+      try {
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+      }
+      catch(error) {
+          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+          await this.gradePassback();
+      }
   }
 
   async _handleQuestion(e: CustomEvent) {

@@ -71,8 +71,19 @@ class PrendusReviewAssignment extends Polymer.Element {
         this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
       });
     } else {
-      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
+      this.gradePassback();
     }
+  }
+
+  async gradePassback() {
+      try {
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+      }
+      catch(error) {
+          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+          await this.gradePassback();
+      }
   }
 
   _handleRatings(e: CustomEvent) {
