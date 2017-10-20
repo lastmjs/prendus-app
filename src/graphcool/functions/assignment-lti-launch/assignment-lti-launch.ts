@@ -43,21 +43,21 @@ export default async (event: any) => {
             protocol: 'https',
             url: `/lti${event.data.path.replace('{assignmentid}', assignmentId).replace('{assignmenttype}', assignmentType)}`,
             headers: {
-                host: 'dwz17de96a.execute-api.us-west-2.amazonaws.com'
+                host: 'api.prenduslearning.com'
             },
             method: event.data.method
         });
         const ltiSessionId = await createLTISession(api, ltiProvider, ltiUserId);
         const ltiSessionIdJWT = JWT.sign({
             ltiSessionId
-        }, event.context.graphcool.rootToken);
+        }, process.env.PRENDUS_JWT_SECRET);
         const ltiSessionIdJWTCookie = `ltiSessionIdJWT=${ltiSessionIdJWT}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}`;
         const ltiUser = await getLTIUser(api, ltiUserId);
         const clientRedirectUrl = `assignment/${assignmentId}/${assignmentType.toLowerCase()}`;
         const clientRedirectUrlCookie = `redirectUrl=${clientRedirectUrl}; Domain=${process.env.PRENDUS_CLIENT_DOMAIN}`;
 
         return {
-            data: await generateReturnValues(api, ltiUser, courseId, ltiSessionIdJWTCookie, clientRedirectUrlCookie, assignmentId, assignmentType, ltiUserId, lisPersonContactEmailPrimary, event.context.graphcool.rootToken)
+            data: await generateReturnValues(api, ltiUser, courseId, ltiSessionIdJWTCookie, clientRedirectUrlCookie, assignmentId, assignmentType, ltiUserId, lisPersonContactEmailPrimary, process.env.PRENDUS_JWT_SECRET)
         };
     }
     catch(error) {

@@ -76,6 +76,7 @@ functions:
                     PRENDUS_LTI_SECRET: ${env:PRENDUS_LTI_SECRET}
                     PRENDUS_CLIENT_ORIGIN: ${env:PRENDUS_CLIENT_ORIGIN}
                     PRENDUS_CLIENT_DOMAIN: ${env:PRENDUS_CLIENT_DOMAIN}
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
         context:
             rootToken: cloudFunctionsRootToken
         type: resolver
@@ -84,6 +85,8 @@ functions:
         handler:
             code:
                 src: ./functions/assignment-lti-grade/assignment-lti-grade.ts
+                environment:
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
         context:
             rootToken: cloudFunctionsRootToken
         type: resolver

@@ -12,12 +12,15 @@ export default async (event: any) => {
         const graphcool = fromEvent(event);
         const api = graphcool.api('simple/v1');
         const ltiSessionIdJWT = event.data.ltiSessionIdJWT;
-        const ltiSessionId = JWT.verify(ltiSessionIdJWT, event.context.graphcool.rootToken).ltiSessionId;
+        const ltiSessionId = JWT.verify(ltiSessionIdJWT, process.env.PRENDUS_JWT_SECRET).ltiSessionId;
         const outcomeService = await getOutcomeService(api, ltiSessionId);
-        await sendGrade(outcomeService, .5); //TODO change to 1 after testing!!!!!!
+        await sendGrade(outcomeService, 1);
+        await deleteLTISession(api, ltiSessionId);
 
         return {
-            data: true
+            data: {
+                success: true
+            }
         };
     }
     catch(error) {
@@ -30,8 +33,8 @@ export default async (event: any) => {
 
 async function getOutcomeService(api: any, ltiSessionId: string) {
     const data = await api.request(`
-        query(ltiSessionId: ID!) {
-            LTISession(id: ltiSessionId) {
+        query($ltiSessionId: ID!) {
+            LTISession(id: $ltiSessionId) {
                 serializedOutcomeService
             }
         }
@@ -44,6 +47,20 @@ async function getOutcomeService(api: any, ltiSessionId: string) {
     });
 
     return outcomeService;
+}
+
+async function deleteLTISession(api: any, ltiSessionId: string) {
+    const data = await api.request(`
+        mutation($ltiSessionId: ID!) {
+            deleteLTISession(id: $ltiSessionId) {
+                id
+            }
+        }
+    `, {
+        ltiSessionId
+    });
+
+    return data.deleteLTISession.id;
 }
 
 function sendGrade(outcomeService: any, grade: number) {
