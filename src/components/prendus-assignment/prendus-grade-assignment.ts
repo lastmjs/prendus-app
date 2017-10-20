@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
-import {createUUID, asyncMap, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, asyncMap, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
@@ -85,7 +85,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   async gradePassback() {
       try {
-          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
           this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
       }
       catch(error) {

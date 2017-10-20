@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
@@ -66,7 +66,7 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   async gradePassback() {
       try {
-          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
           this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
       }
       catch(error) {
