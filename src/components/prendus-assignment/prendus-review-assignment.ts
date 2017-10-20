@@ -63,7 +63,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       },
       completionReason: {
         type: String,
-        computed: '_computeCompletionReason(assignment, questions)'
+        computed: '_computeCompletionReason(assignment)'
       },
       questions: {
         type: Array,
@@ -91,8 +91,8 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  _computeCompletionReason(assignment: Assignment, questions: Question[]): string {
-    return questions && questions.length > assignment.numReviewQuestions
+  _computeCompletionReason(assignment: Assignment): string {
+    return assignment.questions.length >= assignment.numReviewQuestions
       ? 'You have completed this assignment'
       : 'There are not enough questions to take the assignment yet';
   }
