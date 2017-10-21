@@ -1,7 +1,7 @@
 const fromEvent = require('graphcool-lib').fromEvent;
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-module.exports = function (event) {
+export default async (event) => {
     if (!event.context.graphcool.pat) {
         console.log('Please provide a valid root token!')
         return { error: 'course-payment not configured correctly.'}

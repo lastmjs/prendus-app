@@ -1,5 +1,6 @@
 targets:
-  dev: shared-eu-west-1/cj8dlzxgn0oyr0144574u2ivb
-  default: dev
+  production: shared-eu-west-1/
+  development: shared-eu-west-1/cj8dlzxgn0oyr0144574u2ivb
+  default: development
 clusters:
   default: shared-eu-west-1
