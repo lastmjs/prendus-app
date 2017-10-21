@@ -3,4 +3,5 @@
 /src/node_modules
 /npm-debug.log
 /src/dist
-/src/cloud-functions/lti-assignment/node_modules
+/src/graphcool/node_modules
+/src/graphcool/build.zip

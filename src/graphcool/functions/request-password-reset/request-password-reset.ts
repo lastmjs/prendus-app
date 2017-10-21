@@ -5,10 +5,10 @@ const mailgun = require('mailgun-js')({
     domain: 'prendus.com'
 });
 
-module.exports = function(event) {
+export default async (event) => {
     if (!event.context.graphcool.pat) {
         console.log('Please provide a valid root token!')
-        return { error: 'Request Password Reset not configured correctly.'}
+        return { error: 'request-password-reset not configured correctly.'}
     }
 
     const graphcool = fromEvent(event);
@@ -53,7 +53,7 @@ module.exports = function(event) {
             };
         });
     });
-};
+}
 
 function getUserInfo(api, email) {
     return api.request(`

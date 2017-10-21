@@ -1,16 +1,16 @@
 const JWT = require('jsonwebtoken');
 const fromEvent = require('graphcool-lib').fromEvent;
 
-module.exports = function(event) {
+export default async (event) => {
     if (!event.context.graphcool.pat) {
         console.log('Please provide a valid root token!')
-        return { error: 'Add LTI User not configured correctly.'}
+        return { error: 'add-lti-user not configured correctly.'}
     }
 
     const graphcool = fromEvent(event);
     const api = graphcool.api('simple/v1');
     const jwt = event.data.jwt;
-    const payload = JWT.verify(jwt, event.context.graphcool.pat);
+    const payload = JWT.verify(jwt, process.env.PRENDUS_JWT_SECRET);
     const userId = event.data.userId;
     const ltiUserId = payload.ltiUserId;
     const assignmentId = payload.assignmentId;
@@ -36,7 +36,7 @@ module.exports = function(event) {
                     error
                 };
             });
-};
+}
 
 function createLTIUser(api, ltiUserId, userId, lisPersonContactEmailPrimary) {
     return api.request(`
