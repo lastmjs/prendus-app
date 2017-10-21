@@ -43,7 +43,7 @@ export default async (event: any) => {
             protocol: 'https',
             url: `/lti${event.data.path.replace('{assignmentid}', assignmentId).replace('{assignmenttype}', assignmentType)}`,
             headers: {
-                host: 'api.prenduslearning.com'
+                host: 'api.prendus.com'
             },
             method: event.data.method
         });
