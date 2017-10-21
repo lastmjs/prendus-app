@@ -28,46 +28,60 @@ rootTokens:
 # modules: {}
 
 functions:
-    # signup:
-    #     handler:
-    #         code:
-    #             src: ./functions/signup/signup.ts
-    #     type: resolver
-    #     schema: ./functions/signup/signup.graphql
-    # authenticate:
-    #     handler:
-    #         code:
-    #             src: ./functions/authenticate/authenticate.ts
-    #     type: resolver
-    #     schema: ./functions/authenticate/authenticate.graphql
-    # add-lti-user:
-    #     handler:
-    #         code:
-    #             src: ./functions/add-lti-user/add-lti-user.js
-    #     type: resolver
-    #     schema: ./functions/add-lti-user/add-lti-user.graphql
-    # course-payment:
-    #     handler:
-    #         code:
-    #             src: ./functions/course-payment/course-payment.js
-    #             environment:
-    #                 STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
-    #     type: resolver
-    #     schema: ./functions/course-payment/course-payment.graphql
-    # request-password-reset:
-    #     handler:
-    #         code:
-    #             src: ./functions/request-password-reset/request-password-reset.js
-    #             environment:
-    #                 MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
-    #     type: resolver
-    #     schema: ./functions/request-password-reset/request-password-reset.graphql
-    # reset-password:
-    #     handler:
-    #         code:
-    #             src: ./functions/reset-password/reset-password.js
-    #     type: resolver
-    #     schema: ./functions/reset-password/reset-password.graphql
+    signup:
+        handler:
+            code:
+                src: ./functions/signup/signup.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/signup/signup.graphql
+    authenticate:
+        handler:
+            code:
+                src: ./functions/authenticate/authenticate.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/authenticate/authenticate.graphql
+    add-lti-user:
+        handler:
+            code:
+                src: ./functions/add-lti-user/add-lti-user.ts
+                environment:
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/add-lti-user/add-lti-user.graphql
+    course-payment:
+        handler:
+            code:
+                src: ./functions/course-payment/course-payment.ts
+                environment:
+                    STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/course-payment/course-payment.graphql
+    request-password-reset:
+        handler:
+            code:
+                src: ./functions/request-password-reset/request-password-reset.ts
+                environment:
+                    MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/request-password-reset/request-password-reset.graphql
+    reset-password:
+        handler:
+            code:
+                src: ./functions/reset-password/reset-password.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/reset-password/reset-password.graphql
     assignment-lti-launch:
         handler:
             code:
@@ -508,3 +522,107 @@ permissions:
 
 # Purchase Update
 # Purchase Delete
+
+#### Relations Permissions
+
+- operation: RaterOnQuestionRating.connect
+- operation: RaterOnQuestionRating.disconnect
+
+- operation: AuthorOnQuestion.connect
+- operation: AuthorOnQuestion.disconnect
+
+- operation: SubjectOnConcept.connect
+- operation: SubjectOnConcept.disconnect
+
+- operation: QuestionOnAnswerComment.connect
+- operation: QuestionOnAnswerComment.disconnect
+
+- operation: ConceptOnQuestion.connect
+- operation: ConceptOnQuestion.disconnect
+
+- operation: CourseOnAssignment.connect
+- operation: CourseOnAssignment.disconnect
+
+- operation: AssignmentOnConcepts.connect
+- operation: AssignmentOnConcepts.disconnect
+
+- operation: AuthorOnQuiz.connect
+- operation: AuthorOnQuiz.disconnect
+
+- operation: DisciplineOnSubject.connect
+- operation: DisciplineOnSubject.disconnect
+
+- operation: UserOnLTIUser.connect
+- operation: UserOnLTIUser.disconnect
+
+- operation: AuthorOnCourse.connect
+- operation: AuthorOnCourse.disconnect
+
+- operation: AssignmentOnQuiz.connect
+- operation: AssignmentOnQuiz.disconnect
+
+- operation: QuizOnQuestion.connect
+- operation: QuizOnQuestion.disconnect
+
+- operation: AuthorOnAssignment.connect
+- operation: AuthorOnAssignment.disconnect
+
+- operation: AssignmentQuestions.connect
+- operation: AssignmentQuestions.disconnect
+
+- operation: QuestionOnQuestionRating.connect
+- operation: QuestionOnQuestionRating.disconnect
+
+- operation: CourseDiscipline.connect
+- operation: CourseDiscipline.disconnect
+
+- operation: CourseSubject.connect
+- operation: CourseSubject.disconnect
+
+- operation: UserOnPrendusAnalytics.connect
+- operation: UserOnPrendusAnalytics.disconnect
+
+- operation: UserVariablesOnQuestionResponse.connect
+- operation: UserVariablesOnQuestionResponse.disconnect
+
+- operation: ScoresOnQuestionResponseRating.connect
+- operation: ScoresOnQuestionResponseRating.disconnect
+
+- operation: AuthorOnQuestionResponse.connect
+- operation: AuthorOnQuestionResponse.disconnect
+
+- operation: CoursePurchased.connect
+- operation: CoursePurchased.disconnect
+
+- operation: UserPurchases.connect
+- operation: UserPurchases.disconnect
+
+- operation: UserRadiosOnQuestionResponse.connect
+- operation: UserRadiosOnQuestionResponse.disconnect
+
+- operation: QuestionOnQuestionResponse.connect
+- operation: QuestionOnQuestionResponse.disconnect
+
+- operation: UserChecksOnQuestionResponse.connect
+- operation: UserChecksOnQuestionResponse.disconnect
+
+- operation: ImagesOnQuestions.connect
+- operation: ImagesOnQuestions.disconnect
+
+- operation: RaterOnQuestionResponseRating.connect
+- operation: RaterOnQuestionResponseRating.disconnect
+
+- operation: UserInputsOnQuestionResponse.connect
+- operation: UserInputsOnQuestionResponse.disconnect
+
+- operation: RatingsOnQuestionResponse.connect
+- operation: RatingsOnQuestionResponse.disconnect
+
+- operation: UserEssaysOnQuestionResponse.connect
+- operation: UserEssaysOnQuestionResponse.disconnect
+
+- operation: ScoresOnQuestionRating.connect
+- operation: ScoresOnQuestionRating.disconnect
+
+- operation: FlagOnQuestion.connect
+- operation: FlagOnQuestion.disconnect

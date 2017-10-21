@@ -7,8 +7,8 @@ import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-servic
 
 export async function LTIPassback(userToken: string, userId: string, assignmentId: string, assignmentType: string, ltiSessionIdJWT: string): SetPropertyAction {
     const data = await GQLRequest(`
-        mutation($jwt: String!) {
-          assignmentLTIGrade(ltiSessionIdJWT: $jwt) {
+        mutation($ltiSessionIdJWT: String!) {
+          assignmentLTIGrade(ltiSessionIdJWT: $ltiSessionIdJWT) {
             success
           }
         }

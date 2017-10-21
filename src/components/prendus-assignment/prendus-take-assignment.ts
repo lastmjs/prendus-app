@@ -81,7 +81,9 @@ class PrendusTakeAssignment extends Polymer.Element {
       }
       catch(error) {
           this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-          await this.gradePassback();
+          setTimeout(() => {
+              this.gradePassback();
+          }, 5000);
       }
   }
 
