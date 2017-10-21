@@ -3,18 +3,22 @@ import {setNotification} from '../redux/actions';
 import {SetPropertyAction} from '../typings/actions';
 import {getPrendusLTIServerOrigin} from '../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType, ContextType, VerbType, ObjectType} from './constants-service';
+import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-service';
 
-export async function LTIPassback(userToken: string, userId: string, assignmentId: string, assignmentType: string): SetPropertyAction {
-  const LTIResponse = await window.fetch(`${getPrendusLTIServerOrigin()}/lti/grade-passback`, {
-    method: 'post',
-    mode: 'no-cors',
-    credentials: 'include'
-  });
+export async function LTIPassback(userToken: string, userId: string, assignmentId: string, assignmentType: string, ltiSessionIdJWT: string): SetPropertyAction {
+    const data = await GQLRequest(`
+        mutation($ltiSessionIdJWT: String!) {
+          assignmentLTIGrade(ltiSessionIdJWT: $ltiSessionIdJWT) {
+            success
+          }
+        }
+    `, {
+        ltiSessionIdJWT
+    }, userToken, (error: any) => {
+        throw error;
+    });
 
-  if (LTIResponse.ok === true) {
+  if (data.assignmentLTIGrade.success === true) {
     sendStatement(userToken, userId, assignmentId, ContextType.ASSIGNMENT, VerbType.SUBMITTED, assignmentType);
-    return setNotification('Assignment submitted', NotificationType.SUCCESS);
-  } else {
-    return setNotification('LTI error', NotificationType.ERROR);
-  };
+  }
 }

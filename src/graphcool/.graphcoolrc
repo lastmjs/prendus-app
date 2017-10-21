@@ -1,3 +1,6 @@
-default: dev
-environments:
-  dev: cj8dlzxgn0oyr0144574u2ivb
+targets:
+  production: shared-eu-west-1/cj48qaw2u6uyd01411y8gj8fr
+  development: shared-eu-west-1/cj8dlzxgn0oyr0144574u2ivb
+  default: development
+clusters:
+  default: shared-eu-west-1

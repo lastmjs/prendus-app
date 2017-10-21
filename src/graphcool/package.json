@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "graphcool-lib": "0.0.3",
+    "ims-lti": "^3.0.2",
+    "jsonwebtoken": "^8.1.0",
+    "mailgun-js": "^0.13.1",
+    "stripe": "^5.1.1",
+    "validator": "^9.0.0"
+  }
+}
