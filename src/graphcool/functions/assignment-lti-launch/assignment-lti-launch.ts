@@ -73,7 +73,6 @@ export default async (event: any) => {
 };
 
 async function createLTISession(api: any, ltiProvider: any, ltiUserId: string): Promise<string> {
-    console.log('ltiProvider.outcome_service', ltiProvider.outcome_service);
     const outcomeServiceJSON = jsonifyOutcomeService(ltiProvider.outcome_service);
     const data = await api.request(`
         mutation($ltiUserId: String!, $serializedOutcomeService: Json!) {
@@ -93,7 +92,7 @@ async function createLTISession(api: any, ltiProvider: any, ltiUserId: string): 
 }
 
 function jsonifyOutcomeService(outcomeService: any): OutcomeServiceJSON | NullOutcomeServiceJSON {
-    if (!outcomeService) {
+    if (!outcomeService.service_url) {
         return {
             outcomeService: null
         };
