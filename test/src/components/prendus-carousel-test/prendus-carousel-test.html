@@ -5,7 +5,13 @@
 <dom-module id="prendus-carousel-test">
 
   <template>
-    <redux-store root-reducer="[[rootReducer]]" store-name="CAROUSEL" action="[[action]]"></redux-store>
+    <redux-store
+      root-reducer="[[rootReducer]]"
+      store-name="CAROUSEL"
+      action="[[action]]"
+      on-statechange="stateChange"
+    ></redux-store>
+
   </template>
 
   <script type="module" src="prendus-carousel-test.ts"></script>

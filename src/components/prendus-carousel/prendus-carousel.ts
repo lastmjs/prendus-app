@@ -4,7 +4,7 @@ import {
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {SetComponentPropertyAction} from '../../typings/index.d';
 
-class PrendusCarousel extends Polymer.Element {
+export class PrendusCarousel extends Polymer.Element {
   action: SetComponentPropertyAction;
   componentId: string;
   data: any[];
@@ -32,6 +32,10 @@ class PrendusCarousel extends Polymer.Element {
         type: Number,
         value: 0
       },
+      current: {
+        type: Object,
+        notify: true
+      },
       nextText: {
         type: String,
         value: 'Next'
@@ -51,6 +55,7 @@ class PrendusCarousel extends Polymer.Element {
       finished: {
         type: Boolean,
         computed: '_computeFinished(data, currentIndex)'
+        notify: true
       }
     }
   }
@@ -69,32 +74,28 @@ class PrendusCarousel extends Polymer.Element {
     return !data || !data.length || currentIndex === data.length - 1;
   }
 
-  _initCarousel(data: any[]) {
+  _initCarousel(data: any[], old) {
     this.action = fireLocalAction(this.componentId, 'currentIndex', 0);
-    this._notifyNextData(data.length ? data[0] : null);
+    this.action = fireLocalAction(this.componentId, 'current', data[0]);
   }
 
   _plusOne(num: number): number {
     return num + 1;
   }
 
-  nextData() {
-    if (this.currentIndex < this.data.length) {
+  next() {
+    if (!this.finished) {
       const index = this.currentIndex + 1;
       this.action = fireLocalAction(this.componentId, 'currentIndex', index);
-      if (index < this.data.length)
-        this._notifyNextData(this.data[index]);
-      else {
-        this._notifyNextData(null);
-      }
+      this.action = fireLocalAction(this.componentId, 'current', this.data[index]);
     }
   }
 
-  previousData() {
+  previous() {
     if (this.currentIndex > 0) {
       const index = this.currentIndex - 1;
       this.action = fireLocalAction(this.componentId, 'currentIndex', index);
-      this._notifyNextQuestion(this.data[index]);
+      this.action = fireLocalAction(this.componentId, 'current', this.data[index]);
     }
   }
 
@@ -103,14 +104,7 @@ class PrendusCarousel extends Polymer.Element {
   }
 
   _notifyNext() {
-    this.dispatchEvent(new CustomEvent('carousel-next', {composed: true}));
-  }
-
-  _notifyNextData(data: any) {
-    const evt = new CustomEvent('carousel-data', {
-      detail: {data}
-    });
-    this.dispatchEvent(evt);
+    this.dispatchEvent(new CustomEvent('carousel-next'));
   }
 
   stateChange(e: CustomEvent) {

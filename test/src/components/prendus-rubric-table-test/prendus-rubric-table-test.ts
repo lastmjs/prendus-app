@@ -5,6 +5,7 @@ class PrendusRubricTableTest extends Polymer.Element {
   static get is() { return 'prendus-rubric-table-test' }
 
   constructor() {
+    super();
     this.rootReducer = RootReducer;
   }
 

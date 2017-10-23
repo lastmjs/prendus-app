@@ -5,6 +5,7 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
   static get is() { return 'prendus-review-assignment-test' }
 
   constructor() {
+    super();
     this.rootReducer = RootReducer;
   }
 
