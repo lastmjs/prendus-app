@@ -22,6 +22,10 @@ class PrendusRubricDropdowns extends Polymer.Element {
       rubric: {
         type: Object,
         observer: '_initScores'
+      },
+      scores: {
+        type: Array,
+        notify: true
       }
     }
   }
@@ -39,7 +43,7 @@ class PrendusRubricDropdowns extends Polymer.Element {
   resetDropdowns() {
     const dropdowns = this.shadowRoot.querySelectorAll('paper-dropdown-menu paper-listbox');
     if (!dropdowns) return;
-    Array.from(dropdowns).forEach(dropdown => {
+    dropdowns.forEach(dropdown => {
       dropdown.selected = null;
     });
   }
@@ -48,7 +52,6 @@ class PrendusRubricDropdowns extends Polymer.Element {
     this.resetDropdowns();
     const scores = Object.keys(rubric || {}).map(resetScores);
     this.action = fireLocalAction(this.componentId, 'scores', scores);
-    this._notify(scores);
   }
 
   _categories(rubric: Rubric): string[] {
@@ -70,16 +73,10 @@ class PrendusRubricDropdowns extends Polymer.Element {
     const { points } = this.rubric[category][option];
     const newScores = this.scores.map(scoreCategory(category, Number(points)));
     this.action = fireLocalAction(this.componentId, 'scores', newScores);
-    this._notify(newScores);
   }
 
-  _notify(scores: object) {
-    const evt = new CustomEvent('scores-changed', {detail: {scores}});
-    this.dispatchEvent(evt);
-  }
-
-  categoryId(category: string, option: string): string {
-    return category.replace(/\s/g, '-') + option.replace(/\s/g, '-');
+  categoryId(categoryIndex: number, optionIndex: number): string {
+    return `category${categoryIndex}${optionIndex}`;
   }
 
   stateChange(e: CustomEvent) {

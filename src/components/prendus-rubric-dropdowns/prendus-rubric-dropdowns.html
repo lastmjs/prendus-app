@@ -29,9 +29,9 @@
         <template>
           <paper-dropdown-menu class="flex-item" label="[[category]]">
             <paper-listbox slot="dropdown-content">
-              <dom-repeat items="[[_options(rubric, category)]]" as="option">
+              <dom-repeat items="[[_options(rubric, category)]]" as="option" index-as="optionIndex">
                 <template>
-                  <paper-item id="[[categoryId(category, option)]]" on-click="_scoreCategory">[[option]]</paper-item>
+                  <paper-item id="[[categoryId(index, optionIndex)]]" category="[[category]]" on-click="_scoreCategory">[[option]]</paper-item>
                 </template>
               </dom-repeat>
             </paper-listbox>
@@ -40,9 +40,9 @@
       </dom-repeat>
       <dom-repeat items="[[_categories(rubric)]]" as="category">
         <template>
-          <dom-repeat items="[[_options(rubric, category)]]" as="option">
+          <dom-repeat items="[[_options(rubric, category)]]" as="option" index-as="optionIndex">
             <template>
-              <paper-tooltip for="[[categoryId(category, option)]]" animation-delay="300">[[_description(rubric, category, option)]]</paper-tooltip>
+              <paper-tooltip for="[[categoryId(index, optionIndex)]]" animation-delay="300">[[_description(rubric, category, option)]]</paper-tooltip>
             </template>
           </dom-repeat>
         </template>

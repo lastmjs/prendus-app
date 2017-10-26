@@ -4,7 +4,7 @@ import {
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {SetComponentPropertyAction} from '../../typings/index.d';
 
-export class PrendusCarousel extends Polymer.Element {
+class PrendusCarousel extends Polymer.Element {
   action: SetComponentPropertyAction;
   componentId: string;
   items: any[];

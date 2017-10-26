@@ -10,3 +10,5 @@ export const getListener = (eventName: string, element: HTMLElment): Promise => 
   element.addEventListener(eventName, listener);
   return promise;
 };
+
+export const randomIndex = (l: number): number => Math.round((l - 1) * Math.random());
