@@ -3,10 +3,10 @@ const fromEvent = require('graphcool-lib').fromEvent;
 const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10;
 
-module.exports = function(event) {
+export default async (event) => {
     if (!event.context.graphcool.pat) {
         console.log('Please provide a valid root token!')
-        return { error: 'Request Password Reset not configured correctly.'}
+        return { error: 'reset-password not configured correctly.'}
     }
 
     const graphcool = fromEvent(event);
@@ -39,7 +39,7 @@ module.exports = function(event) {
                     error
                 };
             });
-};
+}
 
 function getUserInfo(api, email) {
     return api.request(`

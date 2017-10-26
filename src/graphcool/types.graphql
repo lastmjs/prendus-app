@@ -1,4 +1,4 @@
-type File implements Node {
+type File @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -10,7 +10,7 @@ type File implements Node {
   question: Question @relation(name: "ImagesOnQuestions")
 }
 
-type User implements Node {
+type User @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -30,7 +30,7 @@ type User implements Node {
   purchases: [Purchase!]! @relation(name: "UserPurchases")
 }
 
-type Course implements Node {
+type Course @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -46,7 +46,7 @@ type Course implements Node {
   purchases: [Purchase!]! @relation(name: "CoursePurchased")
 }
 
-type Assignment implements Node {
+type Assignment @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -63,7 +63,7 @@ type Assignment implements Node {
   numGradeResponses: Int! @defaultValue(value: 3)
 }
 
-type Quiz implements Node {
+type Quiz @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -73,7 +73,7 @@ type Quiz implements Node {
   assignment: Assignment @relation(name: "AssignmentOnQuiz")
 }
 
-type Question implements Node {
+type Question @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -93,7 +93,7 @@ type Question implements Node {
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
 }
 
-type QuestionFlag implements Node {
+type QuestionFlag @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -101,7 +101,7 @@ type QuestionFlag implements Node {
   comment: String!
 }
 
-type QuestionResponse implements Node {
+type QuestionResponse @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -115,7 +115,7 @@ type QuestionResponse implements Node {
   question: Question! @relation(name: "QuestionOnQuestionResponse")
 }
 
-type UserEssay implements Node {
+type UserEssay @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -124,7 +124,7 @@ type UserEssay implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserEssaysOnQuestionResponse")
 }
 
-type UserVariable implements Node {
+type UserVariable @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -133,7 +133,7 @@ type UserVariable implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserVariablesOnQuestionResponse")
 }
 
-type UserInput implements Node {
+type UserInput @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -142,7 +142,7 @@ type UserInput implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserInputsOnQuestionResponse")
 }
 
-type UserCheck implements Node {
+type UserCheck @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -151,7 +151,7 @@ type UserCheck implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserChecksOnQuestionResponse")
 }
 
-type UserRadio implements Node {
+type UserRadio @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -160,7 +160,7 @@ type UserRadio implements Node {
   questionResponse: QuestionResponse! @relation(name: "UserRadiosOnQuestionResponse")
 }
 
-type QuestionRating implements Node {
+type QuestionRating @model {
   id: ID! @isUnique
   scores: [CategoryScore!]! @relation(name: "ScoresOnQuestionRating")
   rater: User! @relation(name: "RaterOnQuestionRating")
@@ -170,7 +170,7 @@ type QuestionRating implements Node {
   updatedAt: DateTime!
 }
 
-type QuestionResponseRating implements Node {
+type QuestionResponseRating @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -179,7 +179,7 @@ type QuestionResponseRating implements Node {
   questionResponse: QuestionResponse! @relation(name: "RatingsOnQuestionResponse")
 }
 
-type CategoryScore implements Node {
+type CategoryScore @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -189,7 +189,7 @@ type CategoryScore implements Node {
   questionResponseRating: QuestionResponseRating @relation(name: "ScoresOnQuestionResponseRating")
 }
 
-type AnswerComment implements Node {
+type AnswerComment @model {
   id: ID! @isUnique
   text: String!
   createdAt: DateTime!
@@ -197,7 +197,7 @@ type AnswerComment implements Node {
   question: Question! @relation(name: "QuestionOnAnswerComment")
 }
 
-type Discipline implements Node {
+type Discipline @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -207,7 +207,7 @@ type Discipline implements Node {
   approved: PrendusApproved! @defaultValue(value: TBD)
 }
 
-type Subject implements Node {
+type Subject @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -218,7 +218,7 @@ type Subject implements Node {
   courses: [Course!]! @relation(name: "CourseSubject")
 }
 
-type Concept implements Node {
+type Concept @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -228,7 +228,7 @@ type Concept implements Node {
   questions: [Question!]! @relation(name: "ConceptOnQuestion")
 }
 
-type LTIUser implements Node {
+type LTIUser @model {
   id: ID! @isUnique
   ltiUserId: String! @isUnique
   createdAt: DateTime!
@@ -237,7 +237,7 @@ type LTIUser implements Node {
   lisPersonContactEmailPrimary: String!
 }
 
-type PrendusAnalytics implements Node {
+type PrendusAnalytics @model {
   user: User @relation(name: "UserOnPrendusAnalytics")
   contextId: String!
   contextType: ContextType!
@@ -248,7 +248,7 @@ type PrendusAnalytics implements Node {
   updatedAt: DateTime!
 }
 
-type Purchase implements Node {
+type Purchase @model {
   id: ID! @isUnique
   user: User! @relation(name: "UserPurchases")
   amount: Int!
@@ -256,6 +256,14 @@ type Purchase implements Node {
   updatedAt: DateTime!
   course: Course @relation(name: "CoursePurchased")
   stripeTokenId: String!
+}
+
+type LTISession @model {
+    id: ID! @isUnique
+    ltiUserId: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    serializedOutcomeService: Json!
 }
 
 enum UserRole {
