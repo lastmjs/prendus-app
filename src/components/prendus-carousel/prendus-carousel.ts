@@ -107,7 +107,11 @@ class PrendusCarousel extends Polymer.Element {
   }
 
   _notifyNext() {
-    this.dispatchEvent(new CustomEvent('carousel-next'));
+    this.dispatchEvent(new CustomEvent('next'));
+  }
+
+  _notifyPrevious() {
+    this.dispatchEvent(new CustomEvent('previous'));
   }
 
   stateChange(e: CustomEvent) {

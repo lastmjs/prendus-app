@@ -121,7 +121,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     try {
       validate(this.evaluationRubric, this.ratings);
       await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
-      this.shadowRoot.querySelector('#carousel').nextData();
+      this.shadowRoot.querySelector('#carousel').next();
     } catch (err) {
       this.action = setNotification(err.message, NotificationType.ERROR);
     }

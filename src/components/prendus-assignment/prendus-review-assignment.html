@@ -26,7 +26,7 @@
     <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
 
     <div hidden$="[[!loaded]]">
-      <prendus-carousel id="carousel" hide-back next-text="Submit" data="[[questions]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextQuestion">
+      <prendus-carousel id="carousel" hide-back next-text="Submit" items="[[questions]]" on-next="_handleNextRequest" on-item-changed="_handleNextQuestion">
         <div hidden$="[[!question]]">
           <div>
             <h3>Concept</h3>
