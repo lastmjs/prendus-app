@@ -179,6 +179,9 @@ async function getUser(email: string, password: string, userToken: string | null
               id
               title
             }
+            ownedQuestions{
+              id
+            }
         }
       }
     `, {email}, userToken, (error: any) => {

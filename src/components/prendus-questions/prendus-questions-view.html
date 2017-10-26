@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+
+
+<dom-module id="prendus-questions-view">
+  <style>
+    :host {
+      display: block;
+    }
+    iron-list {
+      height: 100vh; /* don't use % values unless the parent element is sized. */
+    }
+  </style>
+    <template>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+      <dom-if if="[[loaded]]">
+          <template>
+            <!-- Need to get an iron list working.  -->
+            <dom-repeat items="[[questionIds]]">
+              <template>
+                <prendus-view-question  question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
+                [[item]]
+              </template>
+            </dom-repeat>
+            <p>Hello World</p>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-questions-view.ts"></script>
+</dom-module>

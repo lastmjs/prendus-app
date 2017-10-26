@@ -3,13 +3,10 @@ import {fireLocalAction, navigate} from '../../node_modules/prendus-shared/servi
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 
-class PrendusNavbar extends Polymer.Element {
-    static get is() { return 'prendus-navbar'; }
+class PrendusMenu extends Polymer.Element {
+    static get is() { return 'prendus-menu'; }
     static get properties() {
 
-    }
-    toggleDrawer(e: Event){
-      this.shadowRoot.querySelector('#drawer').toggle();
     }
 
     stateChange(e: CustomEvent) {
@@ -22,4 +19,4 @@ class PrendusNavbar extends Polymer.Element {
     }
 }
 
-window.customElements.define(PrendusNavbar.is, PrendusNavbar);
+window.customElements.define(PrendusMenu.is, PrendusMenu);
