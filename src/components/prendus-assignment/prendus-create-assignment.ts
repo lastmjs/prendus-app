@@ -1,5 +1,5 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
@@ -61,7 +61,20 @@ class PrendusCreateAssignment extends Polymer.Element {
     else //subsequent rounds mean a question was created
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.CREATED, ObjectType.CREATE);
     if (!data) //last round
-      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE);
+        this.gradePassback();
+  }
+
+  async gradePassback() {
+      try {
+          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
+          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+      }
+      catch(error) {
+          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+          setTimeout(() => {
+              this.gradePassback();
+          }, 5000);
+      }
   }
 
   async _handleQuestion(e: CustomEvent) {
