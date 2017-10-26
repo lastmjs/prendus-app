@@ -129,18 +129,18 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _handleNextQuestion(e: CustomEvent) {
-    const { data } = e.detail;
-    this.action = fireLocalAction(this.componentId, 'question', data);
-    if (data && data === this.questions[0])
+    const question = e.detail.value;
+    this.action = fireLocalAction(this.componentId, 'question', question);
+    if (question && question === this.questions[0])
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
     else
       sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (!data && this.questions.length)
+    if (!question && this.questions.length)
       LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
   }
 
   _handleRatings(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.scores);
+    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
   }
 
   stateChange(e: CustomEvent) {

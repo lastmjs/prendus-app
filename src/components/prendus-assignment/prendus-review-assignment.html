@@ -40,7 +40,7 @@
             <br>
             <div hidden$="[[!essayType]]">
                 <h3>Grading Rubric</h3>
-                <prendus-rubric-table rubric="[[gradingRubric]]"></prendus-rubric-table>
+                <prendus-rubric-table init="[[gradingRubric]]"></prendus-rubric-table>
             </div>
             <br>
             <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>

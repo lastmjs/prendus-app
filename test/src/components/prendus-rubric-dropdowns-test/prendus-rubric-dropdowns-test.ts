@@ -45,12 +45,13 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
 
 function testDropdownsScoring(dropdowns, rubric: Rubric) {
   return async _ => {
-    const fakeEvent = getFakeEvent(rubric);
-    const event = fakeEvent
+    const category = randomCategory(rubric);
+    const option = randomOption(rubric, category);
+    const event = category && option
       ? getListener(SCORES_CHANGED, dropdowns)
       : Promise.resolve();
-    const scores = getExpected(dropdowns.scores, rubric, fakeEvent);
-    if (fakeEvent) dropdowns._scoreCategory(fakeEvent);
+    const scores = getExpected(dropdowns.scores, rubric, category, option);
+    scoreCategory(dropdowns, rubric, category, option);
     await event;
     return verifyDropdowns(scores, dropdowns);
   }
@@ -73,38 +74,37 @@ function initialScores(rubric: Rubric): CategoryScore[] {
   )
 }
 
-function getFakeEvent(rubric: Rubric): object {
+function randomCategory(rubric: Rubric): string {
   const categories = Object.keys(rubric);
-  const category = categories.length
+  return categories.length
     ? categories[randomIndex(categories.length)]
     : null;
-  if (!category) return null;
-  const options = Object.keys(rubric[category]);
-  const option = options.length
-    ? options[randomIndex(options.length)]
-    : null;
-  if (!option) return null;
-  const fakeEvent = {
-    model: {
-      category,
-      option
-    }
-  };
-  return fakeEvent;
 }
 
+function randomOption(rubric: Rubric, category: string): string {
+  if (!category) return null;
+  const options = Object.keys(rubric[category]);
+  return options.length
+    ? options[randomIndex(options.length)]
+    : null;
+}
 
-function getExpected(scores: CategoryScore[], rubric: Rubric, event: object): CategoryScore[] {
-  if (!event) return scores;
-  const {
-    category,
-    option
-  } = event.model;
+function getExpected(scores: CategoryScore[], rubric: Rubric, category: string, option: string): CategoryScore[] {
+  if (!category || !option) return scores;
   const newScores = [...scores];
   const i = newScores.findIndex(score => score.category === category);
   const points = rubric[category][option].points;
   newScores[i].score = points;
   return scores;
+}
+
+function scoreCategory(dropdowns, rubric: Rubric, category: string, option: string) {
+  if (!category || !option) return;
+  const categoryIndex = Object.keys(rubric).findIndex(_category => _category === category);
+  const optionIndex = Object.keys(rubric[category]).findIndex(_option => _option === option);
+  const categoryElement = dropdowns.shadowRoot.querySelectorAll('paper-dropdown-menu').item(categoryIndex);
+  const optionElement = categoryElement.querySelectorAll('paper-item').item(optionIndex);
+  optionElement.click();
 }
 
 window.customElements.define(PrendusRubricDropdownsTest.is, PrendusRubricDropdownsTest);
