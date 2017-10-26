@@ -1,6 +1,5 @@
 import {
   createUUID,
-  fireLocalAction,
   asyncMap
 } from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 import {RootReducer} from '../../../../src/redux/reducers';
@@ -12,9 +11,11 @@ const dataArb = jsc.array(jsc.nat);
 
 const NEXT = 'next';
 const PREV = 'prev';
-const COMMANDS = [NEXT, PREV];
+const STAY = 'stay';
+const COMMANDS = [NEXT, PREV, STAY];
 
-const DATA_CHANGE = 'current-changed';
+const ITEMS_CHANGED = 'items-changed';
+const ITEM_CHANGED = 'item-changed';
 const FINISHED = 'finished-changed';
 
 class PrendusCarouselTest extends Polymer.Element {
@@ -27,47 +28,35 @@ class PrendusCarouselTest extends Polymer.Element {
     this.rootReducer = RootReducer;
   }
 
-  getCarousel() {
-    const carousel = new PrendusCarousel();
-    this.shadowRoot.appendChild(carousel);
-    return carousel;
-  }
-
   prepareTests(test) {
 
-    test('Carousel takes array next and previous commands', [jsc.nonshrink(dataArb)], async (data: number[]) => {
-      const carousel = this.getCarousel();
-      this.carousel = carousel;
-      const setup = getListener(DATA_CHANGE, carousel);
-      carousel.data = data;
+    test('Carousel takes array next and previous commands', [dataArb], async (data: number[]) => {
+      const carousel = this.shadowRoot.querySelector('prendus-carousel');
+      const setup = getListener(ITEMS_CHANGED, carousel)
+      carousel.items = data;
       await setup;
-      const initial = { index: 0, data: data[0], finished: !data.length };
-      if (!verifyCarousel(initial, carousel))
+      const initial = { index: 0, item: data[0], finished: !data.length };
+      if (!verifyCarousel(initial, carousel)) {
         return false;
-      const iterations = await asyncMap(data, async _ => {
+      }
+      const iterations = (new Array(100)).fill(0); //Just an array to pass to asyncMap for convenience
+      const results = await asyncMap(iterations, async _ => {
         const command = randomCommand();
         const expected = getExpected(carousel, command);
         const event = getEvent(carousel, command);
         executeCommand(carousel, command);
         await event;
         const success = verifyCarousel(expected, carousel);
-        if (!success) console.log(expected.index, expected.data, carousel.currentIndex, carousel.current, data);
         return success;
       });
-      return iterations.reduce((success, nextCase) => success && nextCase, true);
+      return results.reduce((success, nextCase) => success && nextCase, true);
     });
-  }
-
-  stateChange(e: CustomEvent) {
-    const { state } = e.detail;
-    const componentState = state.components[this.componentId] || {};
-    this.carousel = componentState.carousel;
   }
 }
 
 function verifyCarousel(expect, carousel): boolean {
-  return carousel.currentIndex === expect.index
-    && carousel.current === expect.data
+  return carousel.index === expect.index
+    && carousel.item === expect.item
     && carousel.finished === expect.finished;
 }
 
@@ -93,38 +82,47 @@ function executeCommand(carousel, command) {
 }
 
 function getEvent(carousel, command) {
-  const index = carousel.currentIndex;
-  const data = carousel.data;
+  const index = carousel.index;
+  const items = carousel.items;
   switch (command) {
     case NEXT:
-      return index < data.length - 1
-        ? getListener(DATA_CHANGE, carousel)
-        : getListener(FINISHED, carousel);
+      return items[index] === items[index + 1]
+        ? Promise.resolve()
+        : getListener(ITEM_CHANGED, carousel);
     case PREV:
-      return index
-        ? getListener(DATA_CHANGE, carousel)
-        : Promise.resolve();
+      return !index || items[index] === items[index - 1]
+        ? Promise.resolve()
+        : getListener(ITEM_CHANGED, carousel);
     default:
       return Promise.resolve();
   }
 }
 
 function getExpected(carousel, command) {
-  const index = carousel.currentIndex;
-  const data = carousel.data;
+  const index = carousel.index;
+  const items = carousel.items;
+  const item = carousel.item;
+  const finished = carousel.finished;
+  const currentState = { index, item, finished };
   switch (command) {
     case NEXT:
-      return index < data.length - 1
-        ? { index: index + 1, data: data[index + 1], finished: false }
-        : { index, data: data[index], finished: true };
-      return ;
+      return carousel.finished
+        ? currentState
+        : {
+          index: index + 1,
+          item: items[index + 1],
+          finished: index + 1 === items.length
+        };
     case PREV:
-      carousel.previous();
-      return carousel.currentIndex
-        ? { index: index - 1, data: data[index - 1], finished: false }
-        : { index, data: data[index], finished: false };
+      return !index
+        ? currentState
+        : {
+          index: index - 1,
+          item: items[index - 1],
+          finished: false
+        };
     default:
-      return {};
+      return currentState;
   }
 }
 

@@ -7,32 +7,34 @@ import {SetComponentPropertyAction} from '../../typings/index.d';
 export class PrendusCarousel extends Polymer.Element {
   action: SetComponentPropertyAction;
   componentId: string;
-  data: any[];
+  items: any[];
+  item: any;
+  index: number;
   label: string;
-  currentIndex: number;
   nextText: string;
   backText: string;
   hideBack: boolean;
   hideNext: boolean;
-  finished: boolean = false;
+  finished: boolean;
 
   static get is() { return 'prendus-carousel' }
 
   static get properties() {
     return {
-      data: {
+      items: {
         type: Array,
+        notify: true,
         observer: '_initCarousel'
       },
       label: {
         type: String,
         value: 'Question'
       }
-      currentIndex: {
+      index: {
         type: Number,
         value: 0
       },
-      current: {
+      item: {
         type: Object,
         notify: true
       },
@@ -54,7 +56,8 @@ export class PrendusCarousel extends Polymer.Element {
       },
       finished: {
         type: Boolean,
-        computed: '_computeFinished(data, currentIndex)'
+        value: false,
+        computed: '_computeFinished(items, index)'
         notify: true
       }
     }
@@ -70,13 +73,13 @@ export class PrendusCarousel extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  _computeFinished(data: any[], currentIndex: number): boolean {
-    return !data || !data.length || currentIndex === data.length - 1;
+  _computeFinished(items: any[], index: number): boolean {
+    return !items || index === items.length;
   }
 
-  _initCarousel(data: any[], old) {
-    this.action = fireLocalAction(this.componentId, 'currentIndex', 0);
-    this.action = fireLocalAction(this.componentId, 'current', data[0]);
+  _initCarousel(items: any[]) {
+    this.action = fireLocalAction(this.componentId, 'index', 0);
+    this.action = fireLocalAction(this.componentId, 'item', items[0]);
   }
 
   _plusOne(num: number): number {
@@ -85,17 +88,17 @@ export class PrendusCarousel extends Polymer.Element {
 
   next() {
     if (!this.finished) {
-      const index = this.currentIndex + 1;
-      this.action = fireLocalAction(this.componentId, 'currentIndex', index);
-      this.action = fireLocalAction(this.componentId, 'current', this.data[index]);
+      const index = this.index + 1;
+      this.action = fireLocalAction(this.componentId, 'index', index);
+      this.action = fireLocalAction(this.componentId, 'item', this.items[index]);
     }
   }
 
   previous() {
-    if (this.currentIndex > 0) {
-      const index = this.currentIndex - 1;
-      this.action = fireLocalAction(this.componentId, 'currentIndex', index);
-      this.action = fireLocalAction(this.componentId, 'current', this.data[index]);
+    if (this.index > 0) {
+      const index = this.index - 1;
+      this.action = fireLocalAction(this.componentId, 'index', index);
+      this.action = fireLocalAction(this.componentId, 'item', this.items[index]);
     }
   }
 
@@ -109,9 +112,9 @@ export class PrendusCarousel extends Polymer.Element {
 
   stateChange(e: CustomEvent) {
     const componentState = e.detail.state.components[this.componentId] || {};
-    this.currentIndex = componentState.currentIndex;
+    this.index = componentState.index;
     this.finished = componentState.finished;
-    this.current = componentState.current;
+    this.item = componentState.item;
   }
 }
 
