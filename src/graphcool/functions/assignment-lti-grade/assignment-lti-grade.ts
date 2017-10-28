@@ -43,6 +43,13 @@ async function getOutcomeService(api: any, ltiSessionId: string): Promise<object
         ltiSessionId
     });
 
+    //TODO temp solution, remove once the ltiSessionIdJWT can be deleted on the client
+    if (data.LTISession === null) {
+        console.log('LTISession does not exist, it was most likely deleted...this really should not happen, perhaps the ltiSessionIdJWT was not deleted properly from the client');
+        return null;
+    }
+    //TODO temp solution, remove once the ltiSessionIdJWT can be deleted on the client
+
     // the outcomeService property will be null if the LTI consumer has not setup grade passback
     if (data.LTISession.serializedOutcomeService.outcomeService === null) {
         return null;
@@ -66,6 +73,13 @@ async function deleteLTISession(api: any, ltiSessionId: string): Promise<string>
     `, {
         ltiSessionId
     });
+
+    //TODO temp solution, remove once the ltiSessionIdJWT can be deleted on the client
+    if (data.deleteLTISession === null) {
+        console.log('LTISession does not exist, it was most likely deleted...this really should not happen, perhaps the ltiSessionIdJWT was not deleted properly from the client');
+        return null;
+    }
+    //TODO temp solution, remove once the ltiSessionIdJWT can be deleted on the client
 
     return data.deleteLTISession.id;
 }
