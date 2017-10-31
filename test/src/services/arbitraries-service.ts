@@ -2,7 +2,7 @@ import {DEFAULT_EVALUATION_RUBRIC} from '../../../src/services/constants-service
 
 const jsc = require('jsverify');
 
-const escapedString = jsc.asciinestring.smap(str => str.replace(/\\|"/, ''), str => str);
+export const escapedString = jsc.asciinestring.smap(str => str.replace(/\\|"/, ''), str => str);
 
 export type GQLArbitrary = {
   type: string,

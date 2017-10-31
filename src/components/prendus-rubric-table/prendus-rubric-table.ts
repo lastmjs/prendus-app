@@ -27,6 +27,10 @@ class PrendusRubricTable extends Polymer.Element {
         type: Object,
         observer: '_initCategories'
       },
+      categories: {
+        type: Array,
+        notify: true
+      },
       rubric: {
         type: Object,
         notify: true
@@ -50,8 +54,10 @@ class PrendusRubricTable extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'categories', [templateCategory()]);
       this.action = fireLocalAction(this.componentId, 'rubric', makeRubric([templateCategory()]));
     }
-    else
+    else {
       this.action = fireLocalAction(this.componentId, 'categories', categories);
+      this.action = fireLocalAction(this.componentId, 'rubric', init);
+    }
   }
 
   addCategory() {
@@ -63,6 +69,7 @@ class PrendusRubricTable extends Polymer.Element {
     if (!this.editable) return;
     const newCategories = this.categories.slice(0, this.categories.length - 1)
     this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' makeRubric(newCategories));
   }
 
   addScale(e: Event) {
@@ -83,6 +90,7 @@ class PrendusRubricTable extends Polymer.Element {
         : category
     );
     this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' makeRubric(newCategories));
   }
 
   setCategory(e: Event) {
@@ -91,6 +99,7 @@ class PrendusRubricTable extends Polymer.Element {
     newCategories[e.model.itemsIndex].name = e.target.value;
     this.action = fireLocalAction(this.componentId, 'categories', newCategories);
     this.action = fireLocalAction(this.componentId, 'rubric', makeRubric(newCategories));
+    console.log('setting categories');
   }
 
   setOptionProp(e: Event, prop) {

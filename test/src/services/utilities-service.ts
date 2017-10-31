@@ -11,4 +11,6 @@ export const getListener = (eventName: string, element: HTMLElment): Promise => 
   return promise;
 };
 
-export const randomIndex = (l: number): number => Math.round((l - 1) * Math.random());
+export const randomIndex = (l: number): number => l ? (Math.round((l - 1) * Math.random())) : -1;
+
+export const randomItem = (arr: any[]): any | null => arr.length ? arr[randomIndex(arr.length)] : null;

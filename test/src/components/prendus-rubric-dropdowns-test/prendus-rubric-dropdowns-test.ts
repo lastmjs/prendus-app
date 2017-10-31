@@ -7,7 +7,7 @@ import {
 import {RubricArb} from '../../services/arbitraries-service';
 import {
   getListener,
-  randomIndex
+  randomItem
 } from '../../services/utilities-service';
 
 const jsc = require('jsverify');
@@ -36,15 +36,16 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
       if (!verifyDropdownsReset(dropdowns))
         return false;
       const iterations = (new Array(100)).fill(0);
-      const results = await asyncMap(iterations, testDropdownsScoring(dropdowns, rubric));
+      const results = await asyncMap(iterations, testDropdownsScoring(dropdowns));
       return results.every(result => result);
     });
 
   }
 }
 
-function testDropdownsScoring(dropdowns, rubric: Rubric) {
+function testDropdownsScoring(dropdowns) {
   return async _ => {
+    const rubric: Rubric = dropdowns.rubric;
     const category = randomCategory(rubric);
     const option = randomOption(rubric, category);
     const event = category && option
@@ -74,19 +75,12 @@ function initialScores(rubric: Rubric): CategoryScore[] {
   )
 }
 
-function randomCategory(rubric: Rubric): string {
-  const categories = Object.keys(rubric);
-  return categories.length
-    ? categories[randomIndex(categories.length)]
-    : null;
+function randomCategory(rubric: Rubric): string | null {
+  return randomItem(Object.keys(rubric));
 }
 
-function randomOption(rubric: Rubric, category: string): string {
-  if (!category) return null;
-  const options = Object.keys(rubric[category]);
-  return options.length
-    ? options[randomIndex(options.length)]
-    : null;
+function randomOption(rubric: Rubric, category: string): string | null {
+  return category ? randomItem(Object.keys(rubric[category])) : null;
 }
 
 function getExpected(scores: CategoryScore[], rubric: Rubric, category: string, option: string): CategoryScore[] {
