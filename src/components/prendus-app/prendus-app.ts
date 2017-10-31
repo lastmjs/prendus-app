@@ -71,6 +71,7 @@ class PrendusApp extends Polymer.Element {
           return 'oerView';
         }
         if (signupRouteActive){
+          console.log('signup active')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'signupView';
@@ -256,8 +257,19 @@ class PrendusApp extends Polymer.Element {
     _isStudent(user: User): boolean {
       return user ? user.role === 'STUDENT' : true;
     }
-
+    averages(numbers:number[]):number[] {
+      const newNumbers = numbers.map((number, pos, numbers) => {
+        console.log(number);
+        console.log(pos);
+        console.log(numbers);
+        console.log((number + numbers[pos-1])/2);
+        const avgNum = (number + numbers[pos-1])/2;
+        return avgNum;
+      })
+      return newNumbers;
+    }
     logout() {
+      console.log('logout')
       if (this.userToken){
         this.action = removeUser();
         this.action = removeUserToken();

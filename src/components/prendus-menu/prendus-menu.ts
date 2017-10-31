@@ -1,12 +1,24 @@
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {fireLocalAction, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
+import {SetPropertyAction, DefaultAction} from '../../typings/actions';
+import {setNotification, checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
+import {User} from '../../typings/user';
 
 class PrendusMenu extends Polymer.Element {
-    static get is() { return 'prendus-menu'; }
-    static get properties() {
+    action: SetPropertyAction | DefaultAction;
+    user: User;
+    userToken: string;
+    componentId: string;
 
+    static get is() { return 'prendus-menu'; }
+
+    logout() {
+      if (this.userToken){
+        this.action = removeUser();
+        this.action = removeUserToken();
+        navigate(`/login`)
+      }
     }
 
     stateChange(e: CustomEvent) {

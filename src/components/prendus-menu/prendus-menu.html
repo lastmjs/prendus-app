@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 
 <dom-module id="prendus-menu">
@@ -16,11 +17,12 @@
     <style include="prendus-styles">
       app-drawer{
         top: 64px;
-        bottom: 64px;
+        /*Need this to be 0*/
+        bottom: 0;
       }
       #prendus-menu{
         /*This is because the app-drawer has padding of 120px. Annoying. Open to other ways to get rid of the padding*/
-        margin-top: -120px;
+        margin-top: -184px;
       }
       #prendus-menu  paper-item{
         cursor: pointer;
@@ -39,12 +41,34 @@
       #prendus-menu  paper-item:hover{
         color: var(--prendus-primary-color);
       }
+      #legal-links{
+        position: absolute;
+        bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
     </style>
 
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <app-drawer-layout>
       <app-drawer id="prendus-drawer" slot="drawer" align="right" fullbleed>
-        <paper-listbox id="prendus-menu">
+        <app-header id ="prendus-navbar" fixed>
+          <app-toolbar id="prendus-menu" sticky>
+            <dom-if if="[[user]]">
+              <template>
+                <span id="large-screen"><a class="prendus-button prendus-button--recommended navbar-text" on-click="logout">Log out</a></span>
+              </template>
+            </dom-if>
+            <dom-if if="[[!user]]">
+              <template>
+                <a class="prendus-button prendus-button--recommended navbar-text" href="signup">Signup</a>
+                <a class="prendus-button prendus-button--recommended navbar-text" href="login">Login</a>
+              </template>
+            </dom-if>
+            <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
+          <app-toolbar>
+        </app-header>
+        <paper-listbox >
           <paper-item><iron-icon icon="account-circle"></iron-icon>&nbsp; My Account</paper-item>
           <hr>
           <a href="/questions/view"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
@@ -53,9 +77,13 @@
           <hr>
           <a href="/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
           <hr>
-          <a class="prendus-button prendus-button--recommended navbar-text" on-click="logout">Log out</a>
-          <paper-icon-button icon="menu" on-click="narrowToggle"></paper-icon-button>
         </paper-listbox>
+        <div id="legal-links">
+          <!-- &copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span><br> -->&nbsp;&nbsp;&nbsp;
+          <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms</a>&nbsp;&nbsp;&nbsp;
+          <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>&nbsp;&nbsp;&nbsp;
+          <a href="/open-source">Licenses</a>
+        </div>
       </app-drawer>
     </app-drawer-layout>
   </template>

@@ -18,6 +18,10 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     confirmedPassword: string;
     signupButtonEnabled: boolean;
     user: User | null;
+    client: any;
+    index: any;
+    institution: string;
+    institutions: string[];
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -30,16 +34,60 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
     constructor() {
         super();
-
         this.componentId = createUUID();
     }
 
     connectedCallback() {
         super.connectedCallback();
+        this.client = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
+        this.index = this.client.initIndex('Institutions');
+        const data = this.index.search('Brigham', function(err: Error, content: any) {
+          console.log(content.hits);
+        });
+        const that = this;
+        this.index.search(
+          {
+            query: 'Brigham',
+            attributesToRetrieve: ['Name'],
+            hitsPerPage: 3,
+          },
+          function searchDone(err: Error, content: any) {
+            if (err) {
+              console.error(err);
+              return err;
+            }
+            const institutionNames = content.hits.map(hit => hit.Name);
+            that.institutions = institutionNames;
+            return institutionNames;
+          }
+        );
         this.action = fireLocalAction(this.componentId, "loaded", true)
         this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
     }
-
+    findInstitution(){
+      const institutionPartialName: string = this.shadowRoot.querySelector('#institution').value;
+      const that = this;
+      this.index.search(
+        {
+          query: institutionPartialName,
+          attributesToRetrieve: ['Name'],
+          hitsPerPage: 3,
+        },
+        function searchDone(err: Error, content: any) {
+          if (err) {
+            console.error(err);
+            return err;
+          }
+          const institutionNames = content.hits.map(hit => hit.Name);
+          that.institutions = institutionNames;
+          return institutionNames;
+        }
+      );
+    }
+    setInstitution(e){
+      console.log('e.target', e.target.id)
+      this.action = fireLocalAction(this.componentId, "institution", e.target.id)
+    }
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
       if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
@@ -97,6 +145,8 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('password')) this.password = componentState.password;
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
         if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
+        if (keys.includes('institution')) this.institution = componentState.institution;
+        if (keys.includes('institutions')) this.institutions = componentState.institutions;
         this.user = state.user;
         this.userToken = state.userToken;
     }

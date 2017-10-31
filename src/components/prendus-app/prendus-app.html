@@ -1,3 +1,21 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Marketplace
+Explore
+ @bmackley
+ Sign out
+ Unwatch 2
+  Star 0  Fork 0 lastmjs/prendus-app Private
+ Code  Issues 0  Pull requests 5  Projects 0  Wiki  Insights
+Branch: ben-app-layout Find file Copy pathprendus-app/src/components/prendus-app/prendus-app.html
+8a57796  4 days ago
+ Ben Mackley working on the courses
+4 contributors @lastmjs @trevorhere @benjaminogles @bmackley
+RawBlameHistory
+217 lines (187 sloc)  19.3 KB
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
@@ -47,13 +65,11 @@
         .app-window-wide {
           max-width: 1200px;
         }
-
         .landing{
           max-width: 100%;
           margin:0;
           padding:0;
         }
-
   			.loading-spinner {
   				position: fixed;
   				left: calc(50% - 30px);
@@ -136,7 +152,12 @@
         <app-route route="[[route]]" pattern="/questions/view" data="{{viewQuestionsRouteData}}" active="{{viewQuestionsRouteActive}}"></app-route>
 
         <prendus-navbar></prendus-navbar>
-        <prendus-menu></prendus-menu>
+        <dom-if if="[[user]]">
+          <template>
+          <prendus-menu></prendus-menu>
+          </template>
+        </dom-if>
+
         <div id="main-content">
           <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive)]]">
 
@@ -199,11 +220,6 @@
 
           </iron-lazy-pages>
         </div>
-        <dom-if if="[[user]]">
-          <template>
-            <prendus-footer-main></prendus-footer-main>
-          </template>
-        </dom-if>
         <dom-if if="[[!user]]">
           <template>
             <prendus-footer-marketing></prendus-footer-marketing>
