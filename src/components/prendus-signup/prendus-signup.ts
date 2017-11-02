@@ -22,6 +22,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     index: any;
     institution: string;
     institutions: string[];
+    attributesToRetrieve: string[]
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -61,6 +62,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             return institutionNames;
           }
         );
+        this.action = fireLocalAction(this.componentId, "attributesToRetrieve", ['name'])
         this.action = fireLocalAction(this.componentId, "loaded", true)
         this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
     }
@@ -147,6 +149,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
         if (keys.includes('institution')) this.institution = componentState.institution;
         if (keys.includes('institutions')) this.institutions = componentState.institutions;
+        if (keys.includes('attributesToRetrieve')) this.attributesToRetrieve = componentState.attributesToRetrieve;
         this.user = state.user;
         this.userToken = state.userToken;
     }

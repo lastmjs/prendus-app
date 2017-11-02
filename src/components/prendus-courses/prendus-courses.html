@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
@@ -63,8 +65,8 @@
                 <paper-dialog id="add-course-modal" modal>
                   <div class="content">
                     <h2>Add Course</h2>
-                    <paper-input id="department" name="department" label="Department" maxlength="50" required auto-validate error-message="Please enter a department." autoFocus on-keydown="submitOnEnter"></paper-input>
-                    <paper-input id="number" name="number" label="Course Number" maxlength="50" required auto-validate error-message="Please enter a course number." autoFocus on-keydown="submitOnEnter"></paper-input>
+                    <paper-input id="department" name="department" label="Department" maxlength="50" on-keydown="findDisciplines" required auto-validate error-message="Please enter a department." autoFocus on-keydown="submitOnEnter"></paper-input>
+                    <paper-input id="courseNumber" name="courseNumber" label="Course Number" maxlength="50" required auto-validate error-message="Please enter a course number." autoFocus on-keydown="submitOnEnter"></paper-input>
                     <paper-input id="subject" name="subject" label="Subject" maxlength="50" required auto-validate error-message="Please enter a subject." autoFocus on-keydown="submitOnEnter"></paper-input>
                     <paper-input id="titleInput" name="title" label="Course Title" maxlength="50" required auto-validate error-message="Please enter a title." autoFocus on-keydown="submitOnEnter"></paper-input>
                   </div>

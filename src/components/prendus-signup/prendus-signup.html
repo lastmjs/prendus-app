@@ -12,6 +12,7 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html" >
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-search/prendus-search.html">
 
 <dom-module id="prendus-signup">
     <template>
@@ -43,6 +44,8 @@
                 <paper-input id="password" name="password" label="Password" type="password" required  minlength="6" on-focusout="hardValidatePassword" on-keyup="validatePassword" error-message="Please enter a password with at least 6 characters."></paper-input>
                 <paper-input id="confirm-password" name="confirm-password" label="Confirm Password" type="password" required minlength="6" on-focusout="hardValidateConfirmedPassword" on-keyup="validateConfirmedPassword" error-message="Passwords do not match."></paper-input>
                 <paper-input id="institution" name="institution" label="Institution" on-keydown="findInstitution" value="[[institution]]"></paper-input>
+                [[attributesToRetrieve]]
+                <prendus-search search-index="Ben" attributes-to-retrieve="[[attributesToRetrieve]]"></prendus-search>
                 <dom-repeat items="[[institutions]]">
                   <template>
                     <paper-item id="[[item]]" on-click="setInstitution">[[item]]</paper-item>
