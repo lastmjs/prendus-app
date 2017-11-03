@@ -24,45 +24,14 @@
     SOFTWARE.
 */
 
-const fromEvent = require('graphcool-lib').fromEvent
-const bcrypt = require('bcrypt')
-const validator = require('validator')
+const fromEvent = require('graphcool-lib').fromEvent;
+const bcrypt = require('bcrypt');
+const validator = require('validator');
 
-function getGraphcoolUser(api, email) {
-  return api.request(`
-    query {
-      User(email: "${email}") {
-        id
-      }
-    }`)
-    .then((userQueryResult) => {
-      if (userQueryResult.error) {
-        return Promise.reject(userQueryResult.error)
-      } else {
-        return userQueryResult.User
-      }
-    })
-}
-
-function createGraphcoolUser(api, email, passwordHash) {
-  return api.request(`
-    mutation {
-      createUser(
-        email: "${email}",
-        password: "${passwordHash}"
-      ) {
-        id
-      }
-    }`)
-    .then((userMutationResult) => {
-      return userMutationResult.createUser.id
-    })
-}
-
-module.exports = function(event) {
+export default async (event) => {
   if (!event.context.graphcool.pat) {
     console.log('Please provide a valid root token!')
-    return { error: 'Email Signup not configured correctly.'}
+    return { error: 'signup not configured correctly.'}
   }
 
   const email = event.data.email
@@ -96,4 +65,35 @@ module.exports = function(event) {
   } else {
     return { error: "Not a valid email" }
   }
+}
+
+function getGraphcoolUser(api, email) {
+  return api.request(`
+    query {
+      User(email: "${email}") {
+        id
+      }
+    }`)
+    .then((userQueryResult) => {
+      if (userQueryResult.error) {
+        return Promise.reject(userQueryResult.error)
+      } else {
+        return userQueryResult.User
+      }
+    })
+}
+
+function createGraphcoolUser(api, email, passwordHash) {
+  return api.request(`
+    mutation {
+      createUser(
+        email: "${email}",
+        password: "${passwordHash}"
+      ) {
+        id
+      }
+    }`)
+    .then((userMutationResult) => {
+      return userMutationResult.createUser.id
+    })
 }
