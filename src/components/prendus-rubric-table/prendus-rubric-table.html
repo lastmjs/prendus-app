@@ -80,13 +80,13 @@
         <template>
           <dom-repeat id="categories" items="[[categories]]" as="category">
             <template>
-              <div class="grid-row grid-outer-row">
-                <div class="grid-cell"><input class="category" type="text" placeholder="Category..." value="[[category.name]]" on-change="setCategory"></div>
+              <div class="grid-row grid-outer-row category">
+                <div class="grid-cell"><input class="category-name" type="text" placeholder="Category..." value="[[category.name]]" on-change="setCategory"></div>
                 <div class="grid">
                   <dom-repeat items="[[category.options]]" as="option">
                     <template>
-                      <div class="grid-row grid-inner-row">
-                        <div class="grid-cell"><input class="option" type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
+                      <div class="grid-row grid-inner-row option">
+                        <div class="grid-cell"><input class="option-name" type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
                         <div class="grid-cell"><input class="description" type="text" placeholder="Description..." value="[[option.description]]" on-change="setDescription"></div>
                         <div class="grid-cell"><input class="points" type="number" placeholder="Points..." value="[[option.points]]" min="0" on-change="setPoints"></div>
                       </div>
