@@ -71,7 +71,6 @@ class PrendusApp extends Polymer.Element {
           return 'oerView';
         }
         if (signupRouteActive){
-          console.log('signup active')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'signupView';
@@ -128,7 +127,6 @@ class PrendusApp extends Polymer.Element {
           return 'createAssignmentView';
         }
         if (demoAssignmentRouteActive){
-          console.log('assignment demo')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'assignmentDemoView';
@@ -258,7 +256,6 @@ class PrendusApp extends Polymer.Element {
       return user ? user.role === 'STUDENT' : true;
     }
     logout() {
-      console.log('logout')
       if (this.userToken){
         this.action = removeUser();
         this.action = removeUserToken();

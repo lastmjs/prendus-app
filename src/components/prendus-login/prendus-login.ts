@@ -98,6 +98,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           const password: string = this.shadowRoot.querySelector('#password').value;
           const data = await signinUser(email, password, this.userToken);
           if(!data.authenticateUser){
+            this.action = setNotification('No account found with that email and password combination', NotificationType.ERROR)
             this.action = fireLocalAction(this.componentId, 'loaded', true);
             return;
           }
@@ -163,7 +164,7 @@ async function signinUser(email: string, password: string, userToken: string | n
             }
         }
     `, {email, password}, userToken, (error: any) => {
-      error.message = "Password or email information incorrect"
+      error.message = "No account found with that email and password combination"
       throw error;
     });
     return data;

@@ -21,8 +21,10 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     client: any;
     index: any;
     institution: string;
+    institutionPartialName: string;
     institutions: string[];
     attributesToRetrieve: string[]
+    createInstitutionModalOpen: boolean;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -32,62 +34,41 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             }
         };
     }
-
     constructor() {
         super();
         this.componentId = createUUID();
     }
-
     connectedCallback() {
         super.connectedCallback();
-        this.client = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
-        this.index = this.client.initIndex('Institutions');
-        const data = this.index.search('Brigham', function(err: Error, content: any) {
-          console.log(content.hits);
-        });
-        const that = this;
-        this.index.search(
-          {
-            query: 'Brigham',
-            attributesToRetrieve: ['Name'],
-            hitsPerPage: 3,
-          },
-          function searchDone(err: Error, content: any) {
-            if (err) {
-              console.error(err);
-              return err;
-            }
-            const institutionNames = content.hits.map(hit => hit.Name);
-            that.institutions = institutionNames;
-            return institutionNames;
-          }
-        );
-        this.action = fireLocalAction(this.componentId, "attributesToRetrieve", ['name'])
-        this.action = fireLocalAction(this.componentId, "loaded", true)
-        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
+        this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", false);
+        this.action = fireLocalAction(this.componentId, "attributesToRetrieve", ['Name']);
+        this.action = fireLocalAction(this.componentId, "loaded", true);
+        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false);
+    }
+    openCreateInstitutionModal(e: any){
+      this.shadowRoot.querySelector('#create-institution-modal').open();
+      // this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", true);
+    }
+    closeCreateInstitutionModal(){
+      this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", false);
+    }
+    loadInstitutions(e: any){
+      //This is so that the autocomplete will function correctly.
+      const institutions = e.detail.results.map((result) => {
+        const institution = {
+          id: "id",
+          text: result.Name,
+          value: result. Name
+        }
+        return institution;
+      })
+      this.action = fireLocalAction(this.componentId, "institutions", institutions)
     }
     findInstitution(){
+      this.action = fireLocalAction(this.componentId, "institutionPartialName", this.shadowRoot.querySelector('#institution').shadowRoot.querySelector('#autocompleteInput').value)
       const institutionPartialName: string = this.shadowRoot.querySelector('#institution').value;
-      const that = this;
-      this.index.search(
-        {
-          query: institutionPartialName,
-          attributesToRetrieve: ['Name'],
-          hitsPerPage: 3,
-        },
-        function searchDone(err: Error, content: any) {
-          if (err) {
-            console.error(err);
-            return err;
-          }
-          const institutionNames = content.hits.map(hit => hit.Name);
-          that.institutions = institutionNames;
-          return institutionNames;
-        }
-      );
     }
     setInstitution(e){
-      console.log('e.target', e.target.id)
       this.action = fireLocalAction(this.componentId, "institution", e.target.id)
     }
     validateEmail(): void {
@@ -148,8 +129,10 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
         if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
         if (keys.includes('institution')) this.institution = componentState.institution;
+        if (keys.includes('institutionPartialName')) this.institutionPartialName = componentState.institutionPartialName;
         if (keys.includes('institutions')) this.institutions = componentState.institutions;
         if (keys.includes('attributesToRetrieve')) this.attributesToRetrieve = componentState.attributesToRetrieve;
+        if (keys.includes('createInstitutionModalOpen')) this.createInstitutionModalOpen = componentState.createInstitutionModalOpen;
         this.user = state.user;
         this.userToken = state.userToken;
     }

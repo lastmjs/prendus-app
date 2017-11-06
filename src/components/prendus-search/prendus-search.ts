@@ -11,6 +11,7 @@ class PrendusSearch extends Polymer.Element implements ContainerElement {
     userToken: string | null;
     client: any;
     index: any;
+    searchParameter: string;
     searchResult: string;
     searchResults: string[];
     searchIndex: string;
@@ -20,12 +21,12 @@ class PrendusSearch extends Polymer.Element implements ContainerElement {
     static get is() { return 'prendus-search'; }
     static get properties() {
         return {
-            redirectUrl: {
+            searchIndex: {
                 type: String
             },
-            searchIndex: {
-                type: String,
-                observer: 'searchContent'
+            searchParameter: {
+              type: String,
+              observer: 'searchContent'
             },
             attributesToRetrieve: {
                 type: Array,
@@ -47,17 +48,26 @@ class PrendusSearch extends Polymer.Element implements ContainerElement {
     searchContent(){
       const algoliaSearchInfo = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
       const hitsToReturn = this.hitsPerPage ? this.hitsPerPage : 3;
-      console.log('this.algoliasearch', algoliaSearchInfo)
-      console.log('this.searchIndex', this.searchIndex)
-      console.log('this.hits', hitsToReturn)
-      console.log('this.attributesToRetrieve', this.attributesToRetrieve)
-
-      // this.client = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
-      this.index = algoliaSearchInfo.initIndex('Institutions');
+      try{
+        algoliaSearchInfo.initIndex(this.searchIndex).search(
+          {
+            query: this.searchParameter,
+            attributesToRetrieve: this.attributesToRetrieve,
+            hitsPerPage: hitsToReturn,
+          },
+          (err: Error, content: any)=>{
+            if (err) throw err;
+            const results = content.hits;
+            this.dispatchEvent(new CustomEvent('result', {detail: {results: results}}));
+          }
+        );
+      }catch(error){
+        throw error;
+      }
     }
     findInstitution(){
       const that = this;
-      this.index.search(
+      const search = this.index.search(
         {
           query: institutionPartialName,
           attributesToRetrieve: ['Name'],
@@ -73,6 +83,10 @@ class PrendusSearch extends Polymer.Element implements ContainerElement {
           return institutionNames;
         }
       );
+      console.log('search', search)
+    }
+    _searchDone(err: Error, content: any){
+
     }
     setInstitution(e){
       console.log('e.target', e.target.id)
