@@ -13,11 +13,11 @@
           }
         </style>
         <h2>Add Institution</h2>
-        <paper-input id="institutionName" name="institutionName" label="Name of School or Business" maxlength="50" required auto-validate error-message="Please enter a name for your Institution." autoFocus on-keydown="submitInstitutionOnEnter"></paper-input>
-        <paper-input id="institutionAbbreviation" name="institutionAbbreviation" label="Abbreviation" maxlength="5" autoFocus on-keydown="submitInstitutionOnEnter"></paper-input>
-        <paper-input id="country" name="country" label="Country" maxlength="50" required auto-validate error-message="Please enter the country." autoFocus on-keydown="submitInstitutionOnEnter"></paper-input>
-        <paper-input id="state" name="state" label="State" maxlength="50" required auto-validate error-message="Please enter a state." autoFocus on-keydown="submitInstitutionOnEnter"></paper-input>
-        <paper-input id="city" name="city" label="City" maxlength="50" required auto-validate error-message="Please enter a city." autoFocus on-keydown="submitInstitutionOnEnter"></paper-input>
+        <paper-input id="institutionName" name="institutionName" label="Name of School or Business" maxlength="50" required auto-validate error-message="Please enter a name for your Institution." autoFocus on-keydown="createInstitutionOnEnter"></paper-input>
+        <paper-input id="institutionAbbreviation" name="institutionAbbreviation" label="Abbreviation" maxlength="5" autoFocus on-keydown="createInstitutionOnEnter"></paper-input>
+        <paper-input id="institutionCountry" name="country" label="Country" maxlength="50" required auto-validate error-message="Please enter the country." autoFocus on-keydown="createInstitutionOnEnter"></paper-input>
+        <paper-input id="institutionState" name="state" label="State" maxlength="50" required auto-validate error-message="Please enter a state." autoFocus on-keydown="createInstitutionOnEnter"></paper-input>
+        <paper-input id="institutionCity" name="city" label="City" maxlength="50" required auto-validate error-message="Please enter a city." autoFocus on-keydown="createInstitutionOnEnter"></paper-input>
         <div class="buttons">
           <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
           <button class="prendus-button prendus-button--recommended" on-click="createInstitution">Continue</button>

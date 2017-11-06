@@ -279,7 +279,7 @@ type Institution @model {
     createdAt: DateTime!
     updatedAt: DateTime!
     name: String!
-    abbreviation: String!
+    abbreviation: String
     country: String!
     state: String!
     city: String!
