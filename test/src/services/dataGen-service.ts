@@ -1,6 +1,8 @@
+import {
+  User,
+  Course
+} from '../../../../src/typings/index.d';
 import {GQLRequest} from '../../../../src/node_modules/prendus-shared/services/graphql-service';
-import {GQLVariables} from '../../../../src/typings/gql-variables';
-import {GQLArbitrary} from './services/arbitraries-service';
 
 const AUTH_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MDQxOTcxNzMsImNsaWVudElkIjoiY2o1bDg3cmQwMzVoaTAxMzQ0bzAwNW5maCIsInByb2plY3RJZCI6ImNqNW12aXNoaW5ucGYwMTM0OG04Z3p0YjAiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqNzBvNXJldTA0ZmEwMTk4a2ZlNnkwaXIifQ.LbuydRKQjQgbMiMggFU-wOr-IKSxzcO5ZA5mAZGEUjU';
 
@@ -15,29 +17,35 @@ const dependencyTree = [
   'Course'
 ];
 
-function dependencySort(typeA, typeB) {
+function dependencySort(typeA, typeB): number {
   return dependencyTree.indexOf(typeA) < dependencyTree.indexOf(typeB) ? 1 : -1;
 }
 
-export async function createTestUser(role: string): {id: string, token: string} {
+export async function createTestUser(role: string): Promise<User> {
   const email = `test-${role}@test-prendus.com`;
-  const data = await GQLRequest(`mutation create($role: UserRole!, $email: String!) {
-    createUser(role: $role, authProvider: { email: { email: $email, password: "test" } }) {
+  const data = await GQLRequest(`mutation create($email: String!) {
+    signupUser(email: $email, password: "test") {
+      id
+    }
+    authenticateUser(email: $email, password: "test") {
+      token
+    }
+  }`, {email}, AUTH_TOKEN, handleError);
+  const id = data.signupUser.id;
+  await GQLRequest(`mutation update($id: ID!, $role: UserRole!) {
+    updateUser(id: $id, role: $role) {
       id
       role
     }
-    signinUser(email: { email: $email, password: "test" }) {
-      token
-    }
-  }`, {role, email}, AUTH_TOKEN, handleError);
+  }`, {id, role}, AUTH_TOKEN, handleError);
   return {
-    id: data.createUser.id,
-    role: data.createUser.role,
-    token: data.signinUser.token
+    id: data.signupUser.id,
+    role,
+    token: data.authenticateUser.token
   }
 }
 
-export async function deleteTestUsers(...users: User[]) {
+export async function deleteTestUsers(...users: User[]): Promise<object> {
   const params = users.map((user, i) => `$user${i}: ID!`).join(', ');
   const query = `
     mutation del(${params}) {
@@ -83,7 +91,7 @@ function deleteQuery(ids: object): string {
 
 function extractIdsRecursive(obj: object, T: string): object {
   return Object.keys(obj)
-    .filter(k => k != 'id')
+    .filter(k => k != 'id' && !k.match(/Ids$/))
     .map(k => {
       return Array.isArray(obj[k])
         ? obj[k].map(el => extractIdsRecursive(el, k))
@@ -122,8 +130,10 @@ function arbToCreateQuery(arb: GQLArbitrary): string {
 
 //TODO: need a good way to handle enums
 function arbParamType(containerType: string, fieldName: string, field: any): string {
-  if (Array.isArray(field))
+  if (Array.isArray(field) && field[0].type)
     return `[${containerType + fieldName + field[0].type}!]`
+  if (Array.isArray(field))
+    return '[ID!]!';
   if (field && typeof field === 'object')
     return `${containerType + fieldName + field.type}!`;
   if (typeof field === 'string')
@@ -135,7 +145,7 @@ function collectArbIds(arb: GQLArbitrary): string {
   return `
     id
   ` + Object.keys(arb)
-      .filter(k => k != 'type')
+      .filter(k => k != 'type' && !k.match(/Ids$/))
       .reduce((result, k) => {
         if (['string', 'number'].includes(typeof arb[k]))
           return result;
@@ -153,6 +163,8 @@ function arbToVariables(arb: GQLArbitrary): GQLVariables {
   const vars = {...arb};
   if (vars.type) delete vars.type;
   Object.keys(arb).filter(k => k != 'type').forEach(k => {
+    if (k.match(/Ids$/))
+      return;
     if (Array.isArray(arb[k]))
       vars[k] = arb[k].map(arbToVariables);
     else if (typeof arb[k] === 'object')

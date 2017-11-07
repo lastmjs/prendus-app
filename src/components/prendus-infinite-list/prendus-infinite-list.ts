@@ -88,7 +88,6 @@ class PrendusInfiniteList extends Polymer.Element {
     else
       threshold.clearLower();
     this.action = fireLocalAction(this.componentId, 'loading', false);
-    this.dispatchEvent(new CustomEvent('items-loaded'));
   }
 
   stateChange(e: CustomEvent) {

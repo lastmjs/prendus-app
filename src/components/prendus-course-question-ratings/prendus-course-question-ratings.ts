@@ -66,7 +66,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
       },
       filter: {
         type: Object,
-        computed: '_computeFilter(courseId, user, assignmentId, conceptId, authorEmail)'
+        computed: '_computeFilter(course, user, assignmentId, conceptId, authorEmail)'
       },
       fetchQuestions: {
         type: Function,
@@ -85,6 +85,8 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
 
   //Computed Properties
   _computeOrderBy(sortField: string, sortAsc: boolean): string {
+    if (!sortField || sortAsc === undefined)
+      return undefined;
     return categoryCamelCase(sortField) + (sortAsc ? GQL_SORT_ASC : GQL_SORT_DESC);
   }
 
@@ -92,11 +94,13 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return [STUDENT, ...Object.keys(rubric), OVERALL];
   }
 
-  _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
+  _computeFilter(course: Course, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
+    if (!course || !user)
+      return undefined;
     const filter = {
       assignment: {
         course: {
-          id: courseId
+          id: course.id
         }
       },
       author: {},
@@ -104,7 +108,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     };
     if (authorEmail)
       filter.author.email = authorEmail;
-    if (!user || user.role !== Role.INSTRUCTOR)
+    if (user.role !== Role.INSTRUCTOR)
       filter.author.id = (user || {}).id;
     if (assignmentId !== ALL)
       filter.assignment.id = assignmentId;
