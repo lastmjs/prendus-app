@@ -43,26 +43,28 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
         return false;
       if (!verifyDropdownsReset(dropdowns))
         return false;
-      const iterations = (new Array(100)).fill(0);
-      const results = await asyncMap(iterations, testDropdownsScoring(dropdowns));
+      const success = jsc.check(dropdownsScore(dropdowns));
       this.shadowRoot.removeChild(dropdowns);
-      return results.every(result => result);
+      return success;
     });
 
   }
 }
 
-function testDropdownsScoring(dropdowns) {
-  return async _ => {
-    const rubric: Rubric = dropdowns.rubric;
-    const category = randomCategory(rubric);
+function dropdownsScore(dropdowns) {
+  const rubric: Rubric = dropdowns.rubric;
+  const categoryArb = jsc.oneof(
+    jsc.constant(null), //arbitrary category to represent empty rubric
+    ...Object.keys(rubric).map(category => jsc.constant(category.name))
+  ]);
+  return jsc.forall(categoryArb, async category => {
     const option = randomOption(rubric, category);
     const event = getEvent(dropdowns, rubric, category, option);
     const scores = getExpected(dropdowns.scores, rubric, category, option);
     scoreCategory(dropdowns, rubric, category, option);
     await event;
     return verifyDropdowns(scores, dropdowns);
-  }
+  });
 }
 
 function verifyDropdowns(scores, dropdowns) {
@@ -80,10 +82,6 @@ function initialScores(rubric: Rubric): CategoryScore[] {
   return Object.keys(rubric).map(
     (category) => ({ category, score: -1 }),
   )
-}
-
-function randomCategory(rubric: Rubric): string | null {
-  return randomItem(Object.keys(rubric));
 }
 
 function randomOption(rubric: Rubric, category: string): string | null {

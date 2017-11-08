@@ -16,9 +16,6 @@ import {
 
 const jsc = require('jsverify');
 
-const randomString = jsc.sampler(escapedString);
-const randomNumber = jsc.sampler(jsc.nat);
-
 const ADD_CATEGORY = 'addCategory';
 const REMOVE_CATEGORY = 'removeCategory';
 const ADD_SCALE = 'addScale';
@@ -28,6 +25,8 @@ const SET_OPTION = 'setOption';
 const SET_DESCRIPTION = 'setDescription';
 const SET_POINTS = 'setPoints';
 const COMMANDS = [ADD_CATEGORY, REMOVE_CATEGORY, ADD_SCALE, REMOVE_SCALE, SET_CATEGORY, SET_DESCRIPTION, SET_POINTS];
+
+const commandArb = jsc.oneof(COMMANDS.map(command => jsc.constant(command)));
 
 const RUBRIC_CHANGED = 'rubric-changed';
 const CATEGORIES_CHANGED = 'categories-changed';
@@ -46,32 +45,30 @@ class PrendusRubricTableTest extends Polymer.Element {
       const table = this.shadowRoot.querySelector('prendus-rubric-table');
       const setup = getListener(RUBRIC_CHANGED, table);
       table.init = rubric;
-      const categories = makeCategories(rubric);
+      const categories = table._categoriesForHtml(rubric);
       await setup;
       if (!verifyTable({ rubric, categories }, table))
         return false;
-      const iterations = (new Array(100)).fill(0);
-      const results = await asyncMap(iterations, testEditableTable(table));
-      return results.every(result => result);
+      return jsc.check(tableIsEditable(table));
     });
   }
 }
 
-function testEditableTable(table) {
-  return async _ => {
-    const command = randomCommand();
-    const categories = table.categories.map(({ name }) => name);
-    const category = randomIndex(categories.length);
-    const options = category >= 0 ? table.categories[category].options.map(({ name }) => name) : -1;
-    const option = randomIndex(options.length);
-    const name = randomString();
-    const points = randomNumber();
-    const event = getEvent(table, command, category, option, name);
-    const expected = getExpected(table, command, category, option, name, points);
-    executeCommand(table, command, category, option, name, points);
-    await event;
-    return verifyTable(expected, table);
-  }
+function tableIsEditable(table) {
+  return jsc.forall(
+    commandArb, escapedString, jsc.nat,
+    async (command, name, points) => {
+      const categories = table.categories.map(({ name }) => name);
+      const category = randomIndex(categories.length);
+      const options = category >= 0 ? table.categories[category].options.map(({ name }) => name) : -1;
+      const option = randomIndex(options.length);
+      const event = getEvent(table, command, category, option, name);
+      const expected = getExpected(table, command, category, option, name, points);
+      executeCommand(table, command, category, option, name, points);
+      await event;
+      return verifyTable(expected, table);
+    }
+  );
 }
 
 function randomCommand() {
@@ -122,21 +119,21 @@ function getExpected(table, command: string, category: number, option: number, n
   const { rubric, categories } = table;
   switch (command) {
     case ADD_CATEGORY:
-      return stateAfterAddCategory(rubric, categories);
+      return stateAfterAddCategory(table, rubric, categories);
     case REMOVE_CATEGORY
-      return stateAfterRemoveCategory(rubric, categories, category);
+      return stateAfterRemoveCategory(table, rubric, categories, category);
     case ADD_SCALE
-      return stateAfterAddScale(rubric, categories, category);
+      return stateAfterAddScale(table, rubric, categories, category);
     case REMOVE_SCALE:
-      return stateAfterRemoveScale(rubric, categories, category, option);
+      return stateAfterRemoveScale(table, rubric, categories, category, option);
     case SET_CATEGORY:
-      return stateAfterSetCategory(rubric, categories, category, name);
+      return stateAfterSetCategory(table, rubric, categories, category, name);
     case SET_OPTION:
-      return stateAfterSetOption(rubric, categories, category, option, name);
+      return stateAfterSetOption(table, rubric, categories, category, option, name);
     case SET_DESCRIPTION:
-      return stateAfterSetDescription(rubric, categories, category, option, name);
+      return stateAfterSetDescription(table, rubric, categories, category, option, name);
     case SET_POINTS:
-      return stateAfterSetPoints(rubric, categories, category, option, points);
+      return stateAfterSetPoints(table, rubric, categories, category, option, points);
     default:
       return { rubric, categories };
   }
@@ -196,39 +193,39 @@ function simulateOnChange(el: HTMLElement, value) {
   el.dispatchEvent(new Event('change'));
 }
 
-function stateAfterAddCategory(rubric: Rubric, categories: object[]): object {
+function stateAfterAddCategory(table, rubric: Rubric, categories: object[]): object {
   const _categories = categories.some(({ name }) => !name.length)
     ? categories
-    : categories.concat(templateCategory());
+    : categories.concat(table._templateCategory());
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterRemoveCategory(rubric: Rubric, categories: object[], category: number): object {
+function stateAfterRemoveCategory(table, rubric: Rubric, categories: object[], category: number): object {
   const _categories = categories.slice(0, -1);
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterAddScale(rubric: Rubric, categories: object[], category: number): object {
+function stateAfterAddScale(table, rubric: Rubric, categories: object[], category: number): object {
   const _categories = category >= 0 && !categories[category].options.some(({ name }) => !name.length)
     ? categories.map(
       ({ name, options }, i) => i === category
-        ? { name, options: options.concat(templateOption()) }
+        ? { name, options: options.concat(table._templateOption()) }
         : { name, options }
       )
       : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterRemoveScale(rubric: Rubric, categories: object[], category: number, option: number): object {
+function stateAfterRemoveScale(table, rubric: Rubric, categories: object[], category: number, option: number): object {
   const _categories = category >= 0 && option >= 0
     ? categories.map(
       ({ name, options }, i) => i === category
@@ -237,12 +234,12 @@ function stateAfterRemoveScale(rubric: Rubric, categories: object[], category: n
       )
     : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterSetCategory(rubric: Rubric, categories: object[], category: number, name: string): object {
+function stateAfterSetCategory(table, rubric: Rubric, categories: object[], category: number, name: string): object {
   const _categories = category >= 0 && !categories.some(({ name: _name }) => _name === name)
     ? categories.map(
         (_category, i) => category === i
@@ -251,109 +248,39 @@ function stateAfterSetCategory(rubric: Rubric, categories: object[], category: n
       )
     : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterSetOption(rubric: Rubric, categories: object[], category: number, option: number, name: string): object {
+function stateAfterSetOption(table, rubric: Rubric, categories: object[], category: number, option: number, name: string): object {
   const _categories = category >= 0 && option >= 0 && !categories[category].options.some(({ name: _name }) => _name === name)
-    ? categories.map(
-        (_category, i) => category === i
-          ? { ..._category, options: _category.options.map(
-            (_option, j) => option === j
-              ? { ..._option, name }
-              : _option
-            )
-          }
-          : _category
-      )
+    ? table._setOptionProp(categories, category, option, 'name', name)
     : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterSetDescription(rubric: Rubric, categories: object[], category: number, option: number, name: string): object {
+function stateAfterSetDescription(table, rubric: Rubric, categories: object[], category: number, option: number, name: string): object {
   const _categories = category >= 0 && option >= 0
-    ? categories.map(
-        (_category, i) => category === i
-          ? { ..._category, options: _category.options.map(
-            (_option, j) => option === j
-              ? { ..._option, description: name }
-              : _option
-            )
-          }
-          : _category
-      )
+    ? table._setOptionProp(categories, category, option, 'description', name)
     : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
 }
 
-function stateAfterSetPoints(rubric: Rubric, categories: object[], category: number, option: number, points: number): object {
+function stateAfterSetPoints(table, rubric: Rubric, categories: object[], category: number, option: number, points: number): object {
   const _categories = category >= 0 && option >= 0
-    ? categories.map(
-        (_category, i) => category === i
-          ? { ..._category, options: _category.options.map(
-            (_option, j) => option === j
-              ? { ..._option, points }
-              : _option
-            )
-          }
-          : _category
-      )
+    ? table._setOptionProp(categories, category, option, 'points', points)
     : categories;
   return {
-    rubric: makeRubric(_categories),
+    rubric: table._makeRubric(_categories),
     categories: _categories
   };
-}
-
-function templateCategory(): object[] {
-  return {
-    name: '',
-    options: [templateOption()]
-  }
-}
-
-function templateOption(): object[] {
-  return {
-    name: '',
-    description: '',
-    points: 0
-  }
-}
-
-function makeCategories(rubric: Rubric): object[] {
-  return Object.keys(rubric || {}).map(category => {
-    return {
-      name: category,
-      options: Object.keys(rubric[category]).map(option => {
-        return {
-          name: option,
-          ...rubric[category][option]
-        }
-      })
-    }
-  });
-}
-
-function makeRubric(categories: object[]): Rubric {
-  return categories.reduce((rubric, category) => {
-    return {
-      ...rubric,
-      [category.name]: category.options.reduce((options, option) => {
-        return {
-          ...options,
-          [option.name]: {description: option.description, points: Number(option.points)}
-        }
-      }, {})
-    };
-  }, {});
 }
 
 window.customElements.define(PrendusRubricTableTest.is, PrendusRubricTableTest);

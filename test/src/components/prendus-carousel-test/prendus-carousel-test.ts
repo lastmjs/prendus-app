@@ -13,6 +13,8 @@ const PREV = 'prev';
 const STAY = 'stay';
 const COMMANDS = [NEXT, PREV, STAY];
 
+const commandArb = jsc.oneof(COMMANDS.map(command => jsc.constant(command)));
+
 const ITEMS_CHANGED = 'items-changed';
 const ITEM_CHANGED = 'item-changed';
 const FINISHED = 'finished-changed';
@@ -36,23 +38,20 @@ class PrendusCarouselTest extends Polymer.Element {
       const initial = { index: 0, item: data[0], finished: !data.length };
       if (!verifyCarousel(initial, carousel))
         return false;
-      const iterations = (new Array(100)).fill(0); //Just an array to pass to asyncMap
-      const results = await asyncMap(iterations, testCarouselFunctionality(carousel));
-      return results.every(result => result);
+      return jsc.check(carouselStopsAtBeginningAndEnd(carousel));
     });
   }
 }
 
-function testCarouselFunctionality(carousel) {
-  return async _ => {
-    const command = randomCommand();
+function carouselStopsAtBeginningAndEnd(carousel) {
+  return jsc.forall(commandArb, async command => {
     const expected = getExpected(carousel, command);
     const event = getEvent(carousel, command);
     executeCommand(carousel, command);
     await event;
     const success = verifyCarousel(expected, carousel);
     return success;
-  }
+  });
 }
 
 function verifyCarousel(expect, carousel): boolean {
