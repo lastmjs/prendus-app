@@ -28,10 +28,10 @@
       <dom-repeat id="categories" items="[[_categories(rubric)]]" as="category">
         <template>
           <paper-dropdown-menu class="flex-item" label="[[category]]">
-            <paper-listbox slot="dropdown-content">
+            <paper-listbox slot="dropdown-content" attr-for-selected="option" on-selected-changed="_scoreCategory">
               <dom-repeat items="[[_options(rubric, category)]]" as="option" index-as="optionIndex">
                 <template>
-                  <paper-item id="[[categoryId(index, optionIndex)]]" category="[[category]]" on-click="_scoreCategory">[[option]]</paper-item>
+                  <paper-item category="[[category]]" option="[[option]]" id="[[categoryId(index, optionIndex)]]">[[option]]</paper-item>
                 </template>
               </dom-repeat>
             </paper-listbox>

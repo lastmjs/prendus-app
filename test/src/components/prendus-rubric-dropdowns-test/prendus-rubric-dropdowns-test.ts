@@ -9,6 +9,7 @@ import {
   getListener,
   randomItem
 } from '../../services/utilities-service';
+import {PrendusRubricDropdowns} from '../../../../src/components/prendus-rubric-dropdowns/prendus-rubric-dropdowns';
 
 const jsc = require('jsverify');
 
@@ -23,13 +24,20 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
     this.rootReducer = RootReducer;
   }
 
+  async attachDropdowns(rubric: Rubric) {
+    const dropdowns = new PrendusRubricDropdowns();
+    dropdowns.style.display = 'none';
+    this.shadowRoot.appendChild(dropdowns);
+    const setup = getListener(SCORES_CHANGED, dropdowns);
+    dropdowns.rubric = rubric;
+    await setup;
+    return dropdowns;
+  }
+
   prepareTests(test) {
 
     test('Dropdowns functionality', [jsc.nonshrink(RubricArb)], async (rubric: Rubric) => {
-      const dropdowns = this.shadowRoot.querySelector('prendus-rubric-dropdowns');
-      const setup = getListener(SCORES_CHANGED, dropdowns);
-      dropdowns.rubric = rubric;
-      await setup;
+      const dropdowns = await this.attachDropdowns(rubric);
       const initial = initialScores(rubric);
       if (!verifyDropdowns(initial, dropdowns))
         return false;
@@ -37,6 +45,7 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
         return false;
       const iterations = (new Array(100)).fill(0);
       const results = await asyncMap(iterations, testDropdownsScoring(dropdowns));
+      this.shadowRoot.removeChild(dropdowns);
       return results.every(result => result);
     });
 
@@ -48,9 +57,7 @@ function testDropdownsScoring(dropdowns) {
     const rubric: Rubric = dropdowns.rubric;
     const category = randomCategory(rubric);
     const option = randomOption(rubric, category);
-    const event = category && option
-      ? getListener(SCORES_CHANGED, dropdowns)
-      : Promise.resolve();
+    const event = getEvent(dropdowns, rubric, category, option);
     const scores = getExpected(dropdowns.scores, rubric, category, option);
     scoreCategory(dropdowns, rubric, category, option);
     await event;
@@ -92,13 +99,23 @@ function getExpected(scores: CategoryScore[], rubric: Rubric, category: string, 
   return scores;
 }
 
+function getEvent(dropdowns, rubric: Rubric, category: string, option: string): Promise {
+  if (!category || !option)
+    return Promise.resolve();
+  const categoryIndex = Object.keys(rubric).findIndex(_category => _category === category);
+  const categoryElement = dropdowns.shadowRoot.querySelectorAll('paper-dropdown-menu').item(categoryIndex);
+  const selected = categoryElement.querySelector('paper-listbox').selected;
+  return selected === option
+    ? Promise.resolve()
+    : getListener(SCORES_CHANGED, dropdowns);
+}
+
+
 function scoreCategory(dropdowns, rubric: Rubric, category: string, option: string) {
   if (!category || !option) return;
   const categoryIndex = Object.keys(rubric).findIndex(_category => _category === category);
-  const optionIndex = Object.keys(rubric[category]).findIndex(_option => _option === option);
   const categoryElement = dropdowns.shadowRoot.querySelectorAll('paper-dropdown-menu').item(categoryIndex);
-  const optionElement = categoryElement.querySelectorAll('paper-item').item(optionIndex);
-  optionElement.click();
+  categoryElement.querySelector('paper-listbox').selected = option;
 }
 
 window.customElements.define(PrendusRubricDropdownsTest.is, PrendusRubricDropdownsTest);

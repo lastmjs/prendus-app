@@ -8,7 +8,7 @@ import {
   fireLocalAction
 } from '../../node_modules/prendus-shared/services/utilities-service';
 
-class PrendusRubricDropdowns extends Polymer.Element {
+export class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
   action: SetComponentPropertyAction;
   rubric: Rubric;
@@ -69,7 +69,8 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   _scoreCategory(e) {
-    const { category, option } = e.model;
+    const option = e.detail.value;
+    const { category } = e.model;
     const { points } = this.rubric[category][option];
     const newScores = this.scores.map(scoreCategory(category, Number(points)));
     this.action = fireLocalAction(this.componentId, 'scores', newScores);
