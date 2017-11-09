@@ -27,33 +27,16 @@
 const fromEvent = require('graphcool-lib').fromEvent;
 const bcrypt = require('bcrypt');
 
-function getGraphcoolUser(api, email) {
-  return api.request(`
-    query {
-      User(email: "${email}"){
-        id
-        password
-      }
-    }`)
-    .then((userQueryResult) => {
-      if (userQueryResult.error) {
-        return Promise.reject(userQueryResult.error)
-      } else {
-        return userQueryResult.User
-      }
-    })
-}
-
-module.exports = function(event) {
+export default async (event) => {
   if (!event.context.graphcool.pat) {
     console.log('Please provide a valid root token!')
-    return { error: 'Email Authentication not configured correctly.'}
+    return { error: 'authenticate not configured correctly.'}
   }
 
-  const email = event.data.email
-  const password = event.data.password
-  const graphcool = fromEvent(event)
-  const api = graphcool.api('simple/v1')
+  const email = event.data.email;
+  const password = event.data.password;
+  const graphcool = fromEvent(event);
+  const api = graphcool.api('simple/v1');
 
   return getGraphcoolUser(api, email)
     .then((graphcoolUser) => {
@@ -81,5 +64,22 @@ module.exports = function(event) {
 
       // don't expose error message to client!
       return { error: `An unexpected error occured` }
+    })
+}
+
+function getGraphcoolUser(api, email) {
+  return api.request(`
+    query {
+      User(email: "${email}"){
+        id
+        password
+      }
+    }`)
+    .then((userQueryResult) => {
+      if (userQueryResult.error) {
+        return Promise.reject(userQueryResult.error)
+      } else {
+        return userQueryResult.User
+      }
     })
 }

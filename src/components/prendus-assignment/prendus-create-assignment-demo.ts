@@ -68,7 +68,8 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
         this.action = fireLocalAction(this.componentId, 'incorrectAnswer3RadioNumber', radioNumbers[3]);
         this.action = fireLocalAction(this.componentId, 'question', {
             text: '',
-            code: `answer = radio${radioNumbers[0]} === true;`
+            // code: `answer = radio${radioNumbers[0]} === true;`
+            code: 'answer = true;'
         });
     }
 
