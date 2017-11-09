@@ -7,7 +7,8 @@ import {
 } from '../../typings/index.d';
 import {
   createUUID,
-  fireLocalAction
+  fireLocalAction,
+  navigate,
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
@@ -22,7 +23,6 @@ import {
 } from '../../services/constants-service';
 import {
   setNotification,
-  getAndSetUser,
 } from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
@@ -41,6 +41,7 @@ class PrendusReviewAssignment extends Polymer.Element {
   essayType: boolean;
   gradingRubric: Rubric;
   completionReason: string;
+  modalOpen: boolean;
 
   static get is() { return 'prendus-review-assignment' }
 
@@ -92,9 +93,19 @@ class PrendusReviewAssignment extends Polymer.Element {
   }
 
   _computeCompletionReason(assignment: Assignment): string {
-    return assignment.questions.length >= assignment.numReviewQuestions
+    return assignment && assignment.questions.length >= assignment.numReviewQuestions
       ? 'You have completed this assignment'
       : 'There are not enough questions to take the assignment yet';
+  }
+
+  _handleUnauthorized(e: CustomEvent) {
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    if (authenticated === false)
+      navigate('/authenticate');
+    else if (payed === false)
+      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+    else if (enrolled === false)
+      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
   }
 
   async _loadAssignment(e: CustomEvent) {
@@ -104,6 +115,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.dispatchEvent(new CustomEvent('assignment-loaded'));
   }
 
   _computeQuestions(assignment: Assignment): Question[] {
@@ -131,12 +143,20 @@ class PrendusReviewAssignment extends Polymer.Element {
   _handleNextQuestion(e: CustomEvent) {
     const question = e.detail.value;
     this.action = fireLocalAction(this.componentId, 'question', question);
+    const statement = { userId: this.user.id };
     if (question && question === this.questions[0])
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
+      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED, assignmentId: this.assignment.id });
     else
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (!question && this.questions.length)
-      LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.REVIEW);
+      sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: question.id });
+  }
+
+  _handleFinished(e: CustomEvent) {
+    const finished = e.detail.value;
+    this.action = fireLocalAction(this.componentId, 'finished', finished);
+    if (!finished)
+      return;
+    if (this.questions && this.questions.length)
+      LTIPassback(this.userToken, this.user.id, this.assignment.id);
   }
 
   _handleRatings(e: CustomEvent) {
@@ -150,6 +170,8 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.assignment = componentState.assignment;
     this.question = componentState.question;
     this.ratings = componentState.ratings;
+    this.finished = componentState.finished;
+    this.modalOpen = componentState.modalOpen;
     this.user = state.user;
     this.userToken = state.userToken;
   }

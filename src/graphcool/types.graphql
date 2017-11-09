@@ -44,6 +44,7 @@ type Course implements Node {
   enrolledStudents: [User!]! @relation(name: "StudentsAndCourses")
   price: Int! @defaultValue(value: 1000)
   purchases: [Purchase!]! @relation(name: "CoursePurchased")
+  analytics: [PrendusAnalytics!]! @relation(name: "CourseOnPrendusAnalytics")
 }
 
 type Assignment implements Node {
@@ -61,6 +62,7 @@ type Assignment implements Node {
   numReviewQuestions: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
   numGradeResponses: Int! @defaultValue(value: 3)
+  analytics: [PrendusAnalytics!]! @relation(name: "AssignmentOnPrendusAnalytics")
 }
 
 type Quiz implements Node {
@@ -91,6 +93,7 @@ type Question implements Node {
   images: [File!]! @relation(name: "ImagesOnQuestions")
   visibility: QuestionVisibility! @defaultValue(value: COURSE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
+  analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
 }
 
 type QuestionFlag implements Node {
@@ -238,14 +241,17 @@ type LTIUser implements Node {
 }
 
 type PrendusAnalytics implements Node {
-  user: User @relation(name: "UserOnPrendusAnalytics")
-  contextId: String!
-  contextType: ContextType!
-  verb: String!
-  object: String!
-  createdAt: DateTime!
   id: ID! @isUnique
+  createdAt: DateTime!
   updatedAt: DateTime!
+  user: User @relation(name: "UserOnPrendusAnalytics")
+  verb: String!
+  course: Course @relation(name: "CourseOnPrendusAnalytics")
+  assignment: Assignment @relation(name: "AssignmentOnPrendusAnalytics")
+  question: Question @relation(name: "QuestionOnPrendusAnalytics")
+  contextId: String
+  contextType: ContextType
+  object: String
 }
 
 type Purchase implements Node {

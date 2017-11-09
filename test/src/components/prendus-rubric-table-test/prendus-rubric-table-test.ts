@@ -49,7 +49,8 @@ class PrendusRubricTableTest extends Polymer.Element {
       await setup;
       if (!verifyTable({ rubric, categories }, table))
         return false;
-      return jsc.check(tableIsEditable(table));
+      const success = await jsc.check(tableIsEditable(table));
+      return success;
     });
   }
 }

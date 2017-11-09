@@ -2,8 +2,13 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
-<link rel="import" href="../prendus-stacked-bar/prendus-stacked-bar.html">
+<link rel="import" href="../prendus-infinite-list/prendus-infinite-list.html">
+<link rel="import" href="prendus-course-question-ratings-row.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 
 <dom-module id="prendus-course-question-ratings">
   <template>
@@ -14,19 +19,16 @@
 
       #questions {
         margin-top: 10px;
-        border-bottom: 1px solid;
       }
 
       #table-header {
         background: var(--prendus-primary-color);
         color: white;
         border-radius: 15px 15px 0 0;
-        border: none;
         align-items: center;
       }
 
       #table-header .table-cell {
-        border: none;
         font-size: 14px;
       }
 
@@ -44,7 +46,6 @@
         grid-template-columns: 5fr; /* 3fr;*/
         grid-auto-columns: 1fr;
         grid-auto-flow: column;
-        border-left: 1px solid;
       }
 
       .question-row .table-cell {
@@ -52,8 +53,6 @@
         align-items: center;
         justify-content: center;
         padding: 5%;
-        border-right: 1px solid;
-        border-bottom: 1px solid;
         overflow: hidden;
       }
 
@@ -61,19 +60,15 @@
         justify-content: normal !important;
       }
 
-      .scroll {
-        overflow-x: auto !important;
-      }
-
-      [hidden] {
-        display: none;
-      }
-
     </style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <div>
+
       <h2 id="question-rating-table-header">Questions: [[course.title]]</h2>
+
+      <!-- Using template with is because <dom-repeat> does not work in <select> tags -->
+      <!-- Assignment Filter -->
       <label for="assignmentId">Assignment</label>
       <select id="assignmentId" on-change="_assignmentIdChanged">
         <option value="ALL">All</option>
@@ -82,52 +77,62 @@
           <option value="[[item.id]]">[[item.title]]</option>
         </template>
       </select>
+
+      <!-- Concept Filter -->
       <label for="conceptId">Concept</label>
       <select id="conceptId" on-change="_conceptIdChanged">
         <option value="ALL">All</option>
-          <template is="dom-repeat" items="[[_concepts(course.assignments)]]">
+          <template is="dom-repeat" items="[[course.subject.concepts]]">
             <option value="[[item.id]]">[[item.title]]</option>
           </template>
       </select>
+
+      <!-- Table -->
       <div id="questions" role="grid" aria-readonly="true" aria-labelledby="question-rating-table-header">
+
+        <!-- Table Header -->
         <div id="table-header" class="question-row" role="row">
           <div class="table-cell column-header question-meta" scope="col" role="columnheader" aria-sort="none">Question</div>
-          <div id="Student" class="table-cell column-header" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Student</span></div>
-          <dom-repeat items="[[categories]]" hidden>
+          <div class="table-cell column-header" scope="col" role="columnheader" aria-sort="none">Student</div>
+          <dom-repeat items="[[categories]]">
             <template>
-              <div class="column-header table-cell" scope="col" role="columnheader" aria-sort="none"><span class="sortable" on-click="_toggleSort" role="button" on-keydown="_checkToggleSort" tabindex="0">[[item]]</span></div>
+              <div
+                class="column-header table-cell"
+                scope="col"
+                role="columnheader"
+                aria-sort$="[[_ariaSort(item, sortField, sortAsc)]]">
+                  <span
+                    class="sortable"
+                    on-click="_toggleSort"
+                    role="button"
+                    on-keydown="_checkToggleSort"
+                    tabindex="0">
+                      [[item]]
+                  </span>
+              </div>
             </template>
           </dom-repeat>
-          <div id="Overall" class="table-cell column-header" scope="col" role="columnheader" aria-sort="descending"><span class="sortable" on-click="_toggleSort" on-keydown="_checkToggleSort" role="button" tabindex="0">Overall</span></div>
         </div>
 
-        <dom-if if="[[loaded]]">
-            <template>
-                <dom-repeat items="[[questionStats]]" filter="[[_makeFilter(assignmentId, conceptId)]]" sort="[[_makeSorter(sortField, sortAsc)]]" hidden>
-                  <template>
-                    <div class="question-row" role="row">
-                      <div class="table-cell question-meta" role="rowheader">[[_questionOnly(item.text)]]</div>
-                      <div class="table-cell question-meta scroll">[[item.student]]</div>
-                      <dom-repeat items="[[categories]]" as="category" hidden>
-                        <template>
-                          <div class="table-cell" role="gridcell"><prendus-stacked-bar label="ratings" data="[[_barStats(item.stats, category)]]"></prendus-stacked-bar></div>
-                        </template>
-                      </dom-repeat>
-                      <div class="table-cell">[[item.overall]]</div>
-                    </div>
-                  </template>
-                </dom-repeat>
-            </template>
-        </dom-if>
-
-        <dom-if if="[[!loaded]]">
-            <template>
-                Loading...
-            </template>
-        </dom-if>
+        <!-- Table Body -->
+        <prendus-infinite-list next="[[fetchQuestions]]" on-items-loaded="_tableLoaded">
+          <template>
+            <prendus-course-question-ratings-row categories="[[categories]]" question="[[item]]" on-view-question="_viewQuestion"></prendus-course-question-ratings-row>
+          </template>
+        </prendus-infinite-list>
 
       </div>
     </div>
+
+    <paper-dialog id="question-modal" modal>
+      <paper-dialog-scrollable>
+        <prendus-flaggable-question question="[[question]]" on-question-flagged="_closeQuestion"></prendus-flaggable-question>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button class="prendus-button prendus-button--minor" dialog-dismiss>Close</paper-button>
+      </div>
+    </paper-dialog>
+
   </template>
 
   <script type="module" src="prendus-course-question-ratings.ts"></script>

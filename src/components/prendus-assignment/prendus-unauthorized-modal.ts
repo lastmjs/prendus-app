@@ -4,9 +4,9 @@ import {
   Course
 } from '../../typings/index.d';
 import {
-  navigate,
   createUUID,
-  fireLocalAction
+  fireLocalAction,
+  navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {
   GQLRequest
@@ -38,6 +38,11 @@ class PrendusUnauthorizedModal extends Polymer.Element {
         type: Boolean,
         computed: '_computeAuthenticated(_user)'
       },
+      opened: {
+        type: Boolean,
+        value: false,
+        observer: '_openedChanged'
+      }
     }
   }
 
@@ -54,8 +59,8 @@ class PrendusUnauthorizedModal extends Polymer.Element {
   }
 
   async _computeUser(_user: User, assignmentId: string, userToken: string) {
-    if (!_user || !assignmentId || !userToken) return;
-
+    if (!_user || !assignmentId || !userToken)
+      return undefined;
     const data = await getAuthorizationData(_user.id, assignmentId, userToken);
     this.action = fireLocalAction(this.componentId, 'user', data.user);
     this.action = fireLocalAction(this.componentId, 'course', data.assignment.course);
@@ -82,16 +87,22 @@ class PrendusUnauthorizedModal extends Polymer.Element {
   }
 
   _computeView(authenticated: boolean, payed: boolean, enrolled: boolean) {
-    if (authenticated === false)
-      navigate('/authenticate');
-    else if (payed === false)
-      navigate(`/course/${this.course.id}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-    else if (enrolled === false)
-      this.shadowRoot.querySelector('#modal').open();
-    else if (authenticated && payed && enrolled) {
+    if (authenticated && payed && enrolled) {
       this.dispatchEvent(new CustomEvent('authorized'));
       this.shadowRoot.querySelector('#modal').close();
+      return;
     }
+    if (authenticated === undefined || payed === undefined || enrolled === undefined)
+      return;
+    const courseId = this.course.id;
+    this.dispatchEvent(new CustomEvent('unauthorized', detail: { authenticated, payed, enrolled, courseId }));
+  }
+
+  _openedChanged(opened: boolean) {
+    if (opened)
+      this.shadowRoot.querySelector('#modal').open();
+    else
+      this.shadowRoot.querySelector('#modal').close();
   }
 
   _toHome(e: Event) {

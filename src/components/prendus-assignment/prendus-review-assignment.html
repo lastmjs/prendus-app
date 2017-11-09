@@ -23,11 +23,25 @@
       </template>
     </dom-if>
 
-    <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
+    <prendus-unauthorized-modal
+      assignment-id="[[assignmentId]]"
+      on-authorized="_loadAssignment"
+      on-unauthorized="_handleUnauthorized"
+      opened="[[modalOpen]]"
+    >
+    </prendus-unauthorized-modal>
 
     <div hidden$="[[!loaded]]">
-      <prendus-carousel id="carousel" hide-back next-text="Submit" items="[[questions]]" on-next="_handleNextRequest" on-item-changed="_handleNextQuestion">
-        <div hidden$="[[!question]]">
+      <prendus-carousel
+        id="carousel"
+        hide-back
+        next-text="Submit"
+        items="[[questions]]"
+        on-next="_handleNextRequest"
+        on-item-changed="_handleNextQuestion"
+        on-finished-changed="_handleFinished"
+      >
+        <div hidden$="[[finished]]">
           <div>
             <h3>Concept</h3>
             <div class="prendus-card">[[question.concept.title]]</div>
@@ -46,7 +60,7 @@
             <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
         </div>
         </div>
-        <div hidden$="[[question]]">
+        <div hidden$="[[!finished]]">
           <div>
             <h4>Done</h4>
             <p>[[completionReason]]</p>
