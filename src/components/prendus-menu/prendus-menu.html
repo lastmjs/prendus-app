@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
@@ -20,11 +21,14 @@
         /*Need this to be 0*/
         bottom: 0;
       }
-      #prendus-menu{
+      a:hover, a:visited, a:link, a:active{
+          text-decoration: none;
+      }
+      #menu{
         /*This is because the app-drawer has padding of 120px. Annoying. Open to other ways to get rid of the padding*/
         margin-top: -184px;
       }
-      #prendus-menu  paper-item{
+      #menu-items  paper-item{
         cursor: pointer;
         text-transform: uppercase;
         font-style: normal;
@@ -39,7 +43,7 @@
         color: gray;
         width: 100%;
       }
-      #prendus-menu  paper-item:hover{
+      #menu-items  paper-item:hover{
         color: var(--prendus-primary-color);
       }
       #legal-links{
@@ -48,30 +52,52 @@
         display: flex;
         justify-content: space-between;
       }
+      #account-info{
+        cursor: pointer;
+        text-transform: uppercase;
+        font-style: normal;
+        font-variant-ligatures: normal;
+        font-variant-caps: normal;
+        font-variant-numeric: normal;
+        font-weight: 500;
+        font-stretch: normal;
+        font-size: 18px;
+        line-height: normal;
+        font-family: Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        color: white;
+      }
+      #truncated-email{
+        width: 165px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #account-item{
+        padding: 0;
+      }
     </style>
 
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <app-drawer-layout>
-      <app-drawer id="prendus-drawer" slot="drawer" align="right" fullbleed>
-        <app-header id ="prendus-navbar" fixed>
-          <app-toolbar id="prendus-menu" sticky>
-            <dom-if if="[[user]]">
-              <template>
-                <span id="large-screen"><a class="prendus-button prendus-button--recommended navbar-text" on-click="logout">Log out</a></span>
-              </template>
-            </dom-if>
-            <dom-if if="[[!user]]">
-              <template>
-                <a class="prendus-button prendus-button--recommended navbar-text" href="signup">Signup</a>
-                <a class="prendus-button prendus-button--recommended navbar-text" href="login">Login</a>
-              </template>
-            </dom-if>
-            <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
+      <app-drawer id="menu" slot="drawer" align="right" fullbleed>
+        <app-header id="prendus-navbar" fixed>
+          <app-toolbar>
+            <paper-menu-button vertical-align="bottom" horizontal-align="left" id='account-info'>
+              <paper-item id="account-item" slot="dropdown-trigger"><iron-icon icon="account-circle"></iron-icon>&nbsp; <span id="truncated-email">[[user.email]]</span></paper-item>
+              <a slot="dropdown-content" class="prendus-button prendus-button--recommended navbar-text" on-click="logout">Log out</a>
+              <paper-listbox >
+                <!-- Need to fix this later -->
+                <paper-item on-click="logout">Share</paper-item>
+                <paper-item>Settings</paper-item>
+                <paper-item>Help</paper-item>
+              </paper-listbox>
+            </paper-menu-button>
           <app-toolbar>
         </app-header>
-        <paper-listbox >
-          <paper-item><iron-icon icon="account-circle"></iron-icon>&nbsp; My Account</paper-item>
-          <hr>
+        <paper-listbox id="menu-items">
           <a href="/questions/view"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
           <hr>
           <paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item>

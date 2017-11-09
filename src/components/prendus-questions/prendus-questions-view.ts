@@ -18,6 +18,7 @@ class PrendusQuestionsView extends Polymer.Element {
   user: User;
   assignment: Assignment;
   flagQuestionModalOpened: boolean;
+  noUserQuestions: boolean;
   questionIds: string[];
   questions:  Question[];
   static get is() { return 'prendus-questions-view' }
@@ -43,7 +44,7 @@ class PrendusQuestionsView extends Polymer.Element {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
         const userQuestionIds = await getUserQuestions(this.user.id, this.userToken);
-        const userQuestionIdsArray = userQuestionIds.map(question => question.id)
+        const userQuestionIdsArray = (userQuestionIds.length) ? userQuestionIds.map(question => question.id) : false;
         this.action = fireLocalAction(this.componentId, 'questionIds', userQuestionIdsArray)
         this.action = fireLocalAction(this.componentId, 'loaded', true)
       }, 0);
@@ -62,11 +63,11 @@ class PrendusQuestionsView extends Polymer.Element {
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
+    if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
     if (keys.includes('error')) this.error = componentState.error;
     if (keys.includes('flagQuestionModalOpened')) this.flagQuestionModalOpened = componentState.flagQuestionModalOpened;
     this.userToken = state.userToken;
     this.user = state.user;
-    console.log('this.questionIds', this.questionIds)
   }
 
 }

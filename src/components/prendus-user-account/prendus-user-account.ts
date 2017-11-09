@@ -8,7 +8,7 @@ import {persistUserToken, getAndSetUser, setNotification} from '../../redux/acti
 import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
-class PrendusSignup extends Polymer.Element implements ContainerElement {
+class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | DefaultAction | SetComponentPropertyAction;
     userToken: string | null;
@@ -27,7 +27,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     attributesToRetrieve: string[]
     createInstitutionModalOpen: boolean;
 
-    static get is() { return 'prendus-signup'; }
+    static get is() { return 'prendus-user-account'; }
     static get properties() {
         return {
             redirectUrl: {
@@ -165,7 +165,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     }
 }
 
-window.customElements.define(PrendusSignup.is, PrendusSignup);
+window.customElements.define(PrendusUserAccount.is, PrendusUserAccount);
 
 function enableSignup(email: string, password: string, confirmedPassword: string){
   if(email && password && confirmedPassword){
@@ -178,7 +178,7 @@ function enableSignup(email: string, password: string, confirmedPassword: string
   }
 }
 
-async function performSignupMutation(context: PrendusSignup, email: string, password: string, userToken: string | null) {
+async function performSignupMutation(context: PrendusUserAccount, email: string, password: string, userToken: string | null) {
     // signup the user and login the user
     const data = await GQLRequest(`
         mutation signupUser($email: String!, $password: String!) {
@@ -195,7 +195,7 @@ async function performSignupMutation(context: PrendusSignup, email: string, pass
     return data;
 }
 
-async function addUserInstitution(context: PrendusSignup, userId: string, institutionId: string, userToken: string | null){
+async function addUserInstitution(context: PrendusUserAccount, userId: string, institutionId: string, userToken: string | null){
   const data = await GQLRequest(`
       mutation addUserInstitution($email: String!, $password: String!) {
           addToUsersInstitution(usersUserId: $userId, institutionInstitutionId: $institutionId) {
@@ -225,7 +225,7 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
       });
   }
 }
-function _clearFormData(context: PrendusSignup){
+function _clearFormData(context: PrendusUserAccount){
   context.shadowRoot.querySelector('#email').value = '';
   context.shadowRoot.querySelector('#password').value = '';
   context.shadowRoot.querySelector('#confirm-password').value = '';

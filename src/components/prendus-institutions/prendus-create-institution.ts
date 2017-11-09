@@ -1,22 +1,18 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
+import {setNotification} from '../../redux/actions';
 import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType, QuestionType} from '../../services/constants-service';
 import {User} from '../../typings/user';
+import {Institution} from '../../typings/institution'
 import {GQLVariables} from '../../typings/gql-variables';
 
-class PrendusCreateInstitution extends Polymer.Element implements ContainerElement {
+class PrendusCreateInstitution extends Polymer.Element {
     componentId: string;
     action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
     user: User;
-    userToken: string;
-    institutionName: string;
-    institutionAbbreviation: string;
-    institutionCountry: string;
-    institutionState: string;
-    institutionCity: string;
+    institution: Institution;
+    createInstitutionButtonDisabled: boolean;
 
     static get is() { return 'prendus-create-institution'; }
 
@@ -24,78 +20,83 @@ class PrendusCreateInstitution extends Polymer.Element implements ContainerEleme
         super();
         this.componentId = createUUID();
     }
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
+        setTimeout(() => {
+          this.action = fireLocalAction(this.componentId, "createInstitutionButtonDisabled", true);
+        });
     }
     checkIfInstitutionFormReadyToSubmit(){
-      const variables = getAndSetInstitutionVars();
-      console.log('variables check', variables);
+      const variables: Institution = this.getInstitutionVars();
+      (variables.name && variables.country && variables.state && variables.city) ? this.action = fireLocalAction(this.componentId, "createInstitutionButtonDisabled", false) : this.action = fireLocalAction(this.componentId, "createInstitutionButtonDisabled", true);
+      const checksPass = (variables.name && variables.country && variables.state && variables.city) ? variables : false;
+      return checksPass;
     }
-    getAndSetInstitutionVars(){
-      this.shadowRoot.querySelector('#institutionName').value ? fireLocalAction(this.componentId, 'institutionName', this.shadowRoot.querySelector('#institutionName').value) : null;
-      this.shadowRoot.querySelector('#institutionAbbreviation').value ? fireLocalAction(this.componentId, 'institutionAbbreviation', this.shadowRoot.querySelector('#institutionAbbreviation').value) : null;
-      this.shadowRoot.querySelector('#institutionCountry').value ? fireLocalAction(this.componentId, 'institutionCountry', this.shadowRoot.querySelector('#institutionCountry').value) : null;
-      this.shadowRoot.querySelector('#institutionState').value ? fireLocalAction(this.componentId, 'institutionState', this.shadowRoot.querySelector('#institutionState').value) : null;
-      this.shadowRoot.querySelector('#institutionCity').value ? fireLocalAction(this.componentId, 'institutionCity', this.shadowRoot.querySelector('#institutionCity').value) : null;
+    getInstitutionVars(){
+      const institutionName = this.shadowRoot.querySelector('#institutionName').value;
+      const institutionAbbreviation = this.shadowRoot.querySelector('#institutionAbbreviation').value ? this.shadowRoot.querySelector('#institutionAbbreviation').value : '';
+      const institutionCountry = this.shadowRoot.querySelector('#institutionCountry').value;
+      const institutionState = this.shadowRoot.querySelector('#institutionState').value;
+      const institutionCity = this.shadowRoot.querySelector('#institutionCity').value;
 
       return {
-        name: this.institutionName,
-        abbreviation: this.institutionAbbreviation,
-        country: this.institutionCountry,
-        state: this.institutionState,
-        city: this.institutionCity,
-        user: this.user,
+        name: institutionName,
+        abbreviation: institutionAbbreviation,
+        country: institutionCountry,
+        state: institutionState,
+        city: institutionCity
       }
     }
-    createInstitutionOnEnter(e){
-      console.log('e', e)
+    enableCreateInstitutionAndSubmitOnEnter(e: any){
       this.checkIfInstitutionFormReadyToSubmit();
+      if(e.keyCode === 13) this.createInstitution();
     }
-    createInstitution(){
-      this.checkIfInstitutionFormReadyToSubmit();
+    async createInstitution(){
+      const institutionVars = this.checkIfInstitutionFormReadyToSubmit();
+      if(institutionVars){
+        try{
+          const institution = await this.saveInstitution(institutionVars);
+          const evt = new CustomEvent('institution-created', {detail: {institution}});
+          this.dispatchEvent(evt);
+          //Fire the action here to send institution data to the client.
+        }catch(error){
+          this.action = setNotification(error.message, NotificationType.ERROR);
+        }
+      }
+    }
+    _handleGQLError(err: any) {
+      this.action = setNotification(err.message, NotificationType.ERROR);
+    }
+    async saveInstitution(variables: GQLVariables): Promise<{}|null> {
       try{
-        saveInstitution(institutionVars)
+        const data = await GQLRequest(`mutation newInstitution($name: String!, $abbreviation: String!, $country: String!, $city: String!, $state: String!) {
+          createInstitution(
+            name: $name,
+            abbreviation: $abbreviation,
+            country: $country,
+            state: $state,
+            city: $city,
+          ) {
+            id
+            name
+          }
+        }`, variables, "", this._handleGQLError.bind(this));
+        if (!data) {
+          throw "Unable to save institution"
+        }
+        return data.createInstitution;
+      }catch(error){
+        throw error;
       }
     }
-
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         const componentState = state.components[this.componentId] || {};
         const keys = Object.keys(componentState);
-        if (keys.includes('institutionName')) this.institutionName = componentState.institutionName;
-        if (keys.includes('institutionAbbreviation')) this.institutionAbbreviation = componentState.institutionAbbreviation;
-        if (keys.includes('institutionCountry')) this.institutionCountry = componentState.institutionCountry;
-        if (keys.includes('institutionState')) this.institutionState = componentState.institutionState;
-        if (keys.includes('institutionCity')) this.institutionCity = componentState.institutionCity;
+        if (keys.includes('createInstitutionButtonDisabled')) this.createInstitutionButtonDisabled = componentState.createInstitutionButtonDisabled;
         this.userToken = state.userToken;
         this.user = state.user;
     }
 }
 
 window.customElements.define(PrendusCreateInstitution.is, PrendusCreateInstitution);
-
-async function saveInstitution(variables: GQLVariables): Promise<string|null> {
-  console.log('variables', variables)
-  try{
-    const data = await GQLRequest(`mutation newInstitution($authorId: ID!, $conceptId: ID!, $resource: String!, $text: String!, $code: String!, $assignmentId: ID!, $imageIds: [ID!]!, $answerComments: [QuestionanswerCommentsAnswerComment!]!) {
-      createQuestion(
-        authorId: $authorId,
-        conceptId: $conceptId,
-        assignmentId: $assignmentId,
-        resource: $resource,
-        text: $text,
-        code: $code,
-        imagesIds: $imageIds
-        answerComments: $answerComments
-      ) {
-        id
-      }
-    }`, variables, this.userToken, this._handleGQLError.bind(this));
-    if (!data) {
-      throw "Unable to save institution"
-    }
-    return data.createQuestion.id;
-  }catch(error){
-    throw error;
-  }
-}

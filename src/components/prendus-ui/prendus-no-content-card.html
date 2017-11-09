@@ -1,0 +1,40 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="prendus-styles.html">
+
+<dom-module id="prendus-no-content-card">
+    <template>
+        <style include="prendus-styles">
+        :host {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        #card-container {
+          width: 100%;
+          max-width: 400px;
+          padding: 3vh;
+        }
+        .giveMeSomeSpace{
+          margin-top: 5vh;
+        }
+        </style>
+          <paper-card id="card-container">
+            <h1>No [[parentComponent]]s Yet</h1>
+            <div>
+              <iron-icon class="prendus-icon-button" icon="add"></iron-icon>
+            </div>
+            <div>
+              <a class="giveMeSomeSpace prendus-button prendus-button--recommended" disabled="[[!signupButtonEnabled]]" href="[[primaryRedirectUrl]]">Create [[parentComponent]]</a>
+            </div>
+          </paper-card>
+    </template>
+
+    <script type="module" src="prendus-no-content-card.ts"></script>
+</dom-module>

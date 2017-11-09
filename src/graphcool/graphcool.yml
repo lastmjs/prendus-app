@@ -523,6 +523,22 @@ permissions:
 # Purchase Update
 # Purchase Delete
 
+# Institution Create
+- operation: Institution.create
+
+# Institution Read
+- operation: Institution.read
+
+# Institution Update
+- operation: Institution.update
+  authenticated: true
+  query: ./permission-queries/institution/institution-update.graphql
+
+# Institution Delete
+- operation: Institution.delete
+  authenticated: true
+  query: ./permission-queries/institution/institution-delete.graphql
+
 #### Relations Permissions
 
 - operation: RaterOnQuestionRating.connect

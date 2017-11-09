@@ -186,6 +186,7 @@ async function getUser(email: string, password: string, userToken: string | null
         }
       }
     `, {email}, userToken, (error: any) => {
+      console.log('error', error)
       error.message = "An unexpected error occurred fetching user data. Please reload and try again."
       throw error;
     });

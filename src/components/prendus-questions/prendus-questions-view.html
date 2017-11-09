@@ -6,10 +6,12 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
 
 
 <dom-module id="prendus-questions-view">
-  <style>
+  <style include="prendus-styles">
     :host {
       display: block;
     }
@@ -22,10 +24,15 @@
 
       <dom-if if="[[loaded]]">
           <template>
+            <dom-if if="[[!questionIds]]">
+              <template>
+                <prendus-no-content-card parent-component="Question" primary-redirect-url="question/create"></prendus-no-content-card>
+              </template>
+            </dom-if>
             <!-- Need to get an iron list working.  -->
             <dom-repeat items="[[questionIds]]">
               <template>
-                <prendus-view-question  question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
+                <prendus-view-question question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
               </template>
             </dom-repeat>
             <p>Hello World</p>
