@@ -91,7 +91,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   _computeCategories(rubric: Rubric): string[] {
-    return [STUDENT, ...Object.keys(rubric), OVERALL];
+    return [...Object.keys(rubric), OVERALL];
   }
 
   _computeFilter(course: Course, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
