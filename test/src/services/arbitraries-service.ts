@@ -26,14 +26,14 @@ export const QuestionArb = jsc.record({
   text: escapedString,
   code: escapedString,
   concept: ConceptArb,
-  ratings: jsc.nearray(QuestionRatingArb),
+  ratings: jsc.array(QuestionRatingArb),
 });
 export const AssignmentArb = jsc.record({
   title: escapedString,
-  questions: jsc.nearray(QuestionArb),
+  questions: jsc.array(QuestionArb),
 });
 export const CourseArb = jsc.record({
   title: escapedString,
-  assignments: jsc.small(jsc.nearray(AssignmentArb)),
+  assignments: jsc.small(jsc.array(AssignmentArb)),
 });
 

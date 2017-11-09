@@ -64,10 +64,18 @@ function mutationParameters(arb, mut) {
 }
 
 function mutationSelections(arb, type, name) {
-  if (Array.isArray(arb) && arb.every(el => typeof el === 'object'))
-    return mutationSelections(arb[0], type, name);
-  else if (Array.isArray(arb) || typeof arb !== 'object')
-    return '';
+  if (Array.isArray(arb)) {
+    if (arb.length)
+      return arb
+        .map(el => mutationSelections(el, type, name))
+        .reduce((max, str) => str.length > max.length ? str : max, '');
+    else if (getNamedType(type) instanceof GraphQLObjectType)
+      return `${name} {id}\n`
+    else
+      return `${name}\n`;
+  }
+  else if (typeof arb !== 'object')
+    return `${name}\n`;
   const gqlFields = getNamedType(type).getFields();
   const fields = Object.keys(arb).filter(field => Boolean(gqlFields[field]));
   const selections = fields
@@ -128,6 +136,8 @@ function flattenTypedIds(data, type) {
       .map(datum => flattenTypedIds(datum, type))
       .reduce(flatten, []);
   const rawType = getNamedType(type);
+  if (!(rawType instanceof GraphQLObjectType))
+    return [];
   const fields = rawType.getFields();
   return Object.keys(data).reduce(
     (result, k) => k === 'id'

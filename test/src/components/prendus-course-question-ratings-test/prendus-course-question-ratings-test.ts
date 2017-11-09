@@ -243,24 +243,30 @@ function tableIsSortable(table, course) {
 }
 
 function verifyTable(table: PrendusCourseQuestionRatings, course: object): boolean {
-  const questions = course
-    .assignments
-    .map(assignment => assignment.questions)
-    .reduce(flatten, []);
-  return table.courseId === course.id
-    && table.course.id === course.id
-    && questions.every(
-        question => table
-        .shadowRoot
-        .querySelector('prendus-infinite-list')
-        .items
-        .map(q => q.id)
-        .indexOf(question.id) > -1
-    )
-    && table.assignmentId === 'ALL'
-    && table.conceptId === 'ALL'
-    && table.sortAsc === false
-    && table.sortField === 'Overall';
+  try {
+    const questions = course
+      .assignments
+      .map(assignment => assignment.questions)
+      .reduce(flatten, []);
+    return table.courseId === course.id
+      && table.course.id === course.id
+      && questions.every(
+          question => table
+          .shadowRoot
+          .querySelector('prendus-infinite-list')
+          .items
+          .map(q => q.id)
+          .indexOf(question.id) > -1
+      )
+      && table.assignmentId === 'ALL'
+      && table.conceptId === 'ALL'
+      && table.sortAsc === false
+      && table.sortField === 'Overall';
+  }
+  catch (e) {
+    console.error(e);
+    return false;
+  }
 }
 
 function verifyFilter(assignmentId: number, conceptId: number, filtered: Question[]): boolean {
