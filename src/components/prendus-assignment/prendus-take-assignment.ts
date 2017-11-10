@@ -33,6 +33,7 @@ class PrendusTakeAssignment extends Polymer.Element {
   completionReason: string;
   submitted: string[] = [];
   finished: boolean;
+  modalOpen: boolean;
 
   static get is() { return 'prendus-take-assignment' }
 
@@ -72,6 +73,16 @@ class PrendusTakeAssignment extends Polymer.Element {
     const questions = await createQuiz(questionIds, this.user.id, this.userToken, errCb);
     this.action = fireLocalAction(this.componentId, 'questions', shuffleArray(questions));
     this.action = fireLocalAction(this.componentId, 'loaded', true);
+  }
+
+  _handleUnauthorized(e: CustomEvent) {
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    if (authenticated === false)
+      navigate('/authenticate');
+    else if (payed === false)
+      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+    else if (enrolled === false)
+      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
   }
 
   async _handleResponse(e: CustomEvent) {
@@ -145,6 +156,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     this.question = componentState.question;
     this.submitted = componentState.submitted || [];
     this.finished = componentState.finished;
+    this.modalOpen = componentState.modalOpen;
     this.userToken = state.userToken;
     this.user = state.user;
   }

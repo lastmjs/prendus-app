@@ -18,7 +18,12 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
+    <prendus-unauthorized-modal
+      assignment-id="[[assignmentId]]"
+      on-authorized="_loadAssignment"
+      on-unauthorized="_handleUnauthorized"
+      opened="[[modalOpen]]"
+    ></prendus-unauthorized-modal>
 
     <div hidden$="[[!loaded]]">
       <h2>[[assignment.title]] Grade Assignment</h2>

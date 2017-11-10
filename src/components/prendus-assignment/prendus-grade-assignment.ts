@@ -36,6 +36,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   response: UserEssay;
   completionReason: string;
   finished: boolean;
+  modalOpen: boolean;
 
   static get is() { return 'prendus-grade-assignment' }
 
@@ -78,6 +79,16 @@ class PrendusGradeAssignment extends Polymer.Element {
     if (!text) return '';
     const m = parse(text, null).ast[0].content.match(/<img src="(.*)"/);
     return m ? m[1] : '';
+  }
+
+  _handleUnauthorized(e: CustomEvent) {
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    if (authenticated === false)
+      navigate('/authenticate');
+    else if (payed === false)
+      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+    else if (enrolled === false)
+      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
   }
 
   async _handleNextRequest(e: CustomEvent) {
@@ -151,6 +162,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     this.response = componentState.response;
     this.grades = componentState.grades;
     this.finished = componentState.finished;
+    this.modalOpen = componentState.modalOpen;
     this.userToken = state.userToken;
     this.user = state.user;
   }
