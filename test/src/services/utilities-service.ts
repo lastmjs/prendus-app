@@ -1,6 +1,7 @@
 import {
   Course,
 } from '../../../src/typings/index.d';
+import {asyncForEach} from '../../../src/node_modules/prendus-shared/services/utilities-service';
 import {getAnalytics} from './dataGen-service';
 
 export const getListener = (eventName: string, element: HTMLElment): Promise => {
@@ -47,5 +48,21 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
 export async function checkAnalytics(assignmentId: string, verbs: string[]): Promise<boolean> {
   const analytics = await getAnalytics({ assignment: { id: assignmentId } });
   return analytics.every((analytic, i) => analytic.verb === verbs[i]);
+}
+
+export async function scoreDropdowns(dropdowns): Promise {
+  const SCORES_CHANGED = 'scores-changed';
+  const rubric = dropdowns.rubric;
+  const menus = Array.from(dropdowns.shadowRoot.querySelector('paper-dropdown-menu'));
+  await asyncForEach(
+    menus,
+    async menu => {
+      const category = rubric[menu.category];
+      const option = Object.keys(category)[0]; //Arbitrary for now.
+      const event = getListener(SCORES_CHANGED, dropdowns);
+      menu.selected = option;
+      await event;
+    }
+  );
 }
 

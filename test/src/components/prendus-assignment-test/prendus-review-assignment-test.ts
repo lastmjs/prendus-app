@@ -88,7 +88,8 @@ function loadAndTestAssignment(reviewAssignment) {
       return false;
     if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
       return checkAnalytics(assignment.id, [VerbType.STARTED]) && reviewAssignment.finished === true;
-    return true;
+    const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+    await scoreDropdowns(dropdowns);
   }
 }
 
