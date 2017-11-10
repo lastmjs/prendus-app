@@ -3,83 +3,47 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
+<link rel="import" href="prendus-unauthorized-modal.html">
+<link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
 <link rel="import" href="../prendus-notification/prendus-notification.html">
-<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
 <dom-module id="prendus-take-assignment">
 
   <template>
 
     <style include="prendus-styles">
-    #unauthorizedAccessModal{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .unauthorizedAccessModalListItem{
-        margin-top: 30px;
-      }
       #carousel{
         position: relative;
-      }
-      #flag{
-        position: absolute;
-        top: calc(100% - 90px);
-        --iron-icon-fill-color: red;
       }
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <dom-if if="[[loaded]]">
-        <template>
-            <prendus-carousel id="carousel" hide-next hide-back data="[[questions]]" on-carousel-data="_handleNextQuestion">
-              <div hidden$="[[!question]]">
-                <prendus-view-question  question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
-                <iron-icon id="flag" class="prendus-icon-button" icon="flag" on-click="_openFlagQuestionModal"></iron-icon>
-                <!-- <button id="flag" class="prendus-button" on-click="_nextClick"><icon></icon></button> -->
-                <button class="prendus-button prendus-button--recommended" on-click="_nextClick">Next Question</button>
-              </div>
-              <div hidden$="[[question]]">
-                <h3>Done</h3>
-                <p>You have completed this assignment</p>
-              </div>
-            </prendus-carousel>
-        </template>
-    </dom-if>
+    <prendus-unauthorized-modal assignment-id="[[assignmentId]]" on-authorized="_loadAssignment"></prendus-unauthorized-modal>
 
-    <dom-if if="[[!loaded]]">
-        <template>
-            Loading...
-        </template>
-    </dom-if>
-    <paper-dialog id="flagQuestionModal" modal opened="[[flagQuestionModalOpened]]">
-        <div class="content">
-          <h1>What is wrong with this question?</h1>
-          <div>
-            <paper-input id="flag-response" label="Reason question should be flagged"></paper-input>
-          </div>
-        <div>
-        <div class="buttons">
-          <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
-          <button class="prendus-button prendus-button--recommended" on-click="createQuestionFlag">Submit Feedback</button>
+    <div hidden$="[[!loaded]]">
+      <prendus-carousel
+        id="carousel"
+        items="[[questions]]"
+        on-item-changed="_handleNextQuestion"
+        on-next="_nextClick"
+        on-back="_backClick"
+        on-finished-changed="_handleFinished"
+      >
+        <div hidden$="[[finished]]">
+          <prendus-flaggable-question  question="[[question]]" on-question-response="_handleResponse"></prendus-flaggable-question>
         </div>
-    </paper-dialog>
-    <paper-dialog id="unauthorizedAccessModal" modal>
-        <div class="content">
-          <h1>Unauthorized to Access this page</h1>
-          <p class="unauthorizedAccessModalListItem">If you are using this in a course, launch from your Learning Management System to properly access the course.</p>
-          <p class="unauthorizedAccessModalListItem">If you are unsure of how to access the content through your LMS, contact your intructor to get added to the course</p>
-          <p class="unauthorizedAccessModalListItem">For customer assistance, please contact Prendus help at benjaminprendus@gmail.com
-        <div>
-        <div id="continueButton" class="buttons">
-          <button class="prendus-button prendus-button--recommended" on-click="continueToHome">Go To Homepage</button>
+        <div hidden$="[[!finished]]">
+          <h3>Done</h3>
+          <p>[[completionReason]]</p>
         </div>
-    </paper-dialog>
+      </prendus-carousel>
+    </div>
+
+    <div hidden$="[[loaded]]">
+      Loading...
+    </div>
 
   </template>
 

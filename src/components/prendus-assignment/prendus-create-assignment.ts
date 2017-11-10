@@ -19,6 +19,8 @@ class PrendusCreateAssignment extends Polymer.Element {
   question: Question;
   userToken: string;
   user: User;
+  savedId: string;
+  finished: boolean;
 
   static get is() { return 'prendus-create-assignment' }
 
@@ -56,32 +58,41 @@ class PrendusCreateAssignment extends Polymer.Element {
   _handleNextQuestion(e: CustomEvent) {
     const { data } = e.detail;
     this._fireLocalAction('question', data);
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
     if (data && data === this.questions[0]) //first round started
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.CREATE);
+      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
     else //subsequent rounds mean a question was created
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.CREATED, ObjectType.CREATE);
-    if (!data) //last round
-        this.gradePassback();
+      sendStatement(this.userToken, { ...statement, verb: VerbType.CREATED, questionId: this.savedId });
   }
 
   async gradePassback() {
-      try {
-          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
-          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
-      }
-      catch(error) {
-          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-          setTimeout(() => {
-              this.gradePassback();
-          }, 5000);
-      }
+    try {
+      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+    }
+    catch(error) {
+      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+      setTimeout(() => {
+          this.gradePassback();
+      }, 5000);
+    }
+  }
+
+  _handleFinished(e: CustomEvent) {
+    const finished = e.detail.value;
+    this._fireLocalAction('finished', finished);
+    if (!finished)
+      return;
+    if (this.questions && this.questions.length)
+      this.gradePassback();
   }
 
   async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
     const save = question.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(question);
-    this.shadowRoot.querySelector('#carousel').nextData();
+    this._fireLocalAction('savedId', questionId);
+    this.shadowRoot.querySelector('#carousel').next();
   }
 
   isEssayType(questionType: string): boolean {
@@ -120,6 +131,9 @@ class PrendusCreateAssignment extends Polymer.Element {
           const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
             Assignment(id: $assignmentId) {
               id
+              course {
+                id
+              }
               title
               numCreateQuestions
               questionType
@@ -139,8 +153,7 @@ class PrendusCreateAssignment extends Polymer.Element {
           }
 
           // Create array of "questions" just to create carousel events to create multiple questions
-          // avoid 0 because question is evaluated as a boolean
-          const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((dummy, i) => i+1);
+          const questions = Array(data.Assignment.numCreateQuestions).fill(null).map((_, i) => i);
           this._fireLocalAction('assignment', data.Assignment);
           this._fireLocalAction('questions', questions);
           this._fireLocalAction('loaded', true);
@@ -201,6 +214,8 @@ class PrendusCreateAssignment extends Polymer.Element {
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
+    if (keys.includes('savedId')) this.savedId = componentState.savedId;
+    if (keys.includes('finished')) this.finished = componentState.finished;
     this.userToken = state.userToken;
     this.user = state.user;
   }

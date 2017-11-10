@@ -142,12 +142,12 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   _handleNextQuestion(e: CustomEvent) {
     const question = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'question', question);
-    const statement = { userId: this.user.id };
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
     if (question && question === this.questions[0])
-      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED, assignmentId: this.assignment.id });
+      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
     else
-      sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: question.id });
+      sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: this.question.id });
+    this.action = fireLocalAction(this.componentId, 'question', question);
   }
 
   _handleFinished(e: CustomEvent) {
@@ -161,7 +161,7 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   async gradePassback() {
     try {
-      await LTIPassback(this.userToken, this.user.id, this.assignment.id, getCookie('ltiSessionIdJWT'));
+      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
@@ -239,6 +239,9 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
         }
       }) {
         id
+        course {
+          id
+        }
         text
         code
         explanation
