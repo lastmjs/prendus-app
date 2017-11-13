@@ -243,8 +243,12 @@ permissions:
   query: ./permission-queries/question/question-read-all-unauthenticated.graphql
 
 - operation: Question.read
+  query: ./permission-queries/question/question-read-all-unauthenticated.graphql
   authenticated: true
+
+- operation: Question.read
   query: ./permission-queries/question/question-read-all-authenticated.graphql
+  authenticated: true
 
 # Question Update
 - operation: Question.update
