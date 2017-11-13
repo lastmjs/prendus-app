@@ -33,8 +33,10 @@
   			}
         .app-window {
           padding-left: 5vw;
+          padding-right: 5vw;
           padding-top: 5vh;
           padding-bottom: 5vh;
+          width: 100%;
           min-height: calc(100vh - 64px);
         }
         #prendus-menu{
@@ -111,6 +113,9 @@
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/quiz" data="{{assignmentQuizRouteData}}" active="{{assignmentQuizRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/edit" data="{{editAssignmentRouteData}}" active="{{editAssignmentRouteActive}}"></app-route>
 
+        <app-route route="[[route]]" pattern="/quiz/create" data="{{createQuizRouteData}}" active="{{createQuizRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/quizzes/view" data="{{viewQuizzesRouteData}}" active="{{viewQuizzesRouteActive}}"></app-route>
+
         <app-route route="[[route]]" pattern="/learning-structure" data="{{learningStructureRouteData}}" active="{{learningStructureRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/teacher-approval" data="{{teacherApprovalRouteData}}" active="{{teacherApprovalRouteActive}}"></app-route>
@@ -137,7 +142,7 @@
 
         <prendus-navbar></prendus-navbar>
         <div id="main-content">
-          <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive)]]">
+          <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive, createQuizRouteActive, editQuizRouteActive, viewQuizzesRouteActive)]]">
 
               <prendus-home-page class="landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
               <prendus-what-is-prendus class="landing" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
@@ -180,6 +185,10 @@
               <prendus-grade-assignment class="app-window" show="assignmentGradeView" assignment-id="[[assignmentGradeRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-grade-assignment.html"></prendus-grade-assignment>
               <prendus-take-assignment class="app-window" show="assignmentQuizView" assignment-id="[[assignmentQuizRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-take-assignment.html"></prendus-take-assignment>
               <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
+
+              <prendus-quiz-create class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-create.html"></prendus-quiz-create>
+              <prendus-quiz-edit class="app-window" show="editQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quizzes-view class="app-window" show="viewQuizzesView" data-path="../prendus-quizzes/prendus-quizzes-view.html"></prendus-quizzes-view>
 
               <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>
 

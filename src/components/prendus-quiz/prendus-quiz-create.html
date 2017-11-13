@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+
+
+<dom-module id="prendus-quiz-create">
+    <template>
+      <style include="prendus-styles">
+        #questionsToAddToQuiz{
+          display: flex;
+        }
+      </style>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+      <!-- Eventually just wrap the quiz-edit component in this component that will except an empty state and has a save button  -->
+      <dom-if if="[[loaded]]">
+          <template>
+            <div id="questionsToAddToQuiz">
+              <dom-repeat items="[[questionIds]]">
+                <template>
+                  <prendus-view-question class="prendus-question" question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
+                </template>
+              </dom-repeat>
+            </div>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-quiz-create.ts"></script>
+</dom-module>

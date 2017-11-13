@@ -7,7 +7,16 @@ class PrendusNoContentCard extends Polymer.Element implements ContainerElement {
           primaryRedirectUrl: {
             type: String,
           },
+          secondaryRedirectUrl: {
+            type: String,
+          },
           parentComponent: {
+            type: String,
+          },
+          plural: {
+            type: String,
+          },
+          displayIcon: {
             type: String,
           }
         };

@@ -77,7 +77,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
         };
     }
     findDisciplines(){
-      console.log('finding discipliens')
       this.client = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
       this.index = this.client.initIndex('Discipline');
       const departmentPartialName: string = this.shadowRoot.querySelector('#department').value;
@@ -129,7 +128,6 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
       const title = this.shadowRoot.querySelector('#titleInput').value;
       const disciplineId = this.shadowRoot.querySelector('#department').value;
       const subjectId = this.shadowRoot.querySelector('#subject').value;
-      console.log('disciplineId', disciplineId, 'subjectId', subjectId)
       const courseNumber = this.shadowRoot.querySelector('#courseNumber').value;
       if(title){
         const data = await GQLRequest(`

@@ -13,6 +13,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 
 <dom-module id="prendus-courses">
     <template>
@@ -41,6 +42,11 @@
         </style>
         <dom-if if="[[loaded]]">
             <template>
+                <dom-if if="[[!courses.length]]">
+                  <template>
+                    <prendus-no-content-card parent-component="Course" plural="Courses" primary-redirect-url="course/create" secondary-redirect-url="course/search" display-icon="social:school"></prendus-no-content-card>
+                  </template>
+                </dom-if>
       				  <h1>Courses</h1>
                 <dom-repeat items="[[courses]]" class="courses-container">
                     <template>

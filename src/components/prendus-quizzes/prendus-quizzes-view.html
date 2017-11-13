@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
@@ -12,7 +12,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 
-<dom-module id="prendus-questions-view">
+<dom-module id="prendus-quizzes-view">
     <template>
       <style include="prendus-styles">
         paper-fab{
@@ -21,40 +21,23 @@
           bottom: 30px;
           right: 300px;
         }
-        #prendus-questions-container{
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-around;
-          align-items: flex-start;
-          align-content: flex-start;
-        }
-        .prendus-question{
-          border-style: solid;
-          border-color: black;
-          padding: 5px;
-          margin: 5px;
-        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
       <dom-if if="[[loaded]]">
           <template>
-            <dom-if if="[[!questionIds]]">
+            <dom-if if="[[!quizIds]]">
               <template>
-                <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
+                <prendus-no-content-card parent-component="Quiz" plural="Quizzes" primary-redirect-url="quiz/create" secondary-redirect-url="quiz/search" display-icon="editor:format-list-bulleted"></prendus-no-content-card>
               </template>
             </dom-if>
             <!-- Need to get an iron list working.  -->
-            <div id="prendus-questions-container">
-              <dom-repeat items="[[questionIds]]">
-                <template>
-                  <div style="width: 50vw; background-color: white; margin-bottom: 5vh; box-shadow: 0px 0px 3px black">
-                    <prendus-view-question class="prendus-question" question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
-                  </div>
-                </template>
-              </dom-repeat>
-            </div>
-            <a href="/question/create"><paper-fab icon="add"></paper-fab></a>
+            <dom-repeat items="[[quizIds]]">
+              <template>
+                [[quizId]]
+              </template>
+            </dom-repeat>
+            <a href="/quiz/create"><paper-fab icon="add"></paper-fab></a>
           </template>
       </dom-if>
 
@@ -65,5 +48,5 @@
       </dom-if>
     </template>
 
-    <script type="module" src="prendus-questions-view.ts"></script>
+    <script type="module" src="prendus-quizzes-view.ts"></script>
 </dom-module>

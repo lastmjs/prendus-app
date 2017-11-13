@@ -49,7 +49,8 @@
     "iron-pages": "^2.0.0",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
     "iron-list": "PolymerElements/iron-list#^2.0.11",
-    "paper-autocomplete": "^3.4.0"
+    "paper-autocomplete": "^3.4.0",
+    "paper-fab": "PolymerElements/paper-fab#^2.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0"
