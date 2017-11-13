@@ -15,47 +15,96 @@
 
 types: ./types.graphql
 
+# Your root tokens used for functions to get full access to the API
+# Read more here:
+# https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
+rootTokens:
+- cloudFunctionsRootToken
+
+
+# Organize your code into modules
+# You can find modules from the community here:
+# https://github.com/graphcool/modules
+# modules: {}
+
 functions:
     signup:
         handler:
             code:
-                src: ./functions/signup/signup.js
+                src: ./functions/signup/signup.ts
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/signup/signup.graphql
     authenticate:
         handler:
             code:
-                src: ./functions/authenticate/authenticate.js
+                src: ./functions/authenticate/authenticate.ts
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/authenticate/authenticate.graphql
     add-lti-user:
         handler:
             code:
-                src: ./functions/add-lti-user/add-lti-user.js
+                src: ./functions/add-lti-user/add-lti-user.ts
+                environment:
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/add-lti-user/add-lti-user.graphql
     course-payment:
         handler:
             code:
-                src: ./functions/course-payment/course-payment.js
+                src: ./functions/course-payment/course-payment.ts
                 environment:
                     STRIPE_SECRET_KEY: ${env:STRIPE_SECRET_KEY}
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/course-payment/course-payment.graphql
     request-password-reset:
         handler:
             code:
-                src: ./functions/request-password-reset/request-password-reset.js
+                src: ./functions/request-password-reset/request-password-reset.ts
                 environment:
                     MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/request-password-reset/request-password-reset.graphql
     reset-password:
         handler:
             code:
-                src: ./functions/reset-password/reset-password.js
+                src: ./functions/reset-password/reset-password.ts
+        context:
+            rootToken: cloudFunctionsRootToken
         type: resolver
         schema: ./functions/reset-password/reset-password.graphql
+    assignment-lti-launch:
+        handler:
+            code:
+                src: ./functions/assignment-lti-launch/assignment-lti-launch.ts
+                environment:
+                    PRENDUS_LTI_SECRET: ${env:PRENDUS_LTI_SECRET}
+                    PRENDUS_CLIENT_ORIGIN: ${env:PRENDUS_CLIENT_ORIGIN}
+                    PRENDUS_CLIENT_DOMAIN: ${env:PRENDUS_CLIENT_DOMAIN}
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/assignment-lti-launch/assignment-lti-launch.graphql
+    assignment-lti-grade:
+        handler:
+            code:
+                src: ./functions/assignment-lti-grade/assignment-lti-grade.ts
+                environment:
+                    PRENDUS_JWT_SECRET: ${env:PRENDUS_JWT_SECRET}
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: resolver
+        schema: ./functions/assignment-lti-grade/assignment-lti-grade.graphql
 
 permissions:
 
@@ -194,8 +243,12 @@ permissions:
   query: ./permission-queries/question/question-read-all-unauthenticated.graphql
 
 - operation: Question.read
+  query: ./permission-queries/question/question-read-all-unauthenticated.graphql
   authenticated: true
+
+- operation: Question.read
   query: ./permission-queries/question/question-read-all-authenticated.graphql
+  authenticated: true
 
 # Question Update
 - operation: Question.update
@@ -355,16 +408,16 @@ permissions:
 #### AnswerComment Permissions
 
 # AnswerComment Create
-- operation: Answercomment.create
+- operation: AnswerComment.create
 
 # AnswerComment Read
-- operation: Answercomment.read
+- operation: AnswerComment.read
 
 # AnswerComment Update
-- operation: Answercomment.update
+- operation: AnswerComment.update
 
 # AnswerComment Delete
-- operation: Answercomment.delete
+- operation: AnswerComment.delete
 
 #### Discipline Permissions
 
@@ -474,13 +527,106 @@ permissions:
 # Purchase Update
 # Purchase Delete
 
-# Your root tokens used for functions to get full access to the API
-# Read more here:
-# https://docs-next.graph.cool/reference/auth/authentication/authentication-tokens-eip7ahqu5o
-rootTokens: [cloudFunctionsRootToken]
+#### Relations Permissions
 
+- operation: RaterOnQuestionRating.connect
+- operation: RaterOnQuestionRating.disconnect
 
-# Organize your code into modules
-# You can find modules from the community here:
-# https://github.com/graphcool/modules
-modules: {}
+- operation: AuthorOnQuestion.connect
+- operation: AuthorOnQuestion.disconnect
+
+- operation: SubjectOnConcept.connect
+- operation: SubjectOnConcept.disconnect
+
+- operation: QuestionOnAnswerComment.connect
+- operation: QuestionOnAnswerComment.disconnect
+
+- operation: ConceptOnQuestion.connect
+- operation: ConceptOnQuestion.disconnect
+
+- operation: CourseOnAssignment.connect
+- operation: CourseOnAssignment.disconnect
+
+- operation: AssignmentOnConcepts.connect
+- operation: AssignmentOnConcepts.disconnect
+
+- operation: AuthorOnQuiz.connect
+- operation: AuthorOnQuiz.disconnect
+
+- operation: DisciplineOnSubject.connect
+- operation: DisciplineOnSubject.disconnect
+
+- operation: UserOnLTIUser.connect
+- operation: UserOnLTIUser.disconnect
+
+- operation: AuthorOnCourse.connect
+- operation: AuthorOnCourse.disconnect
+
+- operation: AssignmentOnQuiz.connect
+- operation: AssignmentOnQuiz.disconnect
+
+- operation: QuizOnQuestion.connect
+- operation: QuizOnQuestion.disconnect
+
+- operation: AuthorOnAssignment.connect
+- operation: AuthorOnAssignment.disconnect
+
+- operation: AssignmentQuestions.connect
+- operation: AssignmentQuestions.disconnect
+
+- operation: QuestionOnQuestionRating.connect
+- operation: QuestionOnQuestionRating.disconnect
+
+- operation: CourseDiscipline.connect
+- operation: CourseDiscipline.disconnect
+
+- operation: CourseSubject.connect
+- operation: CourseSubject.disconnect
+
+- operation: UserOnPrendusAnalytics.connect
+- operation: UserOnPrendusAnalytics.disconnect
+
+- operation: UserVariablesOnQuestionResponse.connect
+- operation: UserVariablesOnQuestionResponse.disconnect
+
+- operation: ScoresOnQuestionResponseRating.connect
+- operation: ScoresOnQuestionResponseRating.disconnect
+
+- operation: AuthorOnQuestionResponse.connect
+- operation: AuthorOnQuestionResponse.disconnect
+
+- operation: CoursePurchased.connect
+- operation: CoursePurchased.disconnect
+
+- operation: UserPurchases.connect
+- operation: UserPurchases.disconnect
+
+- operation: UserRadiosOnQuestionResponse.connect
+- operation: UserRadiosOnQuestionResponse.disconnect
+
+- operation: QuestionOnQuestionResponse.connect
+- operation: QuestionOnQuestionResponse.disconnect
+
+- operation: UserChecksOnQuestionResponse.connect
+- operation: UserChecksOnQuestionResponse.disconnect
+
+- operation: ImagesOnQuestions.connect
+- operation: ImagesOnQuestions.disconnect
+
+- operation: RaterOnQuestionResponseRating.connect
+- operation: RaterOnQuestionResponseRating.disconnect
+
+- operation: UserInputsOnQuestionResponse.connect
+- operation: UserInputsOnQuestionResponse.disconnect
+
+- operation: RatingsOnQuestionResponse.connect
+- operation: RatingsOnQuestionResponse.disconnect
+
+- operation: UserEssaysOnQuestionResponse.connect
+- operation: UserEssaysOnQuestionResponse.disconnect
+
+- operation: ScoresOnQuestionRating.connect
+- operation: ScoresOnQuestionRating.disconnect
+
+- operation: FlagOnQuestion.connect
+- operation: FlagOnQuestion.disconnect

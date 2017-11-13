@@ -1,0 +1,10 @@
+type AssignmentLTILaunchPayload {
+    ltiJWTCookie: String
+    ltiSessionIdJWTCookie: String!
+    clientRedirectUrlCookie: String!
+    serverRedirectUrl: String!
+}
+
+extend type Mutation {
+    assignmentLTILaunch(assignmentId: String!, assignmentType: String!, requestBody: String!, path: String!, method: String!): AssignmentLTILaunchPayload
+}
