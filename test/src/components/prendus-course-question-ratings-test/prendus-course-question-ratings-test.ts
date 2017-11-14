@@ -139,6 +139,139 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
   }
 }
 
+// Utils
+function assignUserIds(course: Course, instructorId: string, studentId: string): Course {
+  return {
+    ...course,
+    authorId: instructorId,
+    enrolledStudentsIds: [studentId],
+    assignments: course.assignments.map(
+      assignment => ({
+        ...assignment,
+        authorId: instructorId,
+        questions: assignment.questions.map(
+          question => ({
+            ...question,
+            authorId: studentId,
+            ratings: question.ratings.map(
+              rating => ({
+                ...rating,
+                raterId: studentId
+              })
+            )
+          })
+        )
+      })
+    )
+  }
+}
+
+async function setupData(course: Course) {
+  const student = await createTestUser('STUDENT');
+  const instructor = await createTestUser('INSTRUCTOR');
+  const courseData = await saveArbitrary(
+    assignUserIds(course, instructor.id, student.id),
+    'createCourse'
+  );
+  return { student, instructor, courseData };
+}
+
+function getConceptIds(course): string[] {
+  return [
+    ...course.assignments
+      .map(assignment => assignment.questions)
+      .reduce(flatten, [])
+      .map(question => question.concept.id),
+    'ALL',
+  ];
+}
+
+function getAssignmentIds(course): string[] {
+  return [
+    ...course.assignments.map(assignment => assignment.id),
+    'ALL',
+  ];
+}
+
+function flatten(arr: any[], el: any): any[] {
+  return arr.concat(Array.isArray(el) ? el.reduce(flatten, []) : el);
+}
+
+// Properties
+async function changeCourseId(table: PrendusCourseQuestionRatings, course: object): boolean {
+  const fulfilled = getListener(TABLE_LOADED, table);
+  table.courseId = course.id;
+  await fulfilled;
+  return verifyTable(table, course);
+}
+
+function tableFilters(table, course) {
+  const conceptIds = getConceptIds(course);
+  const assignmentIds = getAssignmentIds(course);
+  const assignmentArb = jsc.oneof(assignmentIds.map(id => jsc.constant(id)));
+  const conceptArb = jsc.oneof(conceptIds.map(id => jsc.constant(id)));
+  return jsc.forall(assignmentArb, conceptArb, async (assignmentId, conceptId) => {
+    const assignmentLoaded = assignmentId === table.assignmentId
+      ? Promise.resolve()
+      : getListener(TABLE_LOADED, table);
+    table.action = fireLocalAction(table.componentId, 'assignmentId', assignmentId);
+    await assignmentLoaded;
+    const conceptLoaded = conceptId === table.conceptId
+      ? Promise.resolve
+      : getListener(TABLE_LOADED, table);
+    table.action = fireLocalAction(table.componentId, 'conceptId', conceptId);
+    await conceptLoaded;
+    const filtered = table.shadowRoot.querySelector('prendus-infinite-list').items;
+    return verifyFilter(assignmentId, conceptId, filtered);
+  });
+}
+
+function tableIsSortable(table, course) {
+  const columns = [...Object.keys(DEFAULT_EVALUATION_RUBRIC), 'Overall',];
+  const columnArb = jsc.oneof(columns.map(column => jsc.constant(column)));
+  return jsc.forall(columnArb, jsc.bool, async (sortField, sortAsc) => {
+    const columnLoaded = sortField === table.sortField
+      ? Promise.resolve()
+      : getListener(TABLE_LOADED, table);
+    table.action = fireLocalAction(table.componentId, 'sortField', sortField);
+    await columnLoaded;
+    const loaded = sortAsc === table.sortAsc
+      ? Promise.resolve()
+      : getListener(TABLE_LOADED, table);
+    table.action = fireLocalAction(table.componentId, 'sortAsc', sortAsc);
+    await loaded;
+    const sorted = table.shadowRoot.querySelector('prendus-infinite-list').items;
+    return verifySort(sortField, sortAsc, sorted);
+  });
+}
+
+function verifyTable(table: PrendusCourseQuestionRatings, course: object): boolean {
+  try {
+    const questions = course
+      .assignments
+      .map(assignment => assignment.questions)
+      .reduce(flatten, []);
+    return table.courseId === course.id
+      && table.course.id === course.id
+      && questions.every(
+          question => table
+          .shadowRoot
+          .querySelector('prendus-infinite-list')
+          .items
+          .map(q => q.id)
+          .indexOf(question.id) > -1
+      )
+      && table.assignmentId === 'ALL'
+      && table.conceptId === 'ALL'
+      && table.sortAsc === false
+      && table.sortField === 'Overall';
+  }
+  catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
 //Utils
 async function setupData(course: Course) {
   const student = await createTestUser('STUDENT');
