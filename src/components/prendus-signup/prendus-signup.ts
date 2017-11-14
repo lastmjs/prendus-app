@@ -85,6 +85,7 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
 
         }catch(error){
           this.action = setNotification(error.message, NotificationType.ERROR);
+          this.action = fireLocalAction(this.componentId, 'loaded', true);
         }
     }
 
@@ -143,7 +144,7 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
           userId: user ? user.id : 'user is null',
           jwt: ltiJWT
       }, userToken, (error: any) => {
-        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help"
+        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
         throw error;
       });
   }

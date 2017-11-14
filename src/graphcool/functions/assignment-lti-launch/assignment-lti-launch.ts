@@ -21,6 +21,10 @@ interface OutcomeServiceJSON {
     send_replace_result_with_url: null;
 }
 
+interface NullOutcomeServiceJSON {
+    outcomeService: null;
+}
+
 export default async (event: any) => {
     if (!event.context.graphcool.rootToken) {
         console.log('Please provide a valid root token!')
@@ -87,25 +91,32 @@ async function createLTISession(api: any, ltiProvider: any, ltiUserId: string): 
     return data.createLTISession.id;
 }
 
-function jsonifyOutcomeService(outcomeService: any): OutcomeServiceJSON {
-    return {
-        cert_authority: outcomeService.cert_authority,
-        consumer_key: outcomeService.consumer_key,
-        consumer_secret: outcomeService.consumer_secret,
-        language: outcomeService.language,
-        result_data_types: outcomeService.result_data_types,
-        service_url: outcomeService.service_url,
-        service_url_oauth: outcomeService.service_url_oauth,
-        service_url_parts: outcomeService.service_url_parts,
-        signer: null,
-        source_did: outcomeService.source_did,
-        send_replace_result: null,
-        supports_result_data: null,
-        send_read_result: null,
-        send_delete_result: null,
-        send_replace_result_with_text: null,
-        send_replace_result_with_url: null
-    };
+function jsonifyOutcomeService(outcomeService: any): OutcomeServiceJSON | NullOutcomeServiceJSON {
+    if (!outcomeService.service_url) {
+        return {
+            outcomeService: null
+        };
+    }
+    else {
+        return {
+            cert_authority: outcomeService.cert_authority,
+            consumer_key: outcomeService.consumer_key,
+            consumer_secret: outcomeService.consumer_secret,
+            language: outcomeService.language,
+            result_data_types: outcomeService.result_data_types,
+            service_url: outcomeService.service_url,
+            service_url_oauth: outcomeService.service_url_oauth,
+            service_url_parts: outcomeService.service_url_parts,
+            signer: null,
+            source_did: outcomeService.source_did,
+            send_replace_result: null,
+            supports_result_data: null,
+            send_read_result: null,
+            send_delete_result: null,
+            send_replace_result_with_text: null,
+            send_replace_result_with_url: null
+        };
+    }
 }
 
 async function getCourseId(api: any, assignmentId: string): Promise<string> {
