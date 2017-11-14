@@ -31,11 +31,11 @@ const jsc = require('jsverify');
 const courseArb = jsc.nonshrink(CourseArb);
 
 const ASSIGNMENT_LOADED = 'assignment-loaded';
-const REVIEW_SUBMITTED = 'review-submitted';
+const QUIZ_SUBMITTED = 'quiz-submitted';
 
-class PrendusReviewAssignmentTest extends Polymer.Element {
+class PrendusGradeAssignmentTest extends Polymer.Element {
 
-  static get is() { return 'prendus-review-assignment-test' }
+  static get is() { return 'prendus-take-assignment-test' }
 
   constructor() {
     super();
@@ -66,7 +66,7 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
   prepareTests(test) {
 
     test('Collects correct analytics', [courseArb], async (course: Course) => {
-      const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
+      const takeAssignment = this.shadowRoot.querySelector('prendus-take-assignment');
       const author = await createTestUser('STUDENT', 'author');
       const viewer = await createTestUser('STUDENT', 'viewer');
       const instructor = await createTestUser('INSTRUCTOR');
@@ -80,7 +80,7 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
       console.log('done authorizing student');
       const success = (await asyncMap(
         data.assignments,
-        loadAndTestAssignment(reviewAssignment)
+        loadAndTestAssignment(takeAssignment)
       )).every(result => result === true);
       await deleteArbitrary(data, 'createCourse');
       await deleteArbitrary(purchase, 'createPurchase');
@@ -92,39 +92,39 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
 
 }
 
-function loadAndTestAssignment(reviewAssignment) {
+function loadAndTestAssignment(takeAssignment) {
   return async assignment => {
     console.log('setting assignment');
-    const setup = getListener(ASSIGNMENT_LOADED, reviewAssignment);
-    reviewAssignment.assignmentId = assignment.id;
+    const setup = getListener(ASSIGNMENT_LOADED, takeAssignment);
+    takeAssignment.assignmentId = assignment.id;
     await setup;
     console.log('assignment loaded');
-    if (!verifyAssignment(assignment, reviewAssignment))
+    if (!verifyAssignment(assignment, takeAssignment))
       return false;
     console.log('assignment id matches');
-    if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
-      return checkAnalytics(assignment.id, [VerbType.STARTED]) && reviewAssignment.finished === true;
+    if (assignment.questions.length < takeAssignment.assignment.numReviewQuestions)
+      return checkAnalytics(assignment.id, [VerbType.STARTED]) && takeAssignment.finished === true;
     console.log('starting integration test');
     const expect = await asyncMap(
-      reviewAssignment.assignment.numReviewQuestions,
+      takeAssignment.assignment.numReviewQuestions,
       async _ => {
-        console.log('starting review');
-        const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+        console.log('starting grade');
+        const dropdowns = takeAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
         await scoreDropdowns(dropdowns);
-        console.log('submitting review');
-        const submitted = getListener(REVIEW_SUBMITTED, reviewAssignment);
-        reviewAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button').click();
+        console.log('submitting grade');
+        const submitted = getListener(QUIZ_SUBMITTED, takeAssignment);
+        takeAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('next-button').click();
         await submitted;
         console.log('submitted');
-        return VerbType.REVIEWED;
+        return VerbType.RESPONDED;
       }
     );
-    return checkAnalytics(assignment.id, [VerbType.STARTED, ...expect, VerbType.SUBMITTED]) && reviewAssignment.finished === true;
+    return checkAnalytics(assignment.id, [VerbType.STARTED, ...expect, VerbType.SUBMITTED]) && takeAssignment.finished === true;
   }
 }
 
-function verifyAssignment(assignment: Assignment, reviewAssignment): boolean {
-  return reviewAssignment.assignment.id === assignment.id;
+function verifyAssignment(assignment: Assignment, takeAssignment): boolean {
+  return takeAssignment.assignment.id === assignment.id;
 }
 
-window.customElements.define(PrendusReviewAssignmentTest.is, PrendusReviewAssignmentTest);
+window.customElements.define(PrendusGradeAssignmentTest.is, PrendusGradeAssignmentTest);

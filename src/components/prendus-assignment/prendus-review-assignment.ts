@@ -154,9 +154,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     const finished = e.detail.value;
     this.action = fireLocalAction(this.componentId, 'finished', finished);
     if (!finished)
-      return;
+     return;
     if (this.questions && this.questions.length)
-      this.gradePassback();
+     this.gradePassback();
   }
 
   async gradePassback() {
@@ -165,46 +165,13 @@ class PrendusReviewAssignment extends Polymer.Element {
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
-      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-      setTimeout(() => {
-          this.gradePassback();
-      }, 5000);
+      console.error(error);
+      //      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+      //      setTimeout(() => {
+      //          this.gradePassback();
+      //      }, 5000);
     }
-  }
-
-  _handleRatings(e: CustomEvent) {
-    this._fireLocalAction('ratings', e.detail.scores);
-  }
-
-  _parseRubric(code: string, varName: string): Rubric {
-    if (!code) return {};
-    const { evaluationRubric, gradingRubric } = extractVariables(code);
-    if (varName === 'evaluationRubric' && evaluationRubric)
-      return JSON.parse(evaluationRubric.value);
-    else if (varName === 'evaluationRubric')
-      return DEFAULT_EVALUATION_RUBRIC;
-    else if (varName === 'gradingRubric' && gradingRubric)
-      return JSON.parse(gradingRubric.value);
-    else return {};
-  }
-
-  async _submit(question: Question, ratings: CategoryScore[]) {
-    const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
-      createQuestionRating (
-        raterId: $raterId
-        questionId: $questionId
-        scores: $ratings
-      ) {
-        id
-      }
-    }`;
-    const variables = {
-      questionId: question.id,
-      ratings,
-      raterId: this.user.id
-    };
-    await GQLRequest(query, variables, this.userToken, this._handleGQLError.bind(this));
->>>>>>> tech-transfer-staging
+    this.dispatchEvent(new CustomEvent('grades-submitted'));
   }
 
   _handleRatings(e: CustomEvent) {
@@ -230,18 +197,18 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
   const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
     Assignment(id: $assignmentId) {
       id
+      course {
+        id
+      }
       title
       questionType
       numReviewQuestions
       questions(filter: {
         author: {
-          id: $userId
+          id_not: $userId
         }
       }) {
         id
-        course {
-          id
-        }
         text
         code
         explanation

@@ -8,7 +8,7 @@ export async function sendStatement(userToken: string, variables: object): Promi
   return GQLRequest(`
     mutation analytics($userId: ID!, $verb: String!, $questionId: ID, $assignmentId: ID, $courseId: ID) {
       createPrendusAnalytics(
-        assignment: $assignmentId
+        assignmentId: $assignmentId
         courseId: $courseId
         verb: $verb
         questionId: $questionId

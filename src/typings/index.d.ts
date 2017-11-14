@@ -288,3 +288,10 @@ export interface State {
 }
 
 export type Reducer = (state: State, action: Action) => State;
+
+export interface AuthResult {
+  readonly authenticated: boolean;
+  readonly enrolled: boolean;
+  readonly payed: boolean;
+  readonly courseId: string;
+}

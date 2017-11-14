@@ -188,7 +188,7 @@ export async function deleteTestUsers(...users: User[]): Promise<object> {
 }
 
 export async function authorizeTestUserOnCourse(userId: string, courseId: string): Promise<object> {
-  return GQLRequest(`
+  const data = await GQLRequest(`
     mutation authorizeUserOnCourse($userId: ID!, $courseId: ID!) {
       addToStudentsAndCourses(
         enrolledCoursesCourseId: $courseId,
@@ -208,17 +208,18 @@ export async function authorizeTestUserOnCourse(userId: string, courseId: string
       }
     }
   `, { userId, courseId }, AUTH_TOKEN, handleError);
+  return data.createPurchase;
 }
 
 export async function getAnalytics(filter: object): Promise<object> {
   const data = await GQLRequest(`
     query getAnalytics($filter: PrendusAnalyticsFilter) {
-      allPrendusAnalytics(orderBy: createdAt_DESC, filter: $filter) {
+      allPrendusAnalyticses(orderBy: createdAt_DESC, filter: $filter) {
         verb
       }
     }
   `, {filter}, AUTH_TOKEN, handleError);
-  return data.allPrendusAnalytics;
+  return data.allPrendusAnalyticses;
 }
 
 function handleError(err: any) {

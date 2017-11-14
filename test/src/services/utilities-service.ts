@@ -47,20 +47,23 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
 
 export async function checkAnalytics(assignmentId: string, verbs: string[]): Promise<boolean> {
   const analytics = await getAnalytics({ assignment: { id: assignmentId } });
-  return analytics.every((analytic, i) => analytic.verb === verbs[i]);
+  console.log(verbs, analytics);
+  return verbs.length === analytics.length && analytics.every(
+    (analytic, i) => analytic.verb === verbs[i]
+  );
 }
 
 export async function scoreDropdowns(dropdowns): Promise {
   const SCORES_CHANGED = 'scores-changed';
   const rubric = dropdowns.rubric;
-  const menus = Array.from(dropdowns.shadowRoot.querySelector('paper-dropdown-menu'));
+  const menus = Array.from(dropdowns.shadowRoot.querySelectorAll('paper-dropdown-menu'));
   await asyncForEach(
     menus,
     async menu => {
       const category = rubric[menu.category];
       const option = Object.keys(category)[0]; //Arbitrary for now.
       const event = getListener(SCORES_CHANGED, dropdowns);
-      menu.selected = option;
+      menu.querySelector('paper-listbox').selected = option;
       await event;
     }
   );
