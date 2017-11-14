@@ -22,6 +22,11 @@
           bottom: 30px;
           right: 300px;
         }
+        #questions-block{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
@@ -33,11 +38,13 @@
               </template>
             </dom-if>
             <!-- Need to get an iron list working.  -->
-            <dom-repeat items="[[questionIds]]">
-              <template>
-                <prendus-question-container question-id="[[item]]"></prendus-question-container>
-              </template>
-            </dom-repeat>
+            <div id="questions-block">
+              <dom-repeat items="[[questionIds]]">
+                <template>
+                  <prendus-question-container question-id="[[item]]"></prendus-question-container>
+                </template>
+              </dom-repeat>
+            </div>
             <a href="/question/create"><paper-fab icon="add"></paper-fab></a>
           </template>
       </dom-if>
