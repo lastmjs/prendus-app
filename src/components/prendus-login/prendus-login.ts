@@ -165,7 +165,7 @@ async function signinUser(email: string, password: string, userToken: string | n
             }
         }
     `, {email, password}, userToken, (error: any) => {
-      error.message = "Password or email information incorrect"
+      error.message = "Password or email information incorrect."
       throw error;
     });
     return data;
@@ -184,7 +184,7 @@ async function getUser(email: string, password: string, userToken: string | null
         }
       }
     `, {email}, userToken, (error: any) => {
-      error.message = "An unexpected error occurred fetching user data. Please reload and try again."
+      error.message = "Could not fetch user data."
       throw error;
     });
     return data;
@@ -202,7 +202,7 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
           userId: user ? user.id : 'user is null',
           jwt: ltiJWT
       }, userToken, (error: any) => {
-        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help"
+        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
         throw error;
       });
   }
