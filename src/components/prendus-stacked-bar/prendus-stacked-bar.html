@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -42,6 +43,7 @@
       }
     </style>
 
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
     <div id="wrapper">
       <dom-repeat id="bars" items="[[data]]">
         <template>
@@ -57,6 +59,6 @@
 
   </template>
 
-  <script src="prendus-stacked-bar.ts"></script>
+  <script type="module" src="prendus-stacked-bar.ts"></script>
 
 </dom-module>
