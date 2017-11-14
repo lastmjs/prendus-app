@@ -243,32 +243,55 @@ export interface Purchase {
 }
 
 //Other types
-export interface Rubric = {
-  [category: string]: {
-    [scale: string]: {
-      readonly description: string,
-      readonly points: string
-    }
-  }
+
+export interface RubricScale {
+  readonly description: string;
+  readonly points: string;
+}
+
+export interface RubricCategory {
+  readonly [scale: string]: RubricScale;
+}
+
+export interface Rubric {
+  readonly [category: string]: RubricCategory;
 }
 
 export interface Action {
-    readonly type: string;
+  readonly type: string;
 }
 
 export interface SetPropertyAction {
-    readonly type: 'SET_PROPERTY';
-    readonly key: string;
-    readonly value: any;
+  readonly type: 'SET_PROPERTY';
+  readonly key: string;
+  readonly value: any;
 }
 
 export interface SetComponentPropertyAction {
-    readonly type: 'SET_COMPONENT_PROPERTY';
-    readonly componentId: string;
-    readonly key: string;
-    readonly value: any;
+  readonly type: 'SET_COMPONENT_PROPERTY';
+  readonly componentId: string;
+  readonly key: string;
+  readonly value: any;
 }
 
 export interface DefaultAction {
-    readonly type: 'DEFAULT_ACTION';
+  readonly type: 'DEFAULT_ACTION';
+}
+
+export interface State {
+  readonly userToken: string | null;
+  readonly user: User | null;
+  readonly notification: Notification;
+  readonly components: {
+    readonly [componentId: string]: any;
+  };
+}
+
+export type Reducer = (state: State, action: Action) => State;
+
+export interface AuthResult {
+  readonly authenticated: boolean;
+  readonly enrolled: boolean;
+  readonly payed: boolean;
+  readonly courseId: string;
 }

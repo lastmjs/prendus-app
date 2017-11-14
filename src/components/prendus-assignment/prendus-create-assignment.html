@@ -32,8 +32,15 @@
         <template>
             <h2>[[assignment.title]] Create Assignment</h2>
             <br>
-            <prendus-carousel id="carousel" hide-back hide-next data="[[questions]]" on-carousel-data="_handleNextQuestion">
-              <div hidden$="[[!question]]">
+            <prendus-carousel
+              id="carousel"
+              hide-back
+              hide-next
+              items="[[questions]]"
+              on-item-changed="_handleNextQuestion"
+              on-finished-changed="_handleFinished"
+            >
+              <div hidden$="[[finished]]">
                 <dom-if if="[[isEssayType(assignment.questionType)]]">
                   <template>
                     <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
@@ -45,7 +52,7 @@
                   </template>
                 </dom-if>
               </div>
-              <div hidden$="[[question]]">
+              <div hidden$="[[!finished]]">
                 <h3>Done</h3>
                 <p>You have completed this assignment</p>
               </div>

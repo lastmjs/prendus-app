@@ -1,26 +1,42 @@
-import {SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  createUUID,
+  fireLocalAction
+} from '../../node_modules/prendus-shared/services/utilities-service';
+import {SetComponentPropertyAction} from '../../typings/index.d';
 
 class PrendusCarousel extends Polymer.Element {
-  action: SetPropertyAction | SetComponentPropertyAction;
+  action: SetComponentPropertyAction;
   componentId: string;
-  finished: boolean = false;
+  items: any[];
+  item: any;
+  index: number;
+  label: string;
+  nextText: string;
+  backText: string;
+  hideBack: boolean;
+  hideNext: boolean;
+  finished: boolean;
 
   static get is() { return 'prendus-carousel' }
 
   static get properties() {
     return {
-      data: {
+      items: {
         type: Array,
+        notify: true,
         observer: '_initCarousel'
       },
       label: {
         type: String,
         value: 'Question'
       }
-      currentIndex: {
+      index: {
         type: Number,
         value: 0
+      },
+      item: {
+        type: Object,
+        notify: true
       },
       nextText: {
         type: String,
@@ -37,6 +53,12 @@ class PrendusCarousel extends Polymer.Element {
       hideNext: {
         type: Boolean,
         value: false
+      },
+      finished: {
+        type: Boolean,
+        value: false,
+        computed: '_computeFinished(items, index)'
+        notify: true
       }
     }
   }
@@ -48,47 +70,35 @@ class PrendusCarousel extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('loaded', true);
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
+  _computeFinished(items: any[], index: number): boolean {
+    return !items || index === items.length;
   }
 
-  _initCarousel(data: any[]) {
-    this._fireLocalAction('currentIndex', 0);
-    this._fireLocalAction('finished', data.length === 0);
-    this._notifyNextData(data.length ? data[0] : null);
+  _initCarousel(items: any[]) {
+    this.action = fireLocalAction(this.componentId, 'index', 0);
+    this.action = fireLocalAction(this.componentId, 'item', items[0]);
   }
 
   _plusOne(num: number): number {
     return num + 1;
   }
 
-  nextData() {
-    if (this.currentIndex < this.data.length) {
-      const index = this.currentIndex + 1;
-      this._fireLocalAction('currentIndex', index);
-      if (index < this.data.length)
-        this._notifyNextData(this.data[index]);
-      else {
-        this._fireLocalAction('finished', true);
-        this._notifyNextData(null);
-      }
+  next() {
+    if (!this.finished) {
+      const index = this.index + 1;
+      this.action = fireLocalAction(this.componentId, 'index', index);
+      this.action = fireLocalAction(this.componentId, 'item', this.items[index]);
     }
   }
 
-  previousData() {
-    this._fireLocalAction('finished', false);
-    if (this.currentIndex > 0) {
-      const index = this.currentIndex - 1;
-      this._fireLocalAction('currentIndex', index);
-      this._notifyNextQuestion(this.data[index]);
+  previous() {
+    if (this.index > 0) {
+      const index = this.index - 1;
+      this.action = fireLocalAction(this.componentId, 'index', index);
+      this.action = fireLocalAction(this.componentId, 'item', this.items[index]);
     }
   }
 
@@ -97,23 +107,18 @@ class PrendusCarousel extends Polymer.Element {
   }
 
   _notifyNext() {
-    this.dispatchEvent(new CustomEvent('carousel-next', {composed: true}));
+    this.dispatchEvent(new CustomEvent('next'));
   }
 
-  _notifyNextData(data: Object) {
-    const evt = new CustomEvent('carousel-data', {
-      composed: true,
-      detail: {data}
-    });
-    this.dispatchEvent(evt);
+  _notifyPrevious() {
+    this.dispatchEvent(new CustomEvent('previous'));
   }
 
-  stateChange(e) {
-    const componentState = e.detail.state.components[this.componentId];
-    const keys = Object.keys(componentState || {});
-    if (keys.includes('currentIndex')) this.currentIndex = componentState.currentIndex;
-    if (keys.includes('finished')) this.finished = componentState.finished;
-    if (keys.includes('current')) this.current = componentState.current;
+  stateChange(e: CustomEvent) {
+    const componentState = e.detail.state.components[this.componentId] || {};
+    this.index = componentState.index;
+    this.finished = componentState.finished;
+    this.item = componentState.item;
   }
 }
 

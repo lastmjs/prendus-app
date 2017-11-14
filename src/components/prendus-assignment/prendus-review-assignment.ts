@@ -1,31 +1,74 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  Rubric,
+  CategoryScore,
+  Question,
+  SetComponentPropertyAction,
+  Assignment,
+} from '../../typings/index.d';
+import {
+  createUUID,
+  fireLocalAction,
+  navigate,
+} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {extractVariables} from '../../services/code-to-question-service';
-import {NotificationType, QuestionType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
-import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
+import {
+  NotificationType,
+  QuestionType,
+  ContextType,
+  VerbType,
+  ObjectType
+} from '../../services/constants-service';
+import {
+  setNotification,
+} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
-  loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
-  componentId: string;
+  action: SetComponentPropertyAction;
+  user: User;
+  userToken: string;
+  assignmentId: string;
+  assignment: Assignment;
+  question: Question;
+  questions: Question[];
   ratings: CategoryScore[];
   rubric: Rubric;
-  userToken: string;
-  user: User;
+  loaded: boolean = false;
+  essayType: boolean;
+  gradingRubric: Rubric;
+  completionReason: string;
+  modalOpen: boolean;
 
   static get is() { return 'prendus-review-assignment' }
 
   static get properties() {
     return {
-      assignmentId: {
+      assignmentId: String,
+      essayType: {
+        type: Boolean,
+        value: false,
+        computed: '_computeEssayType(assignment)'
+      },
+      gradingRubric: {
+        type: Object,
+        computed: '_computeGradingRubric(question)'
+      },
+      evaluationRubric: {
+        type: Object,
+        value: {},
+        computed: '_computeEvaluationRubric(question)'
+      },
+      completionReason: {
         type: String,
-        observer: 'loadAssignment'
+        computed: '_computeCompletionReason(assignment)'
+      },
+      questions: {
+        type: Array,
+        computed: '_computeQuestions(assignment)'
       }
     }
   }
@@ -35,189 +78,196 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  connectedCallback() {
-    super.connectedCallback();
+  _computeEssayType(assignment: Assignment): boolean {
+    return assignment && assignment.questionType === QuestionType.ESSAY;
+  }
+
+  _computeGradingRubric(question: Question): Rubric | null {
+    if (!question || !question.code) return null;
+    return parseRubric(question.code, 'gradingRubric');
+  }
+
+  _computeEvaluationRubric(question: Question): Rubric | null {
+    if (!question || !question.code) return null;
+    return parseRubric(question.code, 'evaluationRubric');
+  }
+
+  _computeCompletionReason(assignment: Assignment): string {
+    return assignment && assignment.questions.length >= assignment.numReviewQuestions
+      ? 'You have completed this assignment'
+      : 'There are not enough questions to take the assignment yet';
+  }
+
+  _handleUnauthorized(e: CustomEvent) {
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    if (authenticated === false)
+      navigate('/authenticate');
+    else if (payed === false)
+      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+    else if (enrolled === false)
+      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
+  }
+
+  async _loadAssignment(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
+    const assignment = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
+    if (assignment.rated.length)
+      this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
+    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.dispatchEvent(new CustomEvent('assignment-loaded'));
+  }
+
+  _computeQuestions(assignment: Assignment): Question[] {
+    return assignment && assignment.questions.length >= assignment.numReviewQuestions
+      ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
+      : [];
   }
 
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
-  continueToHome(){
-      this.shadowRoot.querySelector("#unauthorizedAccessModal").close();
-      navigate('/');
-    }
-
-  _handleNextRequest(e: CustomEvent) {
+  async _handleNextRequest(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
     try {
-      validate(this.rubric, this.ratings);
-      this._submit(this.question, this.ratings)
-      this.shadowRoot.querySelector('#carousel').nextData();
+      validate(this.evaluationRubric, this.ratings);
+      await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
+      this.shadowRoot.querySelector('#carousel').next();
     } catch (err) {
       this.action = setNotification(err.message, NotificationType.ERROR);
     }
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
   _handleNextQuestion(e: CustomEvent) {
-    const { data } = e.detail;
-    this._fireLocalAction('question', data);
-    if (data && data === this.questions[0])
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
+    const question = e.detail.value;
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
+    if (question && question === this.questions[0])
+      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
     else
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (data) {
-      this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
-      setTimeout(() => {
-        this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
-      });
-    } else {
-      this.gradePassback();
-    }
+      sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: this.question.id });
+    this.action = fireLocalAction(this.componentId, 'question', question);
+  }
+
+  _handleFinished(e: CustomEvent) {
+    const finished = e.detail.value;
+    this.action = fireLocalAction(this.componentId, 'finished', finished);
+    if (!finished)
+     return;
+    if (this.questions && this.questions.length)
+     this.gradePassback();
   }
 
   async gradePassback() {
-      try {
-          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
-          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
-      }
-      catch(error) {
-          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-          setTimeout(() => {
-              this.gradePassback();
-          }, 5000);
-      }
+    try {
+      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
+    }
+    catch(error) {
+      console.error(error);
+      //      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+      //      setTimeout(() => {
+      //          this.gradePassback();
+      //      }, 5000);
+    }
+    this.dispatchEvent(new CustomEvent('grades-submitted'));
   }
 
   _handleRatings(e: CustomEvent) {
-    this._fireLocalAction('ratings', e.detail.scores);
-  }
-
-  _parseRubric(code: string, varName: string): Rubric {
-    if (!code) return {};
-    const { evaluationRubric, gradingRubric } = extractVariables(code);
-    if (varName === 'evaluationRubric' && evaluationRubric)
-      return JSON.parse(evaluationRubric.value);
-    else if (varName === 'evaluationRubric')
-      return DEFAULT_EVALUATION_RUBRIC;
-    else if (varName === 'gradingRubric' && gradingRubric)
-      return JSON.parse(gradingRubric.value);
-    else return {};
-  }
-
-  async _submit(question: Question, ratings: CategoryScore[]) {
-    const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
-      createQuestionRating (
-        raterId: $raterId
-        questionId: $questionId
-        scores: $ratings
-      ) {
-        id
-      }
-    }`;
-    const variables = {
-      questionId: question.id,
-      ratings,
-      raterId: this.user.id
-    };
-    await GQLRequest(query, variables, this.userToken, this._handleGQLError.bind(this));
-  }
-
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
-  }
-
-  async loadAssignment(assignmentId: string): Assignment {
-      this._fireLocalAction('loaded', true);
-
-      setTimeout(async () => {
-          this._fireLocalAction('loaded', false);
-
-          this.action = checkForUserToken();
-        this.action = await getAndSetUser();
-
-        if (!this.user) {
-            navigate('/authenticate');
-            return;
-        }
-
-        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
-
-        if (!userOnCourse) {
-            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-            return;
-        }
-
-        if (!userPaidForCourse) {
-            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-
-
-        const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
-          Assignment(id: $assignmentId) {
-            id
-            title
-            questionType
-            numReviewQuestions
-            questions(filter: {
-              author: {
-                id_not: $userId
-              }
-            }) {
-              id
-              text
-              code
-              explanation
-              concept {
-                title
-              }
-              resource
-              answerComments {
-                text
-              }
-              _ratingsMeta {
-                count
-              }
-            }
-          }
-        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-        if (!data) {
-          return;
-        }
-        this._fireLocalAction('assignment', data.Assignment);
-        this._fireLocalAction('questions', randomWithUnreviewedFirst(data.Assignment.questions, data.Assignment.numReviewQuestions));
-        this._fireLocalAction('loaded', true);
-      });
-  }
-
-  isEssayType(questionType: string): boolean {
-    return questionType === QuestionType.ESSAY;
-  }
-
-  isMultipleChoiceType(questionType: string): boolean {
-    return questionType === QuestionType.MULTIPLE_CHOICE;
+    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
   }
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('assignment')) this.assignment = componentState.assignment;
-    if (keys.includes('questions')) this.questions = componentState.questions;
-    if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('rubric')) this.rubric = componentState.rubric;
-    if (keys.includes('ratings')) this.ratings = componentState.ratings;
-    this.userToken = state.userToken;
+    this.loaded = componentState.loaded;
+    this.assignment = componentState.assignment;
+    this.question = componentState.question;
+    this.ratings = componentState.ratings;
+    this.finished = componentState.finished;
+    this.modalOpen = componentState.modalOpen;
     this.user = state.user;
+    this.userToken = state.userToken;
   }
 
+}
+
+async function loadAssignment(assignmentId: string, userId: string, userToken: string, cb: (err: any) => void): Assignment | null {
+  const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    Assignment(id: $assignmentId) {
+      id
+      course {
+        id
+      }
+      title
+      questionType
+      numReviewQuestions
+      questions(filter: {
+        author: {
+          id_not: $userId
+        }
+      }) {
+        id
+        text
+        code
+        explanation
+        concept {
+          title
+        }
+        resource
+        answerComments {
+          text
+        }
+        _ratingsMeta {
+          count
+        }
+      }
+      rated: questions(filter: {
+        ratings_some: {
+          rater: {
+            id: $userId
+          }
+        }
+      }) {
+        id
+      }
+    }
+  }`, {assignmentId, userId}, userToken, cb);
+  if (!data) {
+    return null;
+  }
+  return data.Assignment;
+}
+
+function submit(questionId: string, raterId: string, ratings: CategoryScore[], userToken: string, cb: (err: any) => void) {
+  const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
+    createQuestionRating (
+      raterId: $raterId
+      questionId: $questionId
+      scores: $ratings
+    ) {
+      id
+    }
+  }`;
+  const variables = {
+    questionId,
+    ratings,
+    raterId
+  };
+  return GQLRequest(query, variables, userToken, cb);
+}
+
+function parseRubric(code: string, varName: string): Rubric {
+  if (!code) return {};
+  const { evaluationRubric, gradingRubric } = extractVariables(code);
+  if (varName === 'evaluationRubric' && evaluationRubric)
+    return JSON.parse(evaluationRubric.value);
+  else if (varName === 'evaluationRubric')
+    return DEFAULT_EVALUATION_RUBRIC;
+  else if (varName === 'gradingRubric' && gradingRubric)
+    return JSON.parse(gradingRubric.value);
+  else return {};
 }
 
 function randomWithUnreviewedFirst(questions: Question[], num: number): Question[] {
@@ -231,9 +281,7 @@ function randomWithUnreviewedFirst(questions: Question[], num: number): Question
 }
 
 function validate(rubric: Rubric, ratings: CategoryScore[]) {
-  if (!ratings) throw new Error('You must rate the question');
-  if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
-  if (ratings.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
+  if (ratings.some(score => score.score < 0))
     throw new Error('You must rate each category');
 }
 

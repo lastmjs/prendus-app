@@ -24,8 +24,9 @@
   "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",
+    "guesswork": "^0.3.1",
     "fs-extra": "^4.0.2",
-    "graphcool": "^0.7.0",
+    "graphcool": "^0.8.5",
     "graphql": "^0.11.7",
     "guesswork": "^0.3.1",
     "oss-attribution-generator": "^1.2.0",

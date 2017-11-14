@@ -1,13 +1,23 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  SetComponentPropertyAction,
+  SetPropertyAction,
+  User,
+  Rubric,
+} from '../../typings/index.d';
+import {
+  createUUID,
+  fireLocalAction
+} from '../../node_modules/prendus-shared/services/utilities-service';
+import { setNotification } from '../../redux/actions';
+import { NotificationType } from '../../services/constants-service';
 
 class PrendusRubricTable extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
+  action: SetComponentPropertyAction;
   componentId: string;
-  userToken: string | null;
-  user: User;
+  editable: boolean;
+  categories: object[];
+  rubric: Rubric;
 
   static get is() { return 'prendus-rubric-table' }
   static get properties() {
@@ -16,9 +26,17 @@ class PrendusRubricTable extends Polymer.Element {
         type: Boolean,
         value: false
       },
-      rubric: {
+      init: {
         type: Object,
         observer: '_initCategories'
+      },
+      categories: {
+        type: Array,
+        notify: true
+      },
+      rubric: {
+        type: Object,
+        notify: true
       }
     }
   }
@@ -30,16 +48,146 @@ class PrendusRubricTable extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this._fireLocalAction('loaded', true);
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
+  _initCategories(init: Rubric) {
+    const categories = this._categoriesForHtml(init);
+    if (!categories.length && this.editable) {
+      this.action = fireLocalAction(this.componentId, 'categories', [this._templateCategory()]);
+      this.action = fireLocalAction(this.componentId, 'rubric', this._makeRubric([this._templateCategory()]));
+    }
+    else {
+      this.action = fireLocalAction(this.componentId, 'categories', categories);
+      this.action = fireLocalAction(this.componentId, 'rubric', init);
+    }
+  }
+
+  addCategory() {
+    if (!this.editable) return;
+    if (this.categories.some(({ name }) => !name.length)) {
+      this.action = setNotification('Please define other categories first', NotificationType.WARNING);
+      return;
+    }
+    const newCategories = [...this.categories, this._templateCategory()];
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' this._makeRubric(newCategories));
+  }
+
+  removeCategory() {
+    if (!this.editable) return;
+    const newCategories = this.categories.slice(0, this.categories.length - 1)
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' this._makeRubric(newCategories));
+  }
+
+  addScale(e: Event) {
+    if (!this.editable) return;
+    if (this.categories[e.model.itemsIndex].options.some(({ name }) => !name.length)) {
+      this.action = setNotification('Please define other scales first', NotificationType.WARNING);
+      return;
+    }
+    const newCategories = this.categories.map((category, i) =>
+      i === e.model.itemsIndex
+        ? {...category, options: [...category.options, this._templateOption()]}
+        : category
+    );
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' this._makeRubric(newCategories));
+  }
+
+  removeScale(e: Event) {
+    if (!this.editable) return;
+    const newCategories = this.categories.map((category, i) =>
+      i === e.model.itemsIndex
+        ? {...category, options: category.options.slice(0, -1)}
+        : category
+    );
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric' this._makeRubric(newCategories));
+  }
+
+  setCategory(e: Event) {
+    if (!this.editable) return;
+    if (this.categories.some(({ name }) => name === e.target.value)) {
+      this.action = setNotification('Please use a different name for each category', NotificationType.WARNING);
+      return;
+    }
+    const newCategories = this.categories.map((category, i) =>
+      i === e.model.itemsIndex
+        ? { ...category, name: e.target.value }
+        : category
+    );
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric', this._makeRubric(newCategories));
+  }
+
+  setOption(e: Event) {
+    if (!this.editable) return;
+    const categoryIndex = this.shadowRoot.getElementById('categories').indexForElement(e.target);
+    if (this.categories[categoryIndex].options.some(({ name }) => name === e.target.value)) {
+      this.action = setNotification('Please use a different name for each scale', NotificationType.WARNING);
+      return;
+    }
+    const newCategories = this._setOptionProp(this.categories, categoryIndex, e.model.itemsIndex, 'name', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric', this._makeRubric(newCategories));
+  }
+
+  setDescription(e: Event) {
+    if (!this.editable) return;
+    const categoryIndex = this.shadowRoot.getElementById('categories').indexForElement(e.target);
+    const newCategories = this._setOptionProp(this.categories, categoryIndex, e.model.itemsIndex, 'description', e.target.value);
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric', this._makeRubric(newCategories));
+  }
+
+  setPoints(e: Event) {
+    if (!this.editable) return;
+    const categoryIndex = this.shadowRoot.getElementById('categories').indexForElement(e.target);
+    const newCategories = this._setOptionProp(this.categories, categoryIndex, e.model.itemsIndex, 'points', Number(e.target.value));
+    this.action = fireLocalAction(this.componentId, 'categories', newCategories);
+    this.action = fireLocalAction(this.componentId, 'rubric', this._makeRubric(newCategories));
+  }
+
+  stateChange(e: CustomEvent) {
+    const state = e.detail.state;
+    const componentState = state.components[this.componentId] || {};
+    this.loaded = componentState.loaded;
+    this.categories = componentState.categories;
+    this.rubric = componentState.rubric;
+  }
+
+  //Keeping these in class to use in testing. I am keeping the tests tightly coupled with the implementation of these private
+  //methods because it makes maintaining the tests easier and makes it simple to fully simulate the usage of this component
+  _setOptionProp(categories: object[], categoryIndex: number, optionIndex: number, prop: string, value: any): object[] {
+    return categories.map((category, i) =>
+      i === categoryIndex
+        ? {
+          ...category,
+          options: category.options.map((option, j) =>
+            j === optionIndex
+              ? { ...option, [prop]: value }
+              : option
+          )
+        }
+        : category
+    );
+  }
+
+  _templateCategory(): object[] {
+    return {
+      name: '',
+      options: [this._templateOption()]
+    }
+  }
+
+  _templateOption(): object[] {
+    return {
+      name: '',
+      description: '',
+      points: 0
+    }
   }
 
   _categoriesForHtml(rubric: Rubric): object[] {
@@ -56,7 +204,7 @@ class PrendusRubricTable extends Polymer.Element {
     });
   }
 
-  _makeRubric(categories: object[]): object {
+  _makeRubric(categories: object[]): Rubric {
     return categories.reduce((rubric, category) => {
       return {
         ...rubric,
@@ -69,104 +217,6 @@ class PrendusRubricTable extends Polymer.Element {
       };
     }, {});
   }
-
-  _notify(rubric: Rubric) {
-    const evt = new CustomEvent('rubric-changed', {composed: true, detail: {rubric}});
-    this.dispatchEvent(evt);
-  }
-
-  _initCategories(rubric: Rubric) {
-    const categories = this._categoriesForHtml(rubric);
-    if (!categories.length && this.editable)
-      this._fireLocalAction('categories', this.templateRubric());
-    else
-      this._fireLocalAction('categories', categories);
-  }
-
-  templateRubric(): object[] {
-    return [
-      {
-        name: '',
-        options: this.templateOption()
-      }
-    ];
-  }
-
-  templateOption(): object[] {
-    return [
-      {
-        name: '',
-        description: '',
-        points: 0
-      }
-    ]
-  }
-
-  addCategory() {
-    this._fireLocalAction('categories', this.categories.concat(this.templateRubric()));
-  }
-
-  removeCategory() {
-    const newRubric = this.categories.length ? this.categories.slice(0, this.categories.length - 1) : this.categories;
-    this._fireLocalAction('categories', newRubric);
-  }
-
-  addScale(e: Event) {
-    const newRubric = this.categories.map((category, i) => {
-      if (i === e.model.itemsIndex)
-        return {
-          name: category.name,
-          options: category.options.concat(this.templateOption())
-        }
-      return category;
-    });
-    this._fireLocalAction('categories', newRubric);
-  }
-
-  removeScale(e: Event) {
-    const newRubric = [...this.categories];
-    newRubric[e.model.itemsIndex].options = newRubric[e.model.itemsIndex].options.slice(0, -1);
-    this._fireLocalAction('categories', newRubric);
-  }
-
-  setCategory(e: Event) {
-    const newCategories = [...this.categories];
-    newCategories[e.model.itemsIndex].name = e.target.value;
-    this._fireLocalAction('categories', newCategories);
-    this._notify(this._makeRubric(newCategories));
-  }
-
-  setOptionProp(e: Event, prop) {
-    const i = this.shadowRoot.getElementById('categories').indexForElement(e.target);
-    const newCategories = [...this.categories];
-    newCategories[i].options[e.model.itemsIndex][prop] = e.target.value;
-    this._fireLocalAction('categories', newCategories);
-    this._notify(this._makeRubric(newCategories));
-  }
-
-  setOption(e: Event) {
-    this.setOptionProp(e, 'name');
-  }
-
-  setDescription(e: Event) {
-    this.setOptionProp(e, 'description');
-  }
-
-  setPoints(e: Event) {
-    this.setOptionProp(e, 'points');
-  }
-
-  stateChange(e: CustomEvent) {
-    const state = e.detail.state;
-    const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('categories')) this.categories = componentState.categories;
-    if (keys.includes('rubric')) this.rubric = componentState.rubric;
-    this.userToken = state.userToken;
-    this.user = state.user;
-  }
-
 }
 
 window.customElements.define(PrendusRubricTable.is, PrendusRubricTable)

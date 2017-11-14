@@ -147,8 +147,8 @@ function flattenTypedIds(data, type) {
   ).sort((a, b) => dependencySort(a.type, b.type));
 }
 
-export async function createTestUser(role: string): Promise<User> {
-  const email = `test-${role}@test-prendus.com`;
+export async function createTestUser(role: string, name: string): Promise<User> {
+  const email = `test-${role}${name || ''}@test-prendus.com`;
   const data = await GQLRequest(`mutation create($email: String!) {
     signupUser(email: $email, password: "test") {
       id
@@ -185,6 +185,41 @@ export async function deleteTestUsers(...users: User[]): Promise<object> {
     }
   }, {});
   await GQLRequest(query, variables, AUTH_TOKEN, handleError);
+}
+
+export async function authorizeTestUserOnCourse(userId: string, courseId: string): Promise<object> {
+  const data = await GQLRequest(`
+    mutation authorizeUserOnCourse($userId: ID!, $courseId: ID!) {
+      addToStudentsAndCourses(
+        enrolledCoursesCourseId: $courseId,
+        enrolledStudentsUserId: $userId
+      ) {
+        enrolledStudentsUser {
+          id
+        }
+      }
+      createPurchase(
+        amount: 1000,
+        stripeTokenId: "fake-token-for-testing",
+        userId: $userId,
+        courseId: $courseId
+      ) {
+        id
+      }
+    }
+  `, { userId, courseId }, AUTH_TOKEN, handleError);
+  return data.createPurchase;
+}
+
+export async function getAnalytics(filter: object): Promise<object> {
+  const data = await GQLRequest(`
+    query getAnalytics($filter: PrendusAnalyticsFilter) {
+      allPrendusAnalyticses(orderBy: createdAt_DESC, filter: $filter) {
+        verb
+      }
+    }
+  `, {filter}, AUTH_TOKEN, handleError);
+  return data.allPrendusAnalyticses;
 }
 
 function handleError(err: any) {
