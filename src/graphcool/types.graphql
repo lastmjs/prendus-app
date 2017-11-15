@@ -28,6 +28,7 @@ type User @model {
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
   purchases: [Purchase!]! @relation(name: "UserPurchases")
+  institution: [Institution!]! @relation(name: "UsersInstitution")
 }
 
 type Course @model {
@@ -91,6 +92,13 @@ type Question @model {
   images: [File!]! @relation(name: "ImagesOnQuestions")
   visibility: QuestionVisibility! @defaultValue(value: COURSE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
+  overall: Int! @defaultValue(value: 0)
+  language: Int! @defaultValue(value: 0)
+  learningCategory: Int! @defaultValue(value: 0)
+  conceptAlignment: Int! @defaultValue(value: 0)
+  difficulty: Int! @defaultValue(value: 0)
+  plagiarism: Int! @defaultValue(value: 0)
+  inclusion: Int! @defaultValue(value: 0)
 }
 
 type QuestionFlag @model {
@@ -264,6 +272,19 @@ type LTISession @model {
     createdAt: DateTime!
     updatedAt: DateTime!
     serializedOutcomeService: Json!
+}
+
+type Institution @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    name: String!
+    abbreviation: String
+    country: String!
+    state: String!
+    city: String!
+    users: [User!]! @relation(name: "UsersInstitution")
+    approved: PrendusApproved! @defaultValue(value: TBD)
 }
 
 enum UserRole {

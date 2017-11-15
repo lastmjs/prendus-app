@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<dom-module id="prendus-infinite-list">
+
+  <template>
+    <style is="custom-style">
+      .loading {
+        font-size: xx-large;
+        padding: 30px;
+        text-align: center;
+      }
+      #list {
+        height: 40vw;
+        overflow: auto;
+      }
+      #progress {
+        width: 100%;
+      }
+    </style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <iron-scroll-threshold
+      id="threshold"
+      on-lower-trigger="loadMore"
+      lower-threshold="[[lowerThreshold]]"
+      scroll-target="[[list]]"
+    >
+      <paper-progress id="progress" hidden$="[[!loading]]" indeterminate></paper-progress>
+      <iron-list id="list" as="[[as]]" index-as="[[indexAs]]" items="[[items]]">
+        <slot></slot>
+      </iron-list>
+    </iron-scroll-threshold>
+  </template>
+
+  <script type="module" src="prendus-infinite-list.ts"></script>
+</dom-module>

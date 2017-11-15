@@ -1,0 +1,60 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-question/prendus-question-container.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-questions-view">
+    <template>
+      <style include="prendus-styles">
+        paper-fab{
+          --paper-fab-background: var(--prendus-primary-color);
+          position: fixed;
+          bottom: 30px;
+          right: 300px;
+        }
+        #questions-block{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+      </style>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+      <dom-if if="[[loaded]]">
+          <template>
+            <dom-if if="[[!questionIds]]">
+              <template>
+                <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
+              </template>
+            </dom-if>
+            <!-- Need to get an iron list working.  -->
+            <div id="questions-block">
+              <dom-repeat items="[[questionIds]]">
+                <template>
+                  <prendus-question-container question-id="[[item]]"></prendus-question-container>
+                </template>
+              </dom-repeat>
+            </div>
+            <a href="/question/create"><paper-fab icon="add"></paper-fab></a>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-questions-view.ts"></script>
+</dom-module>

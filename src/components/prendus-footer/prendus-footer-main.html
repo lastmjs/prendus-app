@@ -7,11 +7,11 @@
       <style include ="prendus-styles">
         .footer-items {
           width: 100vw;
+          max-width:100%;
           height: auto;
           display: flex;
           justify-content: space-evenly;
           font-size: 15px;
-          padding: 15px;
           color: black;
         }
         .footer-child{
@@ -21,14 +21,12 @@
           align-items: center;
         }
       </style>
-      <div>
-        <footer class="footer-items">
-          <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
-          <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms of Use</a>
-          <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>
-          <a href="/open-source">Open Source</a>
-        </footer>
-      </div>
+      <footer class="footer-items">
+        <div>&copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span></div>
+        <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms of Use</a>
+        <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>
+        <a href="/open-source">Open Source</a>
+      </footer>
     </template>
 
     <script type="module" src="prendus-footer-main.ts"></script>

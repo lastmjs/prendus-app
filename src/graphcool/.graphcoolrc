@@ -1,6 +1,7 @@
 targets:
   production: shared-eu-west-1/cj48qaw2u6uyd01411y8gj8fr
   development: shared-eu-west-1/cj8dlzxgn0oyr0144574u2ivb
+  ben1: shared-eu-west-1/cj9k4ir7fc1gc0124o7llstmw
   default: development
 clusters:
   default: shared-eu-west-1

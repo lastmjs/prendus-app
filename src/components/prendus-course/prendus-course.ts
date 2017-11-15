@@ -311,6 +311,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadData();
     }
     async loadData() {
+        this._fireLocalAction('loaded', false)
         const data = await GQLRequest(`
             query getAssignments($courseId: ID!) {
                 allAssignments(filter: {
@@ -359,6 +360,7 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             this._fireLocalAction('customSubject', true)
           }
         }
+        this._fireLocalAction('loaded', false)
     }
     subscribeToData() {
         GQLSubscribe(`

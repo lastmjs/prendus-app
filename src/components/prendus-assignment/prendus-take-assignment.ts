@@ -124,7 +124,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     this.action = setNotification("Question Flagged", NotificationType.ERROR);
     this.shadowRoot.querySelector('#carousel').nextData();
   }
-  //TODO: this seems to be getting called twice...
+
   async generateQuiz(assignmentId: string) {
       this._fireLocalAction('loaded', true);
       setTimeout(async () => {

@@ -1,0 +1,57 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-question-container">
+    <template>
+      <style include="prendus-styles">
+        #question-wrapper{
+          width: 30vw;
+          background-color: white;
+          padding-left: 2vw;
+          padding-right: 2vw;
+        }
+      </style>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+      <dom-if if="[[loaded]]">
+          <template>
+            <paper-card>
+              <div id="question-wrapper">
+                <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
+              </div>
+            </div>
+            <div class="card-actions">
+              <paper-icon-button id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
+              <paper-tooltip for="[[question.id]]" offset="0" animation-delay="300">Add Question to Quiz</paper-tooltip>
+              <a href="question/[[item.id]]/edit"><iron-icon id="edit-question" class="prendus-icon-button" icon="create"></iron-icon></a>
+              <paper-tooltip for="edit-question" offset="0" animation-delay="300">Edit Question</paper-tooltip>
+              <paper-icon-button id="delete-question" class="prendus-icon-button" icon="delete" on-click="openDeleteModal"></paper-icon-button>
+              <paper-tooltip for="delete-question" offset="0" animation-delay="300">Delete Question</paper-tooltip>
+            </div>
+            </paper-card>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-question-container.ts"></script>
+</dom-module>
