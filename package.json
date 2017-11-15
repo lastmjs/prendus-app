@@ -21,13 +21,14 @@
     "url": "https://github.com/lastmjs/prendus-app/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-app#readme",
-  "dependencies": {},
+  "dependencies": {
+    "oss-attribution-generator": "^1.4.0"
+  },
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",
     "fs-extra": "^4.0.2",
     "graphcool": "^0.8.5",
     "guesswork": "^0.2.4",
-    "oss-attribution-generator": "^1.2.0",
     "scram-engine": "^0.6.17"
   }
 }
