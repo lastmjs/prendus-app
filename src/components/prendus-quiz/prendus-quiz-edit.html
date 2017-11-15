@@ -8,14 +8,22 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-question/prendus-question-container.html">
+
 <link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 
 
-<dom-module id="prendus-quiz-create">
+<dom-module id="prendus-quiz-edit">
     <template>
       <style include="prendus-styles">
+        paper-fab{
+          --paper-fab-background: var(--prendus-primary-color);
+          position: fixed;
+          bottom: 30px;
+          right: 300px;
+        }
         #createQuizContainer{
           display: flex;
           flex-direction: row;
@@ -23,7 +31,11 @@
         .questionColumn{
           display: flex;
           flex-direction: column;
-          margin-left: 5vw; 
+          /*margin-left: 5vw;*/
+        }
+        .prendus-question{
+          margin: 2vw;
+
         }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -31,21 +43,26 @@
       <dom-if if="[[loaded]]">
           <template>
             <div id="createQuizContainer">
-              <div id="quizQuestions" class="questionColumn">
-                <dom-repeat items="[[questionIds]]">
+              <div id="questionsToAddToQuiz" class="questionColumn">
+                <h1>My Questions</h1>
+                <dom-repeat items="[[userQuestions]]">
                   <template>
-                    <prendus-view-question class="prendus-question" question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
+                    <prendus-question-container class="prendus-question" question="[[item]]" on-added="addToQuiz"></prendus-question-container>
+                    <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>
               </div>
-              <div id="questionsToAddToQuiz" class="questionColumn">
-                <dom-repeat items="[[questionIds]]">
+              <div id="quizQuestions" class="questionColumn">
+                <h1>Quiz Questions</h1>
+                <dom-repeat items="[[quizQuestions]]">
                   <template>
-                    <prendus-view-question class="prendus-question" question-id="[[item]]" on-question-response="_handleResponse"></prendus-view-question>
+                    <prendus-question-container class="prendus-question" question="[[item]]"></prendus-question-container>
+                    <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>
               </div>
             </div>
+            <paper-fab icon="save" on-click="saveQuiz"></paper-fab>
           </template>
       </dom-if>
 
@@ -56,5 +73,5 @@
       </dom-if>
     </template>
 
-    <script type="module" src="prendus-quiz-create.ts"></script>
+    <script type="module" src="prendus-quiz-edit.ts"></script>
 </dom-module>

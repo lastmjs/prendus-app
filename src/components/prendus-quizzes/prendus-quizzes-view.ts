@@ -42,9 +42,11 @@ class PrendusQuizzesView extends Polymer.Element {
       setTimeout(async () => {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        const userQuizIds = await getUserQuizzes(this.user.id, this.userToken);
-        const userQuizIdsArray = (userQuizIds.length) ? userQuizIds.map(quiz => quiz.id) : false;
-        this.action = fireLocalAction(this.componentId, 'quizIds', userQuizIdsArray)
+        const quizzes = await getUserQuizzes(this.user.id, this.userToken);
+        console.log('quizzes', quizzes)
+        // const userQuizIdsArray = (userQuizIds.length) ? userQuizIds.map(quiz => quiz.id) : false;
+        this.action = fireLocalAction(this.componentId, 'quizzes', quizzes)
+        // this.action = fireLocalAction(this.componentId, 'quizIds', userQuizIdsArray)
         this.action = fireLocalAction(this.componentId, 'loaded', true)
       }, 0);
     }catch(error){
@@ -81,6 +83,12 @@ async function getUserQuizzes(userId: String, userToken: String) {
             }
         }) {
           id
+          title
+          questions{
+            id
+            text
+            code
+          }
         }
       }
     `, {userId}, userToken, (error: any) => {

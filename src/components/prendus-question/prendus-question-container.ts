@@ -25,8 +25,8 @@ class PrendusQuestionContainer extends Polymer.Element {
 
   static get properties() {
     return {
-        questionId: {
-            type: String,
+        question: {
+            type: Question,
         },
     };
   }
@@ -41,13 +41,24 @@ class PrendusQuestionContainer extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', false)
     this.action = fireLocalAction(this.componentId, 'loaded', true)
   }
-
+  fireAddQuestion(e){
+    console.log('e', e.target.id)
+    const questionId = e.target.id;
+    console.log('quesitonId', questionId)
+    this.dispatchEvent(new CustomEvent('added', {
+        bubbles: false,
+        detail: {
+          questionId,
+        }
+    }));
+  }
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
+    if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;

@@ -24,10 +24,6 @@
           padding-left: 2vw;
           padding-right: 2vw;
         }
-        paper-card{
-          margin-bottom: 5vh;
-          margin-left: 5vw;
-        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
@@ -35,10 +31,12 @@
           <template>
             <paper-card>
               <div id="question-wrapper">
-                <prendus-view-question class="prendus-question" question-id="[[questionId]]" on-question-response="_handleResponse"></prendus-view-question>
+                <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
               </div>
             </div>
             <div class="card-actions">
+              <paper-icon-button id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
+              <paper-tooltip for="[[question.id]]" offset="0" animation-delay="300">Add Question to Quiz</paper-tooltip>
               <a href="question/[[item.id]]/edit"><iron-icon id="edit-question" class="prendus-icon-button" icon="create"></iron-icon></a>
               <paper-tooltip for="edit-question" offset="0" animation-delay="300">Edit Question</paper-tooltip>
               <paper-icon-button id="delete-question" class="prendus-icon-button" icon="delete" on-click="openDeleteModal"></paper-icon-button>

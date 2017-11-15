@@ -114,6 +114,8 @@
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/edit" data="{{editAssignmentRouteData}}" active="{{editAssignmentRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/quiz/create" data="{{createQuizRouteData}}" active="{{createQuizRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/quiz/:quizId/edit" data="{{editQuizRouteData}}" active="{{editQuizRouteActive}}"></app-route>
+
         <app-route route="[[route]]" pattern="/quizzes/view" data="{{viewQuizzesRouteData}}" active="{{viewQuizzesRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/learning-structure" data="{{learningStructureRouteData}}" active="{{learningStructureRouteActive}}"></app-route>
@@ -186,8 +188,8 @@
               <prendus-take-assignment class="app-window" show="assignmentQuizView" assignment-id="[[assignmentQuizRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-take-assignment.html"></prendus-take-assignment>
               <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
 
-              <prendus-quiz-create class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-create.html"></prendus-quiz-create>
-              <prendus-quiz-edit class="app-window" show="editQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quiz-edit class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quiz-edit class="app-window" show="editQuizView" quiz-id="[[editQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
               <prendus-quizzes-view class="app-window" show="viewQuizzesView" data-path="../prendus-quizzes/prendus-quizzes-view.html"></prendus-quizzes-view>
 
               <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>
