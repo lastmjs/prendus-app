@@ -144,7 +144,9 @@ function flattenTypedIds(data, type) {
       ? [ ...result, { type: rawType.name, id: data.id } ]
       : [ ...result, ...flattenTypedIds(data[k], fields[k].type) ],
     []
-  ).sort((a, b) => dependencySort(a.type, b.type));
+  )
+    .reduce((filtered, typedId) => (filtered.some(({ id }) => id === typedId.id) ? filtered : [...filtered, typedId]), [])
+    .sort((a, b) => dependencySort(a.type, b.type));
 }
 
 export async function createTestUser(role: string, name: string): Promise<User> {
@@ -187,6 +189,47 @@ export async function deleteTestUsers(...users: User[]): Promise<object> {
   await GQLRequest(query, variables, AUTH_TOKEN, handleError);
 }
 
+export async function deleteCourseArbitrary(courseId: string): Promise<object> {
+  const data = await GQLRequest(`
+    query getCourse($courseId: ID!) {
+      Course(id: $courseId) {
+        id
+        assignments {
+          id
+          questions {
+            id
+            ratings {
+              id
+              scores {
+                id
+              }
+            }
+            responses {
+              id
+            }
+            concept {
+              id
+              subject {
+                id
+                discipline {
+                  id
+                }
+              }
+            }
+            analytics {
+              id
+            }
+          }
+        }
+        purchases {
+          id
+        }
+      }
+    }
+  `, { courseId }, AUTH_TOKEN, handleError);
+  return deleteArbitrary(data.Course, 'createCourse');
+}
+
 export async function authorizeTestUserOnCourse(userId: string, courseId: string): Promise<object> {
   const data = await GQLRequest(`
     mutation authorizeUserOnCourse($userId: ID!, $courseId: ID!) {
@@ -214,8 +257,11 @@ export async function authorizeTestUserOnCourse(userId: string, courseId: string
 export async function getAnalytics(filter: object): Promise<object> {
   const data = await GQLRequest(`
     query getAnalytics($filter: PrendusAnalyticsFilter) {
-      allPrendusAnalyticses(orderBy: createdAt_DESC, filter: $filter) {
+      allPrendusAnalyticses(orderBy: createdAt_ASC, filter: $filter) {
         verb
+        question {
+          id
+        }
       }
     }
   `, {filter}, AUTH_TOKEN, handleError);

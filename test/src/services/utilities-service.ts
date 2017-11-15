@@ -1,5 +1,6 @@
 import {
   Course,
+  Question
 } from '../../../src/typings/index.d';
 import {asyncForEach} from '../../../src/node_modules/prendus-shared/services/utilities-service';
 import {getAnalytics} from './dataGen-service';
@@ -45,11 +46,12 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
   )
 });
 
-export async function checkAnalytics(assignmentId: string, verbs: string[]): Promise<boolean> {
+export async function checkAnalytics(assignmentId: string, verbs: string[], questions: string[]): Promise<boolean> {
   const analytics = await getAnalytics({ assignment: { id: assignmentId } });
-  console.log(verbs, analytics);
   return verbs.length === analytics.length && analytics.every(
-    (analytic, i) => analytic.verb === verbs[i]
+    (analytic, i) =>
+      analytic.verb === verbs[i] &&
+      (!analytic.question || questions.some(qId => qId === analytic.question.id))
   );
 }
 
@@ -60,10 +62,8 @@ export async function scoreDropdowns(dropdowns): Promise {
   await asyncForEach(
     menus,
     async menu => {
-      const category = rubric[menu.category];
-      const option = Object.keys(category)[0]; //Arbitrary for now.
       const event = getListener(SCORES_CHANGED, dropdowns);
-      menu.querySelector('paper-listbox').selected = option;
+      menu.querySelectorAll('paper-item').item(0).click();
       await event;
     }
   );

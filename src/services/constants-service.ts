@@ -7,6 +7,16 @@ export const GQL_SORT_ASC = '_ASC';
 export const ARIA_SORT_ASC = 'ascending';
 export const ARIA_SORT_DESC = 'descending';
 export const ARIA_SORT_NONE = 'none';
+//Event names mostly used for testing
+export const ASSIGNMENT_LOADED = 'assignment-loaded';
+export const ASSIGNMENT_SUBMITTED = 'assignment-submitted';
+export const STATEMENT_SENT = 'statement-sent';
+export const SCORES_CHANGED = 'scores-changed';
+export const CATEGORIES_CHANGED = 'categories-changed';
+export const ITEM_CHANGED = 'item-changed';
+export const ITEMS_CHANGED = 'items-changed';
+export const RUBRIC_CHANGED = 'rubric-changed';
+export const FINISHED_CHANGED = 'finished-changed';
 export const Role = {
   INSTRUCTOR: 'INSTRUCTOR',
   STUDENT: 'STUDENT',

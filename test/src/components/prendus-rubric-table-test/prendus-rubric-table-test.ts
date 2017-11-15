@@ -5,6 +5,10 @@ import {
   CategoryScore
 } from '../../../../typings/index.d';
 import {
+  RUBRIC_CHANGED,
+  CATEGORIES_CHANGED
+} from '../../../../src/services/constants-service';
+import {
   RubricArb,
   escapedString
 } from '../../services/arbitraries-service';
@@ -26,10 +30,7 @@ const SET_DESCRIPTION = 'setDescription';
 const SET_POINTS = 'setPoints';
 const COMMANDS = [ADD_CATEGORY, REMOVE_CATEGORY, ADD_SCALE, REMOVE_SCALE, SET_CATEGORY, SET_DESCRIPTION, SET_POINTS];
 
-const commandArb = jsc.oneof(COMMANDS.map(command => jsc.constant(command)));
-
-const RUBRIC_CHANGED = 'rubric-changed';
-const CATEGORIES_CHANGED = 'categories-changed';
+const commandArb = jsc.elements(COMMANDS);
 
 class PrendusRubricTableTest extends Polymer.Element {
 

@@ -19,6 +19,11 @@ type AddToAssignmentOnConceptsPayload {
   conceptsConcept: Concept
 }
 
+type AddToAssignmentOnPrendusAnalyticsPayload {
+  assignmentAssignment: Assignment
+  analyticsPrendusAnalytics: PrendusAnalytics
+}
+
 type AddToAssignmentQuestionsPayload {
   assignmentAssignment: Assignment
   questionsQuestion: Question
@@ -64,6 +69,11 @@ type AddToCourseOnAssignmentPayload {
   assignmentsAssignment: Assignment
 }
 
+type AddToCourseOnPrendusAnalyticsPayload {
+  courseCourse: Course
+  analyticsPrendusAnalytics: PrendusAnalytics
+}
+
 type AddToCoursePurchasedPayload {
   courseCourse: Course
   purchasesPurchase: Purchase
@@ -92,6 +102,11 @@ type AddToImagesOnQuestionsPayload {
 type AddToQuestionOnAnswerCommentPayload {
   questionQuestion: Question
   answerCommentsAnswerComment: AnswerComment
+}
+
+type AddToQuestionOnPrendusAnalyticsPayload {
+  questionQuestion: Question
+  analyticsPrendusAnalytics: PrendusAnalytics
 }
 
 type AddToQuestionOnQuestionRatingPayload {
@@ -364,6 +379,8 @@ input AnswerCommentquestionQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -533,6 +550,7 @@ type AnswerCommentSubscriptionPayload {
 }
 
 type Assignment implements Node {
+  analytics(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [PrendusAnalytics!]
   author(filter: UserFilter): User!
   concepts(filter: ConceptFilter, orderBy: ConceptOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [Concept!]
   course(filter: CourseFilter): Course
@@ -549,10 +567,26 @@ type Assignment implements Node {
   updatedAt: DateTime!
 
   # Meta information about the query.
+  _analyticsMeta(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+
+  # Meta information about the query.
   _conceptsMeta(filter: ConceptFilter, orderBy: ConceptOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
 
   # Meta information about the query.
   _questionsMeta(filter: QuestionFilter, orderBy: QuestionOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+}
+
+input AssignmentanalyticsPrendusAnalytics {
+  contextId: String
+  contextType: ContextType
+  object: String
+  verb: String!
+  courseId: ID
+  course: PrendusAnalyticscourseCourse
+  questionId: ID
+  question: PrendusAnalyticsquestionQuestion
+  userId: ID
+  user: PrendusAnalyticsuserUser
 }
 
 input AssignmentauthorUser {
@@ -604,6 +638,8 @@ input AssignmentcourseCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -840,6 +876,9 @@ input AssignmentFilter {
 
   # All values greater than or equal the given value.
   updatedAt_gte: DateTime
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   author: UserFilter
   concepts_every: ConceptFilter
   concepts_some: ConceptFilter
@@ -916,6 +955,8 @@ input AssignmentquestionsQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -1180,6 +1221,9 @@ input AssignmentSubscriptionFilterNode {
 
   # All values greater than or equal the given value.
   updatedAt_gte: DateTime
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   author: UserFilter
   concepts_every: ConceptFilter
   concepts_some: ConceptFilter
@@ -1617,6 +1661,8 @@ input ConceptassignmentsAssignment {
   course: AssignmentcourseCourse
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -1799,6 +1845,8 @@ input ConceptquestionsQuestion {
   author: QuestionauthorUser
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -1992,6 +2040,7 @@ enum ContextType {
 }
 
 type Course implements Node {
+  analytics(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [PrendusAnalytics!]
   assignments(filter: AssignmentFilter, orderBy: AssignmentOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [Assignment!]
   author(filter: UserFilter): User!
   createdAt: DateTime!
@@ -2007,6 +2056,9 @@ type Course implements Node {
   updatedAt: DateTime!
 
   # Meta information about the query.
+  _analyticsMeta(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+
+  # Meta information about the query.
   _assignmentsMeta(filter: AssignmentFilter, orderBy: AssignmentOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
 
   # Meta information about the query.
@@ -2014,6 +2066,19 @@ type Course implements Node {
 
   # Meta information about the query.
   _purchasesMeta(filter: PurchaseFilter, orderBy: PurchaseOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+}
+
+input CourseanalyticsPrendusAnalytics {
+  contextId: String
+  contextType: ContextType
+  object: String
+  verb: String!
+  assignmentId: ID
+  assignment: PrendusAnalyticsassignmentAssignment
+  questionId: ID
+  question: PrendusAnalyticsquestionQuestion
+  userId: ID
+  user: PrendusAnalyticsuserUser
 }
 
 input CourseassignmentsAssignment {
@@ -2027,6 +2092,8 @@ input CourseassignmentsAssignment {
   author: AssignmentauthorUser
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -2312,6 +2379,9 @@ input CourseFilter {
 
   # All values greater than or equal the given value.
   updatedAt_gte: DateTime
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   assignments_every: AssignmentFilter
   assignments_some: AssignmentFilter
   assignments_none: AssignmentFilter
@@ -2606,6 +2676,9 @@ input CourseSubscriptionFilterNode {
 
   # All values greater than or equal the given value.
   updatedAt_gte: DateTime
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   assignments_every: AssignmentFilter
   assignments_some: AssignmentFilter
   assignments_none: AssignmentFilter
@@ -2646,6 +2719,8 @@ input CreateAssignment {
   course: AssignmentcourseCourse
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -2682,6 +2757,8 @@ input CreateCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -2722,10 +2799,16 @@ input CreateLTIUser {
 }
 
 input CreatePrendusAnalytics {
-  contextId: String!
-  contextType: ContextType!
-  object: String!
+  contextId: String
+  contextType: ContextType
+  object: String
   verb: String!
+  assignmentId: ID
+  assignment: PrendusAnalyticsassignmentAssignment
+  courseId: ID
+  course: PrendusAnalyticscourseCourse
+  questionId: ID
+  question: PrendusAnalyticsquestionQuestion
   userId: ID
   user: PrendusAnalyticsuserUser
 }
@@ -2760,6 +2843,8 @@ input CreateQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -2927,6 +3012,8 @@ input DisciplinecoursesCourse {
   author: CourseauthorUser
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -3622,6 +3709,8 @@ input FilequestionQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -4680,17 +4769,17 @@ input LTIUseruserUser {
 
 type Mutation {
   createAnswerComment(text: String!, questionId: ID, question: AnswerCommentquestionQuestion): AnswerComment
-  createAssignment(numCreateQuestions: Int, numGradeResponses: Int, numResponseQuestions: Int, numReviewQuestions: Int, questionType: QuestionType, title: String!, authorId: ID, author: AssignmentauthorUser, courseId: ID, course: AssignmentcourseCourse, quizId: ID, quiz: AssignmentquizQuiz, conceptsIds: [ID!], concepts: [AssignmentconceptsConcept!], questionsIds: [ID!], questions: [AssignmentquestionsQuestion!]): Assignment
+  createAssignment(numCreateQuestions: Int, numGradeResponses: Int, numResponseQuestions: Int, numReviewQuestions: Int, questionType: QuestionType, title: String!, authorId: ID, author: AssignmentauthorUser, courseId: ID, course: AssignmentcourseCourse, quizId: ID, quiz: AssignmentquizQuiz, analyticsIds: [ID!], analytics: [AssignmentanalyticsPrendusAnalytics!], conceptsIds: [ID!], concepts: [AssignmentconceptsConcept!], questionsIds: [ID!], questions: [AssignmentquestionsQuestion!]): Assignment
   createCategoryScore(category: String!, score: Int!, questionRatingId: ID, questionRating: CategoryScorequestionRatingQuestionRating, questionResponseRatingId: ID, questionResponseRating: CategoryScorequestionResponseRatingQuestionResponseRating): CategoryScore
   createConcept(title: String!, subjectId: ID, subject: ConceptsubjectSubject, assignmentsIds: [ID!], assignments: [ConceptassignmentsAssignment!], questionsIds: [ID!], questions: [ConceptquestionsQuestion!]): Concept
-  createCourse(description: String, dueDate: DateTime, price: Int, title: String!, authorId: ID, author: CourseauthorUser, disciplineId: ID, discipline: CoursedisciplineDiscipline, subjectId: ID, subject: CoursesubjectSubject, assignmentsIds: [ID!], assignments: [CourseassignmentsAssignment!], enrolledStudentsIds: [ID!], enrolledStudents: [CourseenrolledStudentsUser!], purchasesIds: [ID!], purchases: [CoursepurchasesPurchase!]): Course
+  createCourse(description: String, dueDate: DateTime, price: Int, title: String!, authorId: ID, author: CourseauthorUser, disciplineId: ID, discipline: CoursedisciplineDiscipline, subjectId: ID, subject: CoursesubjectSubject, analyticsIds: [ID!], analytics: [CourseanalyticsPrendusAnalytics!], assignmentsIds: [ID!], assignments: [CourseassignmentsAssignment!], enrolledStudentsIds: [ID!], enrolledStudents: [CourseenrolledStudentsUser!], purchasesIds: [ID!], purchases: [CoursepurchasesPurchase!]): Course
   createDiscipline(approved: PrendusApproved, title: String!, coursesIds: [ID!], courses: [DisciplinecoursesCourse!], subjectsIds: [ID!], subjects: [DisciplinesubjectsSubject!]): Discipline
   createFile(contentType: String!, name: String!, secret: String!, size: Int!, url: String!, questionId: ID, question: FilequestionQuestion): File
   createLTISession(ltiUserId: String!, serializedOutcomeService: Json!): LTISession
   createLTIUser(lisPersonContactEmailPrimary: String!, ltiUserId: String!, userId: ID, user: LTIUseruserUser): LTIUser
-  createPrendusAnalytics(contextId: String!, contextType: ContextType!, object: String!, verb: String!, userId: ID, user: PrendusAnalyticsuserUser): PrendusAnalytics
+  createPrendusAnalytics(contextId: String, contextType: ContextType, object: String, verb: String!, assignmentId: ID, assignment: PrendusAnalyticsassignmentAssignment, courseId: ID, course: PrendusAnalyticscourseCourse, questionId: ID, question: PrendusAnalyticsquestionQuestion, userId: ID, user: PrendusAnalyticsuserUser): PrendusAnalytics
   createPurchase(amount: Int!, stripeTokenId: String!, courseId: ID, course: PurchasecourseCourse, userId: ID, user: PurchaseuserUser): Purchase
-  createQuestion(code: String!, conceptAlignment: Int, difficulty: Int, explanation: String, inclusion: Int, language: Int, learningCategory: Int, overall: Int, plagiarism: Int, resource: String, text: String!, visibility: QuestionVisibility, assignmentId: ID, assignment: QuestionassignmentAssignment, authorId: ID, author: QuestionauthorUser, conceptId: ID, concept: QuestionconceptConcept, quizId: ID, quiz: QuestionquizQuiz, answerCommentsIds: [ID!], answerComments: [QuestionanswerCommentsAnswerComment!], flagsIds: [ID!], flags: [QuestionflagsQuestionFlag!], imagesIds: [ID!], images: [QuestionimagesFile!], ratingsIds: [ID!], ratings: [QuestionratingsQuestionRating!], responsesIds: [ID!], responses: [QuestionresponsesQuestionResponse!]): Question
+  createQuestion(code: String!, conceptAlignment: Int, difficulty: Int, explanation: String, inclusion: Int, language: Int, learningCategory: Int, overall: Int, plagiarism: Int, resource: String, text: String!, visibility: QuestionVisibility, assignmentId: ID, assignment: QuestionassignmentAssignment, authorId: ID, author: QuestionauthorUser, conceptId: ID, concept: QuestionconceptConcept, quizId: ID, quiz: QuestionquizQuiz, analyticsIds: [ID!], analytics: [QuestionanalyticsPrendusAnalytics!], answerCommentsIds: [ID!], answerComments: [QuestionanswerCommentsAnswerComment!], flagsIds: [ID!], flags: [QuestionflagsQuestionFlag!], imagesIds: [ID!], images: [QuestionimagesFile!], ratingsIds: [ID!], ratings: [QuestionratingsQuestionRating!], responsesIds: [ID!], responses: [QuestionresponsesQuestionResponse!]): Question
   createQuestionFlag(comment: String!, questionId: ID, question: QuestionFlagquestionQuestion): QuestionFlag
   createQuestionRating(ratingJson: Json, questionId: ID, question: QuestionRatingquestionQuestion, raterId: ID, rater: QuestionRatingraterUser, scoresIds: [ID!], scores: [QuestionRatingscoresCategoryScore!]): QuestionRating
   createQuestionResponse(authorId: ID, author: QuestionResponseauthorUser, questionId: ID, question: QuestionResponsequestionQuestion, ratingsIds: [ID!], ratings: [QuestionResponseratingsQuestionResponseRating!], userChecksIds: [ID!], userChecks: [QuestionResponseuserChecksUserCheck!], userEssaysIds: [ID!], userEssays: [QuestionResponseuserEssaysUserEssay!], userInputsIds: [ID!], userInputs: [QuestionResponseuserInputsUserInput!], userRadiosIds: [ID!], userRadios: [QuestionResponseuserRadiosUserRadio!], userVariablesIds: [ID!], userVariables: [QuestionResponseuserVariablesUserVariable!]): QuestionResponse
@@ -4703,17 +4792,17 @@ type Mutation {
   createUserRadio(checked: Boolean!, varName: String!, questionResponseId: ID, questionResponse: UserRadioquestionResponseQuestionResponse): UserRadio
   createUserVariable(value: Float!, varName: String!, questionResponseId: ID, questionResponse: UserVariablequestionResponseQuestionResponse): UserVariable
   updateAnswerComment(id: ID!, text: String, questionId: ID, question: AnswerCommentquestionQuestion): AnswerComment
-  updateAssignment(id: ID!, numCreateQuestions: Int, numGradeResponses: Int, numResponseQuestions: Int, numReviewQuestions: Int, questionType: QuestionType, title: String, authorId: ID, author: AssignmentauthorUser, courseId: ID, course: AssignmentcourseCourse, quizId: ID, quiz: AssignmentquizQuiz, conceptsIds: [ID!], concepts: [AssignmentconceptsConcept!], questionsIds: [ID!], questions: [AssignmentquestionsQuestion!]): Assignment
+  updateAssignment(id: ID!, numCreateQuestions: Int, numGradeResponses: Int, numResponseQuestions: Int, numReviewQuestions: Int, questionType: QuestionType, title: String, authorId: ID, author: AssignmentauthorUser, courseId: ID, course: AssignmentcourseCourse, quizId: ID, quiz: AssignmentquizQuiz, analyticsIds: [ID!], analytics: [AssignmentanalyticsPrendusAnalytics!], conceptsIds: [ID!], concepts: [AssignmentconceptsConcept!], questionsIds: [ID!], questions: [AssignmentquestionsQuestion!]): Assignment
   updateCategoryScore(category: String, id: ID!, score: Int, questionRatingId: ID, questionRating: CategoryScorequestionRatingQuestionRating, questionResponseRatingId: ID, questionResponseRating: CategoryScorequestionResponseRatingQuestionResponseRating): CategoryScore
   updateConcept(id: ID!, title: String, subjectId: ID, subject: ConceptsubjectSubject, assignmentsIds: [ID!], assignments: [ConceptassignmentsAssignment!], questionsIds: [ID!], questions: [ConceptquestionsQuestion!]): Concept
-  updateCourse(description: String, dueDate: DateTime, id: ID!, price: Int, title: String, authorId: ID, author: CourseauthorUser, disciplineId: ID, discipline: CoursedisciplineDiscipline, subjectId: ID, subject: CoursesubjectSubject, assignmentsIds: [ID!], assignments: [CourseassignmentsAssignment!], enrolledStudentsIds: [ID!], enrolledStudents: [CourseenrolledStudentsUser!], purchasesIds: [ID!], purchases: [CoursepurchasesPurchase!]): Course
+  updateCourse(description: String, dueDate: DateTime, id: ID!, price: Int, title: String, authorId: ID, author: CourseauthorUser, disciplineId: ID, discipline: CoursedisciplineDiscipline, subjectId: ID, subject: CoursesubjectSubject, analyticsIds: [ID!], analytics: [CourseanalyticsPrendusAnalytics!], assignmentsIds: [ID!], assignments: [CourseassignmentsAssignment!], enrolledStudentsIds: [ID!], enrolledStudents: [CourseenrolledStudentsUser!], purchasesIds: [ID!], purchases: [CoursepurchasesPurchase!]): Course
   updateDiscipline(approved: PrendusApproved, id: ID!, title: String, coursesIds: [ID!], courses: [DisciplinecoursesCourse!], subjectsIds: [ID!], subjects: [DisciplinesubjectsSubject!]): Discipline
   updateFile(contentType: String, id: ID!, name: String, secret: String, size: Int, url: String, questionId: ID, question: FilequestionQuestion): File
   updateLTISession(id: ID!, ltiUserId: String, serializedOutcomeService: Json): LTISession
   updateLTIUser(id: ID!, lisPersonContactEmailPrimary: String, ltiUserId: String, userId: ID, user: LTIUseruserUser): LTIUser
-  updatePrendusAnalytics(contextId: String, contextType: ContextType, id: ID!, object: String, verb: String, userId: ID, user: PrendusAnalyticsuserUser): PrendusAnalytics
+  updatePrendusAnalytics(contextId: String, contextType: ContextType, id: ID!, object: String, verb: String, assignmentId: ID, assignment: PrendusAnalyticsassignmentAssignment, courseId: ID, course: PrendusAnalyticscourseCourse, questionId: ID, question: PrendusAnalyticsquestionQuestion, userId: ID, user: PrendusAnalyticsuserUser): PrendusAnalytics
   updatePurchase(amount: Int, id: ID!, stripeTokenId: String, courseId: ID, course: PurchasecourseCourse, userId: ID, user: PurchaseuserUser): Purchase
-  updateQuestion(code: String, conceptAlignment: Int, difficulty: Int, explanation: String, id: ID!, inclusion: Int, language: Int, learningCategory: Int, overall: Int, plagiarism: Int, resource: String, text: String, visibility: QuestionVisibility, assignmentId: ID, assignment: QuestionassignmentAssignment, authorId: ID, author: QuestionauthorUser, conceptId: ID, concept: QuestionconceptConcept, quizId: ID, quiz: QuestionquizQuiz, answerCommentsIds: [ID!], answerComments: [QuestionanswerCommentsAnswerComment!], flagsIds: [ID!], flags: [QuestionflagsQuestionFlag!], imagesIds: [ID!], images: [QuestionimagesFile!], ratingsIds: [ID!], ratings: [QuestionratingsQuestionRating!], responsesIds: [ID!], responses: [QuestionresponsesQuestionResponse!]): Question
+  updateQuestion(code: String, conceptAlignment: Int, difficulty: Int, explanation: String, id: ID!, inclusion: Int, language: Int, learningCategory: Int, overall: Int, plagiarism: Int, resource: String, text: String, visibility: QuestionVisibility, assignmentId: ID, assignment: QuestionassignmentAssignment, authorId: ID, author: QuestionauthorUser, conceptId: ID, concept: QuestionconceptConcept, quizId: ID, quiz: QuestionquizQuiz, analyticsIds: [ID!], analytics: [QuestionanalyticsPrendusAnalytics!], answerCommentsIds: [ID!], answerComments: [QuestionanswerCommentsAnswerComment!], flagsIds: [ID!], flags: [QuestionflagsQuestionFlag!], imagesIds: [ID!], images: [QuestionimagesFile!], ratingsIds: [ID!], ratings: [QuestionratingsQuestionRating!], responsesIds: [ID!], responses: [QuestionresponsesQuestionResponse!]): Question
   updateQuestionFlag(comment: String, id: ID!, questionId: ID, question: QuestionFlagquestionQuestion): QuestionFlag
   updateQuestionRating(id: ID!, ratingJson: Json, questionId: ID, question: QuestionRatingquestionQuestion, raterId: ID, rater: QuestionRatingraterUser, scoresIds: [ID!], scores: [QuestionRatingscoresCategoryScore!]): QuestionRating
   updateQuestionResponse(id: ID!, authorId: ID, author: QuestionResponseauthorUser, questionId: ID, question: QuestionResponsequestionQuestion, ratingsIds: [ID!], ratings: [QuestionResponseratingsQuestionResponseRating!], userChecksIds: [ID!], userChecks: [QuestionResponseuserChecksUserCheck!], userEssaysIds: [ID!], userEssays: [QuestionResponseuserEssaysUserEssay!], userInputsIds: [ID!], userInputs: [QuestionResponseuserInputsUserInput!], userRadiosIds: [ID!], userRadios: [QuestionResponseuserRadiosUserRadio!], userVariablesIds: [ID!], userVariables: [QuestionResponseuserVariablesUserVariable!]): QuestionResponse
@@ -4777,6 +4866,7 @@ type Mutation {
   setAssignmentOnQuiz(quizQuizId: ID!, assignmentAssignmentId: ID!): SetAssignmentOnQuizPayload
   unsetAssignmentOnQuiz(quizQuizId: ID!, assignmentAssignmentId: ID!): UnsetAssignmentOnQuizPayload
   addToAssignmentOnConcepts(conceptsConceptId: ID!, assignmentsAssignmentId: ID!): AddToAssignmentOnConceptsPayload
+  addToAssignmentOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, assignmentAssignmentId: ID!): AddToAssignmentOnPrendusAnalyticsPayload
   addToAssignmentQuestions(questionsQuestionId: ID!, assignmentAssignmentId: ID!): AddToAssignmentQuestionsPayload
   addToAuthorOnAssignment(ownedAssignmentsAssignmentId: ID!, authorUserId: ID!): AddToAuthorOnAssignmentPayload
   addToAuthorOnCourse(ownedCoursesCourseId: ID!, authorUserId: ID!): AddToAuthorOnCoursePayload
@@ -4786,12 +4876,14 @@ type Mutation {
   addToConceptOnQuestion(conceptConceptId: ID!, questionsQuestionId: ID!): AddToConceptOnQuestionPayload
   addToCourseDiscipline(disciplineDisciplineId: ID!, coursesCourseId: ID!): AddToCourseDisciplinePayload
   addToCourseOnAssignment(assignmentsAssignmentId: ID!, courseCourseId: ID!): AddToCourseOnAssignmentPayload
+  addToCourseOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, courseCourseId: ID!): AddToCourseOnPrendusAnalyticsPayload
   addToCoursePurchased(purchasesPurchaseId: ID!, courseCourseId: ID!): AddToCoursePurchasedPayload
   addToCourseSubject(subjectSubjectId: ID!, coursesCourseId: ID!): AddToCourseSubjectPayload
   addToDisciplineOnSubject(subjectsSubjectId: ID!, disciplineDisciplineId: ID!): AddToDisciplineOnSubjectPayload
   addToFlagOnQuestion(flagsQuestionFlagId: ID!, questionQuestionId: ID!): AddToFlagOnQuestionPayload
   addToImagesOnQuestions(questionQuestionId: ID!, imagesFileId: ID!): AddToImagesOnQuestionsPayload
   addToQuestionOnAnswerComment(answerCommentsAnswerCommentId: ID!, questionQuestionId: ID!): AddToQuestionOnAnswerCommentPayload
+  addToQuestionOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, questionQuestionId: ID!): AddToQuestionOnPrendusAnalyticsPayload
   addToQuestionOnQuestionRating(ratingsQuestionRatingId: ID!, questionQuestionId: ID!): AddToQuestionOnQuestionRatingPayload
   addToQuestionOnQuestionResponse(responsesQuestionResponseId: ID!, questionQuestionId: ID!): AddToQuestionOnQuestionResponsePayload
   addToQuizOnQuestion(questionsQuestionId: ID!, quizQuizId: ID!): AddToQuizOnQuestionPayload
@@ -4811,13 +4903,16 @@ type Mutation {
   addToUserRadiosOnQuestionResponse(userRadiosUserRadioId: ID!, questionResponseQuestionResponseId: ID!): AddToUserRadiosOnQuestionResponsePayload
   addToUserVariablesOnQuestionResponse(userVariablesUserVariableId: ID!, questionResponseQuestionResponseId: ID!): AddToUserVariablesOnQuestionResponsePayload
   removeFromAssignmentOnConcepts(conceptsConceptId: ID!, assignmentsAssignmentId: ID!): RemoveFromAssignmentOnConceptsPayload
+  removeFromAssignmentOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, assignmentAssignmentId: ID!): RemoveFromAssignmentOnPrendusAnalyticsPayload
   removeFromAssignmentQuestions(questionsQuestionId: ID!, assignmentAssignmentId: ID!): RemoveFromAssignmentQuestionsPayload
   removeFromConceptOnQuestion(conceptConceptId: ID!, questionsQuestionId: ID!): RemoveFromConceptOnQuestionPayload
   removeFromCourseDiscipline(disciplineDisciplineId: ID!, coursesCourseId: ID!): RemoveFromCourseDisciplinePayload
   removeFromCourseOnAssignment(assignmentsAssignmentId: ID!, courseCourseId: ID!): RemoveFromCourseOnAssignmentPayload
+  removeFromCourseOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, courseCourseId: ID!): RemoveFromCourseOnPrendusAnalyticsPayload
   removeFromCoursePurchased(purchasesPurchaseId: ID!, courseCourseId: ID!): RemoveFromCoursePurchasedPayload
   removeFromCourseSubject(subjectSubjectId: ID!, coursesCourseId: ID!): RemoveFromCourseSubjectPayload
   removeFromImagesOnQuestions(questionQuestionId: ID!, imagesFileId: ID!): RemoveFromImagesOnQuestionsPayload
+  removeFromQuestionOnPrendusAnalytics(analyticsPrendusAnalyticsId: ID!, questionQuestionId: ID!): RemoveFromQuestionOnPrendusAnalyticsPayload
   removeFromQuizOnQuestion(questionsQuestionId: ID!, quizQuizId: ID!): RemoveFromQuizOnQuestionPayload
   removeFromScoresOnQuestionRating(scoresCategoryScoreId: ID!, questionRatingQuestionRatingId: ID!): RemoveFromScoresOnQuestionRatingPayload
   removeFromScoresOnQuestionResponseRating(scoresCategoryScoreId: ID!, questionResponseRatingQuestionResponseRatingId: ID!): RemoveFromScoresOnQuestionResponseRatingPayload
@@ -4857,14 +4952,59 @@ interface Node {
 }
 
 type PrendusAnalytics implements Node {
-  contextId: String!
-  contextType: ContextType!
+  assignment(filter: AssignmentFilter): Assignment
+  contextId: String
+  contextType: ContextType
+  course(filter: CourseFilter): Course
   createdAt: DateTime!
   id: ID!
-  object: String!
+  object: String
+  question(filter: QuestionFilter): Question
   updatedAt: DateTime!
   user(filter: UserFilter): User
   verb: String!
+}
+
+input PrendusAnalyticsassignmentAssignment {
+  numCreateQuestions: Int
+  numGradeResponses: Int
+  numResponseQuestions: Int
+  numReviewQuestions: Int
+  questionType: QuestionType
+  title: String!
+  authorId: ID
+  author: AssignmentauthorUser
+  courseId: ID
+  course: AssignmentcourseCourse
+  quizId: ID
+  quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
+  conceptsIds: [ID!]
+  concepts: [AssignmentconceptsConcept!]
+  questionsIds: [ID!]
+  questions: [AssignmentquestionsQuestion!]
+}
+
+input PrendusAnalyticscourseCourse {
+  description: String
+  dueDate: DateTime
+  price: Int
+  title: String!
+  authorId: ID
+  author: CourseauthorUser
+  disciplineId: ID
+  discipline: CoursedisciplineDiscipline
+  subjectId: ID
+  subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
+  assignmentsIds: [ID!]
+  assignments: [CourseassignmentsAssignment!]
+  enrolledStudentsIds: [ID!]
+  enrolledStudents: [CourseenrolledStudentsUser!]
+  purchasesIds: [ID!]
+  purchases: [CoursepurchasesPurchase!]
 }
 
 input PrendusAnalyticsFilter {
@@ -5087,6 +5227,9 @@ input PrendusAnalyticsFilter {
 
   # All values not ending with the given string.
   verb_not_ends_with: String
+  assignment: AssignmentFilter
+  course: CourseFilter
+  question: QuestionFilter
   user: UserFilter
 }
 
@@ -5108,13 +5251,48 @@ enum PrendusAnalyticsOrderBy {
 }
 
 type PrendusAnalyticsPreviousValues {
-  contextId: String!
-  contextType: ContextType!
+  contextId: String
+  contextType: ContextType
   createdAt: DateTime!
   id: ID!
-  object: String!
+  object: String
   updatedAt: DateTime!
   verb: String!
+}
+
+input PrendusAnalyticsquestionQuestion {
+  code: String!
+  conceptAlignment: Int
+  difficulty: Int
+  explanation: String
+  inclusion: Int
+  language: Int
+  learningCategory: Int
+  overall: Int
+  plagiarism: Int
+  resource: String
+  text: String!
+  visibility: QuestionVisibility
+  assignmentId: ID
+  assignment: QuestionassignmentAssignment
+  authorId: ID
+  author: QuestionauthorUser
+  conceptId: ID
+  concept: QuestionconceptConcept
+  quizId: ID
+  quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
+  answerCommentsIds: [ID!]
+  answerComments: [QuestionanswerCommentsAnswerComment!]
+  flagsIds: [ID!]
+  flags: [QuestionflagsQuestionFlag!]
+  imagesIds: [ID!]
+  images: [QuestionimagesFile!]
+  ratingsIds: [ID!]
+  ratings: [QuestionratingsQuestionRating!]
+  responsesIds: [ID!]
+  responses: [QuestionresponsesQuestionResponse!]
 }
 
 input PrendusAnalyticsSubscriptionFilter {
@@ -5353,6 +5531,9 @@ input PrendusAnalyticsSubscriptionFilterNode {
 
   # All values not ending with the given string.
   verb_not_ends_with: String
+  assignment: AssignmentFilter
+  course: CourseFilter
+  question: QuestionFilter
   user: UserFilter
 }
 
@@ -5418,6 +5599,8 @@ input PurchasecourseCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -5893,6 +6076,7 @@ type Query {
 }
 
 type Question implements Node {
+  analytics(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [PrendusAnalytics!]
   answerComments(filter: AnswerCommentFilter, orderBy: AnswerCommentOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): [AnswerComment!]
   assignment(filter: AssignmentFilter): Assignment
   author(filter: UserFilter): User!
@@ -5919,6 +6103,9 @@ type Question implements Node {
   visibility: QuestionVisibility!
 
   # Meta information about the query.
+  _analyticsMeta(filter: PrendusAnalyticsFilter, orderBy: PrendusAnalyticsOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+
+  # Meta information about the query.
   _answerCommentsMeta(filter: AnswerCommentFilter, orderBy: AnswerCommentOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
 
   # Meta information about the query.
@@ -5932,6 +6119,19 @@ type Question implements Node {
 
   # Meta information about the query.
   _responsesMeta(filter: QuestionResponseFilter, orderBy: QuestionResponseOrderBy, skip: Int, after: String, before: String, first: Int, last: Int): _QueryMeta!
+}
+
+input QuestionanalyticsPrendusAnalytics {
+  contextId: String
+  contextType: ContextType
+  object: String
+  verb: String!
+  assignmentId: ID
+  assignment: PrendusAnalyticsassignmentAssignment
+  courseId: ID
+  course: PrendusAnalyticscourseCourse
+  userId: ID
+  user: PrendusAnalyticsuserUser
 }
 
 input QuestionanswerCommentsAnswerComment {
@@ -5951,6 +6151,8 @@ input QuestionassignmentAssignment {
   course: AssignmentcourseCourse
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -6409,6 +6611,9 @@ input QuestionFilter {
 
   # All values that are not contained in given list.
   visibility_not_in: [QuestionVisibility!]
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   answerComments_every: AnswerCommentFilter
   answerComments_some: AnswerCommentFilter
   answerComments_none: AnswerCommentFilter
@@ -6610,6 +6815,8 @@ input QuestionFlagquestionQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -7000,6 +7207,8 @@ input QuestionRatingquestionQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -7383,6 +7592,8 @@ input QuestionResponsequestionQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -8307,6 +8518,9 @@ input QuestionSubscriptionFilterNode {
 
   # All values that are not contained in given list.
   visibility_not_in: [QuestionVisibility!]
+  analytics_every: PrendusAnalyticsFilter
+  analytics_some: PrendusAnalyticsFilter
+  analytics_none: PrendusAnalyticsFilter
   answerComments_every: AnswerCommentFilter
   answerComments_some: AnswerCommentFilter
   answerComments_none: AnswerCommentFilter
@@ -8369,6 +8583,8 @@ input QuizassignmentAssignment {
   author: AssignmentauthorUser
   courseId: ID
   course: AssignmentcourseCourse
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -8577,6 +8793,8 @@ input QuizquestionsQuestion {
   author: QuestionauthorUser
   conceptId: ID
   concept: QuestionconceptConcept
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -8754,6 +8972,11 @@ type RemoveFromAssignmentOnConceptsPayload {
   conceptsConcept: Concept
 }
 
+type RemoveFromAssignmentOnPrendusAnalyticsPayload {
+  assignmentAssignment: Assignment
+  analyticsPrendusAnalytics: PrendusAnalytics
+}
+
 type RemoveFromAssignmentQuestionsPayload {
   assignmentAssignment: Assignment
   questionsQuestion: Question
@@ -8774,6 +8997,11 @@ type RemoveFromCourseOnAssignmentPayload {
   assignmentsAssignment: Assignment
 }
 
+type RemoveFromCourseOnPrendusAnalyticsPayload {
+  courseCourse: Course
+  analyticsPrendusAnalytics: PrendusAnalytics
+}
+
 type RemoveFromCoursePurchasedPayload {
   courseCourse: Course
   purchasesPurchase: Purchase
@@ -8787,6 +9015,11 @@ type RemoveFromCourseSubjectPayload {
 type RemoveFromImagesOnQuestionsPayload {
   imagesFile: File
   questionQuestion: Question
+}
+
+type RemoveFromQuestionOnPrendusAnalyticsPayload {
+  questionQuestion: Question
+  analyticsPrendusAnalytics: PrendusAnalytics
 }
 
 type RemoveFromQuizOnQuestionPayload {
@@ -8869,6 +9102,8 @@ input SubjectcoursesCourse {
   author: CourseauthorUser
   disciplineId: ID
   discipline: CoursedisciplineDiscipline
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -9281,6 +9516,8 @@ input UpdateAssignment {
   course: AssignmentcourseCourse
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -9320,6 +9557,8 @@ input UpdateCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -9369,6 +9608,12 @@ input UpdatePrendusAnalytics {
   id: ID!
   object: String
   verb: String
+  assignmentId: ID
+  assignment: PrendusAnalyticsassignmentAssignment
+  courseId: ID
+  course: PrendusAnalyticscourseCourse
+  questionId: ID
+  question: PrendusAnalyticsquestionQuestion
   userId: ID
   user: PrendusAnalyticsuserUser
 }
@@ -9405,6 +9650,8 @@ input UpdateQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -9967,6 +10214,8 @@ input UserenrolledCoursesCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -11057,6 +11306,8 @@ input UserownedAssignmentsAssignment {
   course: AssignmentcourseCourse
   quizId: ID
   quiz: AssignmentquizQuiz
+  analyticsIds: [ID!]
+  analytics: [AssignmentanalyticsPrendusAnalytics!]
   conceptsIds: [ID!]
   concepts: [AssignmentconceptsConcept!]
   questionsIds: [ID!]
@@ -11072,6 +11323,8 @@ input UserownedCoursesCourse {
   discipline: CoursedisciplineDiscipline
   subjectId: ID
   subject: CoursesubjectSubject
+  analyticsIds: [ID!]
+  analytics: [CourseanalyticsPrendusAnalytics!]
   assignmentsIds: [ID!]
   assignments: [CourseassignmentsAssignment!]
   enrolledStudentsIds: [ID!]
@@ -11123,6 +11376,8 @@ input UserownedQuestionsQuestion {
   concept: QuestionconceptConcept
   quizId: ID
   quiz: QuestionquizQuiz
+  analyticsIds: [ID!]
+  analytics: [QuestionanalyticsPrendusAnalytics!]
   answerCommentsIds: [ID!]
   answerComments: [QuestionanswerCommentsAnswerComment!]
   flagsIds: [ID!]
@@ -11758,10 +12013,16 @@ type UserSubscriptionPayload {
 }
 
 input UseruserAnalyticsPrendusAnalytics {
-  contextId: String!
-  contextType: ContextType!
-  object: String!
+  contextId: String
+  contextType: ContextType
+  object: String
   verb: String!
+  assignmentId: ID
+  assignment: PrendusAnalyticsassignmentAssignment
+  courseId: ID
+  course: PrendusAnalyticscourseCourse
+  questionId: ID
+  question: PrendusAnalyticsquestionQuestion
 }
 
 type UserVariable implements Node {

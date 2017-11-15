@@ -132,7 +132,6 @@ class PrendusGradeAssignment extends Polymer.Element {
       //          this.gradePassback();
       //      }, 5000);
     }
-    this.dispatchEvent(new CustomEvent('grades-submitted'));
   }
 
   async _loadAssignment() {
@@ -146,6 +145,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     const responses = random.length >= assignment.numGradeResponses ? random : [];
     this.action = fireLocalAction(this.componentId, 'responses', responses);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.dispatchEvent(new CustomEvent('assignment-loaded'));
   }
 
   _handleGQLError(err: any) {

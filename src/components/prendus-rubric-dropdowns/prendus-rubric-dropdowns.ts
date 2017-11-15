@@ -40,18 +40,19 @@ export class PrendusRubricDropdowns extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  resetDropdowns() {
+  resetDropdowns(rubric: Rubric) {
+    if (rubric)
+      this.action = fireLocalAction(this.componentId, 'scores', Object.keys(rubric).map(resetScores));
     const dropdowns = this.shadowRoot.querySelectorAll('paper-dropdown-menu paper-listbox');
-    if (!dropdowns) return;
+    if (!dropdowns)
+      return;
     dropdowns.forEach(dropdown => {
       dropdown.selected = null;
     });
   }
 
   _initScores(rubric: Rubric) {
-    this.resetDropdowns();
-    const scores = Object.keys(rubric || {}).map(resetScores);
-    this.action = fireLocalAction(this.componentId, 'scores', scores);
+    this.resetDropdowns(rubric);
   }
 
   _categories(rubric: Rubric): string[] {
@@ -70,6 +71,8 @@ export class PrendusRubricDropdowns extends Polymer.Element {
 
   _scoreCategory(e) {
     const option = e.detail.value;
+    if (!option)
+      return; //Resetting.
     const { category } = e.model;
     const { points } = this.rubric[category][option];
     const newScores = this.scores.map(scoreCategory(category, Number(points)));
