@@ -583,6 +583,15 @@ permissions:
 - operation: CourseSubject.connect
 - operation: CourseSubject.disconnect
 
+- operation: QuestionOnPrendusAnalytics.connect
+- operation: QuestionOnPrendusAnalytics.disconnect
+
+- operation: CourseOnPrendusAnalytics.connect
+- operation: CourseOnPrendusAnalytics.disconnect
+
+- operation: AssignmentOnPrendusAnalytics.connect
+- operation: AssignmentOnPrendusAnalytics.disconnect
+
 - operation: UserOnPrendusAnalytics.connect
 - operation: UserOnPrendusAnalytics.disconnect
 

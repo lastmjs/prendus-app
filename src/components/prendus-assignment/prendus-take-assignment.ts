@@ -73,6 +73,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     const questions = await createQuiz(questionIds, this.user.id, this.userToken, errCb);
     this.action = fireLocalAction(this.componentId, 'questions', shuffleArray(questions));
     this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.dispatchEvent(new CustomEvent('assignment-loaded'));
   }
 
   _handleUnauthorized(e: CustomEvent) {
@@ -135,7 +136,6 @@ class PrendusTakeAssignment extends Polymer.Element {
       //          this.gradePassback();
       //      }, 5000);
     }
-    this.dispatchEvent(new CustomEvent('quiz-submitted'));
   }
 
   _nextClick(e: CustomEvent) {

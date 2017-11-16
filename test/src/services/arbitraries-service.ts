@@ -54,14 +54,24 @@ export const ConceptArb = jsc.record({
   subject: SubjectArb
 });
 
+export const UserEssayArb = jsc.record({
+  varName: jsc.constant('essay1'),
+  value: escapedString
+});
+
+export const QuestionResponseArb = jsc.record({
+  userEssays: jsc.array(UserEssayArb),
+});
+
 export const QuestionArb = jsc.record({
-  text: escapedString,
-  code: RubricArb.smap(
-    rubric => 'evaluationRubric = ' + JSON.stringify(rubric),
-    str => JSON.parse(str.slice(19))
-  ),
+  text: jsc.constant('[*]only option[*]'),
+  code: jsc.constant(
+    `evaluationRubric = '${JSON.stringify(DEFAULT_EVALUATION_RUBRIC)}';
+     gradingRubric = '${JSON.stringify(DEFAULT_EVALUATION_RUBRIC)}';
+    `),
   concept: ConceptArb,
   ratings: jsc.small(jsc.array(QuestionRatingArb)),
+  responses: jsc.array(QuestionResponseArb),
 });
 
 export const AssignmentArb = jsc.record({

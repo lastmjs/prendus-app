@@ -12,6 +12,12 @@ import {
 import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
+import {
+  setNotification
+} from '../../redux/actions';
+import {
+  NotificationType
+} from '../../services/constants-service';
 
 class PrendusUnauthorizedModal extends Polymer.Element {
   action: SetComponentPropertyAction;
@@ -50,19 +56,23 @@ class PrendusUnauthorizedModal extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'result', {
         authenticated: false,
       });
-    if (!_user || !assignmentId || !userToken)
+    else if (!_user || !assignmentId || !userToken)
       return;
     const data = await getAuthorizationData(_user.id, assignmentId, userToken);
-    const { user, assignment: { course } } = data;
-    this.action = fireLocalAction(this.componentId, 'result', {
-      authenticated: true,
-      payed: user.purchases.some(p => p.course.id === course.id),
-      enrolled: user.enrolledCourses.some(c => c.id === course.id)
-    });
+    if (!data || !data.user || !data.assignment || !data.assignment.course)
+      this.action = setNotification(
+        'Authorization error, this data has either been deleted or you do not have permission to see it.',
+        NotificationType.ERROR
+      );
+    else
+      this.action = fireLocalAction(this.componentId, 'result', {
+        authenticated: true,
+        payed: data.user.purchases.some(p => p.course.id === data.assignment.course.id),
+        enrolled: data.user.enrolledCourses.some(c => c.id === data.assignment.course.id)
+      });
   }
 
   _computeView(result: AuthResult) {
-    console.log(result);
     const { authenticated, payed, enrolled } = result;
     if (authenticated && payed && enrolled) {
       this.dispatchEvent(new CustomEvent('authorized'));

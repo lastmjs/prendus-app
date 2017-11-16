@@ -1,6 +1,10 @@
 import {asyncMap} from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 import {RootReducer} from '../../../../src/redux/reducers';
 import {
+  ITEM_CHANGED,
+  ITEMS_CHANGED,
+} from '../../../../src/services/constants-service';
+import {
   getListener,
   randomIndex
 } from '../../services/utilities-service';
@@ -13,11 +17,7 @@ const PREV = 'prev';
 const STAY = 'stay';
 const COMMANDS = [NEXT, PREV, STAY];
 
-const commandArb = jsc.oneof(COMMANDS.map(command => jsc.constant(command)));
-
-const ITEMS_CHANGED = 'items-changed';
-const ITEM_CHANGED = 'item-changed';
-const FINISHED = 'finished-changed';
+const commandArb = jsc.elements(COMMANDS);
 
 class PrendusCarouselTest extends Polymer.Element {
 

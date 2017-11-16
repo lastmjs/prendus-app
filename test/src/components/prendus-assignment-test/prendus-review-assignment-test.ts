@@ -5,7 +5,11 @@ import {
   Course
 } from '../../../../src/typings/index.d';
 import {
-  VerbType
+  VerbType,
+  ASSIGNMENT_LOADED,
+  ASSIGNMENT_SUBMITTED,
+  STATEMENT_SENT,
+  SCORES_CHANGED
 } from '../../../../src/services/constants-service';
 import {
   asyncMap,
@@ -14,7 +18,7 @@ import {
 import {CourseArb} from '../../services/arbitraries-service';
 import {
   saveArbitrary,
-  deleteArbitrary,
+  deleteCourseArbitrary,
   createTestUser,
   deleteTestUsers,
   authorizeTestUserOnCourse
@@ -29,9 +33,6 @@ import {
 const jsc = require('jsverify');
 
 const courseArb = jsc.nonshrink(CourseArb);
-
-const ASSIGNMENT_LOADED = 'assignment-loaded';
-const REVIEW_SUBMITTED = 'review-submitted';
 
 class PrendusReviewAssignmentTest extends Polymer.Element {
 
@@ -55,35 +56,28 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
     };
   }
 
-  cleaner(author, viewer, instructor, course, purchase) {
-    this.clean = async () => {
-      await deleteArbitrary(course, 'createCourse');
-      await deleteArbitrary(purchase, 'createPurchase');
-      await deleteTestUsers(author, viewer, instructor);
-    }
+  async cleaner(courseId) {
+    await deleteCourseArbitrary(courseId);
   }
 
   prepareTests(test) {
 
-    test('Collects correct analytics', [courseArb], async (course: Course) => {
+    test('Review assignment collects correct analytics', [courseArb], async (course: Course) => {
       const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
       const author = await createTestUser('STUDENT', 'author');
       const viewer = await createTestUser('STUDENT', 'viewer');
       const instructor = await createTestUser('INSTRUCTOR');
-      this.authenticate(viewer);
       const data = await saveArbitrary(
         assignCourseUserIds(course, instructor.id, author.id),
         'createCourse'
       );
-      const purchase = await authorizeTestUserOnCourse(viewer.id, data.id);
-      this.cleaner(author,viewer,instructor,data,purchase);
-      console.log('done authorizing student');
+      await authorizeTestUserOnCourse(viewer.id, data.id);
+      this.authenticate(viewer);
       const success = (await asyncMap(
         data.assignments,
         loadAndTestAssignment(reviewAssignment)
       )).every(result => result === true);
-      await deleteArbitrary(data, 'createCourse');
-      await deleteArbitrary(purchase, 'createPurchase');
+      await deleteCourseArbitrary(data.id);
       await deleteTestUsers(author, viewer, instructor);
       return success;
     });
@@ -94,32 +88,35 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
 
 function loadAndTestAssignment(reviewAssignment) {
   return async assignment => {
-    console.log('setting assignment');
     const setup = getListener(ASSIGNMENT_LOADED, reviewAssignment);
+    const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+    const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
     reviewAssignment.assignmentId = assignment.id;
     await setup;
-    console.log('assignment loaded');
     if (!verifyAssignment(assignment, reviewAssignment))
       return false;
-    console.log('assignment id matches');
     if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
-      return checkAnalytics(assignment.id, [VerbType.STARTED]) && reviewAssignment.finished === true;
-    console.log('starting integration test');
+      return reviewAssignment.finished === true;
+    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, reviewAssignment);
     const expect = await asyncMap(
-      reviewAssignment.assignment.numReviewQuestions,
+      (new Array(reviewAssignment.assignment.numReviewQuestions)).fill(0),
       async _ => {
-        console.log('starting review');
-        const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+        await dropdownsSetup;
         await scoreDropdowns(dropdowns);
-        console.log('submitting review');
-        const submitted = getListener(REVIEW_SUBMITTED, reviewAssignment);
-        reviewAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button').click();
+        const submitted = getListener(STATEMENT_SENT, reviewAssignment);
+        const btn = reviewAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+        btn.click();
         await submitted;
-        console.log('submitted');
         return VerbType.REVIEWED;
       }
     );
-    return checkAnalytics(assignment.id, [VerbType.STARTED, ...expect, VerbType.SUBMITTED]) && reviewAssignment.finished === true;
+    await assignmentFinished;
+    const analyticsCorrect = await checkAnalytics(
+      assignment.id,
+      [VerbType.STARTED, ...expect, VerbType.SUBMITTED],
+      reviewAssignment.questions.map(q => q.id)
+    );
+    return analyticsCorrect && reviewAssignment.finished === true;
   }
 }
 

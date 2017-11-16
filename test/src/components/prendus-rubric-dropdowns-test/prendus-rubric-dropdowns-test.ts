@@ -9,11 +9,12 @@ import {
   getListener,
   randomItem
 } from '../../services/utilities-service';
+import {
+  SCORES_CHANGED
+} from '../../../../src/services/constants-service';
 import {PrendusRubricDropdowns} from '../../../../src/components/prendus-rubric-dropdowns/prendus-rubric-dropdowns';
 
 const jsc = require('jsverify');
-
-const SCORES_CHANGED = 'scores-changed';
 
 class PrendusRubricDropdownsTest extends Polymer.Element {
 
@@ -43,7 +44,7 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
         return false;
       if (!verifyDropdownsReset(dropdowns))
         return false;
-      const success = jsc.check(dropdownsScore(dropdowns));
+      const success = await jsc.check(dropdownsScore(dropdowns));
       this.shadowRoot.removeChild(dropdowns);
       return success;
     });
@@ -53,10 +54,7 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
 
 function dropdownsScore(dropdowns) {
   const rubric: Rubric = dropdowns.rubric;
-  const categoryArb = jsc.oneof(
-    jsc.constant(null), //arbitrary category to represent empty rubric
-    ...Object.keys(rubric).map(category => jsc.constant(category.name))
-  ]);
+  const categoryArb = jsc.elements([null, ...Object.keys(rubric)]);
   return jsc.forall(categoryArb, async category => {
     const option = randomOption(rubric, category);
     const event = getEvent(dropdowns, rubric, category, option);

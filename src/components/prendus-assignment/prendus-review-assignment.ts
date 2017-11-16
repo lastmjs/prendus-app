@@ -9,6 +9,7 @@ import {
   createUUID,
   fireLocalAction,
   navigate,
+  getCookie
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {sendStatement} from '../../services/analytics-service';
@@ -19,7 +20,10 @@ import {
   QuestionType,
   ContextType,
   VerbType,
-  ObjectType
+  ObjectType,
+  STATEMENT_SENT,
+  ASSIGNMENT_LOADED,
+  ASSIGNMENT_SUBMITTED
 } from '../../services/constants-service';
 import {
   setNotification,
@@ -115,7 +119,7 @@ class PrendusReviewAssignment extends Polymer.Element {
       this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent('assignment-loaded'));
+    this.dispatchEvent(new CustomEvent(ASSIGNMENT_LOADED));
   }
 
   _computeQuestions(assignment: Assignment): Question[] {
@@ -132,50 +136,51 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
     try {
       validate(this.evaluationRubric, this.ratings);
+      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
       await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: this.question.id });
       this.shadowRoot.querySelector('#carousel').next();
+      this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     } catch (err) {
+      console.error(err);
       this.action = setNotification(err.message, NotificationType.ERROR);
     }
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  _handleNextQuestion(e: CustomEvent) {
+  async _handleNextQuestion(e: CustomEvent) {
     const question = e.detail.value;
-    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-    if (question && question === this.questions[0])
-      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
-    else
-      sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: this.question.id });
     this.action = fireLocalAction(this.componentId, 'question', question);
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
+    if (question === this.questions[0])
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
+    if (!question && this.questions.length) {
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.SUBMITTED });
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
+      this.gradePassback(false);
+    }
   }
 
-  _handleFinished(e: CustomEvent) {
-    const finished = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'finished', finished);
-    if (!finished)
-     return;
-    if (this.questions && this.questions.length)
-     this.gradePassback();
-  }
-
-  async gradePassback() {
+  async gradePassback(retried: boolean) {
     try {
-      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
-      console.error(error);
-      //      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-      //      setTimeout(() => {
-      //          this.gradePassback();
-      //      }, 5000);
+      this.action = setNotification('Grade passback failed.', NotificationType.ERROR);
+      if (retried) return; //Only retry once.
+      setTimeout(() => {
+          this.gradePassback(true);
+      }, 5000);
     }
-    this.dispatchEvent(new CustomEvent('grades-submitted'));
   }
 
   _handleRatings(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
+  }
+
+  _handleFinished(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'finished', e.detail.value);
   }
 
   stateChange(e: CustomEvent) {
@@ -281,6 +286,10 @@ function randomWithUnreviewedFirst(questions: Question[], num: number): Question
 }
 
 function validate(rubric: Rubric, ratings: CategoryScore[]) {
+  if (!ratings || !rubric)
+    throw new Error('Prendus error, ratings or rubric was undefined');
+  if (ratings.length !== Object.keys(rubric).length)
+    throw new Error('Prendus error, ratings did not match rubric');
   if (ratings.some(score => score.score < 0))
     throw new Error('You must rate each category');
 }
