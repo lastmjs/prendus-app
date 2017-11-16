@@ -64,11 +64,14 @@ export const QuestionResponseArb = jsc.record({
 });
 
 export const QuestionArb = jsc.record({
-  text: jsc.constant('[*]only option[*]'),
+  text: jsc.constant(`
+    Question Stem
+    [*]only option[*]
+  `),
   code: jsc.constant(
     `evaluationRubric = '${JSON.stringify(DEFAULT_EVALUATION_RUBRIC)}';
      gradingRubric = '${JSON.stringify(DEFAULT_EVALUATION_RUBRIC)}';
-    `),
+  `),
   concept: ConceptArb,
   ratings: jsc.small(jsc.array(QuestionRatingArb)),
   responses: jsc.array(QuestionResponseArb),

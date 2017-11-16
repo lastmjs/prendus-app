@@ -36,7 +36,7 @@
         items="[[responses]]"
         on-next="_handleNextRequest"
         on-item-changed="_handleNextResponse"
-        on-finished="_handleFinished"
+        on-finished-changed="_handleFinished"
       >
         <div hidden$="[[finished]]">
           <h4>Question</h4>
@@ -53,7 +53,7 @@
       </prendus-carousel>
     </div>
 
-    <div hidden$="[[!loaded]]">
+    <div hidden$="[[loaded]]">
       Loading...
     </div>
 

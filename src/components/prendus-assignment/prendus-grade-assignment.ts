@@ -38,7 +38,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   responses: UserEssay[];
   response: UserEssay;
   completionReason: string;
-  finished: boolean;
+  finished: boolean = false;
   modalOpen: boolean;
 
   static get is() { return 'prendus-grade-assignment' }
@@ -68,7 +68,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _computeCompletionReason(assignment: Assignment, responses: UserEssay[]): string {
-    return responses && responses.length >= assignment.numReviewQuestions
+    return responses && responses.length === assignment.numGradeResponses
       ? 'You have completed this assignment'
       : 'There are not enough responses to take the assignment yet';
   }
@@ -103,6 +103,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
       this.shadowRoot.querySelector('#carousel').next();
     } catch (err) {
+      console.error(err);
       this.action = setNotification(err.message, NotificationType.ERROR);
     }
   }
@@ -153,7 +154,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _handleGrades(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'grades', e.detail.scores);
+    this.action = fireLocalAction(this.componentId, 'grades', e.detail.value);
   }
 
   _handleFinished(e: CustomEvent) {
@@ -168,7 +169,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     this.response = componentState.response;
     this.responses = componentState.responses;
     this.grades = componentState.grades;
-    this.finished = componentState.finished;
+    this.finished = componentState.finished || false;
     this.modalOpen = componentState.modalOpen;
     this.userToken = state.userToken;
     this.user = state.user;
@@ -176,6 +177,10 @@ class PrendusGradeAssignment extends Polymer.Element {
 }
 
 function validate(rubric: Rubric, grades: CategoryScore[]) {
+  if (!grades || !rubric)
+    throw new Error('Prendus error, grades or rubric were undefined');
+  if (grades.length !== Object.keys(rubric).length)
+    throw new Error('Prendus error, grades did not match rubric');
   if (grades.some(({ score }) => score < 0))
     throw new Error('You must rate each category');
 }
@@ -233,6 +238,7 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
         questionResponse {
           id
           question {
+            id
             text
             code
           }

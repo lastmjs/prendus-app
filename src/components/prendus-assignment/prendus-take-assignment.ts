@@ -14,7 +14,10 @@ import {
   NotificationType,
   ContextType,
   VerbType,
-  ObjectType
+  ObjectType,
+  ASSIGNMENT_LOADED,
+  ASSIGNMENT_SUBMITTED,
+  STATEMENT_SENT
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
@@ -31,7 +34,6 @@ class PrendusTakeAssignment extends Polymer.Element {
   question: Question;
   questions:  Question[];
   completionReason: string;
-  submitted: string[] = [];
   finished: boolean;
   modalOpen: boolean;
 
@@ -73,7 +75,7 @@ class PrendusTakeAssignment extends Polymer.Element {
     const questions = await createQuiz(questionIds, this.user.id, this.userToken, errCb);
     this.action = fireLocalAction(this.componentId, 'questions', shuffleArray(questions));
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent('assignment-loaded'));
+    this.dispatchEvent(new CustomEvent(ASSIGNMENT_LOADED));
   }
 
   _handleUnauthorized(e: CustomEvent) {
@@ -92,49 +94,43 @@ class PrendusTakeAssignment extends Polymer.Element {
         validateEssay(e.detail.userEssays);
       else if (this.assignment.questionType === QuestionType.MULTIPLE_CHOICE)
         validateMultipleChoice(e.detail.userRadios);
+      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
       await saveResponse({
         ...e.detail,
         questionId: this.question.id,
         authorId: this.user.id
       });
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.RESPONDED, questionId: this.question.id);
+      this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     } catch (err) {
       alert(err.message); //Notification conflicts with paper-toast used in prendus-question-elements
     }
   }
 
-  _handleNextQuestion(e: CustomEvent) {
-    const { data } = e.detail;
-    if (!this.question || this.submitted.indexOf(this.question.id) === -1) {
-      this.action = fireLocalAction(this.componentId, 'submitted', [...this.submitted, this.question.id]);
-      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-      if (data && data === this.questions[0])
-        sendStatement(this.userToken, { ...statement, VerbType.STARTED });
-      else
-        sendStatement(this.userToken, { ...statement, VerbType.RESPONDED, questionId: this.question.id });
+  async _handleNextQuestion(e: CustomEvent) {
+    const question = e.detail.value;
+    this.action = fireLocalAction(this.componentId, 'question', question);
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
+    if (question && question === this.questions[0])
+      await sendStatement(this.userToken, { ...statement, VerbType.STARTED });
+    else if (!question && this.questions.length) {
+      this.gradePassback(false);
+      await sendStatement(this.userToken, { ...statement, VerbType.SUBMITTED });
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
     }
-    this.action = fireLocalAction(this.componentId, 'question', data);
   }
 
-  _handleFinished(e: CustomEvent) {
-    const finished = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'finished', finished);
-    if (!finished)
-      return;
-    if (this.questions && this.questions.length)
-      this.gradePassback();
-  }
-
-  async gradePassback() {
+  async gradePassback(retried: boolean) {
     try {
-      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
-      console.error(error);
-      //      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-      //      setTimeout(() => {
-      //          this.gradePassback();
-      //      }, 5000);
+      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+      if (retried) return; //Only retry once
+      setTimeout(() => {
+          this.gradePassback(true);
+      }, 5000);
     }
   }
 
@@ -144,6 +140,10 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   _backClick(e: CustomEvent) {
     this.shadowRoot.querySelector.('#carousel').previousData();
+  }
+
+  _handleFinished(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'finished', e.detail.value);
   }
 
   _handleError(err: any) {
@@ -156,7 +156,6 @@ class PrendusTakeAssignment extends Polymer.Element {
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
     this.question = componentState.question;
-    this.submitted = componentState.submitted || [];
     this.finished = componentState.finished;
     this.modalOpen = componentState.modalOpen;
     this.userToken = state.userToken;

@@ -90,39 +90,32 @@ function loadAndTestAssignment(gradeAssignment) {
   return async assignment => {
     const responses = assignment.questions
       .map(q => q.responses)
+      .reduce(flatten, [])
       .map(res => res.userEssays)
       .reduce(flatten, []);
     const setup = getListener(ASSIGNMENT_LOADED, gradeAssignment);
     const dropdowns = gradeAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
     const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
-    console.log('setting assignment id');
     gradeAssignment.assignmentId = assignment.id;
     await setup;
-    console.log('set assignment id');
     if (!verifyAssignment(assignment, gradeAssignment))
       return false;
-    console.log('verified assignment id');
     if (responses.length < gradeAssignment.assignment.numGradeResponses)
       return gradeAssignment.finished === true;
-    console.log('starting integration test');
     const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, gradeAssignment);
     const expect = await asyncMap(
       (new Array(gradeAssignment.assignment.numGradeResponses)).fill(0),
       async _ => {
-        console.log('starting dropdowns');
         await dropdownsSetup;
         await scoreDropdowns(dropdowns);
         const submitted = getListener(STATEMENT_SENT, gradeAssignment);
         const btn = gradeAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
         btn.click();
         await submitted;
-        console.log('finished dropdowns');
         return VerbType.GRADED;
       }
     );
-    console.log('waiting for assignment to submit');
     await assignmentFinished;
-    console.log('submitted assignment');
     const analyticsCorrect = await checkAnalytics(
       assignment.id,
       [VerbType.STARTED, ...expect, VerbType.SUBMITTED],

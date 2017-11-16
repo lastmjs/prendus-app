@@ -2,6 +2,9 @@ import {
   Course,
   Question
 } from '../../../src/typings/index.d';
+import {
+  VerbType,
+} from '../../../src/services/constants-service';
 import {asyncForEach} from '../../../src/node_modules/prendus-shared/services/utilities-service';
 import {getAnalytics} from './dataGen-service';
 
@@ -57,7 +60,11 @@ export async function checkAnalytics(assignmentId: string, verbs: string[], ques
   return verbs.length === analytics.length && analytics.every(
     (analytic, i) =>
       analytic.verb === verbs[i] &&
-      (!analytic.question || questions.some(qId => qId === analytic.question.id))
+    (
+      analytic.verb === VerbType.STARTED ||
+      analytic.verb === VerbType.SUBMITTED ||
+      questions.some(qId => qId === analytic.question.id)
+    )
   );
 }
 
