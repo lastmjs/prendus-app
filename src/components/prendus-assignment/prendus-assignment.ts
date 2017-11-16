@@ -182,6 +182,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
   }
 
   async loadData() {
+    this._fireLocalAction('loaded', false)
     const data = await GQLRequest(`
       query assignment($id: ID!) {
         Assignment(id: $id) {
@@ -209,6 +210,7 @@ class PrendusAssignment extends Polymer.Element implements ContainerElement {
     this._fireLocalAction('assignment', data.Assignment)
     this._fireLocalAction('selectedConcepts', data.Assignment.concepts)
     this._fireLocalAction('courseId', data.Assignment.course.id)
+    this._fireLocalAction('loaded', true)
   }
 
   async loadConcepts(subjectId: string){
