@@ -35,9 +35,9 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     async connectedCallback() {
         super.connectedCallback();
-        this.action = fireLocalAction(this.componentId, 'loaded', true)
-        this.action = fireLocalAction(this.componentId, 'loginDisabled', true)
-        this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false)
+        this.action = fireLocalAction(this.componentId, 'loaded', true);
+        this.action = fireLocalAction(this.componentId, 'loginDisabled', true);
+        this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false);
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', true);
     }
 
@@ -58,10 +58,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
     }
     //TODO add loading indication to user
   	loginOnEnter(e: any) {
-      console.log('login on enter', e.keyCode)
       const emailElement: any = this.shadowRoot.querySelector('#email');
       const passwordElement: any = this.shadowRoot.querySelector('#password');
-      console.log(!checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement))
   		if(e.keyCode === 13 && !checkIfLoginButtonShouldBeDisabled(emailElement, passwordElement)) this.loginClick();
     }
   	openResetPasswordDialog(): void {
@@ -83,9 +81,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
       }
     }
     async resetPassword() {
-        const email = this.shadowRoot.querySelector('#reset-password-email').value;
         this.action = fireLocalAction(this.componentId, 'loaded', false);
-        sendResetPasswordEmail(email);
+        await sendResetPasswordEmail(this.shadowRoot.querySelector('#reset-password-email').value);
         this.action = fireLocalAction(this.componentId, 'loaded', true);
         this.closeResetPasswordDialog();
         //Eventually redirect to another landing page that says they will get an email if the
@@ -119,7 +116,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           };
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
-          addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
+          await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
           if (getCookie('redirectUrl')) {
@@ -165,8 +162,11 @@ async function signinUser(email: string, password: string, userToken: string | n
             }
         }
     `, {email, password}, userToken, (error: any) => {
-      error.message = "Password or email information incorrect."
-      throw error;
+      const updatedError = {
+        ...error,
+        message: "Password or email information incorrect."
+      }
+      throw updatedError;
     });
     return data;
 }
@@ -184,8 +184,11 @@ async function getUser(email: string, password: string, userToken: string | null
         }
       }
     `, {email}, userToken, (error: any) => {
-      error.message = "Could not fetch user data."
-      throw error;
+      const updatedError = {
+        ...error,
+        message: "Could not fetch user data."
+      }
+      throw updatedError;
     });
     return data;
 }
@@ -202,8 +205,11 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
           userId: user ? user.id : 'user is null',
           jwt: ltiJWT
       }, userToken, (error: any) => {
-        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
-        throw error;
+        const updatedError = {
+          ...error,
+          message: "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
+        }
+        throw updatedError;
       });
   }
 }
