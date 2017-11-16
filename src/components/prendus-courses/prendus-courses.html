@@ -47,7 +47,6 @@
                     <prendus-no-content-card parent-component="Course" plural="Courses" primary-redirect-url="course/create" secondary-redirect-url="course/search" display-icon="social:school"></prendus-no-content-card>
                   </template>
                 </dom-if>
-      				  <h1>Courses</h1>
                 <dom-repeat items="[[courses]]" class="courses-container">
                     <template>
                       <paper-card class="course-card" heading="[[item.title]]">
@@ -65,9 +64,6 @@
                       </paper-card>
                     </template>
                 </dom-repeat>
-                <div id="add-course-button">
-                  <button class="prendus-button prendus-button--recommended" on-click="openCreateCourseDialog">Add Course </button>
-                </div>
                 <paper-dialog id="add-course-modal" modal>
                   <div class="content">
                     <h2>Add Course</h2>
