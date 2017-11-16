@@ -39,6 +39,12 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
             raterId: studentId,
             ...rating
           })
+        ),
+        responses: question.responses.map(
+          response => ({
+            authorId: studentId,
+            ...response
+          })
         )
       })
     )

@@ -57,12 +57,12 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
   }
 
   async cleaner(courseId) {
-    await deleteCourseArbitrary(courseId, 'createCourse');
+    await deleteCourseArbitrary(courseId);
   }
 
   prepareTests(test) {
 
-    test('Collects correct analytics', [courseArb], async (course: Course) => {
+    test('Review assignment collects correct analytics', [courseArb], async (course: Course) => {
       const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
       const author = await createTestUser('STUDENT', 'author');
       const viewer = await createTestUser('STUDENT', 'viewer');
@@ -77,7 +77,7 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
         data.assignments,
         loadAndTestAssignment(reviewAssignment)
       )).every(result => result === true);
-      await deleteCourseArbitrary(data.id, 'createCourse');
+      await deleteCourseArbitrary(data.id);
       await deleteTestUsers(author, viewer, instructor);
       return success;
     });

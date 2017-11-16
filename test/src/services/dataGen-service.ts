@@ -17,6 +17,8 @@ const dependencyTree = [
   'Subject',
   'Concept',
   'Question',
+  'QuestionResponse',
+  'UserEssay',
   'CategoryScore',
   'QuestionRating',
   'Assignment',
@@ -196,6 +198,9 @@ export async function deleteCourseArbitrary(courseId: string): Promise<object> {
         id
         assignments {
           id
+          analytics {
+            id
+          }
           questions {
             id
             ratings {
@@ -206,6 +211,9 @@ export async function deleteCourseArbitrary(courseId: string): Promise<object> {
             }
             responses {
               id
+              userEssays {
+                id
+              }
             }
             concept {
               id

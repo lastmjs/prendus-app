@@ -5,7 +5,11 @@ import {
   Course
 } from '../../../../src/typings/index.d';
 import {
-  VerbType
+  VerbType,
+  ASSIGNMENT_LOADED,
+  ASSIGNMENT_SUBMITTED,
+  STATEMENT_SENT,
+  SCORES_CHANGED
 } from '../../../../src/services/constants-service';
 import {
   asyncMap,
@@ -14,7 +18,7 @@ import {
 import {CourseArb} from '../../services/arbitraries-service';
 import {
   saveArbitrary,
-  deleteArbitrary,
+  deleteCourseArbitrary,
   createTestUser,
   deleteTestUsers,
   authorizeTestUserOnCourse
@@ -29,9 +33,6 @@ import {
 const jsc = require('jsverify');
 
 const courseArb = jsc.nonshrink(CourseArb);
-
-const ASSIGNMENT_LOADED = 'assignment-loaded';
-const GRADES_SUBMITTED = 'grades-submitted';
 
 class PrendusGradeAssignmentTest extends Polymer.Element {
 
@@ -55,35 +56,28 @@ class PrendusGradeAssignmentTest extends Polymer.Element {
     };
   }
 
-  cleaner(author, viewer, instructor, course, purchase) {
-    this.clean = async () => {
-      await deleteArbitrary(course, 'createCourse');
-      await deleteArbitrary(purchase, 'createPurchase');
-      await deleteTestUsers(author, viewer, instructor);
-    }
+  async cleaner(courseId) {
+    await deleteCourseArbitrary(courseId);
   }
 
   prepareTests(test) {
 
-    test('Collects correct analytics', [courseArb], async (course: Course) => {
+    test('Grade assignment collects correct analytics', [courseArb], async (course: Course) => {
       const gradeAssignment = this.shadowRoot.querySelector('prendus-grade-assignment');
       const author = await createTestUser('STUDENT', 'author');
       const viewer = await createTestUser('STUDENT', 'viewer');
       const instructor = await createTestUser('INSTRUCTOR');
-      this.authenticate(viewer);
       const data = await saveArbitrary(
         assignCourseUserIds(course, instructor.id, author.id),
         'createCourse'
       );
-      const purchase = await authorizeTestUserOnCourse(viewer.id, data.id);
-      this.cleaner(author,viewer,instructor,data,purchase);
-      console.log('done authorizing student');
+      await authorizeTestUserOnCourse(viewer.id, data.id);
+      this.authenticate(viewer);
       const success = (await asyncMap(
         data.assignments,
         loadAndTestAssignment(gradeAssignment)
       )).every(result => result === true);
-      await deleteArbitrary(data, 'createCourse');
-      await deleteArbitrary(purchase, 'createPurchase');
+      await deleteCourseArbitrary(data.id);
       await deleteTestUsers(author, viewer, instructor);
       return success;
     });
@@ -94,37 +88,56 @@ class PrendusGradeAssignmentTest extends Polymer.Element {
 
 function loadAndTestAssignment(gradeAssignment) {
   return async assignment => {
-    console.log('setting assignment');
+    const responses = assignment.questions
+      .map(q => q.responses)
+      .map(res => res.userEssays)
+      .reduce(flatten, []);
     const setup = getListener(ASSIGNMENT_LOADED, gradeAssignment);
+    const dropdowns = gradeAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+    const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
+    console.log('setting assignment id');
     gradeAssignment.assignmentId = assignment.id;
     await setup;
-    console.log('assignment loaded');
+    console.log('set assignment id');
     if (!verifyAssignment(assignment, gradeAssignment))
       return false;
-    console.log('assignment id matches');
-    if (assignment.questions.length < gradeAssignment.assignment.numReviewQuestions)
-      return checkAnalytics(assignment.id, [VerbType.STARTED]) && gradeAssignment.finished === true;
+    console.log('verified assignment id');
+    if (responses.length < gradeAssignment.assignment.numGradeResponses)
+      return gradeAssignment.finished === true;
     console.log('starting integration test');
+    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, gradeAssignment);
     const expect = await asyncMap(
-      gradeAssignment.assignment.numReviewQuestions,
+      (new Array(gradeAssignment.assignment.numGradeResponses)).fill(0),
       async _ => {
-        console.log('starting grade');
-        const dropdowns = gradeAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+        console.log('starting dropdowns');
+        await dropdownsSetup;
         await scoreDropdowns(dropdowns);
-        console.log('submitting grade');
-        const submitted = getListener(GRADES_SUBMITTED, gradeAssignment);
-        gradeAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('next-button').click();
+        const submitted = getListener(STATEMENT_SENT, gradeAssignment);
+        const btn = gradeAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+        btn.click();
         await submitted;
-        console.log('submitted');
+        console.log('finished dropdowns');
         return VerbType.GRADED;
       }
     );
-    return checkAnalytics(assignment.id, [VerbType.STARTED, ...expect, VerbType.SUBMITTED]) && gradeAssignment.finished === true;
+    console.log('waiting for assignment to submit');
+    await assignmentFinished;
+    console.log('submitted assignment');
+    const analyticsCorrect = await checkAnalytics(
+      assignment.id,
+      [VerbType.STARTED, ...expect, VerbType.SUBMITTED],
+      gradeAssignment.responses.map(essay => essay.questionResponse.question.id)
+    );
+    return analyticsCorrect && gradeAssignment.finished === true;
   }
 }
 
 function verifyAssignment(assignment: Assignment, gradeAssignment): boolean {
   return gradeAssignment.assignment.id === assignment.id;
+}
+
+function flatten(arr: any[], el: any): any[] {
+  return arr.concat(Array.isArray(el) ? el.reduce(flatten, []) : el);
 }
 
 window.customElements.define(PrendusGradeAssignmentTest.is, PrendusGradeAssignmentTest);

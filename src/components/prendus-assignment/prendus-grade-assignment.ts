@@ -16,7 +16,10 @@ import {
   NotificationType,
   ContextType,
   VerbType,
-  ObjectType
+  ObjectType,
+  ASSIGNMENT_LOADED,
+  ASSIGNMENT_SUBMITTED,
+  STATEMENT_SENT
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions';
 import {sendStatement} from '../../services/analytics-service';
@@ -65,7 +68,7 @@ class PrendusGradeAssignment extends Polymer.Element {
   }
 
   _computeCompletionReason(assignment: Assignment, responses: UserEssay[]): string {
-    return responses && responses.length > assignment.numReviewQuestions
+    return responses && responses.length >= assignment.numReviewQuestions
       ? 'You have completed this assignment'
       : 'There are not enough responses to take the assignment yet';
   }
@@ -95,42 +98,39 @@ class PrendusGradeAssignment extends Polymer.Element {
     try {
       validate(this.rubric, this.grades);
       await submit(this.grades, this.response.questionResponse.id, this.user.id);
-      this.shadowRoot.querySelector('#carousel').nextData();
+      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.GRADED, questionId: this.response.questionResponse.question.id });
+      this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
+      this.shadowRoot.querySelector('#carousel').next();
     } catch (err) {
       this.action = setNotification(err.message, NotificationType.ERROR);
     }
   }
 
-  _handleNextResponse(e: CustomEvent) {
-    const response = e.detail.data;
+  async _handleNextResponse(e: CustomEvent) {
+    const response = e.detail.value;
+    this.action = fireLocalAction(this.componentId, 'response', response);
     const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
     if (response && response === this.responses[0])
-      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
-    else
-      sendStatement(this.userToken, { ...statement, verb: VerbType.GRADED, questionId: this.response.questionResponse.question.id });
-    this.action = fireLocalAction(this.componentId, 'response', response);
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
+    else if (!response && this.responses.length) {
+      this.gradePassback(false);
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.SUBMITTED });
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
+    }
   }
 
-  _handleFinished(e: CustomEvent) {
-    const finished = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'finished', finished);
-    if (!finished)
-      return;
-    if (this.responses && this.responses.length)
-      this.gradePassback();
-  }
-
-  async gradePassback() {
+  async gradePassback(retried: boolean) {
     try {
-      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
-      console.error(error);
-      //      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-      //      setTimeout(() => {
-      //          this.gradePassback();
-      //      }, 5000);
+      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
+      if (retried) return; //Only retry once
+      setTimeout(() => {
+          this.gradePassback(true);
+      }, 5000);
     }
   }
 
@@ -145,7 +145,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     const responses = random.length >= assignment.numGradeResponses ? random : [];
     this.action = fireLocalAction(this.componentId, 'responses', responses);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent('assignment-loaded'));
+    this.dispatchEvent(new CustomEvent(ASSIGNMENT_LOADED));
   }
 
   _handleGQLError(err: any) {
@@ -156,12 +156,17 @@ class PrendusGradeAssignment extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'grades', e.detail.scores);
   }
 
+  _handleFinished(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'finished', e.detail.value);
+  }
+
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
     this.response = componentState.response;
+    this.responses = componentState.responses;
     this.grades = componentState.grades;
     this.finished = componentState.finished;
     this.modalOpen = componentState.modalOpen;
@@ -200,7 +205,7 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
         title
         questionType
         numGradeResponses
-        graded(filter: {
+        graded: questions(filter: {
           responses_some: {
             ratings_some: {
               rater: {
@@ -230,6 +235,9 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
           question {
             text
             code
+          }
+          _ratingsMeta {
+            count
           }
         }
       }
