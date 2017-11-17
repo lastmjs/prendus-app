@@ -20,7 +20,7 @@
         <paper-input id="institutionState" name="state" label="State" maxlength="50" required auto-validate error-message="Please enter a state." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
         <paper-input id="institutionCity" name="city" label="City" maxlength="50" required auto-validate error-message="Please enter a city." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
         <div class="buttons">
-          <button class="prendus-button prendus-button--minor" dialog-dismiss>Cancel</button>
+          <button class="prendus-button prendus-button--minor" dialog-dismiss on-click="fireCancelDialog">Cancel</button>
           <button class="prendus-button prendus-button--recommended" disabled="[[createInstitutionButtonDisabled]]" on-click="createInstitution">Submit</button>
         </div>
     </template>

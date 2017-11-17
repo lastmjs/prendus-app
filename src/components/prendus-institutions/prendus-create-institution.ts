@@ -89,6 +89,9 @@ class PrendusCreateInstitution extends Polymer.Element {
         throw error;
       }
     }
+    fireCancelDialog(e){
+      this.fire
+    }
     stateChange(e: CustomEvent) {
         const state = e.detail.state;
         const componentState = state.components[this.componentId] || {};

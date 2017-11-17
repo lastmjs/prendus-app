@@ -8,7 +8,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
-<link rel="import" href="../prendus-question/prendus-question-container.html">
+<link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
 <link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
@@ -32,16 +32,16 @@
 
       <dom-if if="[[loaded]]">
           <template>
-            <dom-if if="[[!questionIds]]">
+            <dom-if if="[[!questions]]">
               <template>
                 <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
               </template>
             </dom-if>
             <!-- Need to get an iron list working.  -->
             <div id="questions-block">
-              <dom-repeat items="[[questionIds]]">
+              <dom-repeat items="[[questions]]">
                 <template>
-                  <prendus-question-container question-id="[[item]]"></prendus-question-container>
+                  <prendus-question-viewer-wrapper question="[[item]]" edit delete></prendus-question-viewer-wrapper>
                 </template>
               </dom-repeat>
             </div>

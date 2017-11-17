@@ -33,18 +33,17 @@ class PrendusQuestionsView extends Polymer.Element {
 
   async connectedCallback() {
     this.action = fireLocalAction(this.componentId, 'loaded', false)
-    await this.loadQuizzes();
+    await this.loadQuestions();
     super.connectedCallback();
   }
 
-  async loadQuizzes(){
+  async loadQuestions(){
     try{
       setTimeout(async () => {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        const userQuestionIds = await getUserQuestions(this.user.id, this.userToken);
-        const userQuestionIdsArray = (userQuestionIds) ? userQuestionIds.map(question => question.id) : false;
-        this.action = fireLocalAction(this.componentId, 'questionIds', userQuestionIdsArray)
+        const userQuestions = await getUserQuestions(this.user.id, this.userToken);
+        this.action = fireLocalAction(this.componentId, 'questions', userQuestions)
         this.action = fireLocalAction(this.componentId, 'loaded', true)
       }, 0);
     }catch(error){
@@ -59,7 +58,7 @@ class PrendusQuestionsView extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('questions')) this.quizzes = componentState.quizzes;
+    if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
     if (keys.includes('error')) this.error = componentState.error;
@@ -82,6 +81,8 @@ async function getUserQuestions(userId: String, userToken: String) {
             }
         }) {
           id
+          text
+          code
         }
       }
     `, {userId}, userToken, (error: any) => {

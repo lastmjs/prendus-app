@@ -3,6 +3,9 @@ import {ContainerElement} from '../../typings/container-element';
 import {Course} from '../../typings/course';
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {User} from '../../typings/user';
+import {Institution} from '../../typings/institution';
+import {Discipline} from '../../typings/discipline';
+import {Subject} from '../../typings/subject';
 import {State} from '../../typings/state';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
@@ -18,6 +21,21 @@ class PrendusCourseCreate extends Polymer.Element implements ContainerElement {
     newCourseTitle: string | null;
     client: any;
     index: any;
+    institution: string;
+    institutions: string[];
+    institutionPartialName: string;
+    disciplinePartialName: string;
+    discipline: Discipline;
+    disciplines: string[];
+    subject: Subject;
+    subjects: string[]
+    subjectPartialName: string;
+    createInstitutionModalOpen: boolean;
+    createDisciplineModalOpen: boolean;
+    createSubjectModalOpen: boolean;
+    createInstitutionButtonDisabled: boolean;
+    createDisciplineButtonDisabled: boolean;
+    createSubjectButtonDisabled: boolean;
 
     static get is() { return 'prendus-course-create'; }
 
@@ -29,24 +47,16 @@ class PrendusCourseCreate extends Polymer.Element implements ContainerElement {
 
     async connectedCallback() {
         super.connectedCallback();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
-        };
-
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-
+        this.action = fireLocalAction(this.componentId, "loaded", false);
+        this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", false);
+        this.action = fireLocalAction(this.componentId, "createDisciplineModalOpen", false);
+        this.action = fireLocalAction(this.componentId, "createSubjectModalOpen", false);
+        this.action = fireLocalAction(this.componentId, "createInstitutionButtonDisabled", true);
+        this.action = fireLocalAction(this.componentId, "createDisciplineButtonDisabled", true);
+        this.action = fireLocalAction(this.componentId, "createSubjectButtonDisabled", true);
+        this.action = fireLocalAction(this.componentId, "loaded", true);
         this.subscribeToData();
     }
 
@@ -120,10 +130,51 @@ class PrendusCourseCreate extends Polymer.Element implements ContainerElement {
     submitOnEnter(e: any) {
       if(e.keyCode === 13 && this.shadowRoot.querySelector(`#${e.target.id}`).value) this.createCourse();
     }
+    openCreateInstitutionModal(){
+      this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", true);
+    }
+    findInstitution(){
+      this.action = fireLocalAction(this.componentId, "institutionPartialName", this.shadowRoot.querySelector('#institution').value)
+      // this.action = fireLocalAction(this.componentId, "institutionPartialName", this.shadowRoot.querySelector('#institution').shadowRoot.querySelector('#autocompleteInput').value)
+      const institutionPartialName: string = this.shadowRoot.querySelector('#institution').value;
+    }
+    loadInstitutions(e: any){
+      //This is so that the autocomplete will function correctly.
+      const institutions = e.detail.results.map((result: Institution) => {
+        return {
+          id: "id",
+          //change to result.name once Algolia is updated
+          text: result.Name,
+          value: result.Name
+        }
+      })
+      this.action = fireLocalAction(this.componentId, "institutions", institutions)
+    }
+    createCourseOnEnter(e){
+      if(e.keyCode == 13){
+        console.log('create Course on Enter')
+      }
+    }
     async stateChange(e: CustomEvent) {
-        const state: State = e.detail.state;
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
-        this.courses = state[`coursesFromUser${this.user ? this.user.id : null}`];
+        const state = e.detail.state;
+        const componentState = state.components[this.componentId] || {};
+        const keys = Object.keys(componentState);
+        if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('institution')) this.institution = componentState.institution;
+        if (keys.includes('institutions')) this.institutions = componentState.institutions;
+        if (keys.includes('institutionPartialName')) this.institutionPartialName = componentState.institutionPartialName;
+        if (keys.includes('discipline')) this.disciplinePartialName = componentState.disciplinePartialName;
+        if (keys.includes('disciplines')) this.disciplinePartialName = componentState.disciplinePartialName;
+        if (keys.includes('disciplinePartialName')) this.disciplinePartialName = componentState.disciplinePartialName;
+        if (keys.includes('subject')) this.subjectPartialName = componentState.subjectPartialName;
+        if (keys.includes('subjects')) this.subjectPartialName = componentState.subjectPartialName;
+        if (keys.includes('subjectPartialName')) this.subjectPartialName = componentState.subjectPartialName;
+        if (keys.includes('createInstitutionModalOpen')) this.createInstitutionModalOpen = componentState.createInstitutionModalOpen;
+        if (keys.includes('createDisciplineModalOpen')) this.createDisciplineModalOpen = componentState.createDisciplineModalOpen;
+        if (keys.includes('createSubjectModalOpen')) this.createSubjectModalOpen = componentState.createSubjectModalOpen;
+        if (keys.includes('createInstitutionButtonDisabled')) this.createInstitutionButtonDisabled = componentState.createInstitutionButtonDisabled;
+        if (keys.includes('createDisciplineButtonDisabled')) this.createDisciplineButtonDisabled = componentState.createDisciplineButtonDisabled;
+        if (keys.includes('createSubjectButtonDisabled')) this.createSubjectButtonDisabled = componentState.createSubjectButtonDisabled;
         this.userToken = state.userToken;
         this.user = state.user;
     }

@@ -10,7 +10,7 @@ import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusQuestionContainer extends Polymer.Element {
+class PrendusQuestionViewerWrapper extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
@@ -20,14 +20,29 @@ class PrendusQuestionContainer extends Polymer.Element {
   flagQuestionModalOpened: boolean;
   noUserQuestions: boolean;
   questionIds: string[];
+  question:  Question;
   questions:  Question[];
-  static get is() { return 'prendus-question-container' }
+  add: boolean;
+  delete: boolean;
+  edit: boolean;
+
+  static get is() { return 'prendus-question-viewer-wrapper' }
 
   static get properties() {
     return {
         question: {
             type: Question,
         },
+        add: {
+          type: Boolean,
+          observer: 'stateValue'
+        },
+        edit: {
+          type: Boolean,
+        },
+        delete: {
+          type: Boolean,
+        }
     };
   }
 
@@ -38,8 +53,17 @@ class PrendusQuestionContainer extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'loaded', false)
-    this.action = fireLocalAction(this.componentId, 'loaded', true)
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
+    !this.add ? this.action = fireLocalAction(this.componentId, 'add', false) : this.add;
+    !this.edit ? this.action = fireLocalAction(this.componentId, 'edit', false) : this.edit;
+    !this.delete ? this.action = fireLocalAction(this.componentId, 'delete', false) : this.delete;
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
+  }
+  stateValue(){
+    console.log('this.add', this.add)
+  }
+  setProperty(property: string){
+    console.log('prop', property)
   }
   fireAddQuestion(e){
     console.log('e', e.target.id)
@@ -57,6 +81,10 @@ class PrendusQuestionContainer extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
+    if (keys.includes('add')) this.add = componentState.add;
+    if (keys.includes('edit')) this.edit = componentState.edit;
+    if (keys.includes('delete')) this.delete = componentState.delete;
+
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('questions')) this.questions = componentState.questions;
@@ -70,4 +98,4 @@ class PrendusQuestionContainer extends Polymer.Element {
 
 }
 
-window.customElements.define(PrendusQuestionContainer.is, PrendusQuestionContainer)
+window.customElements.define(PrendusQuestionViewerWrapper.is, PrendusQuestionViewerWrapper)

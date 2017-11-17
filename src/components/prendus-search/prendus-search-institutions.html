@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-tooltip. Remove it when possible -->
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-autocomplete/paper-autocomplete-suggestions.html">
+<link rel="import" href="prendus-search.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-institutions/prendus-create-institution.html">
+
+
+<dom-module id="prendus-search-institutions">
+    <template>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <style include="prendus-styles">
+
+        </style>
+        <h1>Hello</h1>
+        <div class="autocomplete-wrapper">
+          <paper-input id="institution" name="institution" label="Institution" on-keydown="findInstitution" value="[[institution.name]]"></paper-input>
+          <paper-autocomplete-suggestions for="institution" source="[[institutions]]" on-autocomplete-selected="institutionAutoSelected"></paper-autocomplete-suggestions>
+        </div>
+        <span class="add-item">Don't see your institution? <span class="add-item-text" on-click="openCreateInstitutionModal">Add your Institution</span>
+
+        <prendus-search search-index="Institutions" search-parameter="[[institutionPartialName]]" attributes-to-retrieve="[[attributesToRetrieve]]" on-result="loadInstitutions"></prendus-search>
+        [[createInstitutionModalOpen]]
+        <paper-dialog id="create-institution-modal" modal opened="[[createInstitutionModalOpen]]">
+          <div>
+            <prendus-create-institution on-institution-created="setInstitution" on-cancel-dialog="closeCreateInstitutionModal"></prendus-create-institution>
+          </div>
+        </paper-dialog>
+    </template>
+    <script type="module" src="prendus-search-institutions.ts"></script>
+</dom-module>

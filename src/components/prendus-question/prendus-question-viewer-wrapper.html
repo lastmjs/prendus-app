@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
@@ -15,7 +15,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 
 
-<dom-module id="prendus-question-container">
+<dom-module id="prendus-question-viewer-wrapper">
     <template>
       <style include="prendus-styles">
         #question-wrapper{
@@ -35,11 +35,11 @@
               </div>
             </div>
             <div class="card-actions">
-              <paper-icon-button id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
+              <paper-icon-button hidden$="[[!add]]" id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
               <paper-tooltip for="[[question.id]]" offset="0" animation-delay="300">Add Question to Quiz</paper-tooltip>
-              <a href="question/[[item.id]]/edit"><iron-icon id="edit-question" class="prendus-icon-button" icon="create"></iron-icon></a>
+              <a href="question/[[item.id]]/edit" hidden$="[[!edit]]"><iron-icon id="edit-question" class="prendus-icon-button" hidden$="[[!edit]]" icon="create"></iron-icon></a>
               <paper-tooltip for="edit-question" offset="0" animation-delay="300">Edit Question</paper-tooltip>
-              <paper-icon-button id="delete-question" class="prendus-icon-button" icon="delete" on-click="openDeleteModal"></paper-icon-button>
+              <paper-icon-button id="delete-question" class="prendus-icon-button" hidden$="[[!delete]]" icon="delete" on-click="openDeleteModal"></paper-icon-button>
               <paper-tooltip for="delete-question" offset="0" animation-delay="300">Delete Question</paper-tooltip>
             </div>
             </paper-card>
@@ -53,5 +53,5 @@
       </dom-if>
     </template>
 
-    <script type="module" src="prendus-question-container.ts"></script>
+    <script type="module" src="prendus-question-viewer-wrapper.ts"></script>
 </dom-module>
