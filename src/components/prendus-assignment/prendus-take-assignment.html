@@ -6,6 +6,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 <link rel="import" href="prendus-unauthorized-modal.html">
+<link rel="import" href="prendus-assignment-authorization.html">
 <link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
 <link rel="import" href="../prendus-notification/prendus-notification.html">
 
@@ -20,12 +21,12 @@
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-unauthorized-modal
+    <prendus-assignment-authorization
       assignment-id="[[assignmentId]]"
       on-authorized="_loadAssignment"
       on-unauthorized="_handleUnauthorized"
-      opened="[[modalOpen]]"
-    ></prendus-unauthorized-modal>
+    ></prendus-assignment-authorization>
+    <prendus-unauthorized-modal opened="[[modalOpen]]"></prendus-unauthorized-modal>
 
     <div hidden$="[[!loaded]]">
       <prendus-carousel

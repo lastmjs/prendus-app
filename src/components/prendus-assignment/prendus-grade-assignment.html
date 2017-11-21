@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-assignment/prendus-unauthorized-modal.html">
+<link rel="import" href="prendus-unauthorized-modal.html">
+<link rel="import" href="prendus-assignment-authorization.html">
 <link rel="import" href="../prendus-carousel/prendus-carousel.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
@@ -11,19 +13,18 @@
   <template>
 
     <style include="prendus-styles">
-      .question-picture {
-        max-height: 200px;
-        max-width: 200px;
+      .question {
+        max-height: 3vh;
       }
     </style>
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-unauthorized-modal
+    <prendus-assignment-authorization
       assignment-id="[[assignmentId]]"
       on-authorized="_loadAssignment"
       on-unauthorized="_handleUnauthorized"
-      opened="[[modalOpen]]"
-    ></prendus-unauthorized-modal>
+    ></prendus-assignment-authorization>
+    <prendus-unauthorized-modal opened="[[modalOpen]]"></prendus-unauthorized-modal>
 
     <div hidden$="[[!loaded]]">
       <h2>[[assignment.title]] Grade Assignment</h2>
@@ -40,8 +41,9 @@
       >
         <div hidden$="[[finished]]">
           <h4>Question</h4>
-          <p>[[_questionText(response.questionResponse.question.text)]]</p>
-          <p><img class="question-picture" src$="[[_questionPicture(response.questionResponse.question.text)]]"></p>
+          <div class="question">
+            <prendus-view-question question="[[response.questionResponse.question]]"></prendus-view-question>
+          </div>
           <h4>Response</h4>
           <p>[[response.value]]</p>
           <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>

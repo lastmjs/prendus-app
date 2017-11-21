@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
+<link rel="import" href="prendus-unauthorized-modal.html">
+<link rel="import" href="prendus-assignment-authorization.html">
+
+<dom-module id="prendus-assignment-analytics">
+  <template>
+    <style include="prendus-styles"></style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <prendus-assignment-authorization
+      assignment-id="[[assignmentId]]"
+      on-authorized="[[_load]]"
+      on-unauthorized="[[_unauthorized]]"
+    ></prendus-assignment-authorization>
+
+    <prendus-unauthorized-modal
+      open="[[unauthorized]]"
+      authenticated="[[authenticated]]"
+      payed="[[payed]]"
+      course-id"[[courseId]]"
+    ></prendus-unauthorized-modal>
+
+    <div hidden$="[[loaded]]">
+      Loading...
+    </div>
+
+    <div hidden$="[[!loaded]]">
+      <prendus-carousel
+        id="carousel"
+        label="[[label]]"
+        next-text="Submit"
+        hide-back
+        items="[[items]]"
+        on-next="_next"
+        on-item-changed="_item"
+        on-finished-changed="_finished"
+      >
+        <div hidden$="[[finished]]">
+          <slot name="assignment" slot="content"></slot>
+        </div>
+
+        <div hidden$="[[!finished]]">
+          <h4>Done</h4>
+          <p>[[message]]</p>
+          <button class="prendus-button prendus-button--recommended" hidden$="[[success]]" on-click="_gradePassback">Retry</button>
+        </div>
+
+      </prendus-carousel>
+    </div>
+  </template>
+
+  <script type="module" src="prendus-assignment-analytics.ts"></script>
+</dom-module>

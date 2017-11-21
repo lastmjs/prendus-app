@@ -74,7 +74,7 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   _handleRubric(e: CustomEvent) {
-    this._fireLocalAction('rubric', e.detail.rubric);
+    this._fireLocalAction('rubric', e.detail.value);
   }
 
   _triggerPicture(e: Event) {
@@ -130,6 +130,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
+      console.error(e);
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }

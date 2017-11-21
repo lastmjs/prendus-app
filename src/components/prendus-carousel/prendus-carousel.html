@@ -8,30 +8,25 @@
   <template>
 
     <style include="prendus-styles">
-      #back-button, #next-button {
+      .buttons {
         margin-top: 20px;
-      }
-      #back-button {
-        float: left;
-      }
-      #next-button {
-        float: right;
-      }
-      [hidden] {
-        display: none;
+        display: flex;
+        justify-content: between;
       }
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <div hidden$="[[finished]]">
-      <h3>[[label]] [[_plusOne(currentIndex)]]/[[items.length]]</h3>
+      <h3>[[label]] [[_plusOne(index)]]/[[items.length]]</h3>
     </div>
     <br>
 
-    <slot></slot>
+    <slot name="content"></slot>
 
-    <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]" on-click="_notifyPrevious">[[backText]]</button>
-    <button id="next-button" class="prendus-button prendus-button--recommended" hidden$="[[_hideNext(hideNext, finished)]]" on-click="_notifyNext">[[nextText]]</button>
+    <div class="buttons">
+      <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]" on-click="_notifyPrevious">[[backText]]</button>
+      <button id="next-button" class="prendus-button prendus-button--recommended" hidden$="[[_hideNext(hideNext, finished)]]" on-click="_notifyNext">[[nextText]]</button>
+    </div>
   </template>
 
   <script type="module" src="prendus-carousel.ts"></script>

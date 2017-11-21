@@ -19,7 +19,6 @@ class PrendusCreateAssignment extends Polymer.Element {
   question: Question;
   userToken: string;
   user: User;
-  savedId: string;
   finished: boolean;
 
   static get is() { return 'prendus-create-assignment' }
@@ -55,19 +54,21 @@ class PrendusCreateAssignment extends Polymer.Element {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
-  _handleNextQuestion(e: CustomEvent) {
-    const { data } = e.detail;
-    this._fireLocalAction('question', data);
+  async _handleNextQuestion(e: CustomEvent) {
+    const i = e.detail.value;
+    this._fireLocalAction('question', i);
     const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-    if (data && data === this.questions[0]) //first round started
-      sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
-    else //subsequent rounds mean a question was created
-      sendStatement(this.userToken, { ...statement, verb: VerbType.CREATED, questionId: this.savedId });
+    if (i !== undefined && i === this.questions[0]) //first round started
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
+    else if (i === undefined && this.questions.length) {
+      await sendStatement(this.userToken, { ...statement, verb: VerbType.SUBMITTED });
+      this.gradePassback();
+    }
   }
 
   async gradePassback() {
     try {
-      await LTIPassback(this.userToken, this.user.id, this.assignment.id, this.assignment.course.id, getCookie('ltiSessionIdJWT'));
+      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
       this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
     }
     catch(error) {
@@ -78,20 +79,16 @@ class PrendusCreateAssignment extends Polymer.Element {
     }
   }
 
-  _handleFinished(e: CustomEvent) {
-    const finished = e.detail.value;
-    this._fireLocalAction('finished', finished);
-    if (!finished)
-      return;
-    if (this.questions && this.questions.length)
-      this.gradePassback();
+  async _handleFinished(e: CustomEvent) {
+    this._fireLocalAction('finished', e.detail.value);
   }
 
   async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
     const save = question.conceptId ? this.saveQuestion.bind(this) : this.saveQuestionAndConcept.bind(this);
     const questionId = await save(question);
-    this._fireLocalAction('savedId', questionId);
+    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
+    await sendStatement(this.userToken, { ...statement, verb: VerbType.CREATED, questionId });
     this.shadowRoot.querySelector('#carousel').next();
   }
 
@@ -214,7 +211,6 @@ class PrendusCreateAssignment extends Polymer.Element {
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('savedId')) this.savedId = componentState.savedId;
     if (keys.includes('finished')) this.finished = componentState.finished;
     this.userToken = state.userToken;
     this.user = state.user;

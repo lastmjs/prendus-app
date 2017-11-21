@@ -72,7 +72,7 @@ class PrendusTakeAssignmentTest extends Polymer.Element {
         data.assignments,
         loadAndTestAssignment(takeAssignment)
       )).every(result => result === true);
-      await deleteCourseArbitrary(data);
+      await deleteCourseArbitrary(data.id);
       await deleteTestUsers(author, viewer, instructor);
       return success;
     });
@@ -98,7 +98,12 @@ function loadAndTestAssignment(takeAssignment) {
     const expect = await asyncMap(
       (new Array(takeAssignment.assignment.numResponseQuestions)).fill(0),
       async _ => {
-        //TODO: Answer question programatically and hit check then next button
+        console.log(
+          takeAssignment
+          .shadowRoot.querySelector('prendus-flaggable-question')
+          .shadowRoot.querySelector('prendus-view-question')
+          .shadowRoot.querySelector('#contentDiv')
+        )
         return VerbType.RESPONDED;
       }
     );

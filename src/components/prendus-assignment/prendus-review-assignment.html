@@ -4,71 +4,43 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-carousel/prendus-carousel.html">
-<link rel="import" href="../prendus-assignment/prendus-unauthorized-modal.html">
-<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="prendus-assignment-analytics.html">
 
 <dom-module id="prendus-review-assignment">
 
   <template>
 
     <style include="prendus-styles"></style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <h2>[[assignment.title]] Review Assignment</h2>
 
-    <dom-if if="[[!loaded]]">
-      <template>
-        Loading...
-      </template>
-    </dom-if>
-
-    <prendus-unauthorized-modal
+    <prendus-assignment-analytics
       assignment-id="[[assignmentId]]"
-      on-authorized="_loadAssignment"
-      on-unauthorized="_handleUnauthorized"
-      opened="[[modalOpen]]"
+      load="[[_load]]"
+      error="[[_validate]]"
+      submit="[[_submit]]"
+      verb="REVIEWED"
+      on-item-changed="_question"
     >
-    </prendus-unauthorized-modal>
-
-    <div hidden$="[[!loaded]]">
-      <prendus-carousel
-        id="carousel"
-        hide-back
-        next-text="Submit"
-        items="[[questions]]"
-        on-next="_handleNextRequest"
-        on-item-changed="_handleNextQuestion"
-        on-finished-changed="_handleFinished"
-      >
-        <div hidden$="[[finished]]">
-          <div>
-            <h3>Concept</h3>
-            <div class="prendus-card">[[question.concept.title]]</div>
-            <h3>Resource</h3>
-            <div class="prendus-card">[[question.resource]]</div>
-            <br>
-            <h3>Question as seen in quiz</h3>
-            <br>
-            <prendus-view-question question="[[question]]"></prendus-view-question>
-            <br>
-            <div hidden$="[[!essayType]]">
-                <h3>Grading Rubric</h3>
-                <prendus-rubric-table init="[[gradingRubric]]"></prendus-rubric-table>
-            </div>
-            <br>
-            <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_handleRatings"></prendus-rubric-dropdowns>
+      <div slot="assignment">
+        <h3>Concept</h3>
+        <div class="prendus-card">[[question.concept.title]]</div>
+        <h3>Resource</h3>
+        <div class="prendus-card">[[question.resource]]</div>
+        <br>
+        <h3>Question as seen in quiz</h3>
+        <br>
+        <prendus-view-question question="[[question]]"></prendus-view-question>
+        <br>
+        <div hidden$="[[!essayType]]">
+          <h3>Grading Rubric</h3>
+          <prendus-rubric-table init="[[gradingRubric]]"></prendus-rubric-table>
         </div>
-        </div>
-        <div hidden$="[[!finished]]">
-          <div>
-            <h4>Done</h4>
-            <p>[[completionReason]]</p>
-          </div>
-        </div>
-    </prendus-carousel>
-  </div>
-
+        <br>
+        <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_ratings"></prendus-rubric-dropdowns>
+      </div>
+    </prendus-assignment-analytics>
   </template>
 
   <script type="module" src="prendus-review-assignment.ts"></script>

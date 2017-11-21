@@ -3,33 +3,30 @@ import {
   CategoryScore,
   Question,
   SetComponentPropertyAction,
+  SetPropertyAction,
   Assignment,
 } from '../../typings/index.d';
 import {
   createUUID,
   fireLocalAction,
-  navigate,
-  getCookie
 } from '../../node_modules/prendus-shared/services/utilities-service';
-import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {sendStatement} from '../../services/analytics-service';
-import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {extractVariables} from '../../services/code-to-question-service';
+import {
+  shuffleArray
+} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
+import {
+  GQLRequest
+} from '../../node_modules/prendus-shared/services/graphql-service';
+import {
+  extractVariables
+} from '../../services/code-to-question-service';
 import {
   NotificationType,
   QuestionType,
-  ContextType,
-  VerbType,
-  ObjectType,
-  STATEMENT_SENT,
-  ASSIGNMENT_LOADED,
-  ASSIGNMENT_SUBMITTED
+  DEFAULT_EVALUATION_RUBRIC
 } from '../../services/constants-service';
 import {
   setNotification,
 } from '../../redux/actions';
-import {LTIPassback} from '../../services/lti-service';
-import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 
 class PrendusReviewAssignment extends Polymer.Element {
   action: SetComponentPropertyAction;
@@ -38,14 +35,10 @@ class PrendusReviewAssignment extends Polymer.Element {
   assignmentId: string;
   assignment: Assignment;
   question: Question;
-  questions: Question[];
   ratings: CategoryScore[];
-  rubric: Rubric;
-  loaded: boolean = false;
   essayType: boolean;
+  evaluationRubric: Rubric;
   gradingRubric: Rubric;
-  completionReason: string;
-  modalOpen: boolean;
 
   static get is() { return 'prendus-review-assignment' }
 
@@ -66,14 +59,6 @@ class PrendusReviewAssignment extends Polymer.Element {
         value: {},
         computed: '_computeEvaluationRubric(question)'
       },
-      completionReason: {
-        type: String,
-        computed: '_computeCompletionReason(assignment)'
-      },
-      questions: {
-        type: Array,
-        computed: '_computeQuestions(assignment)'
-      }
     }
   }
 
@@ -96,91 +81,44 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  _computeCompletionReason(assignment: Assignment): string {
-    return assignment && assignment.questions.length >= assignment.numReviewQuestions
-      ? 'You have completed this assignment'
-      : 'There are not enough questions to take the assignment yet';
-  }
-
-  _handleUnauthorized(e: CustomEvent) {
-    const { authenticated, payed, enrolled, courseId } = e.detail;
-    if (authenticated === false)
-      navigate('/authenticate');
-    else if (payed === false)
-      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-    else if (enrolled === false)
-      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
-  }
-
-  async _loadAssignment(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'loaded', false);
+  async _load(e: CustomEvent) {
     const assignment = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
-    if (assignment.rated.length)
-      this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent(ASSIGNMENT_LOADED));
-  }
-
-  _computeQuestions(assignment: Assignment): Question[] {
-    return assignment && assignment.questions.length >= assignment.numReviewQuestions
+    const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
       ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
       : [];
+    return {
+      assignment,
+      items: questions,
+      taken: assignment.rated.length > 0
+    }
+  }
+
+  _validate() {
+    if (!this.ratings || !this.evaluationRubric)
+      return 'Prendus error, ratings or rubric was undefined';
+    if (this.ratings.length !== Object.keys(this.evaluationRubric).length)
+      return 'Prendus error, ratings did not match rubric';
+    if (this.ratings.some(score => score.score < 0))
+      return 'You must rate each category';
+    return null;
+  }
+
+  async _submit(question: Question) {
+    await submit(question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
+    return question.id;
+  }
+
+  _question(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'question', e.detail.value);
+  }
+
+  _ratings(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
   }
 
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
-  }
-
-  async _handleNextRequest(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'loaded', false);
-    try {
-      validate(this.evaluationRubric, this.ratings);
-      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-      await submit(this.question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.REVIEWED, questionId: this.question.id });
-      this.shadowRoot.querySelector('#carousel').next();
-      this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
-    } catch (err) {
-      console.error(err);
-      this.action = setNotification(err.message, NotificationType.ERROR);
-    }
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
-  }
-
-  async _handleNextQuestion(e: CustomEvent) {
-    const question = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'question', question);
-    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-    if (question === this.questions[0])
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
-    if (!question && this.questions.length) {
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.SUBMITTED });
-      this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
-      this.gradePassback(false);
-    }
-  }
-
-  async gradePassback(retried: boolean) {
-    try {
-      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
-      this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
-    }
-    catch(error) {
-      this.action = setNotification('Grade passback failed.', NotificationType.ERROR);
-      if (retried) return; //Only retry once.
-      setTimeout(() => {
-          this.gradePassback(true);
-      }, 5000);
-    }
-  }
-
-  _handleRatings(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
-  }
-
-  _handleFinished(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'finished', e.detail.value);
   }
 
   stateChange(e: CustomEvent) {
@@ -190,8 +128,6 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.assignment = componentState.assignment;
     this.question = componentState.question;
     this.ratings = componentState.ratings;
-    this.finished = componentState.finished;
-    this.modalOpen = componentState.modalOpen;
     this.user = state.user;
     this.userToken = state.userToken;
   }
@@ -283,15 +219,6 @@ function randomWithUnreviewedFirst(questions: Question[], num: number): Question
     return shuffleArray(questions).slice(0, num);
   const reviewed = questions.filter(question => question._ratingsMeta.count);
   return [...shuffleArray(unreviewed), ...shuffleArray(reviewed).slice(0, num-unreviewed.length)];
-}
-
-function validate(rubric: Rubric, ratings: CategoryScore[]) {
-  if (!ratings || !rubric)
-    throw new Error('Prendus error, ratings or rubric was undefined');
-  if (ratings.length !== Object.keys(rubric).length)
-    throw new Error('Prendus error, ratings did not match rubric');
-  if (ratings.some(score => score.score < 0))
-    throw new Error('You must rate each category');
 }
 
 window.customElements.define(PrendusReviewAssignment.is, PrendusReviewAssignment)

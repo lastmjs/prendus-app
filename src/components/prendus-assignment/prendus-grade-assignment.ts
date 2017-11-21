@@ -7,7 +7,8 @@ import {
 } from '../../typings/index.d';
 import {
   createUUID,
-  fireLocalAction
+  fireLocalAction,
+  navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
@@ -71,17 +72,6 @@ class PrendusGradeAssignment extends Polymer.Element {
     return responses && responses.length === assignment.numGradeResponses
       ? 'You have completed this assignment'
       : 'There are not enough responses to take the assignment yet';
-  }
-
-  _questionText(text: string): string {
-    if (!text) return '';
-    return parse(text, null).ast[0].content.replace(/<p>|<p style=".*">|<\/p>|<img.*\/>/g, '');
-  }
-
-  _questionPicture(text: string): string {
-    if (!text) return '';
-    const m = parse(text, null).ast[0].content.match(/<img src="(.*)"/);
-    return m ? m[1] : '';
   }
 
   _handleUnauthorized(e: CustomEvent) {

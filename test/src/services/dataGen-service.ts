@@ -17,6 +17,7 @@ const dependencyTree = [
   'Subject',
   'Concept',
   'Question',
+  'Quiz',
   'QuestionResponse',
   'QuestionResponseRating',
   'UserEssay',
@@ -143,9 +144,13 @@ function flattenTypedIds(data, type) {
     return [];
   const fields = rawType.getFields();
   return Object.keys(data).reduce(
-    (result, k) => k === 'id'
-      ? [ ...result, { type: rawType.name, id: data.id } ]
-      : [ ...result, ...flattenTypedIds(data[k], fields[k].type) ],
+    (result, k) => {
+      if (!data[k])
+        return result;
+      return k === 'id'
+        ? [ ...result, { type: rawType.name, id: data.id } ]
+        : [ ...result, ...flattenTypedIds(data[k], fields[k].type) ]
+    },
     []
   )
     .reduce((filtered, typedId) => (filtered.some(({ id }) => id === typedId.id) ? filtered : [...filtered, typedId]), [])
@@ -204,6 +209,9 @@ export async function deleteCourseArbitrary(courseId: string): Promise<object> {
           }
           questions {
             id
+            quiz {
+              id
+            }
             ratings {
               id
               scores {
