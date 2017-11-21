@@ -52,7 +52,8 @@
     "iron-scroll-threshold": "^1.0.2"
   },
   "resolutions": {
-    "webcomponentsjs": "^1.0.0"
+    "webcomponentsjs": "^1.0.0",
+    "polymer": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0"
