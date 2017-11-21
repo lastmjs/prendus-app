@@ -5,7 +5,7 @@ import {
   SetComponentPropertyAction,
   SetPropertyAction,
   Assignment,
-} from '../../typings/index.d';
+} from '../../../prendus.d';
 import {
   createUUID,
   fireLocalAction,

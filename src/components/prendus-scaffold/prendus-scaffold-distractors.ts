@@ -1,4 +1,3 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {setNotification} from '../../redux/actions';
 import {NotificationType} from '../../services/constants-service';

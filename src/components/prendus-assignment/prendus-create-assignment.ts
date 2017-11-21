@@ -1,14 +1,9 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
 import {createUUID, navigate, isUserAuthorizedOnCourse, getCourseIdFromAssignmentId, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
 import {sendStatement} from '../../services/analytics-service';
 import {ContextType, NotificationType, QuestionType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
-import {User} from '../../typings/user';
-import {Question} from '../../typings/question';
-import {Assignment} from '../../typings/assignment';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {GQLVariables} from '../../typings/gql-variables';
 
 class PrendusCreateAssignment extends Polymer.Element {
   loaded: boolean;

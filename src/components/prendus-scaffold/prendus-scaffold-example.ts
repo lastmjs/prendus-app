@@ -1,6 +1,3 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {QuestionScaffold} from '../../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../../typings/question-scaffold-answer';
 import {parse} from '../../node_modules/assessml/assessml';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 

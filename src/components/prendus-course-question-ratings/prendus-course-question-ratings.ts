@@ -24,7 +24,7 @@ import {
   Rubric,
   SetComponentPropertyAction,
   SetPropertyAction,
-} from '../../typings/index.d';
+} from '../../../prendus.d';
 
 const STUDENT = 'Student';
 const OVERALL = 'Overall';

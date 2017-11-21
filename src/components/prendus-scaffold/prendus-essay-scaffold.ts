@@ -1,8 +1,3 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {Assignment} from '../../typings/assignment';
-import {Concept} from '../../typings/concept';
-import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {generateEssay} from '../../services/question-to-code-service';

@@ -4,7 +4,7 @@ import {
   UserEssay,
   Rubric,
   Assignment
-} from '../../typings/index.d';
+} from '../../../prendus.d';
 import {
   createUUID,
   fireLocalAction,

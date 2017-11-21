@@ -1,8 +1,4 @@
-import {ContainerElement} from '../../typings/container-element';
-import {State} from '../../typings/state';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {User} from '../../typings/user';
 import {persistUserToken, setNotification} from '../../redux/actions';
 import {navigate, createUUID, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';

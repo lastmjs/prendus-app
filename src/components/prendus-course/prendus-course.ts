@@ -1,12 +1,4 @@
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {Mode} from '../../typings/mode';
-import {Subject} from '../../typings/subject';
-import {Discipline} from '../../typings/discipline';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {Assignment} from '../../typings/assignment';
-import {Course} from '../../typings/course';
-import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType, QuestionType} from '../../services/constants-service';

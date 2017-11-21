@@ -3,7 +3,7 @@ import {
   User,
   Course,
   AuthResult
-} from '../../typings/index.d';
+} from '../../../prendus.d';
 import {
   createUUID,
   fireLocalAction,

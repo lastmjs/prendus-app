@@ -4,7 +4,7 @@ import {
   Question,
   CategoryScore,
   SetComponentPropertyAction,
-} from '../../typings/index.d';
+} from '../../../prendus.d';
 
 const OVERALL = 'Overall';
 class PrendusCourseQuestionRatingsRow extends Polymer.Element {

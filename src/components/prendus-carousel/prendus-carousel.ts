@@ -2,7 +2,7 @@ import {
   createUUID,
   fireLocalAction
 } from '../../node_modules/prendus-shared/services/utilities-service';
-import {SetComponentPropertyAction} from '../../typings/index.d';
+import {SetComponentPropertyAction} from '../../../prendus.d';
 
 class PrendusCarousel extends Polymer.Element {
   action: SetComponentPropertyAction;

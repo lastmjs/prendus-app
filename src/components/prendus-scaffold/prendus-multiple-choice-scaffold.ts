@@ -1,8 +1,5 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {Concept} from '../../typings/concept';
 import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {AnswerTypes} from '../../typings/answer-types';
 import {NotificationType} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {setNotification} from '../../redux/actions';
