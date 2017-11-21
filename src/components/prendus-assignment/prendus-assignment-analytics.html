@@ -12,15 +12,17 @@
 
     <prendus-assignment-authorization
       assignment-id="[[assignmentId]]"
-      on-authorized="[[_load]]"
-      on-unauthorized="[[_unauthorized]]"
+      user-id="[[user.id]]"
+      user-token="[[userToken]]"
+      on-authorized="_load"
+      on-unauthorized="_unauthorized"
     ></prendus-assignment-authorization>
 
     <prendus-unauthorized-modal
       open="[[unauthorized]]"
       authenticated="[[authenticated]]"
       payed="[[payed]]"
-      course-id"[[courseId]]"
+      course-id="[[courseId]]"
     ></prendus-unauthorized-modal>
 
     <div hidden$="[[loaded]]">

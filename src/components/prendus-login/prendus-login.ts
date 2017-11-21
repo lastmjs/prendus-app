@@ -113,13 +113,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
           await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
-          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
-
-          if (getCookie('redirectUrl')) {
-              deleteCookie('redirectUrl');
-              //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't
-              window.location.reload();
-          }
+          const redirectUrl = window.location.search.substr(1).split('=')[1] || '/courses';
+          navigate(decodeURIComponent(redirectUrl));
           this.action = fireLocalAction(this.componentId, 'loaded', true);
         }catch(error){
           this.action = setNotification(error.message, NotificationType.ERROR)

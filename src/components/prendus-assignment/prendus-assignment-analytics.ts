@@ -83,7 +83,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
+    this.action = fireLocalAction(this.componentId, 'loaded', false);
     this.action = fireLocalAction(this.componentId, 'message', DONE_MESSAGE);
     this.action = fireLocalAction(this.componentId, 'success', true);
   }
@@ -105,6 +105,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
 
   _unauthorized(e: CustomEvent) {
     const { authenticated, payed, enrolled, courseId } = e.detail;
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
     this.action = fireLocalAction(this.componentId, 'authenticated', authenticated);
     this.action = fireLocalAction(this.componentId, 'payed', payed);
     this.action = fireLocalAction(this.componentId, 'enrolled', enrolled);
@@ -144,7 +145,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   async _finished(e: CustomEvent) {
     const finished = e.detail.value;
     this.action = fireLocalAction(this.componentId, 'finished', finished);
-    if (finished) {
+    if (finished && this.items && this.items.length) {
       await this._sendStatement(VerbType.SUBMITTED, null);
       this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
       await this._gradePassback();

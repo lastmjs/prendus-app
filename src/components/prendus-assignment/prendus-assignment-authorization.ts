@@ -7,7 +7,6 @@ import {
 import {
   createUUID,
   fireLocalAction,
-  navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {
   GQLRequest
@@ -31,12 +30,14 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
   static get properties() {
     return {
       assignmentId: String,
+      userId: String,
+      userToken: String
     }
   }
 
   static get observers() {
     return [
-      '_computeAuthResult(assignmentId, user, userToken)',
+      '_computeAuthResult(assignmentId, userId, userToken)',
       '_processResult(result)'
     ]
   }
@@ -46,26 +47,23 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  async _computeAuthResult(assignmentId: string, _user: User, userToken: string) {
-    console.log(assignmentId, _user, userToken);
-    if (!_user === undefined || !assignmentId || !userToken)
-      return;
-    else if (_user === null)
+  async _computeAuthResult(assignmentId: string, userId: string, userToken: string) {
+    if (userToken === null)
       this.action = fireLocalAction(this.componentId, 'result', {
         authenticated: false,
       });
+    else if (!userToken || !assignmentId || !userId)
+      return;
     else {
-      const data = await getAuthorizationData(_user.id, assignmentId, userToken);
+      const data = await getAuthorizationData(userId, assignmentId, userToken);
       if (!data || !data.user || !data.assignment || !data.assignment.course)
-        this.action = setNotification(
-          'Authorization error, this data has either been deleted or you do not have permission to see it.',
-          NotificationType.ERROR
-        );
+        this.action = setNotification('Authorization error', NotificationType.ERROR);
       else
         this.action = fireLocalAction(this.componentId, 'result', {
           authenticated: true,
           payed: data.user.purchases.some(p => p.course.id === data.assignment.course.id),
           enrolled: data.user.enrolledCourses.some(c => c.id === data.assignment.course.id)
+          courseId: data.assignment.course.id
         });
     }
   }
@@ -82,9 +80,6 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.result = componentState.result;
-    this.user = state.user;
-    console.log(this.user === state.user);
-    this.userToken = state.userToken;
   }
 }
 

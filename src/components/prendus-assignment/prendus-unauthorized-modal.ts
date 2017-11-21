@@ -1,34 +1,50 @@
+import {
+  navigate
+} from '../../node_modules/prendus-shared/services/utilities-service';
+
 class PrendusUnauthorizedModal extends Polymer.Element {
-  opened: boolean;
+  open: boolean;
 
   static get is() { return 'prendus-unauthorized-modal' }
 
   static get properties() {
     return {
-      opened: {
+      open: {
         type: Boolean,
         value: false,
-        observer: '_openedChanged'
-      }
+      },
+      payed: {
+        type: Boolean,
+        value: false,
+      },
+      authenticated: {
+        type: Boolean,
+        value: false,
+      },
+      enrolled: {
+        type: Boolean,
+        value: false,
+      },
+      courseId: String,
     }
   }
 
-  constructor() {
-    super();
-    this.componentId = createUUID();
+  _pay(e: Event) {
+    navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.href}`)}`);
   }
 
-  _openedChanged(opened: boolean) {
-    if (opened)
-      this.shadowRoot.querySelector('#modal').open();
-    else
-      this.shadowRoot.querySelector('#modal').close();
+  _authenticate(e: Event) {
+    navigate(`/authenticate?redirectUrl=${encodeURIComponent(`${window.location.pathname}`)}`);
   }
 
-  _toHome(e: Event) {
-    this.shadowRoot.querySelector('#modal').close();
+  _home(e: Event) {
     navigate('/');
   }
+
+  _payMessage(authenticated: boolean, payed: boolean): boolean {
+    return authenticated && !payed;
+  }
+
 }
 
 window.customElements.define(PrendusUnauthorizedModal.is, PrendusUnauthorizedModal);
