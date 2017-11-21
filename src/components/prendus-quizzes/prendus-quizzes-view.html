@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
@@ -40,6 +42,8 @@
                     <!-- What are we going to put here?  -->
                   </div>
                   <div class="card-actions">
+                    <a href="quiz/[[item.id]]/view"><paper-icon-button id="view-quiz" class="prendus-icon-button" icon="view-list"></paper-icon-button></a>
+                    <paper-tooltip for="view-quiz" offset="0" animation-delay="300">Take Quiz</paper-tooltip>
                     <a href="quiz/[[item.id]]/edit"><iron-icon id="edit-quiz" class="prendus-icon-button" icon="create"></iron-icon></a>
                     <paper-tooltip for="edit-quiz" offset="0" animation-delay="300">Edit Course</paper-tooltip>
                     <paper-icon-button id="delete-course" class="prendus-icon-button" icon="delete" on-click="openDeleteModal"></paper-icon-button>

@@ -34,12 +34,12 @@
                 <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
               </div>
             </div>
-            <div class="card-actions">
+            <div class="card-actions" hidden$="[[!noActions]]">
               <paper-icon-button hidden$="[[!add]]" id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
               <paper-tooltip for="[[question.id]]" offset="0" animation-delay="300">Add Question to Quiz</paper-tooltip>
               <a href="question/[[item.id]]/edit" hidden$="[[!edit]]"><iron-icon id="edit-question" class="prendus-icon-button" hidden$="[[!edit]]" icon="create"></iron-icon></a>
               <paper-tooltip for="edit-question" offset="0" animation-delay="300">Edit Question</paper-tooltip>
-              <paper-icon-button id="delete-question" class="prendus-icon-button" hidden$="[[!delete]]" icon="delete" on-click="openDeleteModal"></paper-icon-button>
+              <paper-icon-button id="delete-question" class="prendus-icon-button" hidden$="[[!delete]]" icon="delete" on-click="fireRemoveQuestion"></paper-icon-button>
               <paper-tooltip for="delete-question" offset="0" animation-delay="300">Delete Question</paper-tooltip>
             </div>
             </paper-card>

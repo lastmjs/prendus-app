@@ -21,17 +21,20 @@ class PrendusQuizEdit extends Polymer.Element {
   noUserQuizzes: boolean;
   quizId: string;
   quizIds: string[];
+  quizTitle: string;
   userQuestions: Question[];
   quizQuestions: Question[];
   questionIds: string[];
   quizzes:  Quiz[];
+  editTitle: boolean;
+
   static get is() { return 'prendus-quiz-edit' }
 
   static get properties() {
     return {
         quizId: {
           type: String,
-          observer: 'loadQuizQuestions'
+          observer: 'loadQuiz'
         },
     };
   }
@@ -46,6 +49,7 @@ class PrendusQuizEdit extends Polymer.Element {
     this.action = checkForUserToken();
     this.action = await getAndSetUser();
     this.action = fireLocalAction(this.componentId, 'quizQuestions', [])
+    this.action = fireLocalAction(this.componentId, 'editTitle', true)
     this.loadUserQuestions();
     this.action = fireLocalAction(this.componentId, 'loaded', true)
   }
@@ -62,11 +66,12 @@ class PrendusQuizEdit extends Polymer.Element {
     }
   }
 
-  async loadQuizQuestions(){
+  async loadQuiz(){
     try{
       this.action = fireLocalAction(this.componentId, 'loaded', false)
-      const quiz = await getQuizQuestions(this.quizId, this.userToken);
+      const quiz = await getQuiz(this.quizId, this.userToken);
       this.action = fireLocalAction(this.componentId, 'quizQuestions', quiz.questions);
+      this.action = fireLocalAction(this.componentId, 'quizTitle', quiz.title);
       this.action = fireLocalAction(this.componentId, 'loaded', true)
     }catch(error){
       this.action = setNotification(error.message, NotificationType.ERROR);
@@ -88,7 +93,8 @@ class PrendusQuizEdit extends Polymer.Element {
     }, 10)
   }
   async saveQuiz(){
-    const title = "A quiz title";
+    const title = this.shadowRoot.querySelector('#quizInput').value;
+    console.log('title', title, 'this.quizTitle', this.quizTitle)
     //Logic to save the quiz if it exists, create the quiz if it does not.
     const quizQuestionIds = this.quizQuestions.map((question)=>{
       return question.id
@@ -96,14 +102,27 @@ class PrendusQuizEdit extends Polymer.Element {
     const quizId = (this.quizId) ? await saveQuiz(this.quizId, quizQuestionIds, title, this.userToken) : await createQuiz(quizQuestionIds, title, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'quizId', quizId);
   }
+  startEditingQuizTitle(){
+    this.action = fireLocalAction(this.componentId, 'editTitle', true);
+  }
+  stopEditingQuizTitle(){
+    this.action = fireLocalAction(this.componentId, 'editTitle', false);
+
+  }
+  saveQuizTitle(e){
+    this.saveQuiz();
+    this.stopEditingQuizTitle();
+  }
   //Make this saveQuiz
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
+    if (keys.includes('quizTitle')) this.quizTitle = componentState.quizTitle;
     if (keys.includes('userQuestions')) this.userQuestions = componentState.userQuestions;
     if (keys.includes('quizQuestions')) this.quizQuestions = componentState.quizQuestions;
+    if (keys.includes('editTitle')) this.editTitle = componentState.editTitle;
     if (keys.includes('quizId')) this.quizId = componentState.quizId;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
@@ -136,7 +155,7 @@ async function getUserQuestions(userId: String, userToken: String) {
     return data.allQuestions;
 }
 
-async function getQuizQuestions(quizId: String, userToken: String) {
+async function getQuiz(quizId: String, userToken: String) {
     const data = await GQLRequest(`
       query getQuiz($quizId: ID!) {
         Quiz(id: $quizId) {
@@ -180,6 +199,7 @@ async function createQuiz(questionIds: string[], title: string, userId: string, 
 }
 
 async function saveQuiz(quizId: string, questionIds: string[], title: string, userToken: string): Promise<Question[]> {
+  console.log('save quiz', quizId)
   const data = await GQLRequest(`
     mutation quiz($quizId: ID!, $title: String!, $questionIds: [ID!]!){
       updateQuiz(
@@ -200,5 +220,6 @@ async function saveQuiz(quizId: string, questionIds: string[], title: string, us
   if (!data) {
     return [];
   }
+  console.log('save quiz data', data)
   return data.updateQuiz.id;
 }

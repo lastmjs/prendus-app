@@ -6,10 +6,11 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
-<link rel="import" href="../prendus-question/prendus-question-container.html">
-
+<link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
 <link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
@@ -27,6 +28,7 @@
         #createQuizContainer{
           display: flex;
           flex-direction: row;
+          margin-left: 2vw;
         }
         .questionColumn{
           display: flex;
@@ -35,28 +37,68 @@
         }
         .prendus-question{
           margin: 2vw;
-
+        }
+        #questionsToAddToQuiz{
+          overflow: auto;
+          max-height: 80vh;
+        }
+        #quizQuestions{
+          overflow: auto;
+          max-height: 80vh;
+        }
+        .quizTitle{
+          display: flex;
+          justify-content: space-between;
+          margin-left: 2vw;
+          align-items: center;
+          margin-bottom: 2vh;
+        }
+        #quizInput{
+          --paper-input-container-input: {
+            /*We want this to look like an H1. Figure out overflow and other styles*/
+            font-size: 48px;
+          };
+        }
+        .saveTitle{
+          height: 48px;
+          width: 48px;
+          --iron-icon-height: 60px;
+          --iron-icon-width: 48px;
         }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
       <!-- Eventually just wrap the quiz-edit component in this component that will except an empty state and has a save button  -->
       <dom-if if="[[loaded]]">
           <template>
+            <div class="quizTitle">
+              <h1 hidden$="[[editTitle]]">[[quizTitle]]</h1>
+              <div hidden$="[[editTitle]]">
+                <button class="prendus-button" on-click="startEditingQuizTitle"><iron-icon icon="create"></iron-icon>&nbsp; Edit Title</button>
+                <a href="/quiz/create" class="prendus-button"><iron-icon icon="add"></iron-icon>&nbsp; New Quiz</a>
+              </div>
+            </div>
+            <div class="quizTitle">
+              <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]"></paper-input>
+              <div hidden$="[[!editTitle]]">
+                <button class="prendus-button" on-click="saveQuizTitle"><iron-icon class="saveTitle" icon="check"></iron-icon>&nbsp; Save</button>
+                <button class="prendus-button prendus-button--minor" on-click="stopEditingQuizTitle">Cancel</button>
+              </div>
+            </div>
             <div id="createQuizContainer">
               <div id="questionsToAddToQuiz" class="questionColumn">
-                <h1>My Questions</h1>
+                <h2>My Questions</h2>
                 <dom-repeat items="[[userQuestions]]">
                   <template>
-                    <prendus-question-container class="prendus-question" question="[[item]]" on-added="addToQuiz"></prendus-question-container>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-added="addToQuiz" add edit delete></prendus-question-viewer-wrapper>
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>
               </div>
               <div id="quizQuestions" class="questionColumn">
-                <h1>Quiz Questions</h1>
+                <h2>Quiz Questions</h2>
                 <dom-repeat items="[[quizQuestions]]">
                   <template>
-                    <prendus-question-container class="prendus-question" question="[[item]]"></prendus-question-container>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" edit delete></prendus-question-viewer-wrapper>
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>

@@ -115,6 +115,7 @@
 
         <app-route route="[[route]]" pattern="/quiz/create" data="{{createQuizRouteData}}" active="{{createQuizRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/quiz/:quizId/edit" data="{{editQuizRouteData}}" active="{{editQuizRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/quiz/:quizId/view" data="{{viewQuizRouteData}}" active="{{viewQuizRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/quizzes/view" data="{{viewQuizzesRouteData}}" active="{{viewQuizzesRouteActive}}"></app-route>
 
@@ -144,7 +145,7 @@
 
         <prendus-navbar></prendus-navbar>
         <div id="main-content">
-          <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive, createQuizRouteActive, editQuizRouteActive, viewQuizzesRouteActive)]]">
+          <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive, createQuizRouteActive, editQuizRouteActive, viewQuizRouteActive, viewQuizzesRouteActive)]]">
 
               <prendus-home-page class="landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
               <prendus-what-is-prendus class="landing" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
@@ -190,6 +191,7 @@
 
               <prendus-quiz-edit class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
               <prendus-quiz-edit class="app-window" show="editQuizView" quiz-id="[[editQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quiz-view class="app-window" show="viewQuizView" quiz-id="[[viewQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-view.html"></prendus-quiz-view>
               <prendus-quizzes-view class="app-window" show="viewQuizzesView" data-path="../prendus-quizzes/prendus-quizzes-view.html"></prendus-quizzes-view>
 
               <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>

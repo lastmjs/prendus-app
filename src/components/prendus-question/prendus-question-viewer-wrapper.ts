@@ -25,6 +25,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   add: boolean;
   delete: boolean;
   edit: boolean;
+  noActions: boolean;
 
   static get is() { return 'prendus-question-viewer-wrapper' }
 
@@ -35,12 +36,14 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
         },
         add: {
           type: Boolean,
-          observer: 'stateValue'
         },
         edit: {
           type: Boolean,
         },
         delete: {
+          type: Boolean,
+        },
+        noActions: {
           type: Boolean,
         }
     };
@@ -57,10 +60,8 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     !this.add ? this.action = fireLocalAction(this.componentId, 'add', false) : this.add;
     !this.edit ? this.action = fireLocalAction(this.componentId, 'edit', false) : this.edit;
     !this.delete ? this.action = fireLocalAction(this.componentId, 'delete', false) : this.delete;
+    !this.noActions ? this.action = fireLocalAction(this.componentId, 'noActions', false) : this.noActions;
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-  }
-  stateValue(){
-    console.log('this.add', this.add)
   }
   setProperty(property: string){
     console.log('prop', property)
@@ -76,6 +77,17 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
         }
     }));
   }
+  fireRemoveQuestion(e){
+    console.log('e', e.target.id)
+    const questionId = e.target.id;
+    console.log('quesitonId', questionId)
+    this.dispatchEvent(new CustomEvent('removed', {
+        bubbles: false,
+        detail: {
+          questionId,
+        }
+    }));
+  }
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
@@ -84,6 +96,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     if (keys.includes('add')) this.add = componentState.add;
     if (keys.includes('edit')) this.edit = componentState.edit;
     if (keys.includes('delete')) this.delete = componentState.delete;
+    if (keys.includes('noActions')) this.noActions = componentState.noActions;
 
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('question')) this.question = componentState.question;
