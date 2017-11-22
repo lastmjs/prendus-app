@@ -23,7 +23,7 @@
           margin-top: 1vh;
         }
         #quizQuestions{
-          display: flex;  
+          display: flex;
           justify-content: space-evenly;
           flex-direction: row;
           flex-wrap: wrap;
@@ -38,7 +38,7 @@
               <dom-repeat items="[[quizQuestions]]">
                 <template>
                   <div class="prendus-question">
-                    <prendus-question-viewer-wrapper question="[[item]]" noActions></prendus-question-viewer-wrapper>
+                    <prendus-question-viewer-wrapper question="[[item]]" no-actions></prendus-question-viewer-wrapper>
                   </div>
                   <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                 </template>

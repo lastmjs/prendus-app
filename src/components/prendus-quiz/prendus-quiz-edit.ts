@@ -94,13 +94,21 @@ class PrendusQuizEdit extends Polymer.Element {
   }
   async saveQuiz(){
     const title = this.shadowRoot.querySelector('#quizInput').value;
-    console.log('title', title, 'this.quizTitle', this.quizTitle)
+    if(!title){
+      this.action = setNotification("Quiz needs a title before saving", NotificationType.ERROR)
+      return;
+    }
+    if(this.quizQuestions[0] == null){
+      this.action = setNotification("Quiz needs questions before saving", NotificationType.ERROR)
+      return;
+    }
     //Logic to save the quiz if it exists, create the quiz if it does not.
     const quizQuestionIds = this.quizQuestions.map((question)=>{
       return question.id
     });
-    const quizId = (this.quizId) ? await saveQuiz(this.quizId, quizQuestionIds, title, this.userToken) : await createQuiz(quizQuestionIds, title, this.user.id, this.userToken);
+    const quizId = (this.quizId) ? await updateQuiz(this.quizId, quizQuestionIds, title, this.userToken) : await createQuiz(quizQuestionIds, title, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'quizId', quizId);
+    navigate('/quizzes/view');
   }
   startEditingQuizTitle(){
     this.action = fireLocalAction(this.componentId, 'editTitle', true);
@@ -109,8 +117,17 @@ class PrendusQuizEdit extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'editTitle', false);
 
   }
-  saveQuizTitle(e){
-    this.saveQuiz();
+  async saveQuizTitle(e: CustomEvent){
+    const title = this.shadowRoot.querySelector('#quizInput').value;
+    const quizQuestionIds = this.quizQuestions.map((question)=>{
+      return question.id
+    });
+    try{
+      (this.quizId) ? await updateQuiz(this.quizId, quizQuestionIds, title, this.userToken) : this.action = setNotification("Title updated. Add questions and click save to create quiz", NotificationType.SUCCESS);
+    }catch(error){
+      this.action = setNotification("Error updating quiz title", NotificationType.ERROR)
+    }
+    this.action = fireLocalAction(this.componentId, 'quizTitle', title);
     this.stopEditingQuizTitle();
   }
   //Make this saveQuiz
@@ -195,10 +212,10 @@ async function createQuiz(questionIds: string[], title: string, userId: string, 
   if (!data) {
     return [];
   }
-  return data.createQuiz.id;
+  navigate(`/quiz/${data.createQuiz.id}/edit`);
 }
 
-async function saveQuiz(quizId: string, questionIds: string[], title: string, userToken: string): Promise<Question[]> {
+async function updateQuiz(quizId: string, questionIds: string[], title: string, userToken: string): Promise<Question[]> {
   console.log('save quiz', quizId)
   const data = await GQLRequest(`
     mutation quiz($quizId: ID!, $title: String!, $questionIds: [ID!]!){

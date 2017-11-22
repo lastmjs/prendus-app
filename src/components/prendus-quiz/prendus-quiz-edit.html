@@ -48,8 +48,8 @@
         }
         .quizTitle{
           display: flex;
-          justify-content: space-between;
-          margin-left: 2vw;
+          justify-content: flex-start;
+          margin-left: 4vw;
           align-items: center;
           margin-bottom: 2vh;
         }
@@ -65,6 +65,12 @@
           --iron-icon-height: 60px;
           --iron-icon-width: 48px;
         }
+        .questionHeader{
+          margin-left: 2vw;
+        }
+        .titleActions{
+          margin-left: 5vw;
+        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
       <!-- Eventually just wrap the quiz-edit component in this component that will except an empty state and has a save button  -->
@@ -72,21 +78,21 @@
           <template>
             <div class="quizTitle">
               <h1 hidden$="[[editTitle]]">[[quizTitle]]</h1>
-              <div hidden$="[[editTitle]]">
+              <div class="titleActions" hidden$="[[editTitle]]">
                 <button class="prendus-button" on-click="startEditingQuizTitle"><iron-icon icon="create"></iron-icon>&nbsp; Edit Title</button>
                 <a href="/quiz/create" class="prendus-button"><iron-icon icon="add"></iron-icon>&nbsp; New Quiz</a>
               </div>
             </div>
             <div class="quizTitle">
               <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]"></paper-input>
-              <div hidden$="[[!editTitle]]">
-                <button class="prendus-button" on-click="saveQuizTitle"><iron-icon class="saveTitle" icon="check"></iron-icon>&nbsp; Save</button>
+              <div class="titleActions" hidden$="[[!editTitle]]">
+                <button class="prendus-button" on-click="saveQuizTitle" ><iron-icon class="saveTitle" icon="check"></iron-icon>&nbsp;Done</button>
                 <button class="prendus-button prendus-button--minor" on-click="stopEditingQuizTitle">Cancel</button>
               </div>
             </div>
             <div id="createQuizContainer">
               <div id="questionsToAddToQuiz" class="questionColumn">
-                <h2>My Questions</h2>
+                <h2 class="questionHeader">My Questions</h2>
                 <dom-repeat items="[[userQuestions]]">
                   <template>
                     <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-added="addToQuiz" add edit delete></prendus-question-viewer-wrapper>
@@ -95,7 +101,9 @@
                 </dom-repeat>
               </div>
               <div id="quizQuestions" class="questionColumn">
-                <h2>Quiz Questions</h2>
+                <h2 class="questionHeader">Quiz Questions</h2>
+                <paper-card>
+                </paper-card>
                 <dom-repeat items="[[quizQuestions]]">
                   <template>
                     <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" edit delete></prendus-question-viewer-wrapper>

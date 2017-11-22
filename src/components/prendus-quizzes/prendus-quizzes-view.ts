@@ -43,10 +43,7 @@ class PrendusQuizzesView extends Polymer.Element {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
         const quizzes = await getUserQuizzes(this.user.id, this.userToken);
-        console.log('quizzes', quizzes)
-        // const userQuizIdsArray = (userQuizIds.length) ? userQuizIds.map(quiz => quiz.id) : false;
         this.action = fireLocalAction(this.componentId, 'quizzes', quizzes)
-        // this.action = fireLocalAction(this.componentId, 'quizIds', userQuizIdsArray)
         this.action = fireLocalAction(this.componentId, 'loaded', true)
       }, 0);
     }catch(error){
@@ -55,6 +52,23 @@ class PrendusQuizzesView extends Polymer.Element {
     }
   }
 
+  async deleteQuiz(e){
+    this.action = fireLocalAction(this.componentId, 'loaded', false)
+    try{
+      const deletedQuiz = await deleteUserQuiz(e.target.id, this.userToken);
+      const newQuizzes = this.quizzes.filter((quiz)=>{
+        if(quiz.id != deletedQuiz.id) return quiz;
+      })
+      this.action = fireLocalAction(this.componentId, 'quizzes', newQuizzes)
+      this.action = fireLocalAction(this.componentId, 'loaded', true)
+
+    }catch(error){
+      this.action = setNotification(error.message, NotificationType.ERROR);
+      this.action = fireLocalAction(this.componentId, 'loaded', true)
+    }
+
+    // const newQuizArray = this.quizzes.filter()
+  }
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
@@ -95,6 +109,19 @@ async function getUserQuizzes(userId: String, userToken: String) {
       throw error;
     });
     return data.allQuizzes;
+}
+
+async function deleteUserQuiz(quizId: String, userToken: String) {
+    const data = await GQLRequest(`
+      mutation deleteQuiz($quizId: ID!) {
+        deleteQuiz(id: $quizId) {
+          id
+        }
+      }
+    `, {quizId}, userToken, (error: any) => {
+      throw error;
+    });
+    return data.deleteQuiz;
 }
 
 window.customElements.define(PrendusQuizzesView.is, PrendusQuizzesView)

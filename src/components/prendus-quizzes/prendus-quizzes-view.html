@@ -24,12 +24,19 @@
           bottom: 30px;
           right: 300px;
         }
+        .quiz-card{
+          min-width: 300px;
+          width: 30%;
+          max-width: 30%;
+          margin-left: 2vw;
+          margin-bottom: 2vh;
+        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
       <dom-if if="[[loaded]]">
           <template>
-            <dom-if if="[[!quizIds]]">
+            <dom-if if="[[!quizzes.length]]">
               <template>
                 <prendus-no-content-card parent-component="Quiz" plural="Quizzes" primary-redirect-url="quiz/create" secondary-redirect-url="quiz/search" display-icon="editor:format-list-bulleted"></prendus-no-content-card>
               </template>
@@ -45,9 +52,9 @@
                     <a href="quiz/[[item.id]]/view"><paper-icon-button id="view-quiz" class="prendus-icon-button" icon="view-list"></paper-icon-button></a>
                     <paper-tooltip for="view-quiz" offset="0" animation-delay="300">Take Quiz</paper-tooltip>
                     <a href="quiz/[[item.id]]/edit"><iron-icon id="edit-quiz" class="prendus-icon-button" icon="create"></iron-icon></a>
-                    <paper-tooltip for="edit-quiz" offset="0" animation-delay="300">Edit Course</paper-tooltip>
-                    <paper-icon-button id="delete-course" class="prendus-icon-button" icon="delete" on-click="openDeleteModal"></paper-icon-button>
-                    <paper-tooltip for="delete-course" offset="0" animation-delay="300">Remove Quiz</paper-tooltip>
+                    <paper-tooltip for="edit-quiz" offset="0" animation-delay="300">Edit Quiz</paper-tooltip>
+                    <paper-icon-button id="[[item.id]]" class="prendus-icon-button" icon="delete" on-click="deleteQuiz"></paper-icon-button>
+                    <paper-tooltip for="[[item.id]]" offset="0" animation-delay="300">Remove Quiz</paper-tooltip>
                   </div>
                 </paper-card>
               </template>

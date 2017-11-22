@@ -21,8 +21,6 @@
         #question-wrapper{
           width: 30vw;
           background-color: white;
-          padding-left: 2vw;
-          padding-right: 2vw;
         }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -34,7 +32,7 @@
                 <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
               </div>
             </div>
-            <div class="card-actions" hidden$="[[!noActions]]">
+            <div class="card-actions" hidden$="[[noActions]]">
               <paper-icon-button hidden$="[[!add]]" id="[[question.id]]" class="prendus-icon-button" icon="add" on-click="fireAddQuestion"></paper-icon-button>
               <paper-tooltip for="[[question.id]]" offset="0" animation-delay="300">Add Question to Quiz</paper-tooltip>
               <a href="question/[[item.id]]/edit" hidden$="[[!edit]]"><iron-icon id="edit-question" class="prendus-icon-button" hidden$="[[!edit]]" icon="create"></iron-icon></a>
