@@ -63,13 +63,8 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     !this.noActions ? this.action = fireLocalAction(this.componentId, 'noActions', false) : this.noActions;
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
-  setProperty(property: string){
-    console.log('prop', property)
-  }
   fireAddQuestion(e){
-    console.log('e', e.target.id)
     const questionId = e.target.id;
-    console.log('quesitonId', questionId)
     this.dispatchEvent(new CustomEvent('added', {
         bubbles: false,
         detail: {
@@ -78,9 +73,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     }));
   }
   fireRemoveQuestion(e){
-    console.log('e', e.target.id)
     const questionId = e.target.id;
-    console.log('quesitonId', questionId)
     this.dispatchEvent(new CustomEvent('removed', {
         bubbles: false,
         detail: {
@@ -97,7 +90,6 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     if (keys.includes('edit')) this.edit = componentState.edit;
     if (keys.includes('delete')) this.delete = componentState.delete;
     if (keys.includes('noActions')) this.noActions = componentState.noActions;
-
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('question')) this.question = componentState.question;
     if (keys.includes('questions')) this.questions = componentState.questions;

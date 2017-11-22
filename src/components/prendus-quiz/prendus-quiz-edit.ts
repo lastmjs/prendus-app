@@ -216,7 +216,6 @@ async function createQuiz(questionIds: string[], title: string, userId: string, 
 }
 
 async function updateQuiz(quizId: string, questionIds: string[], title: string, userToken: string): Promise<Question[]> {
-  console.log('save quiz', quizId)
   const data = await GQLRequest(`
     mutation quiz($quizId: ID!, $title: String!, $questionIds: [ID!]!){
       updateQuiz(
@@ -237,6 +236,5 @@ async function updateQuiz(quizId: string, questionIds: string[], title: string, 
   if (!data) {
     return [];
   }
-  console.log('save quiz data', data)
   return data.updateQuiz.id;
 }
