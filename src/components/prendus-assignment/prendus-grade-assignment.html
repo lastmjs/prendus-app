@@ -3,61 +3,33 @@
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="prendus-unauthorized-modal.html">
-<link rel="import" href="prendus-assignment-authorization.html">
-<link rel="import" href="../prendus-carousel/prendus-carousel.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="prendus-assignment-analytics.html">
 
 <dom-module id="prendus-grade-assignment">
 
   <template>
 
-    <style include="prendus-styles">
-      .question {
-        max-height: 3vh;
-      }
-    </style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <style include="prendus-styles"></style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-authorization
+    <prendus-assignment-analytics
       assignment-id="[[assignmentId]]"
-      on-authorized="_loadAssignment"
-      on-unauthorized="_handleUnauthorized"
-    ></prendus-assignment-authorization>
-    <prendus-unauthorized-modal opened="[[modalOpen]]"></prendus-unauthorized-modal>
-
-    <div hidden$="[[!loaded]]">
-      <h2>[[assignment.title]] Grade Assignment</h2>
-      <br>
-      <prendus-carousel
-        id="carousel"
-        hide-back
-        next-text="Submit"
-        label="Response"
-        items="[[responses]]"
-        on-next="_handleNextRequest"
-        on-item-changed="_handleNextResponse"
-        on-finished-changed="_handleFinished"
-      >
-        <div hidden$="[[finished]]">
-          <h4>Question</h4>
-          <div class="question">
-            <prendus-view-question question="[[response.questionResponse.question]]"></prendus-view-question>
-          </div>
-          <h4>Response</h4>
-          <p>[[response.value]]</p>
-          <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
+      load="[[load]]"
+      error="[[error]]"
+      submit="[[submit]]"
+      verb="GRADED"
+      on-item-changed="_response"
+    >
+      <div slot="assignment">
+        <h4>Question as seen in quiz</h4>
+        <div class="question">
+          <prendus-view-question question="[[response.questionResponse.question]]"></prendus-view-question>
         </div>
-        <div hidden$="[[!finished]]">
-          <h3>Done</h3>
-          <p>[[completionReason]]</p>
-        </div>
-      </prendus-carousel>
-    </div>
-
-    <div hidden$="[[loaded]]">
-      Loading...
-    </div>
+        <h4>Response</h4>
+        <p>[[response.value]]</p>
+        <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_grades"></prendus-rubric-dropdowns>
+      </div>
+    </prendus-assignment-analytics>
 
   </template>
 

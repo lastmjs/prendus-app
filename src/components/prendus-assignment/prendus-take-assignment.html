@@ -1,55 +1,27 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
-<link rel="import" href="../prendus-carousel/prendus-carousel.html">
-<link rel="import" href="prendus-unauthorized-modal.html">
-<link rel="import" href="prendus-assignment-authorization.html">
+<link rel="import" href="prendus-assignment-analytics.html">
 <link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
-<link rel="import" href="../prendus-notification/prendus-notification.html">
 
 <dom-module id="prendus-take-assignment">
 
   <template>
 
-    <style include="prendus-styles">
-      #carousel{
-        position: relative;
-      }
-    </style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <style include="prendus-styles"></style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-authorization
+    <prendus-assignment-analytics
       assignment-id="[[assignmentId]]"
-      on-authorized="_loadAssignment"
-      on-unauthorized="_handleUnauthorized"
-    ></prendus-assignment-authorization>
-    <prendus-unauthorized-modal opened="[[modalOpen]]"></prendus-unauthorized-modal>
-
-    <div hidden$="[[!loaded]]">
-      <prendus-carousel
-        id="carousel"
-        items="[[questions]]"
-        on-item-changed="_handleNextQuestion"
-        on-next="_nextClick"
-        on-back="_backClick"
-        on-finished-changed="_handleFinished"
-      >
-        <div hidden$="[[finished]]">
-          <prendus-flaggable-question  question="[[question]]" on-question-response="_handleResponse"></prendus-flaggable-question>
-        </div>
-        <div hidden$="[[!finished]]">
-          <h3>Done</h3>
-          <p>[[completionReason]]</p>
-        </div>
-      </prendus-carousel>
-    </div>
-
-    <div hidden$="[[loaded]]">
-      Loading...
-    </div>
+      load="[[load]]"
+      submit="[[_submit]]"
+      verb="RESPONDED"
+      on-item-changed="_question"
+    >
+      <div slot="assignment">
+        <prendus-flaggable-question  question="[[question]]" on-question-response="_response"></prendus-flaggable-question>
+      </div>
+    </prendus-assignment-analytics>
 
   </template>
 

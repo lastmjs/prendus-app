@@ -42,9 +42,11 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   courseId: string;
   assignmentId: string;
   load: (assignmentId: string) => Promise<{
-    assignment: Assignment,
+    title: string,
+    courseId: string,
     items: object[],
-    taken: boolean
+    taken: boolean,
+    error: string
   }>;
   assignment: Assignment;
   items: object[];
@@ -61,9 +63,21 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   static get properties() {
     return {
       assignmentId: String,
-      load: Function
-      error: Function,
-      submit: Function,
+      load: {
+        type: Function,
+        value: async assignmentId => ({
+          items: [],
+          error: 'Load function was not supplied'
+        })
+      },
+      error: {
+        type: Function,
+        value: () => null
+      },,
+      submit: {
+        type: Function,
+        value: async item => null
+      },,
       verb: String,
       label: {
         type: String,
@@ -90,12 +104,15 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
 
   async _load(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const { assignment, items, taken } = await this.load(this.assignmentId);
-    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
+    const { title, courseId, items, taken, error } = await this.load(this.assignmentId, this.user.id, this.userToken);
+    this.action = fireLocalAction(this.componentId, 'title', title);
+    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
     this.action = fireLocalAction(this.componentId, 'items', items);
     if (taken)
       this.action = setNotification(DONE_MESSAGE, NotificationType.WARNING);
-    if (!items.length)
+    if (error)
+      this.action = fireLocalAction(this.componentId, 'message', error);
+    else if (!items.length)
       this.action = fireLocalAction(this.componentId, 'message', INSUFFICIENT_MESSAGE);
     else
       await this._sendStatement(VerbType.STARTED, null);
@@ -120,7 +137,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
       this.action = setNotification(err, NotificationType.ERROR);
       return;
     }
-    const questionId = await submit(this.item);
+    const questionId = await this.submit(this.item);
     await this._sendStatement(this.verb, questionId);
     this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     this.shadowRoot.querySelector('#carousel').next();
@@ -155,8 +172,8 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   _sendStatement(verb: string, questionId: string | null) {
     return sendStatement(this.userToken, {
       userId: this.user.id,
-      assignmentId: this.assignment.id,
-      courseId: this.assignment.course.id,
+      assignmentId: this.assignmentId,
+      courseId: this.courseId,
       questionId,
       verb
     });
@@ -171,9 +188,12 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     this.enrolled = componentState.enrolled;
     this.courseId = componentState.courseId;
     this.unauthorized = componentState.unauthorized;
-    this.assignment = componentState.assignment;
+    this.courseId = componentState.courseId;
+    this.title = componentState.title;
     this.items = componentState.items;
     this.item = componentState.item;
+    this.message = componentState.message;
+    this.success = componentState.success;
     this.finished = componentState.finished;
     this.user = state.user;
     this.userToken = state.userToken;

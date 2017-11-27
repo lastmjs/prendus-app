@@ -25,11 +25,14 @@
       course-id="[[courseId]]"
     ></prendus-unauthorized-modal>
 
+    <h2>[[title]]</h2>
+
     <div hidden$="[[loaded]]">
       Loading...
     </div>
 
     <div hidden$="[[!loaded]]">
+
       <prendus-carousel
         id="carousel"
         label="[[label]]"
@@ -40,18 +43,20 @@
         on-item-changed="_item"
         on-finished-changed="_finished"
       >
-        <div hidden$="[[finished]]">
-          <slot name="assignment" slot="content"></slot>
+        <div hidden$="[[finished]]" slot="content">
+          <slot name="assignment"></slot>
         </div>
-
-        <div hidden$="[[!finished]]">
-          <h4>Done</h4>
-          <p>[[message]]</p>
-          <button class="prendus-button prendus-button--recommended" hidden$="[[success]]" on-click="_gradePassback">Retry</button>
-        </div>
-
       </prendus-carousel>
+
+      <div hidden$="[[!finished]]">
+        <h4>Done</h4>
+        <p>[[message]]</p>
+        <br>
+        <button hidden$="[[success]]" class="prendus-button prendus-button--recommended" on-click="_gradePassback">Retry Grade Passback</button>
+      </div>
+
     </div>
+
   </template>
 
   <script type="module" src="prendus-assignment-analytics.ts"></script>

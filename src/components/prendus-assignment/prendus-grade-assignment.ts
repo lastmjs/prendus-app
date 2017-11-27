@@ -8,25 +8,23 @@ import {
 import {
   createUUID,
   fireLocalAction,
-  navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';
-import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
+import {
+  shuffleArray
+} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
+import {
+  GQLRequest
+} from '../../node_modules/prendus-shared/services/graphql-service';
 import {
   QuestionType,
   NotificationType,
-  ContextType,
-  VerbType,
-  ObjectType,
-  ASSIGNMENT_LOADED,
-  ASSIGNMENT_SUBMITTED,
-  STATEMENT_SENT
 } from '../../services/constants-service';
-import {setNotification} from '../../redux/actions';
-import {sendStatement} from '../../services/analytics-service';
-import {LTIPassback} from '../../services/lti-service';
-import {extractVariables} from '../../services/code-to-question-service';
-import {parse} from '../../node_modules/assessml/assessml';
+import {
+  setNotification
+} from '../../redux/actions';
+import {
+  extractVariables
+} from '../../services/code-to-question-service';
 
 class PrendusGradeAssignment extends Polymer.Element {
   loaded: boolean = false;
@@ -36,11 +34,10 @@ class PrendusGradeAssignment extends Polymer.Element {
   user: User;
   assignmentId: string;
   rubric: Rubric;
-  responses: UserEssay[];
   response: UserEssay;
-  completionReason: string;
-  finished: boolean = false;
-  modalOpen: boolean;
+  submit: (item: object) => Promise<string>;
+  error: () => string;
+  load: (assignmentId: string) => Promise<object>;
 
   static get is() { return 'prendus-grade-assignment' }
 
@@ -51,10 +48,6 @@ class PrendusGradeAssignment extends Polymer.Element {
         type: Object,
         computed: '_computeRubric(response)'
       },
-      completionReason: {
-        type: String,
-        computed: '_computeCompletionReason(assignment, responses)'
-      }
     }
   }
 
@@ -63,116 +56,69 @@ class PrendusGradeAssignment extends Polymer.Element {
     this.componentId = createUUID();
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
+    this.action = fireLocalAction(this.componentId, 'submit', this._submit.bind(this));
+    this.action = fireLocalAction(this.componentId, 'error', this._error.bind(this));
+  }
+
   _computeRubric(response: UserEssay): Rubric | null {
     if (!response) return null;
     return parseRubric(response.questionResponse.question.code);
   }
 
-  _computeCompletionReason(assignment: Assignment, responses: UserEssay[]): string {
-    return responses && responses.length === assignment.numGradeResponses
-      ? 'You have completed this assignment'
-      : 'There are not enough responses to take the assignment yet';
-  }
-
-  _handleUnauthorized(e: CustomEvent) {
-    const { authenticated, payed, enrolled, courseId } = e.detail;
-    if (authenticated === false)
-      navigate('/authenticate');
-    else if (payed === false)
-      navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-    else if (enrolled === false)
-      this.action = fireLocalAction(this.componentId, 'modalOpen', true);
-  }
-
-  async _handleNextRequest(e: CustomEvent) {
-    try {
-      validate(this.rubric, this.grades);
-      await submit(this.grades, this.response.questionResponse.id, this.user.id);
-      const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.GRADED, questionId: this.response.questionResponse.question.id });
-      this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
-      this.shadowRoot.querySelector('#carousel').next();
-    } catch (err) {
-      console.error(err);
-      this.action = setNotification(err.message, NotificationType.ERROR);
-    }
-  }
-
-  async _handleNextResponse(e: CustomEvent) {
-    const response = e.detail.value;
-    this.action = fireLocalAction(this.componentId, 'response', response);
-    const statement = { userId: this.user.id, assignmentId: this.assignment.id, courseId: this.assignment.course.id };
-    if (response && response === this.responses[0])
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.STARTED });
-    else if (!response && this.responses.length) {
-      this.gradePassback(false);
-      await sendStatement(this.userToken, { ...statement, verb: VerbType.SUBMITTED });
-      this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
-    }
-  }
-
-  async gradePassback(retried: boolean) {
-    try {
-      await LTIPassback(this.userToken, getCookie('ltiSessionIdJWT'));
-      this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
-    }
-    catch(error) {
-      this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-      if (retried) return; //Only retry once
-      setTimeout(() => {
-          this.gradePassback(true);
-      }, 5000);
-    }
-  }
-
-  async _loadAssignment() {
-    this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const data = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
+  async _load(assignmentId: string): Promise<object> {
+    const data = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     const { assignment, essays } = data;
-    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
-    if (assignment.graded.length)
-      this.action = setNotification('You have already completed this assignment', NotificationType.WARNING);
     const random = randomWithUngradedFirst(essays, assignment.numGradeResponses);
     const responses = random.length >= assignment.numGradeResponses ? random : [];
-    this.action = fireLocalAction(this.componentId, 'responses', responses);
-    this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.dispatchEvent(new CustomEvent(ASSIGNMENT_LOADED));
+    return {
+      title: assignment.title + ' Grade Assignment',
+      courseId: assignment.course.id,
+      items: responses,
+      taken: assignment.graded.length
+    };
+  }
+
+  _error(): string {
+    if (!this.grades || !this.rubric)
+      return 'Prendus error, grades or rubric were undefined';
+    if (this.grades.length !== Object.keys(this.rubric).length)
+      return 'Prendus error, grades did not match rubric';
+    if (this.grades.some(({ score }) => score < 0))
+      return 'You must rate each category';
+  }
+
+  async _submit(response: UserEssay): Promise<string> {
+    await submit(this.grades, response.questionResponse.id, this.user.id);
+    return response.questionResponse.question.id;
+  }
+
+  _response(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'response', e.detail.value);
+  }
+
+  _grades(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'grades', e.detail.value);
   }
 
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
-  _handleGrades(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'grades', e.detail.value);
-  }
-
-  _handleFinished(e: CustomEvent) {
-    this.action = fireLocalAction(this.componentId, 'finished', e.detail.value);
-  }
-
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
-    this.assignment = componentState.assignment;
     this.response = componentState.response;
-    this.responses = componentState.responses;
     this.grades = componentState.grades;
-    this.finished = componentState.finished || false;
-    this.modalOpen = componentState.modalOpen;
+    this.load = componentState.load;
+    this.submit = componentState.submit;
+    this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
   }
-}
-
-function validate(rubric: Rubric, grades: CategoryScore[]) {
-  if (!grades || !rubric)
-    throw new Error('Prendus error, grades or rubric were undefined');
-  if (grades.length !== Object.keys(rubric).length)
-    throw new Error('Prendus error, grades did not match rubric');
-  if (grades.some(({ score }) => score < 0))
-    throw new Error('You must rate each category');
 }
 
 function submit(grades: CategoryScore[], responseId: string, userId: string, userToken: string, cb: (err: any) => void) {

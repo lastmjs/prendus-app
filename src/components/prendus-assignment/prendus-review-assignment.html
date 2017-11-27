@@ -13,13 +13,11 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <h2>[[assignment.title]] Review Assignment</h2>
-
     <prendus-assignment-analytics
       assignment-id="[[assignmentId]]"
-      load="[[_load]]"
-      error="[[_validate]]"
-      submit="[[_submit]]"
+      load="[[load]]"
+      error="[[error]]"
+      submit="[[submit]]"
       verb="REVIEWED"
       on-item-changed="_question"
     >

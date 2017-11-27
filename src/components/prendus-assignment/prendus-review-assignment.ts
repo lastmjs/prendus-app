@@ -39,6 +39,9 @@ class PrendusReviewAssignment extends Polymer.Element {
   essayType: boolean;
   evaluationRubric: Rubric;
   gradingRubric: Rubric;
+  submit: (item: object) => Promise<string>;
+  error: () => string;
+  load: (assignmentId: string) => Promise<object>;
 
   static get is() { return 'prendus-review-assignment' }
 
@@ -67,6 +70,13 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.componentId = createUUID();
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
+    this.action = fireLocalAction(this.componentId, 'submit', this._submit.bind(this));
+    this.action = fireLocalAction(this.componentId, 'error', this._error.bind(this));
+  }
+
   _computeEssayType(assignment: Assignment): boolean {
     return assignment && assignment.questionType === QuestionType.ESSAY;
   }
@@ -81,20 +91,21 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  async _load(e: CustomEvent) {
-    const assignment = await loadAssignment(this.assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
+  async _load(assignmentId: string) {
+    const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
       ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
       : [];
     return {
-      assignment,
+      title: assignment.title + ' Review Assignment',
+      courseId: assignment.course.id,
       items: questions,
       taken: assignment.rated.length > 0
     }
   }
 
-  _validate() {
+  _error() {
     if (!this.ratings || !this.evaluationRubric)
       return 'Prendus error, ratings or rubric was undefined';
     if (this.ratings.length !== Object.keys(this.evaluationRubric).length)
@@ -128,6 +139,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     this.assignment = componentState.assignment;
     this.question = componentState.question;
     this.ratings = componentState.ratings;
+    this.load = componentState.load;
+    this.submit = componentState.submit;
+    this.error = componentState.error;
     this.user = state.user;
     this.userToken = state.userToken;
   }
@@ -146,7 +160,7 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
       numReviewQuestions
       questions(filter: {
         author: {
-          id_not: $userId
+          id: $userId
         }
       }) {
         id
@@ -175,9 +189,6 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
       }
     }
   }`, {assignmentId, userId}, userToken, cb);
-  if (!data) {
-    return null;
-  }
   return data.Assignment;
 }
 
