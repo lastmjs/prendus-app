@@ -1,0 +1,20 @@
+<link rel="import" href="../../../../src/bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../src/components/prendus-assignment/prendus-assignment-analytics.html">
+<link rel="import" href="../../../../src/node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-assignment-analytics-test">
+
+  <template>
+    <redux-store root-reducer="[[rootReducer]]" action="[[action]]"></redux-store>
+    <prendus-assignment-analytics
+      style="display: none;"
+      load="[[load]]"
+      error="[[error]]"
+      submit="[[_submit]]"
+      verb="TEST"
+    ></prendus-assignment-analytics>
+  </template>
+
+  <script type="module" src="prendus-assignment-analytics-test.ts"></script>
+
+</dom-module>

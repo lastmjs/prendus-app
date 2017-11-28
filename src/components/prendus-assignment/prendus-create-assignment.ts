@@ -44,7 +44,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   }
 
   async _load(assignmentId: string): Promise<string> {
-    const assignment = await loadAssignment(assignmentId);
+    const assignment = await loadAssignment(assignmentId, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = (new Array(assignment.numCreateQuestions)).fill(null).map((_, i) => i);
     return {
@@ -66,7 +66,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   async _handleQuestion(e: CustomEvent) {
     const { question } = e.detail;
     const save = question.conceptId ? saveQuestion : saveQuestionAndConcept;
-    const questionId = await save(question);
+    const questionId = await save(question, this.userToken, this._handleGQLError.bind(this));
     const questions = [ ...this.questions, questionId ];
     this.action = fireLocalAction(this.componentId, 'questions', questions);
     this.shadowRoot.querySelector('#carousel')._notifyNext(); //This call will be unnecessary when the create assignment uses the editor

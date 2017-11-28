@@ -8,8 +8,14 @@ import {
 import {asyncForEach} from '../../../src/node_modules/prendus-shared/services/utilities-service';
 import {getAnalytics} from './dataGen-service';
 
-export const getListener = (eventName: string, element: HTMLElment): Promise => {
+export const getListener = (eventName: string, element: HTMLElment, timeout: number = 10000): Promise => {
   let _resolve, listener;
+  const timer = new Promise((resolve, reject) => {
+    const id = setTimeout(() => {
+      clearTimeout(id);
+      reject('Test timed out waiting for event ' + eventName);
+    }, timeout);
+  });
   const promise = new Promise((resolve, reject) => {
     _resolve = resolve;
   });
@@ -18,7 +24,7 @@ export const getListener = (eventName: string, element: HTMLElment): Promise => 
     _resolve();
   }
   element.addEventListener(eventName, listener);
-  return promise;
+  return Promise.race([ promise, timer ]);
 };
 
 export const randomIndex = (l: number): number => l ? (Math.round((l - 1) * Math.random())) : -1;
