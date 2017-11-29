@@ -95,11 +95,11 @@ class PrendusQuizEdit extends Polymer.Element {
   async saveQuiz(){
     const title = this.shadowRoot.querySelector('#quizInput').value;
     if(!title){
-      this.action = setNotification("Quiz needs a title before saving", NotificationType.ERROR)
+      this.action = setNotification("Quiz needs a title", NotificationType.ERROR)
       return;
     }
     if(this.quizQuestions[0] == null){
-      this.action = setNotification("Quiz needs questions before saving", NotificationType.ERROR)
+      this.action = setNotification("Quiz needs questions", NotificationType.ERROR)
       return;
     }
     //Logic to save the quiz if it exists, create the quiz if it does not.
@@ -118,16 +118,22 @@ class PrendusQuizEdit extends Polymer.Element {
 
   }
   async saveQuizTitle(e: CustomEvent){
-    const title = this.shadowRoot.querySelector('#quizInput').value;
-    const quizQuestionIds = this.quizQuestions.map((question)=>{
-      return question.id
-    });
     try{
-      (this.quizId) ? await updateQuiz(this.quizId, quizQuestionIds, title, this.userToken) : this.action = setNotification("Title updated. Add questions and click save to create quiz", NotificationType.SUCCESS);
+      const title = this.shadowRoot.querySelector('#quizInput').value;
+      const quizQuestionIds = this.quizQuestions.map((question)=>{
+        return question.id
+      });
+      if(this.quizId && quizQuestionIds.length){
+        await updateQuiz(this.quizId, quizQuestionIds, title, this.userToken)
+        this.action = setNotification("Title updated.", NotificationType.SUCCESS);
+      }else{
+        (quizQuestionIds.length) ? this.action = setNotification("Click save to finish updating quiz.", NotificationType.SUCCESS) : this.action = setNotification("Add questions and click save to finish updating quiz.", NotificationType.SUCCESS);
+      }
+      this.action = fireLocalAction(this.componentId, 'quizTitle', title);
     }catch(error){
+      console.log('error', error)
       this.action = setNotification("Error updating quiz title", NotificationType.ERROR)
     }
-    this.action = fireLocalAction(this.componentId, 'quizTitle', title);
     this.stopEditingQuizTitle();
   }
   //Make this saveQuiz
