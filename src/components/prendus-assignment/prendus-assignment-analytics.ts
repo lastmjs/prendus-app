@@ -1,6 +1,6 @@
 import {
-  Assignment,
   User,
+  AnalyticsAssignment
 } from '../../../prendus.d';
 import {
   createUUID,
@@ -20,6 +20,7 @@ import {
   VerbType,
   ASSIGNMENT_SUBMITTED,
   ASSIGNMENT_LOADED,
+  ASSIGNMENT_VALIDATION_ERROR,
   STATEMENT_SENT
 } from '../../services/constants-service';
 
@@ -41,17 +42,8 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   enrolled: boolean;
   courseId: string;
   assignmentId: string;
-  load: (assignmentId: string) => Promise<{
-    title: string,
-    courseId: string,
-    items: object[],
-    taken: boolean,
-    error: string
-  }>;
-  assignment: Assignment;
+  assignment: AnalyticsAssignment;
   items: object[];
-  error: () => string | null;
-  submit: (item: object) => Promise<string>;
   finished: boolean;
   verb: string;
   label: string;
@@ -63,21 +55,17 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   static get properties() {
     return {
       assignmentId: String,
-      load: {
-        type: Function,
-        value: async assignmentId => ({
-          items: [],
-          error: 'Load function was not supplied'
-        })
+      assignment: {
+        type: Object,
+        value: {
+          load: async assignmentId => ({
+            items: [],
+            error: 'Load function was not supplied'
+          }),
+          error: () => null,
+          submit: async item => null
+        }
       },
-      error: {
-        type: Function,
-        value: () => null
-      },,
-      submit: {
-        type: Function,
-        value: async item => null
-      },,
       verb: String,
       label: {
         type: String,
@@ -103,8 +91,14 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   }
 
   async _load(e: CustomEvent) {
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    this.action = fireLocalAction(this.componentId, 'authenticated', authenticated);
+    this.action = fireLocalAction(this.componentId, 'payed', payed);
+    this.action = fireLocalAction(this.componentId, 'enrolled', enrolled);
+    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
+    this.action = fireLocalAction(this.componentId, 'unauthorized', false);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const { title, courseId, items, taken, error } = await this.load(this.assignmentId, this.user.id, this.userToken);
+    const { title, items, taken, error } = await this.assignment.load(this.assignmentId, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'title', title);
     this.action = fireLocalAction(this.componentId, 'courseId', courseId);
     this.action = fireLocalAction(this.componentId, 'items', items);
@@ -132,12 +126,13 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
 
   async _next(e: CustomEvent) {
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const err = this.error();
+    const err = this.assignment.error();
     if (err) {
       this.action = setNotification(err, NotificationType.ERROR);
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       return;
     }
-    const questionId = await this.submit(this.item);
+    const questionId = await this.assignment.submit(this.item);
     await this._sendStatement(this.verb, questionId);
     this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     this.shadowRoot.querySelector('#carousel').next();

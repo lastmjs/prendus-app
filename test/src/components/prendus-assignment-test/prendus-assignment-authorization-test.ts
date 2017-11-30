@@ -1,6 +1,6 @@
 import {RootReducer} from '../../../../src/redux/reducers';
 import {
-  Assigment,
+  Assignment,
   User,
   Course
 } from '../../../../src/typings/index.d';
@@ -82,42 +82,44 @@ class PrendusAssignmentAuthorizationTest extends Polymer.Element {
     await deleteTestUsers(author, viewer, instructor);
   }
 
+  testOverAssignments(eventName, authenticate: boolean, authorize: boolean, expected: object) {
+    return async course => {
+      const { auth, author, viewer, instructor, data } = await this.setup(course);
+      if (authenticate)
+        this.authenticate(viewer);
+      if (authorize)
+        await authorizeTestUserOnCourse(viewer.id, data.id);
+      try {
+        const success = (await asyncMap(
+          data.assignments,
+          waitForEvent(auth, eventName, {...expected, courseId: data.id })
+        )).every(result => result === true);
+        await this.cleanup(data, author, viewer, instructor);
+        return success;
+      } catch(e) {
+        console.error(e);
+        await this.cleanup(data, author, viewer, instructor);
+        return false;
+      }
+    }
+  }
+
   prepareTests(test) {
-
-    test('Fires an unauthorized event for unauthorized users', [courseArb], async (course: Course) => {
-      const { auth, author, viewer, instructor, data } = await this.setup(course);
-      this.authenticate(viewer);
-      try {
-        const success = (await asyncMap(
-          data.assignments,
-          waitForEvent(auth, 'unauthorized')
-        )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
-        return success;
-      } catch(e) {
-        console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
-        return false;
-      }
-    });
-
-    test('Fires an authorized event for authorized users', [courseArb], async (course: Course) => {
-      const { auth, author, viewer, instructor, data } = await this.setup(course);
-      await authorizeTestUserOnCourse(viewer.id, data.id);
-      this.authenticate(viewer);
-      try {
-        const success = (await asyncMap(
-          data.assignments,
-          waitForEvent(auth, 'authorized')
-        )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
-        return success;
-      } catch(e) {
-        console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
-        return false;
-      }
-    });
+    test(
+      'Fires an unauthorized event for unauthenticated users',
+      [courseArb],
+      this.testOverAssignments('unauthorized', false, true, { authenticated: false, payed: undefined, enrolled: undefined })
+    );
+    test(
+      'Fires an unauthorized event for unauthorized users',
+      [courseArb],
+      this.testOverAssignments('unauthorized', true, false, { authenticated: true, payed: false, enrolled: false })
+    );
+    test(
+      'Fires an authorized event for authorized users',
+      [courseArb],
+      this.testOverAssignments('authorized', true, true, { authenticated: true, payed: true, enrolled: true })
+    );
   }
 
   stateChange(e: CustomEvent) {
@@ -127,12 +129,16 @@ class PrendusAssignmentAuthorizationTest extends Polymer.Element {
   }
 }
 
-function waitForEvent(auth, eventName: string): (assignment: Assignment) => Promise<boolean> {
+function waitForEvent(auth, eventName: string, expected: object): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const event = getListener(eventName, auth);
     auth.assignmentId = assignment.id;
-    await event;
-    return true;
+    const e = await event;
+    const { authenticated, payed, enrolled, courseId } = e.detail;
+    return authenticated === expected.authenticated &&
+      payed === expected.payed &&
+      enrolled === expected.enrolled &&
+      (courseId === expected.courseId || !authenticated);
   }
 }
 

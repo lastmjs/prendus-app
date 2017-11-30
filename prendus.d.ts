@@ -295,3 +295,15 @@ export interface AuthResult {
   readonly payed: boolean;
   readonly courseId: string;
 }
+
+export interface AnalyticsAssignmentLoadResult {
+  title: string;
+  items: object[];
+  taken: boolean;
+}
+
+export interface AnalyticsAssignment {
+  load(assignmentId: string): AnalyticsAssignmentLoadResult;
+  error(): string | null;
+  submit(item: object): string;
+}

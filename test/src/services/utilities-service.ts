@@ -21,7 +21,7 @@ export const getListener = (eventName: string, element: HTMLElment, timeout: num
   });
   listener = (e: Event) => {
     element.removeEventListener(eventName, listener);
-    _resolve();
+    _resolve(e);
   }
   element.addEventListener(eventName, listener);
   return Promise.race([ promise, timer ]);

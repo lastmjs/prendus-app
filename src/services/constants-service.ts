@@ -10,6 +10,7 @@ export const ARIA_SORT_NONE = 'none';
 //Event names mostly used for testing
 export const ASSIGNMENT_LOADED = 'assignment-loaded';
 export const ASSIGNMENT_SUBMITTED = 'assignment-submitted';
+export const ASSIGNMENT_VALIDATION_ERROR = 'assignment-validation-error';
 export const STATEMENT_SENT = 'statement-sent';
 export const SCORES_CHANGED = 'scores-changed';
 export const CATEGORIES_CHANGED = 'categories-changed';

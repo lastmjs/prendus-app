@@ -71,7 +71,7 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
   _processResult(result: AuthResult) {
     const { authenticated, payed, enrolled } = result;
     if (authenticated && payed && enrolled)
-      this.dispatchEvent(new CustomEvent('authorized'));
+      this.dispatchEvent(new CustomEvent('authorized', { detail: {...result} }));
     else
       this.dispatchEvent(new CustomEvent('unauthorized', { detail: {...result} }));
   }

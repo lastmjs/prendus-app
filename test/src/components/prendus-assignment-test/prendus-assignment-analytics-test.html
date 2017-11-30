@@ -5,12 +5,10 @@
 <dom-module id="prendus-assignment-analytics-test">
 
   <template>
-    <redux-store root-reducer="[[rootReducer]]" action="[[action]]"></redux-store>
+    <redux-store root-reducer="[[rootReducer]]" action="[[action]]" on-statechange="stateChange"></redux-store>
     <prendus-assignment-analytics
       style="display: none;"
-      load="[[load]]"
-      error="[[error]]"
-      submit="[[_submit]]"
+      assignment="[[assignment]]"
       verb="TEST"
     ></prendus-assignment-analytics>
   </template>
