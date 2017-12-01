@@ -282,6 +282,12 @@ export async function getAnalytics(filter: object): Promise<object> {
     query getAnalytics($filter: PrendusAnalyticsFilter) {
       allPrendusAnalyticses(orderBy: createdAt_ASC, filter: $filter) {
         verb
+        course {
+          id
+        }
+        assignment {
+          id
+        }
         question {
           id
         }

@@ -8,16 +8,16 @@
     <div id="modal" class="content" hidden$="[[!open]]">
       <h3>Take these steps to get authorized</h3>
       <ol>
-        <li hidden$="[[authenticated]]">Authenticate</li>
-        <li hidden$="[[!_payMessage(authenticated, payed)]]">Pay for the course</li>
+        <li hidden$="[[result.authenticated]]">Authenticate</li>
+        <li hidden$="[[!_payMessage(result)]]">Pay for the course</li>
         <li>Launch from your Learning Management System to properly access the course.</li>
         <li>If you are unsure of how to access the content through your LMS, contact your intructor to get added to the course.</li>
         <li>For customer assistance, please contact Prendus help at benjaminprendus@gmail.com</li>
       </ol>
     <div>
     <div id="buttons" class="buttons">
-      <button hidden$="[[authenticated]]" class="prendus-button prendus-button--recommended" on-click="_authenticate">Authenticate</button>
-      <button hidden$="[[!_payMessage(authenticated, payed)]]" class="prendus-button prendus-button--recommended" on-click="_pay">Pay</button>
+      <button hidden$="[[result.authenticated]]" class="prendus-button prendus-button--recommended" on-click="_authenticate">Authenticate</button>
+      <button hidden$="[[!_payMessage(result)]]" class="prendus-button prendus-button--recommended" on-click="_pay">Pay</button>
       <button class="prendus-button prendus-button--recommended" on-click="_home">Go To Homepage</button>
     </div>
   </template>

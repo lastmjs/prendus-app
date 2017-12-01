@@ -3,7 +3,7 @@ import {asyncMap} from '../../../../src/node_modules/prendus-shared/services/uti
 import {
   Rubric,
   CategoryScore
-} from '../../../../typings/index.d';
+} from '../../../../prendus.d';
 import {
   RUBRIC_CHANGED,
   CATEGORIES_CHANGED
@@ -31,6 +31,7 @@ const SET_POINTS = 'setPoints';
 const COMMANDS = [ADD_CATEGORY, REMOVE_CATEGORY, ADD_SCALE, REMOVE_SCALE, SET_CATEGORY, SET_DESCRIPTION, SET_POINTS];
 
 const commandArb = jsc.elements(COMMANDS);
+const rubricArb = jsc.nonshrink(RubricArb);
 
 class PrendusRubricTableTest extends Polymer.Element {
 
@@ -41,13 +42,27 @@ class PrendusRubricTableTest extends Polymer.Element {
     this.rootReducer = RootReducer;
   }
 
+  async setup(rubric: Rubric) {
+    const table = this.shadowRoot.querySelector('prendus-rubric-table');
+    const done = getListener(RUBRIC_CHANGED, table);
+    table.init = rubric;
+    const categories = table._categoriesForHtml(rubric);
+    await done;
+    return {
+      table,
+      categories
+    };
+  }
+
   prepareTests(test) {
-    test('Rubric table functionality', [jsc.nonshrink(RubricArb)], async (rubric: Rubric) => {
-      const table = this.shadowRoot.querySelector('prendus-rubric-table');
-      const setup = getListener(RUBRIC_CHANGED, table);
-      table.init = rubric;
-      const categories = table._categoriesForHtml(rubric);
-      await setup;
+
+    test('Table loads correct rubric', [rubricArb], async (rubric: Rubric) => {
+      const { table, categories } = await this.setup(rubric);
+      return verifyTable({ rubric, categories }, table);
+    });
+
+    test('User can edit rubric with table', [rubricArb], async (rubric: Rubric) => {
+      const { table, categories } = await this.setup(rubric);
       if (!verifyTable({ rubric, categories }, table))
         return false;
       const success = await jsc.check(tableIsEditable(table));

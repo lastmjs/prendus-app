@@ -134,7 +134,7 @@ function waitForEvent(auth, eventName: string, expected: object): (assignment: A
     const event = getListener(eventName, auth);
     auth.assignmentId = assignment.id;
     const e = await event;
-    const { authenticated, payed, enrolled, courseId } = e.detail;
+    const { result: { authenticated, payed, enrolled, courseId } } = e.detail;
     return authenticated === expected.authenticated &&
       payed === expected.payed &&
       enrolled === expected.enrolled &&

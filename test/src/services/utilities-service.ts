@@ -10,12 +10,14 @@ import {getAnalytics} from './dataGen-service';
 
 export const getListener = (eventName: string, element: HTMLElment, timeout: number = 10000): Promise => {
   let _resolve, listener;
-  const timer = new Promise((resolve, reject) => {
-    const id = setTimeout(() => {
-      clearTimeout(id);
-      reject('Test timed out waiting for event ' + eventName);
-    }, timeout);
-  });
+  const timer = timeout
+    ? new Promise((resolve, reject) => {
+      const id = setTimeout(() => {
+        clearTimeout(id);
+        reject('Test timed out waiting for event ' + eventName);
+      }, timeout);
+    })
+    : null;
   const promise = new Promise((resolve, reject) => {
     _resolve = resolve;
   });
@@ -24,7 +26,7 @@ export const getListener = (eventName: string, element: HTMLElment, timeout: num
     _resolve(e);
   }
   element.addEventListener(eventName, listener);
-  return Promise.race([ promise, timer ]);
+  return timeout ? Promise.race([ promise, timer ]) : promise;
 };
 
 export const randomIndex = (l: number): number => l ? (Math.round((l - 1) * Math.random())) : -1;
@@ -61,15 +63,18 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
   )
 });
 
-export async function checkAnalytics(assignmentId: string, verbs: string[], questions: string[]): Promise<boolean> {
+export async function checkAnalytics(assignmentId: string, expected: object[]): Promise<boolean> {
   const analytics = await getAnalytics({ assignment: { id: assignmentId } });
-  return verbs.length === analytics.length && analytics.every(
+  console.log(analytics, expected);
+  return expected.length === analytics.length && analytics.every(
     (analytic, i) =>
-      analytic.verb === verbs[i] &&
+      analytic.verb === expected[i].verb &&
+      analytic.course.id === expected[i].course.id &&
+      analytic.assignment.id === expected[i].assignment.id &&
     (
       analytic.verb === VerbType.STARTED ||
       analytic.verb === VerbType.SUBMITTED ||
-      questions.some(qId => qId === analytic.question.id)
+      analytic.question.id === expected[i].question.id
     )
   );
 }

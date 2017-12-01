@@ -1,9 +1,13 @@
 import {
+  AuthResult
+} from '../../../prendus.d';
+import {
   navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';
 
 class PrendusUnauthorizedModal extends Polymer.Element {
   open: boolean;
+  result: AuthResult;
 
   static get is() { return 'prendus-unauthorized-modal' }
 
@@ -13,24 +17,17 @@ class PrendusUnauthorizedModal extends Polymer.Element {
         type: Boolean,
         value: false,
       },
-      payed: {
-        type: Boolean,
-        value: false,
-      },
-      authenticated: {
-        type: Boolean,
-        value: false,
-      },
-      enrolled: {
-        type: Boolean,
-        value: false,
-      },
-      courseId: String,
+      result: {
+        type: Object,
+        value: () => ({
+          authenticated: false
+        })
+      }
     }
   }
 
   _pay(e: Event) {
-    navigate(`/course/${this.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.href}`)}`);
+    navigate(`/course/${this.result.courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.href}`)}`);
   }
 
   _authenticate(e: Event) {
@@ -41,8 +38,8 @@ class PrendusUnauthorizedModal extends Polymer.Element {
     navigate('/');
   }
 
-  _payMessage(authenticated: boolean, payed: boolean): boolean {
-    return authenticated && !payed;
+  _payMessage(result: AuthResult): boolean {
+    return result.authenticated && !result.payed;
   }
 
 }

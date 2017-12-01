@@ -30,7 +30,7 @@ class PrendusCarouselTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Carousel functionality', [dataArb], async (data: number[]) => {
+    test('User can carousel through data', [dataArb], async (data: number[]) => {
       const carousel = this.shadowRoot.querySelector('prendus-carousel');
       const setup = getListener(ITEMS_CHANGED, carousel)
       carousel.items = data;

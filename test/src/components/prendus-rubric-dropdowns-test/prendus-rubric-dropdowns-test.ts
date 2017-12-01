@@ -3,7 +3,7 @@ import {asyncMap} from '../../../../src/node_modules/prendus-shared/services/uti
 import {
   Rubric,
   CategoryScore
-} from '../../../../typings/index.d';
+} from '../../../../prendus.d';
 import {RubricArb} from '../../services/arbitraries-service';
 import {
   getListener,
@@ -15,6 +15,7 @@ import {
 import {PrendusRubricDropdowns} from '../../../../src/components/prendus-rubric-dropdowns/prendus-rubric-dropdowns';
 
 const jsc = require('jsverify');
+const rubricArb = jsc.nonshrink(RubricArb);
 
 class PrendusRubricDropdownsTest extends Polymer.Element {
 
@@ -37,7 +38,13 @@ class PrendusRubricDropdownsTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Dropdowns functionality', [jsc.nonshrink(RubricArb)], async (rubric: Rubric) => {
+    test('Dropdowns load correctly from rubric', [rubricArb], async (rubric: Rubric) => {
+      const dropdowns = await this.attachDropdowns(rubric);
+      const initial = initialScores(rubric);
+      return verifyDropdowns(initial, dropdowns);
+    });
+
+    test('User can score dropdowns', [rubricArb], async (rubric: Rubric) => {
       const dropdowns = await this.attachDropdowns(rubric);
       const initial = initialScores(rubric);
       if (!verifyDropdowns(initial, dropdowns))

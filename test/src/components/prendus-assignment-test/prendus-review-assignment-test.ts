@@ -9,6 +9,7 @@ import {
   ASSIGNMENT_LOADED,
   ASSIGNMENT_SUBMITTED,
   STATEMENT_SENT,
+  ASSIGNMENT_VALIDATION_ERROR,
   SCORES_CHANGED
 } from '../../../../src/services/constants-service';
 import {
@@ -56,39 +57,84 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
     };
   }
 
-  async cleaner(courseId) {
-    await deleteCourseArbitrary(courseId);
+  async setup(course: Course) {
+    const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
+    const author = await createTestUser('STUDENT', 'author');
+    const viewer = await createTestUser('STUDENT', 'viewer');
+    const instructor = await createTestUser('INSTRUCTOR');
+    const data = await saveArbitrary(
+      assignCourseUserIds(course, instructor.id, author.id),
+      'createCourse'
+    );
+    return {
+      reviewAssignment,
+      author,
+      viewer,
+      instructor,
+      data
+    };
+  }
+
+  async cleanup(data, author, viewer, instructor) {
+    await deleteCourseArbitrary(data.id);
+    await deleteTestUsers(author, viewer, instructor);
+  }
+
+  testOverAssignment(testFn) {
+    return async course => {
+      const { reviewAssignment, author, viewer, instructor, data } = await this.setup(course);
+      await authorizeTestUserOnCourse(viewer.id, data.id);
+      this.authenticate(viewer);
+      try {
+        const success = (await asyncMap(
+          data.assignments,
+          testFn(reviewAssignment, data.id)
+        )).every(result => result === true);
+        await this.cleanup(data, author, viewer, instructor);
+        return success;
+      } catch (e) {
+        console.error(e);
+        await this.cleanup(data, author, viewer, instructor);
+        return false;
+      }
+    }
   }
 
   prepareTests(test) {
 
-    test('Review assignment collects correct analytics', [courseArb], async (course: Course) => {
-      const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
-      const author = await createTestUser('STUDENT', 'author');
-      const viewer = await createTestUser('STUDENT', 'viewer');
-      const instructor = await createTestUser('INSTRUCTOR');
-      const data = await saveArbitrary(
-        assignCourseUserIds(course, instructor.id, author.id),
-        'createCourse'
-      );
-      await authorizeTestUserOnCourse(viewer.id, data.id);
-      this.authenticate(viewer);
-      const success = (await asyncMap(
-        data.assignments,
-        loadAndTestAssignment(reviewAssignment)
-      )).every(result => result === true);
-      await deleteCourseArbitrary(data.id);
-      await deleteTestUsers(author, viewer, instructor);
-      return success;
-    });
+    test('Loads correct assignment', [courseArb], this.testOverAssignment(verifyLoad));
+
+    test('Detects errors in rubric', [courseArb], this.testOverAssignment(verifyErrorCallback));
+
+    test('Review assignment collects correct analytics', [courseArb], this.testOverAssignment(verifyAnalytics));
 
   }
 
 }
 
-function loadAndTestAssignment(reviewAssignment) {
+function verifyLoad(reviewAssignment, courseId) {
   return async assignment => {
-    const setup = getListener(ASSIGNMENT_LOADED, reviewAssignment);
+    const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
+    const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+    const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
+    reviewAssignment.assignmentId = assignment.id;
+    await setup;
+    return verifyAssignment(assignment, reviewAssignment);
+  }
+}
+
+const analyticBuilder = (courseId, assignmentId) => (verb, question) => ({
+  verb,
+  question,
+  course: { id: courseId },
+  assignment: { id: assignmentId }
+});
+
+function verifyAnalytics(reviewAssignment, courseId) {
+  return async assignment => {
+    const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
     const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
     const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
     reviewAssignment.assignmentId = assignment.id;
@@ -96,27 +142,60 @@ function loadAndTestAssignment(reviewAssignment) {
     if (!verifyAssignment(assignment, reviewAssignment))
       return false;
     if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
-      return reviewAssignment.finished === true;
-    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, reviewAssignment);
-    const expect = await asyncMap(
+      return analytics.finished === true;
+    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const analytic = analyticBuilder(courseId, assignment.id);
+    const start = analytic(VerbType.STARTED, null);
+    const btn = analytic.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    await dropdownsSetup;
+    let i = 0;
+    const statements = await asyncMap(
       (new Array(reviewAssignment.assignment.numReviewQuestions)).fill(0),
       async _ => {
-        await dropdownsSetup;
         await scoreDropdowns(dropdowns);
-        const submitted = getListener(STATEMENT_SENT, reviewAssignment);
-        const btn = reviewAssignment.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+        const submitted = getListener(STATEMENT_SENT, analytic);
         btn.click();
         await submitted;
-        return VerbType.REVIEWED;
+        return analytic(VerbType.REVIEWED, analytic.items[i++]);
       }
     );
+    const end = analytic(VerbType.SUBMITTED, null);
     await assignmentFinished;
     const analyticsCorrect = await checkAnalytics(
       assignment.id,
-      [VerbType.STARTED, ...expect, VerbType.SUBMITTED],
-      reviewAssignment.questions.map(q => q.id)
+      [start, ...statements, end],
     );
-    return analyticsCorrect && reviewAssignment.finished === true;
+    return analyticsCorrect;
+  }
+}
+
+function verifyErrorCallback(reviewAssignment, courseId) {
+  return async assignment => {
+    const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
+    const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
+    const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
+    reviewAssignment.assignmentId = assignment.id;
+    await setup;
+    if (!verifyAssignment(assignment, reviewAssignment))
+      return false;
+    if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
+      return analytics.finished === true;
+    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const analytic = analyticBuilder(courseId, assignment.id);
+    const start = analytic(VerbType.STARTED, null);
+    const btn = analytic.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    await dropdownsSetup;
+    const first = analytic.item;
+    await asyncForEach(
+      (new Array(reviewAssignment.assignment.numReviewQuestions)).fill(0),
+      async _ => {
+        const error = getListener(ASSIGNMENT_VALIDATION_ERROR, analytic);
+        btn.click();
+        await error;
+      }
+    );
+    return first === analytic.item;
   }
 }
 

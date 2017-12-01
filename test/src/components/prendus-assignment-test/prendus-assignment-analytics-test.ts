@@ -21,12 +21,14 @@ import {
 import {
   getListener,
   assignCourseUserIds,
+  checkAnalytics
 } from '../../services/utilities-service';
 import {
   STATEMENT_SENT,
   ASSIGNMENT_LOADED,
   ASSIGNMENT_SUBMITTED
-  ASSIGNMENT_VALIDATION_ERROR
+  ASSIGNMENT_VALIDATION_ERROR,
+  VerbType
 } from '../../../../src/services/constants-service';
 
 const jsc = require('jsverify');
@@ -89,7 +91,7 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
       try {
         const success = (await asyncMap(
           data.assignments,
-          testFn(analytics)
+          testFn(analytics, data.id)
         )).every(result => result === true);
         await this.cleanup(data, author, viewer, instructor);
         return success;
@@ -105,11 +107,11 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
 
     test('Displays error message to unauthorized users', [courseArb], this.testOverAssignments(unauthorizedMessage, false, false));
 
-    test('Loads assignments with residual state', [courseArb], this.testOverAssignments(loadAssignment, true, false));
+    test('Loads data with load function', [courseArb], this.testOverAssignments(loadAssignment, true, false));
 
-    test('Calls error callback', [courseArb], this.testOverAssignments(errorCallback, true, true));
+    test('Checks for errors with error function', [courseArb], this.testOverAssignments(errorCallback, true, true));
 
-    test('Collects analytics', [courseArb], this.testOverAssignments(analytics, true, false));
+    test('Generates analytics with the submit function', [courseArb], this.testOverAssignments(analytics, true, false));
 
   }
 
@@ -141,7 +143,7 @@ function unauthorizedMessage(analytics): (assignment: Assignment) => Promise<boo
     const event = getListener('unauthorized', auth);
     analytics.assignmentId = assignment.id;
     await event;
-    const { items, unauthorized, authenticated, payed, enrolled } = analytics;
+    const { items, unauthorized, authResult: { authenticated, payed, enrolled } } = analytics;
     return items === undefined &&
       unauthorized === true &&
       authenticated === true &&
@@ -184,24 +186,38 @@ function errorCallback(analytics): (assignment: Assignment) => Promise<boolean> 
   }
 }
 
-function analytics(analytics): (assignment: Assignment) => Promise<boolean> {
+function analytics(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const event = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
     await event;
     const next = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
     let i = 0;
-    const success = (await asyncMap(
+    const analytic = (verb, question) => ({
+      course: { id: courseId },
+      assignment: { id: assignment.id },
+      verb,
+      question,
+    });
+    const finished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const start = analytic(VerbType.STARTED, null);
+    const statements = await asyncMap(
       analytics.items,
       async _ => {
-        if (analytics.item !== assignment.questions[i++])
-          return false;
+        if (analytics.item !== assignment.questions[i])
+          throw new Error('Wrong question in analytics assignment');
         const sent = getListener(STATEMENT_SENT, analytics);
         next.click();
         await sent;
-        return true;
+        return analytic('TEST', assignment.questions[i++]);
       }
-    )).every(result => result === true);
+    );
+    const submitted = analytic(VerbType.SUBMITTED, null);
+    const expected = assignment.questions.length
+      ? [start, ...statements, submitted]
+      : [];
+    await finished;
+    const success = await checkAnalytics(assignment.id, expected);
     return success;
   }
 }

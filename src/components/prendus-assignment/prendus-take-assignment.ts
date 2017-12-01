@@ -2,7 +2,9 @@ import {
   SetComponentPropertyAction,
   User,
   Question,
-  Assignment
+  Assignment,
+  AnalyticsAssignmentLoadResult,
+  AnalyticsAssignment
 } from '../../../prendus.d';
 import {
   createUUID,
@@ -20,16 +22,15 @@ import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusTakeAssignment extends Polymer.Element {
+class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignment {
   loaded: boolean = false;
   action: SetComponentPropertyAction;
   componentId: string;
   userToken: string;
   user: User;
   assignment: Assignment;
+  _assignment: AnalyticsAssignment;
   question: Question;
-  submit: (item: object) => Promise<string>;
-  load: (assignmentId: string) => Promise<object>;
 
   static get is() { return 'prendus-take-assignment' }
 
@@ -46,10 +47,10 @@ class PrendusTakeAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
+    this.action = fireLocalAction(this.componentId, '_assignment', this);
   }
 
-  async _load(assignmentId: string): Promise<object> {
+  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment.questions.length > assignment.numResponseQuestions
@@ -57,13 +58,16 @@ class PrendusTakeAssignment extends Polymer.Element {
       : [];
     return {
       title: assignment.title + ' Quiz Assignment',
-      courseId: assignment.course.id,
       items: questions,
       taken: assignment.taken.length
     };
   }
 
-  async _submit(question: Question): Promise<string> {
+  error(): null {
+    return null; //validation taken care of while saving response
+  }
+
+  async submit(question: Question): Promise<string> {
     return question.id;
   }
 
@@ -95,8 +99,8 @@ class PrendusTakeAssignment extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
+    this._assignment = componentState._assignment;
     this.question = componentState.question;
-    this.load = componentState.load;
     this.userToken = state.userToken;
     this.user = state.user;
   }
