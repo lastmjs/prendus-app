@@ -1,6 +1,7 @@
 import {
   User,
-  AnalyticsAssignment
+  AnalyticsAssignment,
+  AuthResult
 } from '../../../prendus.d';
 import {
   createUUID,
@@ -37,10 +38,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   userToken: string;
   loaded: boolean;
   unauthorized: boolean;
-  payed: boolean;
-  authenticated: boolean;
-  enrolled: boolean;
-  courseId: string;
+  authResult: AuthResult;
   assignmentId: string;
   assignment: AnalyticsAssignment;
   items: object[];
@@ -91,16 +89,12 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   }
 
   async _load(e: CustomEvent) {
-    const { authenticated, payed, enrolled, courseId } = e.detail;
-    this.action = fireLocalAction(this.componentId, 'authenticated', authenticated);
-    this.action = fireLocalAction(this.componentId, 'payed', payed);
-    this.action = fireLocalAction(this.componentId, 'enrolled', enrolled);
-    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
+    const { result } = e.detail;
+    this.action = fireLocalAction(this.componentId, 'authResult', result);
     this.action = fireLocalAction(this.componentId, 'unauthorized', false);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
     const { title, items, taken, error } = await this.assignment.load(this.assignmentId, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'title', title);
-    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
     this.action = fireLocalAction(this.componentId, 'items', items);
     if (taken)
       this.action = setNotification(DONE_MESSAGE, NotificationType.WARNING);
@@ -115,12 +109,9 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   }
 
   _unauthorized(e: CustomEvent) {
-    const { authenticated, payed, enrolled, courseId } = e.detail;
+    const { result } = e.detail;
     this.action = fireLocalAction(this.componentId, 'loaded', true);
-    this.action = fireLocalAction(this.componentId, 'authenticated', authenticated);
-    this.action = fireLocalAction(this.componentId, 'payed', payed);
-    this.action = fireLocalAction(this.componentId, 'enrolled', enrolled);
-    this.action = fireLocalAction(this.componentId, 'courseId', courseId);
+    this.action = fireLocalAction(this.componentId, 'authResult', result);
     this.action = fireLocalAction(this.componentId, 'unauthorized', true);
   }
 
@@ -168,7 +159,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     return sendStatement(this.userToken, {
       userId: this.user.id,
       assignmentId: this.assignmentId,
-      courseId: this.courseId,
+      courseId: this.authResult.courseId,
       questionId,
       verb
     });
@@ -178,12 +169,8 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     const { state } = e.detail;
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
-    this.authenticated = componentState.authenticated;
-    this.payed = componentState.payed;
-    this.enrolled = componentState.enrolled;
-    this.courseId = componentState.courseId;
+    this.authResult = componentState.authResult;
     this.unauthorized = componentState.unauthorized;
-    this.courseId = componentState.courseId;
     this.title = componentState.title;
     this.items = componentState.items;
     this.item = componentState.item;

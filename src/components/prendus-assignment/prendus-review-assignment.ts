@@ -5,6 +5,8 @@ import {
   SetComponentPropertyAction,
   SetPropertyAction,
   Assignment,
+  AnalyticsAssignment,
+  AnalyticsAssignmentLoadResult,
 } from '../../../prendus.d';
 import {
   createUUID,
@@ -28,20 +30,18 @@ import {
   setNotification,
 } from '../../redux/actions';
 
-class PrendusReviewAssignment extends Polymer.Element {
+class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssignment {
   action: SetComponentPropertyAction;
   user: User;
   userToken: string;
   assignmentId: string;
   assignment: Assignment;
+  _assignment: AnalyticsAssignment;
   question: Question;
   ratings: CategoryScore[];
   essayType: boolean;
   evaluationRubric: Rubric;
   gradingRubric: Rubric;
-  submit: (item: object) => Promise<string>;
-  error: () => string;
-  load: (assignmentId: string) => Promise<object>;
 
   static get is() { return 'prendus-review-assignment' }
 
@@ -72,9 +72,7 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
-    this.action = fireLocalAction(this.componentId, 'submit', this._submit.bind(this));
-    this.action = fireLocalAction(this.componentId, 'error', this._error.bind(this));
+    this.action = fireLocalAction(this.componentId, '_assignment', this);
   }
 
   _computeEssayType(assignment: Assignment): boolean {
@@ -91,7 +89,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  async _load(assignmentId: string) {
+  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
@@ -99,13 +97,12 @@ class PrendusReviewAssignment extends Polymer.Element {
       : [];
     return {
       title: assignment.title + ' Review Assignment',
-      courseId: assignment.course.id,
       items: questions,
       taken: assignment.rated.length > 0
     }
   }
 
-  _error() {
+  error(): string | null {
     if (!this.ratings || !this.evaluationRubric)
       return 'Prendus error, ratings or rubric was undefined';
     if (this.ratings.length !== Object.keys(this.evaluationRubric).length)
@@ -115,7 +112,7 @@ class PrendusReviewAssignment extends Polymer.Element {
     return null;
   }
 
-  async _submit(question: Question) {
+  async submit(question: Question): Promise<string> {
     await submit(question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
     return question.id;
   }
@@ -137,11 +134,9 @@ class PrendusReviewAssignment extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
+    this._assignment = componentState._assignment;
     this.question = componentState.question;
     this.ratings = componentState.ratings;
-    this.load = componentState.load;
-    this.submit = componentState.submit;
-    this.error = componentState.error;
     this.user = state.user;
     this.userToken = state.userToken;
   }

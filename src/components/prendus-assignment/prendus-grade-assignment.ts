@@ -3,7 +3,9 @@ import {
   User,
   UserEssay,
   Rubric,
-  Assignment
+  Assignment,
+  AnalyticsAssignment,
+  AnalyticsAssignmentLoadResult
 } from '../../../prendus.d';
 import {
   createUUID,
@@ -26,7 +28,7 @@ import {
   extractVariables
 } from '../../services/code-to-question-service';
 
-class PrendusGradeAssignment extends Polymer.Element {
+class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignment {
   loaded: boolean = false;
   action: SetComponentPropertyAction;
   componentId: string;
@@ -35,9 +37,6 @@ class PrendusGradeAssignment extends Polymer.Element {
   assignmentId: string;
   rubric: Rubric;
   response: UserEssay;
-  submit: (item: object) => Promise<string>;
-  error: () => string;
-  load: (assignmentId: string) => Promise<object>;
 
   static get is() { return 'prendus-grade-assignment' }
 
@@ -58,9 +57,7 @@ class PrendusGradeAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
-    this.action = fireLocalAction(this.componentId, 'submit', this._submit.bind(this));
-    this.action = fireLocalAction(this.componentId, 'error', this._error.bind(this));
+    this.action = fireLocalAction(this.componentId, 'assignment', this);
   }
 
   _computeRubric(response: UserEssay): Rubric | null {
@@ -68,20 +65,19 @@ class PrendusGradeAssignment extends Polymer.Element {
     return parseRubric(response.questionResponse.question.code);
   }
 
-  async _load(assignmentId: string): Promise<object> {
+  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const data = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     const { assignment, essays } = data;
     const random = randomWithUngradedFirst(essays, assignment.numGradeResponses);
     const responses = random.length >= assignment.numGradeResponses ? random : [];
     return {
       title: assignment.title + ' Grade Assignment',
-      courseId: assignment.course.id,
       items: responses,
       taken: assignment.graded.length
     };
   }
 
-  _error(): string {
+  error(): string {
     if (!this.grades || !this.rubric)
       return 'Prendus error, grades or rubric were undefined';
     if (this.grades.length !== Object.keys(this.rubric).length)
@@ -90,7 +86,7 @@ class PrendusGradeAssignment extends Polymer.Element {
       return 'You must rate each category';
   }
 
-  async _submit(response: UserEssay): Promise<string> {
+  async submit(response: UserEssay): Promise<string> {
     await submit(this.grades, response.questionResponse.id, this.user.id);
     return response.questionResponse.question.id;
   }
@@ -113,9 +109,7 @@ class PrendusGradeAssignment extends Polymer.Element {
     this.loaded = componentState.loaded;
     this.response = componentState.response;
     this.grades = componentState.grades;
-    this.load = componentState.load;
-    this.submit = componentState.submit;
-    this.error = componentState.error;
+    this.assignment = componentState.assignment;
     this.userToken = state.userToken;
     this.user = state.user;
   }

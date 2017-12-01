@@ -1,4 +1,11 @@
 import {
+  User,
+  Assignment,
+  AnalyticsAssignment,
+  AnalyticsAssignmentLoadResult,
+  Question
+} from '../../../prendus.d';
+import {
   createUUID,
   fireLocalAction
 } from '../../node_modules/prendus-shared/services/utilities-service';
@@ -13,7 +20,7 @@ import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusCreateAssignment extends Polymer.Element {
+class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssignment {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
@@ -21,8 +28,7 @@ class PrendusCreateAssignment extends Polymer.Element {
   question: number; //index
   questions: string[]; //ids of created questions
   userToken: string;
-  submit: (item: object) => Promise<string>;
-  load: (assignmentId: string) => Promise<object>;
+  _assignment: AnalyticsAssignment;
 
   static get is() { return 'prendus-create-assignment' }
 
@@ -39,20 +45,22 @@ class PrendusCreateAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'load', this._load.bind(this));
-    this.action = fireLocalAction(this.componentId, 'submit', this._submit.bind(this));
+    this.action = fireLocalAction(this.componentId, '_assignment', this);
   }
 
-  async _load(assignmentId: string): Promise<string> {
+  async _load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = (new Array(assignment.numCreateQuestions)).fill(null).map((_, i) => i);
     return {
       title: assignment.title + ' Create Assignment',
-      courseId: assignment.course.id,
       items: questions,
       taken: false,
     };
+  }
+
+  error(): null {
+    return null; //validation handled by scaffolds
   }
 
   async _submit(i: number): Promise<string> {
@@ -89,6 +97,7 @@ class PrendusCreateAssignment extends Polymer.Element {
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
+    this._assignment = componentState._assignment;
     this.question = componentState.question;
     this.questions = componentState.questions;
     this.load = componentState.load;
