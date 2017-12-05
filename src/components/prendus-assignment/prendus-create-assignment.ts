@@ -48,7 +48,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
     this.action = fireLocalAction(this.componentId, '_assignment', this);
   }
 
-  async _load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = (new Array(assignment.numCreateQuestions)).fill(null).map((_, i) => i);
@@ -63,7 +63,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
     return null; //validation handled by scaffolds
   }
 
-  async _submit(i: number): Promise<string> {
+  async submitItem(i: number): Promise<string> {
     return this.questions[i];
   }
 
@@ -75,9 +75,9 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
     const { question } = e.detail;
     const save = question.conceptId ? saveQuestion : saveQuestionAndConcept;
     const questionId = await save(question, this.userToken, this._handleGQLError.bind(this));
-    const questions = [ ...this.questions, questionId ];
+    const questions = [ ...(this.questions || []), questionId ];
     this.action = fireLocalAction(this.componentId, 'questions', questions);
-    this.shadowRoot.querySelector('#carousel')._notifyNext(); //This call will be unnecessary when the create assignment uses the editor
+    this.shadowRoot.querySelector('#analytics').shadowRoot.querySelector('#carousel')._notifyNext(); //This call will be unnecessary when the create assignment uses the editor
   }
 
   isEssayType(questionType: string): boolean {
@@ -107,7 +107,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
 
 }
 
-async function loadAssignment(assignmentId: string, userToken: string, handleError: (err: any) => void): Promise<Assignment> {
+async function loadAssignment(assignmentId: string, userToken: string, handleError): Promise<Assignment> {
   const data = await GQLRequest(`query getAssignment($assignmentId: ID!) {
     Assignment(id: $assignmentId) {
       id
@@ -131,7 +131,7 @@ async function loadAssignment(assignmentId: string, userToken: string, handleErr
   return data.Assignment;
 }
 
-async saveQuestion(variables: object, userToken: string, handleError: (err: any) => void): Promise<string> {
+async function saveQuestion(variables: object, userToken: string, handleError): Promise<string> {
   const data = await GQLRequest(`mutation newQuestion(
     $authorId: ID!,
     $conceptId: ID!
@@ -158,7 +158,7 @@ async saveQuestion(variables: object, userToken: string, handleError: (err: any)
   return data.createQuestion.id;
 }
 
-async saveQuestionAndConcept(variables: object, userToken: string, handleError: (err: any) => void): Promise<string> {
+async function saveQuestionAndConcept(variables: object, userToken: string, handleError): Promise<string> {
   const data = await GQLRequest(`mutation newQuestion(
     $authorId: ID!,
     $concept: QuestionconceptConcept!,

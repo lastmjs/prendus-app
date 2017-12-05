@@ -58,13 +58,18 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
       const data = await getAuthorizationData(userId, assignmentId, userToken);
       if (!data || !data.user || !data.assignment || !data.assignment.course)
         this.action = setNotification('Authorization error', NotificationType.ERROR);
-      else
+      else {
+        const courseId = data.assignment.course.id;
+        const owner = data.user.ownedCourses.some(c => c.id === courseId);
+        const payed = owner || data.user.purchases.some(p => p.course.id === data.assignment.course.id);
+        const enrolled = owner || data.user.enrolledCourses.some(c => c.id === data.assignment.course.id);
         this.action = fireLocalAction(this.componentId, 'result', {
           authenticated: true,
-          payed: data.user.purchases.some(p => p.course.id === data.assignment.course.id),
-          enrolled: data.user.enrolledCourses.some(c => c.id === data.assignment.course.id)
-          courseId: data.assignment.course.id
+          payed,
+          enrolled,
+          courseId
         });
+      }
     }
   }
 
@@ -93,6 +98,9 @@ function getAuthorizationData(userId: string, assignmentId: string, userToken: s
       }
       user: User(id: $userId) {
         enrolledCourses {
+          id
+        }
+        ownedCourses {
           id
         }
         purchases {

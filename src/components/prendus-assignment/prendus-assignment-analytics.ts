@@ -93,7 +93,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'authResult', result);
     this.action = fireLocalAction(this.componentId, 'unauthorized', false);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const { title, items, taken, error } = await this.assignment.load(this.assignmentId, this.user.id, this.userToken);
+    const { title, items, taken, error } = await this.assignment.loadItems(this.assignmentId, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'title', title);
     this.action = fireLocalAction(this.componentId, 'items', items);
     if (taken)
@@ -123,7 +123,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
       this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       return;
     }
-    const questionId = await this.assignment.submit(this.item);
+    const questionId = await this.assignment.submitItem(this.item);
     await this._sendStatement(this.verb, questionId);
     this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     this.shadowRoot.querySelector('#carousel').next();
@@ -163,6 +163,10 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
       questionId,
       verb
     });
+  }
+
+  _message(finished: boolean, unauthorized: boolean): boolean {
+    return finished && !unauthorized;
   }
 
   stateChange(e: CustomEvent) {

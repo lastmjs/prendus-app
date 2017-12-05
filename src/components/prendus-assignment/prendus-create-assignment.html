@@ -3,9 +3,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html">
 <link rel="import" href="../prendus-scaffold/prendus-multiple-choice-scaffold.html">
-<link rel="import" href="../prendus-carousel/prendus-carousel.html">
-<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="prendus-assignment-analytics.html">
 
 <dom-module id="prendus-create-assignment">
 
@@ -15,22 +13,19 @@
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
     <prendus-assignment-analytics
+      id="analytics"
       assignment-id="[[assignmentId]]"
       assignment="[[_assignment]]"
       verb="CREATED"
       on-item-changed="_question"
     >
       <div slot="assignment">
-        <dom-if if="[[isEssayType(assignment.questionType)]]">
-          <template>
-            <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
-          </template>
-        </dom-if>
-        <dom-if if="[[isMultipleChoiceType(assignment.questionType)]]">
-          <template>
-            <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
-          </template>
-        </dom-if>
+        <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
+          <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
+        </div>
+        <div hidden$="[[isEssayType(assignment.questionType)]]">
+          <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
+        </div>
       </div>
     </prendus-assignment-analytics>
   </template>

@@ -23,6 +23,12 @@ export const enum QuestionType {
   ESSAY,
 }
 
+export const enum AnswerTypes {
+  MultipleChoice,
+  MultipleResponse,
+  FillInTheBlank
+}
+
 export interface User {
   readonly id: string;
   readonly createdAt: Date;
@@ -303,7 +309,7 @@ export interface AnalyticsAssignmentLoadResult {
 }
 
 export interface AnalyticsAssignment {
-  load(assignmentId: string): AnalyticsAssignmentLoadResult;
+  loadItems(assignmentId: string): AnalyticsAssignmentLoadResult;
   error(): string | null;
-  submit(item: object): string;
+  submitItem(item: object): string;
 }

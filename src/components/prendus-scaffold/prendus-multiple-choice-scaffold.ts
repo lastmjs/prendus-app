@@ -1,3 +1,8 @@
+import {
+  SetPropertyAction,
+  SetComponentPropertyAction,
+  AnswerTypes
+} from '../../prendus.d';
 import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
 import {NotificationType} from '../../services/constants-service';
@@ -155,9 +160,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     const mChoice = (choice, comment, correct) => {
       const text = choice ? choice.text : '';
       const picture = choice ? choice.picture : null;
-      return {text, comment, correct, picture, type: AnswerTypes.MultipleChoice}
+      return {text, comment, correct, picture, type: AnswerTypes.MultipleChoice};
     };
-    return [mChoice(answer, hints ? hints[0] : '', true), ...(distractors || []).map((distractor, i) => mChoice(distractor, (hints ? hints[i+1]: ''), false))];
+    return [mChoice(answer, (hints ? hints[0] : ''), true), ...(distractors || []).map((distractor, i) => mChoice(distractor, (hints ? hints[i+1]: ''), false))];
   }
 
   showNext(i: number): boolean {
