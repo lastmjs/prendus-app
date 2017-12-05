@@ -35,6 +35,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
   userToken: string;
   user: User;
   assignmentId: string;
+  assignment: AnalyticsAssignment;
   rubric: Rubric;
   response: UserEssay;
 

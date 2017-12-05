@@ -26,6 +26,7 @@ import {
   getListener,
   assignCourseUserIds,
   checkAnalytics,
+  analyticBuilder,
 } from '../../services/utilities-service';
 
 const jsc = require('jsverify');
@@ -54,62 +55,127 @@ class PrendusTakeAssignmentTest extends Polymer.Element {
     };
   }
 
+  async setup(course: Course) {
+    const takeAssignment = this.shadowRoot.querySelector('prendus-take-assignment');
+    const author = await createTestUser('STUDENT', 'author');
+    const viewer = await createTestUser('STUDENT', 'viewer');
+    const instructor = await createTestUser('INSTRUCTOR');
+    const data = await saveArbitrary(
+      assignCourseUserIds(course, instructor.id, author.id),
+      'createCourse'
+    );
+    return {
+      takeAssignment,
+      author,
+      viewer,
+      instructor,
+      data
+    };
+  }
+
+  async cleanup(data, author, viewer, instructor) {
+    await deleteCourseArbitrary(data.id);
+    await deleteTestUsers(author, viewer, instructor);
+  }
+
+  testOverAssignment(testFn) {
+    return async course => {
+      const { takeAssignment, author, viewer, instructor, data } = await this.setup(course);
+      await authorizeTestUserOnCourse(viewer.id, data.id);
+      this.authenticate(viewer);
+      try {
+        const success = (await asyncMap(
+          data.assignments,
+          testFn(takeAssignment, data.id)
+        )).every(result => result === true);
+        await this.cleanup(data, author, viewer, instructor);
+        return success;
+      } catch (e) {
+        console.error(e);
+        await this.cleanup(data, author, viewer, instructor);
+        return false;
+      }
+    }
+  }
+
   prepareTests(test) {
 
-    test('Take assignment collects correct analytics', [courseArb], async (course: Course) => {
-      const takeAssignment = this.shadowRoot.querySelector('prendus-take-assignment');
-      const author = await createTestUser('STUDENT', 'author');
-      const viewer = await createTestUser('STUDENT', 'viewer');
-      const instructor = await createTestUser('INSTRUCTOR');
-      this.authenticate(viewer);
-      const data = await saveArbitrary(
-        assignCourseUserIds(course, instructor.id, author.id),
-        'createCourse'
-      );
-      await authorizeTestUserOnCourse(viewer.id, data.id);
-      console.log('done authorizing student');
-      const success = (await asyncMap(
-        data.assignments,
-        loadAndTestAssignment(takeAssignment)
-      )).every(result => result === true);
-      await deleteCourseArbitrary(data.id);
-      await deleteTestUsers(author, viewer, instructor);
-      return success;
-    });
+    test('Quiz assignment loads correct assignment', [courseArb], this.testOverAssignment(verifyLoad));
+
+    test('Quiz assignment detects errors in rubric', [courseArb], this.testOverAssignment(verifyErrorCallback));
+
+    test('Quiz assignment collects correct analytics', [courseArb], this.testOverAssignment(verifyAnalytics));
 
   }
 
 }
 
-function loadAndTestAssignment(takeAssignment) {
+function verifyLoad(takeAssignment, courseId) {
   return async assignment => {
-    console.log('setting assignment');
-    const setup = getListener(ASSIGNMENT_LOADED, takeAssignment);
-    const finished = getListener(ASSIGNMENT_SUBMITTED, takeAssignment);
+    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
     takeAssignment.assignmentId = assignment.id;
     await setup;
-    console.log('assignment loaded');
+    return verifyAssignment(assignment, takeAssignment);
+  }
+}
+
+function verifyAnalytics(takeAssignment, courseId) {
+  return async assignment => {
+    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
+    takeAssignment.assignmentId = assignment.id;
+    await setup;
     if (!verifyAssignment(assignment, takeAssignment))
       return false;
-    console.log('assignment id matches');
-    if (assignment.questions.length < takeAssignment.assignment.numResponseQuestions)
-      return takeAssignment.finished === true;
-    console.log('starting integration test');
-    const expect = await asyncMap(
-      (new Array(takeAssignment.assignment.numResponseQuestions)).fill(0),
+    if (assignment.questions.length < takeAssignment.assignment.numReviewQuestions)
+      return analytics.finished === true;
+    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const analytic = analyticBuilder(courseId, assignment.id);
+    const start = analytic(VerbType.STARTED, null);
+    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    let i = 0;
+    const statements = await asyncMap(
+      (new Array(takeAssignment.assignment.numReviewQuestions)).fill(0),
       async _ => {
-        console.log(
-          takeAssignment
-          .shadowRoot.querySelector('prendus-flaggable-question')
-          .shadowRoot.querySelector('prendus-view-question')
-          .shadowRoot.querySelector('#contentDiv')
-        )
-        return VerbType.RESPONDED;
+        await scoreDropdowns(dropdowns);
+        const submitted = getListener(STATEMENT_SENT, analytic);
+        btn.click();
+        await submitted;
+        return analytic(VerbType.RESPONDED, analytic.items[i++]);
       }
     );
-    await finished;
-    const analyticsCorrect = await checkAnalytics(assignment.id, [VerbType.STARTED, ...expect, VerbType.SUBMITTED]);
-    return analyticsCorrect && takeAssignment.finished === true;
+    const end = analytic(VerbType.SUBMITTED, null);
+    await assignmentFinished;
+    const analyticsCorrect = await checkAnalytics(
+      assignment.id,
+      [start, ...statements, end],
+    );
+    return analyticsCorrect;
+  }
+}
+
+function verifyErrorCallback(takeAssignment, courseId) {
+  return async assignment => {
+    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const setup = getListener(ASSIGNMENT_LOADED, analytics);
+    takeAssignment.assignmentId = assignment.id;
+    await setup;
+    if (!verifyAssignment(assignment, takeAssignment))
+      return false;
+    if (assignment.questions.length < takeAssignment.assignment.numResponseQuestions)
+      return analytics.finished === true;
+    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    const first = analytic.item;
+    await asyncForEach(
+      (new Array(takeAssignment.assignment.numReviewQuestions)).fill(0),
+      async _ => {
+        const error = getListener(ASSIGNMENT_VALIDATION_ERROR, analytic);
+        btn.click();
+        await error;
+      }
+    );
+    return first === analytic.item && analytic.finished === false && takeAssignment.question === first;
   }
 }
 

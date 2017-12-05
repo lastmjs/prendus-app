@@ -93,3 +93,10 @@ export async function scoreDropdowns(dropdowns): Promise {
   );
 }
 
+export const analyticBuilder = (courseId, assignmentId) => (verb, question) => ({
+  verb,
+  question,
+  course: { id: courseId },
+  assignment: { id: assignmentId }
+});
+

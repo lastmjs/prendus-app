@@ -29,6 +29,7 @@ import {
   assignCourseUserIds,
   checkAnalytics,
   scoreDropdowns,
+  analyticBuilder
 } from '../../services/utilities-service';
 
 const jsc = require('jsverify');
@@ -102,9 +103,9 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Loads correct assignment', [courseArb], this.testOverAssignment(verifyLoad));
+    test('Review assignment loads correct assignment', [courseArb], this.testOverAssignment(verifyLoad));
 
-    test('Detects errors in rubric', [courseArb], this.testOverAssignment(verifyErrorCallback));
+    test('Review assignment detects errors in rubric', [courseArb], this.testOverAssignment(verifyErrorCallback));
 
     test('Review assignment collects correct analytics', [courseArb], this.testOverAssignment(verifyAnalytics));
 
@@ -116,20 +117,11 @@ function verifyLoad(reviewAssignment, courseId) {
   return async assignment => {
     const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
-    const dropdowns = reviewAssignment.shadowRoot.querySelector('prendus-rubric-dropdowns');
-    const dropdownsSetup = getListener(SCORES_CHANGED, dropdowns);
     reviewAssignment.assignmentId = assignment.id;
     await setup;
     return verifyAssignment(assignment, reviewAssignment);
   }
 }
-
-const analyticBuilder = (courseId, assignmentId) => (verb, question) => ({
-  verb,
-  question,
-  course: { id: courseId },
-  assignment: { id: assignmentId }
-});
 
 function verifyAnalytics(reviewAssignment, courseId) {
   return async assignment => {
@@ -146,7 +138,7 @@ function verifyAnalytics(reviewAssignment, courseId) {
     const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
     const analytic = analyticBuilder(courseId, assignment.id);
     const start = analytic(VerbType.STARTED, null);
-    const btn = analytic.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
     await dropdownsSetup;
     let i = 0;
     const statements = await asyncMap(
@@ -181,10 +173,7 @@ function verifyErrorCallback(reviewAssignment, courseId) {
       return false;
     if (assignment.questions.length < reviewAssignment.assignment.numReviewQuestions)
       return analytics.finished === true;
-    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
-    const analytic = analyticBuilder(courseId, assignment.id);
-    const start = analytic(VerbType.STARTED, null);
-    const btn = analytic.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
+    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
     await dropdownsSetup;
     const first = analytic.item;
     await asyncForEach(
@@ -195,7 +184,7 @@ function verifyErrorCallback(reviewAssignment, courseId) {
         await error;
       }
     );
-    return first === analytic.item;
+    return first === analytic.item && analytic.finished === false && reviewAssignment.question === first;
   }
 }
 
