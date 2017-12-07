@@ -65,13 +65,21 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
         }
       },
       verb: String,
+      item: {
+        type: Object,
+        notify: true
+      },
       label: {
         type: String,
         value: 'Question'
       },
-      item: {
-        type: Object,
-        notify: true
+      hideBack: {
+        type: Boolean,
+        value: false
+      },
+      hideNext: {
+        type: Boolean,
+        value: false
       }
     }
   }
@@ -93,7 +101,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'authResult', result);
     this.action = fireLocalAction(this.componentId, 'unauthorized', false);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const { title, items, taken, error } = await this.assignment.loadItems(this.assignmentId, this.user.id, this.userToken);
+    const { title, items, taken, error } = await this.assignment.loadItems(this.assignmentId);
     this.action = fireLocalAction(this.componentId, 'title', title);
     this.action = fireLocalAction(this.componentId, 'items', items);
     if (taken)

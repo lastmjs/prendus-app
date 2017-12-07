@@ -12,16 +12,14 @@ import {
 } from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 import {CourseArb} from '../../services/arbitraries-service';
 import {
-  saveArbitrary,
-  deleteCourseArbitrary,
-  createTestUser,
-  deleteTestUsers,
+  setupTestCourse,
+  cleanupTestCourse,
   authorizeTestUserOnCourse
 } from '../../services/dataGen-service';
 import {
   getListener,
-  assignCourseUserIds,
-  checkAnalytics
+  checkAnalytics,
+  analyticBuilder
 } from '../../services/utilities-service';
 import {
   STATEMENT_SENT,
@@ -58,32 +56,10 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
     };
   }
 
-  async setup(course: Course) {
-    const analytics = this.shadowRoot.querySelector('prendus-assignment-analytics');
-    const author = await createTestUser('STUDENT', 'author');
-    const viewer = await createTestUser('STUDENT', 'viewer');
-    const instructor = await createTestUser('INSTRUCTOR');
-    const data = await saveArbitrary(
-      assignCourseUserIds(course, instructor.id, author.id),
-      'createCourse'
-    );
-    return {
-      analytics,
-      author,
-      viewer,
-      instructor,
-      data
-    }
-  }
-
-  async cleanup(data, author, viewer, instructor) {
-    await deleteCourseArbitrary(data.id);
-    await deleteTestUsers(author, viewer, instructor);
-  }
-
   testOverAssignments(testFn, authorize: boolean, error: boolean) {
     return async course => {
-      const { analytics, author, viewer, instructor, data } = await this.setup(course);
+      const analytics = this.shadowRoot.querySelector('prendus-assignment-analytics');
+      const { author, viewer, instructor, data } = await setupTestCourse(course);
       if (authorize)
         await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
@@ -93,11 +69,11 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
           data.assignments,
           testFn(analytics, data.id)
         )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return success;
       } catch(e) {
         console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return false;
       }
     }
@@ -105,13 +81,13 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Displays error message to unauthorized users', [courseArb], this.testOverAssignments(unauthorizedMessage, false, false));
+    test('Displays error message to unauthorized users', [courseArb], this.testOverAssignments(testUnauthorizedMessage, false, false));
 
-    test('Loads data with load function', [courseArb], this.testOverAssignments(loadAssignment, true, false));
+    test('Loads data with load function', [courseArb], this.testOverAssignments(testLoadItems, true, false));
 
-    test('Checks for errors with error function', [courseArb], this.testOverAssignments(errorCallback, true, true));
+    test('Checks for errors with error function', [courseArb], this.testOverAssignments(testError, true, true));
 
-    test('Generates analytics with the submit function', [courseArb], this.testOverAssignments(analytics, true, false));
+    test('Generates analytics with the submit function', [courseArb], this.testOverAssignments(testSubmitItem, true, false));
 
   }
 
@@ -137,7 +113,7 @@ function getAnalyticsAssignment(course: Course, error: boolean): AnalyticsAssign
   };
 }
 
-function unauthorizedMessage(analytics): (assignment: Assignment) => Promise<boolean> {
+function testUnauthorizedMessage(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const auth = analytics.shadowRoot.querySelector('prendus-assignment-authorization');
     const event = getListener('unauthorized', auth);
@@ -153,7 +129,7 @@ function unauthorizedMessage(analytics): (assignment: Assignment) => Promise<boo
 }
 
 
-function loadAssignment(analytics): (assignment: Assignment) => Promise<boolean> {
+function testLoadItems(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const event = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
@@ -167,7 +143,7 @@ function loadAssignment(analytics): (assignment: Assignment) => Promise<boolean>
   }
 }
 
-function errorCallback(analytics): (assignment: Assignment) => Promise<boolean> {
+function testError(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const event = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
@@ -182,23 +158,18 @@ function errorCallback(analytics): (assignment: Assignment) => Promise<boolean> 
         await error;
       }
     );
-    return first === analytics.item;
+    return first === analytics.item && analytics.finished === (analytics.items.length === 0);
   }
 }
 
-function analytics(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
+function testSubmitItem(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
     const event = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
     await event;
     const next = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
     let i = 0;
-    const analytic = (verb, question) => ({
-      course: { id: courseId },
-      assignment: { id: assignment.id },
-      verb,
-      question,
-    });
+    const analytic = analyticBuilder(courseId, assignmentId);
     const finished = getListener(ASSIGNMENT_SUBMITTED, analytics);
     const start = analytic(VerbType.STARTED, null);
     const statements = await asyncMap(
@@ -218,7 +189,7 @@ function analytics(analytics, courseId: string): (assignment: Assignment) => Pro
       : [];
     await finished;
     const success = await checkAnalytics(assignment.id, expected);
-    return success;
+    return success && analytics.finished === true;
   }
 }
 

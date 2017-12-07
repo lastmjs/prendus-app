@@ -9,19 +9,15 @@ import {
 } from '../../../../src/services/constants-service';
 import {
   asyncMap,
-  asyncForEach
 } from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 import {CourseArb} from '../../services/arbitraries-service';
 import {
-  saveArbitrary,
-  deleteCourseArbitrary,
-  createTestUser,
-  deleteTestUsers,
+  setupTestCourse,
+  cleanupTestCourse,
   authorizeTestUserOnCourse
 } from '../../services/dataGen-service';
 import {
   getListener,
-  assignCourseUserIds,
 } from '../../services/utilities-service';
 
 const jsc = require('jsverify');
@@ -50,32 +46,10 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
     };
   }
 
-  async setup(course: Course) {
-    const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
-    const author = await createTestUser('STUDENT', 'author');
-    const viewer = await createTestUser('STUDENT', 'viewer');
-    const instructor = await createTestUser('INSTRUCTOR');
-    const data = await saveArbitrary(
-      assignCourseUserIds(course, instructor.id, author.id),
-      'createCourse'
-    );
-    return {
-      reviewAssignment,
-      author,
-      viewer,
-      instructor,
-      data
-    };
-  }
-
-  async cleanup(data, author, viewer, instructor) {
-    await deleteCourseArbitrary(data.id);
-    await deleteTestUsers(author, viewer, instructor);
-  }
-
   testOverAssignment(testFn) {
     return async course => {
-      const { reviewAssignment, author, viewer, instructor, data } = await this.setup(course);
+      const reviewAssignment = this.shadowRoot.querySelector('prendus-review-assignment');
+      const { author, viewer, instructor, data } = await setupTestCourse(course);
       await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
       try {
@@ -83,11 +57,11 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
           data.assignments,
           testFn(reviewAssignment)
         )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return success;
       } catch (e) {
         console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return false;
       }
     }

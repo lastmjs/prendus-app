@@ -2,6 +2,7 @@ import {
   User,
   Course
 } from '../../../../src/typings/index.d';
+import {assignCourseUserIds} from './utilities-service';
 import {schema} from '../graphcool/testSchema';
 import {GQLRequest} from '../../../../src/node_modules/prendus-shared/services/graphql-service';
 
@@ -295,6 +296,27 @@ export async function getAnalytics(filter: object): Promise<object> {
     }
   `, {filter}, AUTH_TOKEN, handleError);
   return data.allPrendusAnalyticses;
+}
+
+export async function setupTestCourse(course): Promise<object> {
+  const author = await createTestUser('STUDENT', 'author');
+  const viewer = await createTestUser('STUDENT', 'viewer');
+  const instructor = await createTestUser('INSTRUCTOR');
+  const data = await saveArbitrary(
+    assignCourseUserIds(course, instructor.id, author.id),
+    'createCourse'
+  );
+  return {
+    author,
+    viewer,
+    instructor,
+    data
+  }
+}
+
+export async function cleanupTestCourse(data, author, viewer, instructor) {
+  await deleteCourseArbitrary(data.id);
+  await deleteTestUsers(author, viewer, instructor);
 }
 
 function handleError(err: any) {
