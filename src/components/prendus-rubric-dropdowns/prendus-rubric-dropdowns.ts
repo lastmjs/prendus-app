@@ -1,7 +1,7 @@
 import {
   SetComponentPropertyAction,
   Rubric,
-  CategoryScore
+  CategoryScore,
 } from '../../prendus.d';
 import {
   createUUID,

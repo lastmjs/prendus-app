@@ -6,7 +6,7 @@ import {
   VerbType,
 } from '../../../src/services/constants-service';
 import {asyncForEach} from '../../../src/node_modules/prendus-shared/services/utilities-service';
-import {getAnalytics} from './dataGen-service';
+import {getAnalytics} from './mock-data-service';
 
 export const getListener = (eventName: string, element: HTMLElment, timeout: number = 10000): Promise => {
   let _resolve, listener;

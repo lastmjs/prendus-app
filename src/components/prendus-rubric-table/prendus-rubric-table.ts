@@ -3,6 +3,8 @@ import {
   SetPropertyAction,
   User,
   Rubric,
+  EditableRubricScale,
+  EditableRubricCategory,
 } from '../../prendus.d';
 import {
   createUUID,
@@ -16,7 +18,7 @@ class PrendusRubricTable extends Polymer.Element {
   action: SetComponentPropertyAction;
   componentId: string;
   editable: boolean;
-  categories: object[];
+  categories: EditableRubricCategory[];
   rubric: Rubric;
 
   static get is() { return 'prendus-rubric-table' }
@@ -160,7 +162,7 @@ class PrendusRubricTable extends Polymer.Element {
 
   //Keeping these in class to use in testing. I am keeping the tests tightly coupled with the implementation of these private
   //methods because it makes maintaining the tests easier and makes it simple to fully simulate the usage of this component
-  _setOptionProp(categories: object[], categoryIndex: number, optionIndex: number, prop: string, value: any): object[] {
+  _setOptionProp(categories: EditableRubricCategory[], categoryIndex: number, optionIndex: number, prop: string, value: any): object[] {
     return categories.map((category, i) =>
       i === categoryIndex
         ? {
@@ -175,14 +177,14 @@ class PrendusRubricTable extends Polymer.Element {
     );
   }
 
-  _templateCategory(): object[] {
+  _templateCategory(): EditableRubricCategory[] {
     return {
       name: '',
       options: [this._templateOption()]
     }
   }
 
-  _templateOption(): object[] {
+  _templateOption(): EditableRubricScale[] {
     return {
       name: '',
       description: '',
@@ -190,7 +192,7 @@ class PrendusRubricTable extends Polymer.Element {
     }
   }
 
-  _categoriesForHtml(rubric: Rubric): object[] {
+  _categoriesForHtml(rubric: Rubric): EditableRubricCategory[] {
     return Object.keys(rubric || {}).map(category => {
       return {
         name: category,

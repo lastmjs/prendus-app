@@ -23,8 +23,8 @@ import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignment {
-  loaded: boolean = false;
+class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssignment {
+  loaded: boolean;
   action: SetComponentPropertyAction;
   componentId: string;
   userToken: string;
@@ -99,7 +99,7 @@ class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignme
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    this.loaded = componentState.loaded;
+    this.loaded = componentState.loaded || false;
     this.assignment = componentState.assignment;
     this._assignment = componentState._assignment;
     this.question = componentState.question;
@@ -189,4 +189,4 @@ function validateMultipleChoice(radios: UserRadio[]) {
     return 'You must select an answer';
 }
 
-window.customElements.define(PrendusTakeAssignment.is, PrendusTakeAssignment)
+window.customElements.define(PrendusRespondAssignment.is, PrendusRespondAssignment)

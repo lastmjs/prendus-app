@@ -250,6 +250,17 @@ export interface Purchase {
 
 //Other types
 
+export interface EditableRubricScale {
+  readonly name: string;
+  readonly description: string;
+  readonly points: number;
+}
+
+export interface EditableRubricCategory {
+  readonly name: string;
+  readonly options: EditableRubricScale[];
+}
+
 export interface RubricScale {
   readonly description: string;
   readonly points: string;

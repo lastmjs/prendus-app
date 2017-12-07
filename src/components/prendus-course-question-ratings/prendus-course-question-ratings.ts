@@ -16,6 +16,9 @@ import {
   ARIA_SORT_ASC,
   ARIA_SORT_NONE,
   ARIA_SORT_DESC,
+  STUDENT,
+  OVERALL,
+  ALL
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions'
 import {
@@ -25,10 +28,6 @@ import {
   SetComponentPropertyAction,
   SetPropertyAction,
 } from '../../prendus.d';
-
-const STUDENT = 'Student';
-const OVERALL = 'Overall';
-const ALL = 'ALL';
 
 export class PrendusCourseQuestionRatings extends Polymer.Element {
   action: SetComponentPropertyAction | SetPropertyAction;
@@ -84,7 +83,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   //Computed Properties
-  _computeOrderBy(sortField: string, sortAsc: boolean): string {
+  _computeOrderBy(sortField: string, sortAsc: boolean): string | void {
     if (!sortField || sortAsc === undefined)
       return undefined;
     return categoryCamelCase(sortField) + (sortAsc ? GQL_SORT_ASC : GQL_SORT_DESC);
@@ -94,7 +93,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return [...Object.keys(rubric), OVERALL];
   }
 
-  _computeFilter(course: Course, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
+  _computeFilter(course: Course, user: User, assignmentId: string, conceptId: string, authorEmail: string): object | void {
     if (!course || !user)
       return undefined;
     const filter = {
@@ -117,7 +116,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return filter;
   }
 
-  _computeFetchQuestions(orderBy: string, filter: object, userToken: string): (i: number, n: number) => Promise<object> {
+  _computeFetchQuestions(orderBy: string, filter: object, userToken: string): (i: number, n: number) => Promise<object> | void {
     if (!orderBy || !filter || !userToken)
       return undefined;
     return async (pageIndex, pageAmount) => loadQuestions({

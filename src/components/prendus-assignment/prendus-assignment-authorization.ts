@@ -18,6 +18,20 @@ import {
   NotificationType
 } from '../../services/constants-service';
 
+/**
+ * This is a temporary solution to querying an assignment after authorizing the user.
+ * The ideal solution is to define a resolver in graphcool that will run do the auth checks
+ * and return the assignment if the user is authorized or the reason for failure otherwise.
+ * We are temporarily using this solution because graphcool does not currently support relations
+ * in the payload of custom resolvers. When they do support this option we can define a resolver with
+ * a payload like
+ * type AuthorizedAssignmentPayload {
+ *   enrolled: Bool,
+ *   payed: Bool,
+ *   authenticated: Bool,
+ *   assignment: Assignment // not currently supported
+ * }
+ */
 class PrendusAssignmentAuthorization extends Polymer.Element {
   action: SetComponentPropertyAction;
   user: User;

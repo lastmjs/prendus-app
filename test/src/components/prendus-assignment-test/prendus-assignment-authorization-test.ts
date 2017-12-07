@@ -15,7 +15,7 @@ import {
   createTestUser,
   deleteTestUsers,
   authorizeTestUserOnCourse
-} from '../../services/dataGen-service';
+} from '../../services/mock-data-service';
 import {
   getListener,
   assignCourseUserIds,

@@ -1,12 +1,14 @@
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores} from '../../services/question-stats';
 import {
+  OVERALL,
+} from '../../services/constants-service';
+import {
   Question,
   CategoryScore,
   SetComponentPropertyAction,
 } from '../../prendus.d';
 
-const OVERALL = 'Overall';
 class PrendusCourseQuestionRatingsRow extends Polymer.Element {
   action: SetComponentPropertyAction;
   question: Question;

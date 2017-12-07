@@ -18,7 +18,7 @@ import {
   deleteArbitrary,
   createTestUser,
   deleteTestUsers,
-} from '../../services/dataGen-service';
+} from '../../services/mock-data-service';
 
 const jsc = require('jsverify');
 const courseArb = jsc.nonshrink(CourseArb);

@@ -15,7 +15,7 @@ import {
   setupTestCourse,
   cleanupTestCourse,
   authorizeTestUserOnCourse
-} from '../../services/dataGen-service';
+} from '../../services/mock-data-service';
 import {
   getListener,
 } from '../../services/utilities-service';
@@ -24,7 +24,7 @@ const jsc = require('jsverify');
 
 const courseArb = jsc.nonshrink(CourseArb);
 
-class PrendusTakeAssignmentTest extends Polymer.Element {
+class PrendusRespondAssignmentTest extends Polymer.Element {
 
   static get is() { return 'prendus-take-assignment-test' }
 
@@ -48,7 +48,7 @@ class PrendusTakeAssignmentTest extends Polymer.Element {
 
   testOverAssignment(testFn) {
     return async course => {
-      const takeAssignment = this.shadowRoot.querySelector('prendus-take-assignment');
+      const takeAssignment = this.shadowRoot.querySelector('prendus-respond-assignment');
       const { author, viewer, instructor, data } = await setupTestCourse(course);
       await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
@@ -91,4 +91,4 @@ function verifyAssignment(assignment: Assignment, takeAssignment): boolean {
     assignment.questions.some(q => q.id === takeAssignment.question.id);
 }
 
-window.customElements.define(PrendusTakeAssignmentTest.is, PrendusTakeAssignmentTest);
+window.customElements.define(PrendusRespondAssignmentTest.is, PrendusRespondAssignmentTest);

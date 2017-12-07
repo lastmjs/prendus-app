@@ -124,6 +124,8 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   }
 
   async _next(e: CustomEvent) {
+    if (this.finished)
+      return;
     this.action = fireLocalAction(this.componentId, 'loaded', false);
     const err = this.assignment.error();
     if (err) {

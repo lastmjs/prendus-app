@@ -7,6 +7,9 @@ export const GQL_SORT_ASC = '_ASC';
 export const ARIA_SORT_ASC = 'ascending';
 export const ARIA_SORT_DESC = 'descending';
 export const ARIA_SORT_NONE = 'none';
+export const STUDENT = 'Student';
+export const OVERALL = 'Overall';
+export const ALL = 'ALL';
 //Event names mostly used for testing
 export const ASSIGNMENT_LOADED = 'assignment-loaded';
 export const ASSIGNMENT_SUBMITTED = 'assignment-submitted';
