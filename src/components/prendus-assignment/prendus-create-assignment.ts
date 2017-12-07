@@ -4,7 +4,7 @@ import {
   AnalyticsAssignment,
   AnalyticsAssignmentLoadResult,
   Question
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction

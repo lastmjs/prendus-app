@@ -2,7 +2,7 @@ import {
   SetComponentPropertyAction,
   Rubric,
   CategoryScore
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction

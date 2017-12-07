@@ -2,7 +2,12 @@ import {createUUID} from '../../node_modules/prendus-shared/services/utilities-s
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {generateEssay} from '../../services/question-to-code-service';
 import {setNotification} from '../../redux/actions';
-import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
+import {
+  EXAMPLE_GRADING_RUBRIC,
+  DEFAULT_EVALUATION_RUBRIC,
+  ASSIGNMENT_VALIDATION_ERROR,
+  NotificationType,
+} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
@@ -125,7 +130,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
-      console.error(e);
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }

@@ -86,7 +86,7 @@ class PrendusTakeAssignmentTest extends Polymer.Element {
       try {
         const success = (await asyncMap(
           data.assignments,
-          testFn(takeAssignment, data.id)
+          testFn(takeAssignment)
         )).every(result => result === true);
         await this.cleanup(data, author, viewer, instructor);
         return success;
@@ -102,15 +102,11 @@ class PrendusTakeAssignmentTest extends Polymer.Element {
 
     test('Quiz assignment loads correct assignment', [courseArb], this.testOverAssignment(verifyLoad));
 
-    test('Quiz assignment detects errors in rubric', [courseArb], this.testOverAssignment(verifyErrorCallback));
-
-    test('Quiz assignment collects correct analytics', [courseArb], this.testOverAssignment(verifyAnalytics));
-
   }
 
 }
 
-function verifyLoad(takeAssignment, courseId) {
+function verifyLoad(takeAssignment) {
   return async assignment => {
     const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
@@ -120,67 +116,10 @@ function verifyLoad(takeAssignment, courseId) {
   }
 }
 
-function verifyAnalytics(takeAssignment, courseId) {
-  return async assignment => {
-    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
-    const setup = getListener(ASSIGNMENT_LOADED, analytics);
-    takeAssignment.assignmentId = assignment.id;
-    await setup;
-    if (!verifyAssignment(assignment, takeAssignment))
-      return false;
-    if (assignment.questions.length < takeAssignment.assignment.numReviewQuestions)
-      return analytics.finished === true;
-    const assignmentFinished = getListener(ASSIGNMENT_SUBMITTED, analytics);
-    const analytic = analyticBuilder(courseId, assignment.id);
-    const start = analytic(VerbType.STARTED, null);
-    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
-    let i = 0;
-    const statements = await asyncMap(
-      (new Array(takeAssignment.assignment.numReviewQuestions)).fill(0),
-      async _ => {
-        await scoreDropdowns(dropdowns);
-        const submitted = getListener(STATEMENT_SENT, analytic);
-        btn.click();
-        await submitted;
-        return analytic(VerbType.RESPONDED, analytic.items[i++]);
-      }
-    );
-    const end = analytic(VerbType.SUBMITTED, null);
-    await assignmentFinished;
-    const analyticsCorrect = await checkAnalytics(
-      assignment.id,
-      [start, ...statements, end],
-    );
-    return analyticsCorrect;
-  }
-}
-
-function verifyErrorCallback(takeAssignment, courseId) {
-  return async assignment => {
-    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
-    const setup = getListener(ASSIGNMENT_LOADED, analytics);
-    takeAssignment.assignmentId = assignment.id;
-    await setup;
-    if (!verifyAssignment(assignment, takeAssignment))
-      return false;
-    if (assignment.questions.length < takeAssignment.assignment.numResponseQuestions)
-      return analytics.finished === true;
-    const btn = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
-    const first = analytic.item;
-    await asyncForEach(
-      (new Array(takeAssignment.assignment.numReviewQuestions)).fill(0),
-      async _ => {
-        const error = getListener(ASSIGNMENT_VALIDATION_ERROR, analytic);
-        btn.click();
-        await error;
-      }
-    );
-    return first === analytic.item && analytic.finished === false && takeAssignment.question === first;
-  }
-}
 
 function verifyAssignment(assignment: Assignment, takeAssignment): boolean {
-  return takeAssignment.assignment.id === assignment.id;
+  return takeAssignment.assignment.id === assignment.id &&
+    assignment.questions.some(q => q.id === takeAssignment.question.id);
 }
 
 window.customElements.define(PrendusTakeAssignmentTest.is, PrendusTakeAssignmentTest);

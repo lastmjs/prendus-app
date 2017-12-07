@@ -2,7 +2,7 @@ import {
   SetComponentPropertyAction,
   SetPropertyAction,
   Question
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType} from '../../services/constants-service';

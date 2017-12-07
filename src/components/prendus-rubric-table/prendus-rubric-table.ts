@@ -3,7 +3,7 @@ import {
   SetPropertyAction,
   User,
   Rubric,
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction

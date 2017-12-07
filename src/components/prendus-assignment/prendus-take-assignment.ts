@@ -5,7 +5,7 @@ import {
   Assignment,
   AnalyticsAssignmentLoadResult,
   AnalyticsAssignment
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction
@@ -14,6 +14,7 @@ import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into
 import {
   QuestionType,
   NotificationType,
+  ASSIGNMENT_VALIDATION_ERROR,
 } from '../../services/constants-service';
 import {
   setNotification
@@ -50,7 +51,7 @@ class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignme
     this.action = fireLocalAction(this.componentId, '_assignment', this);
   }
 
-  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment.questions.length > assignment.numResponseQuestions
@@ -67,7 +68,7 @@ class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignme
     return null; //validation taken care of while saving response
   }
 
-  async submit(question: Question): Promise<string> {
+  async submitItem(question: Question): Promise<string> {
     return question.id;
   }
 
@@ -76,6 +77,7 @@ class PrendusTakeAssignment extends Polymer.Element implements AnalyticsAssignme
       ? validateEssay(e.detail.userEssays)
       : validateMultipleChoice(e.detail.userRadios);
     if (err) {
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = setNotification(err, NotificationType.ERROR);
       return;
     }
@@ -178,7 +180,7 @@ function saveResponse(variables: object, userToken: string, cb: (err: any) => vo
 }
 
 function validateEssay(essays: UserEssay[]) {
-  if (!essays.length || !essays[0].value || !essays[0].value.trim().length)
+  if (!essays.length || !essays.every(essay => essay && essay.value && essay.value.trim().length))
     return 'Your essay response is empty';
 }
 

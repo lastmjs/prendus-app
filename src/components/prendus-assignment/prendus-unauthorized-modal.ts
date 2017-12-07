@@ -1,6 +1,6 @@
 import {
   AuthResult
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   navigate
 } from '../../node_modules/prendus-shared/services/utilities-service';

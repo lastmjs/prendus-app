@@ -7,7 +7,7 @@ import {
   Assignment,
   AnalyticsAssignment,
   AnalyticsAssignmentLoadResult,
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction,
@@ -89,7 +89,7 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
@@ -112,7 +112,7 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
     return null;
   }
 
-  async submit(question: Question): Promise<string> {
+  async submitItem(question: Question): Promise<string> {
     await submit(question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
     return question.id;
   }

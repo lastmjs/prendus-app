@@ -6,7 +6,7 @@ import {
   Assignment,
   AnalyticsAssignment,
   AnalyticsAssignmentLoadResult
-} from '../../../prendus.d';
+} from '../../prendus.d';
 import {
   createUUID,
   fireLocalAction,
@@ -66,7 +66,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
     return parseRubric(response.questionResponse.question.code);
   }
 
-  async load(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItem(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const data = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     const { assignment, essays } = data;
     const random = randomWithUngradedFirst(essays, assignment.numGradeResponses);
@@ -87,7 +87,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
       return 'You must rate each category';
   }
 
-  async submit(response: UserEssay): Promise<string> {
+  async submitItem(response: UserEssay): Promise<string> {
     await submit(this.grades, response.questionResponse.id, this.user.id);
     return response.questionResponse.question.id;
   }

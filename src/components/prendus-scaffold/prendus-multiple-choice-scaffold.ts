@@ -5,7 +5,7 @@ import {
 } from '../../prendus.d';
 import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {NotificationType} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {setNotification} from '../../redux/actions';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
@@ -183,6 +183,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionStem, this.answer, this.distractors, this.hints);
     } catch (e) {
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }
