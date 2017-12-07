@@ -2,7 +2,7 @@ import {DEFAULT_EVALUATION_RUBRIC} from '../../../src/services/constants-service
 
 const jsc = require('jsverify');
 
-export const escapedString = jsc.asciinestring.smap(str => str.replace(/\\|"/, ''), str => str);
+export const escapedString = jsc.nestring.smap(str => str.replace(/\\|"/, ''), str => str);
 
 export const RubricCategoryArb = jsc.pair(
   jsc.array(escapedString),

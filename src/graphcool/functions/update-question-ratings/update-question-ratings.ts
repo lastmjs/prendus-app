@@ -1,4 +1,4 @@
-const { fromEvent } = require('graphcool-lib');
+import { fromEvent, FunctionEvent } from 'graphcool-lib'
 
 const categoryCamelCase = category =>
   category
@@ -45,7 +45,7 @@ const update = `
   }
 `;
 
-module.exports = function (event) {
+export default async (event: FunctionEvent) => {
   const rating = event.QuestionRating.node;
   const averages = rating.scores.reduce(averageScore(rating.question), {});
   const values = Object.values(averages);
@@ -54,6 +54,6 @@ module.exports = function (event) {
     overall: values.reduce((sum, num) => sum + num, 0) / (values.length || 1)
   };
   const api = fromEvent(event).api('simple/v1');
-  api.request(update, variables).then(data => console.log(data));
+  await api.request(update, variables);
   return {data: event.data};
 };
