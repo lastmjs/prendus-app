@@ -34,16 +34,8 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
   }
 
   authenticate(user: User) {
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'userToken',
-      value: user.token
-    };
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'user',
-      value: user
-    };
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: user.token };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: user };
   }
 
   testOverAssignment(testFn) {
@@ -81,13 +73,17 @@ function verifyLoad(reviewAssignment) {
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
     reviewAssignment.assignmentId = assignment.id;
     await setup;
-    return verifyAssignment(assignment, reviewAssignment);
+    return verifyAssignment(assignment, reviewAssignment, analytics);
   }
 }
 
 
-function verifyAssignment(assignment: Assignment, reviewAssignment): boolean {
-  return reviewAssignment.assignment.id === assignment.id && assignment.questions.some(q => q.id === reviewAssignment.question.id);
+function verifyAssignment(assignment: Assignment, reviewAssignment, analytics): boolean {
+  return reviewAssignment.assignment.id === assignment.id &&
+    (
+      analytics.finished ||
+      assignment.questions.some(q => q.id === reviewAssignment.question.id)
+    );
 }
 
 window.customElements.define(PrendusReviewAssignmentTest.is, PrendusReviewAssignmentTest);

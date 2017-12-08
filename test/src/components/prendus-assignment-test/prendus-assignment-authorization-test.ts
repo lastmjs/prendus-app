@@ -2,19 +2,21 @@ import {RootReducer} from '../../../../src/redux/reducers';
 import {
   Assignment,
   User,
-  Course
+  Course,
+  AuthResult
 } from '../../../../src/typings/index.d';
 import {
   asyncMap,
-  asyncForEach
 } from '../../../../src/node_modules/prendus-shared/services/utilities-service';
-import {CourseArb} from '../../services/arbitraries-service';
 import {
-  saveArbitrary,
-  deleteCourseArbitrary,
-  createTestUser,
-  deleteTestUsers,
-  authorizeTestUserOnCourse
+  CourseArb,
+  AuthResultArb
+} from '../../services/arbitraries-service';
+import {
+  setupTestCourse,
+  cleanupTestCourse,
+  enrollInTestCourse,
+  payForTestCourse
 } from '../../services/mock-data-service';
 import {
   getListener,
@@ -36,7 +38,6 @@ const courseArb = jsc.nonshrink(
   )
 );
 
-
 class PrendusAssignmentAuthorizationTest extends Polymer.Element {
 
   static get is() { return 'prendus-assignment-authorization-test'; }
@@ -47,79 +48,41 @@ class PrendusAssignmentAuthorizationTest extends Polymer.Element {
   }
 
   authenticate(user: User) {
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'userToken',
-      value: user.token
-    };
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'user',
-      value: user
-    };
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: user.token };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: user };
   }
 
-  async setup(course: Course) {
-    const auth = this.shadowRoot.querySelector('prendus-assignment-authorization');
-    const author = await createTestUser('STUDENT', 'author');
-    const viewer = await createTestUser('STUDENT', 'viewer');
-    const instructor = await createTestUser('INSTRUCTOR');
-    const data = await saveArbitrary(
-      assignCourseUserIds(course, instructor.id, author.id),
-      'createCourse'
-    );
-    return {
-      auth,
-      author,
-      viewer,
-      instructor,
-      data
-    }
-  }
-
-  async cleanup(data, author, viewer, instructor) {
-    await deleteCourseArbitrary(data.id);
-    await deleteTestUsers(author, viewer, instructor);
-  }
-
-  testOverAssignments(eventName, authenticate: boolean, authorize: boolean, expected: object) {
-    return async course => {
-      const { auth, author, viewer, instructor, data } = await this.setup(course);
-      if (authenticate)
-        this.authenticate(viewer);
-      if (authorize)
-        await authorizeTestUserOnCourse(viewer.id, data.id);
-      try {
-        const success = (await asyncMap(
-          data.assignments,
-          waitForEvent(auth, eventName, {...expected, courseId: data.id })
-        )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
-        return success;
-      } catch(e) {
-        console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
-        return false;
-      }
-    }
+  clearState() {
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: null };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: null };
   }
 
   prepareTests(test) {
-    test(
-      'Fires an unauthorized event for unauthenticated users',
-      [courseArb],
-      this.testOverAssignments('unauthorized', false, true, { authenticated: false, payed: undefined, enrolled: undefined })
-    );
-    test(
-      'Fires an unauthorized event for unauthorized users',
-      [courseArb],
-      this.testOverAssignments('unauthorized', true, false, { authenticated: true, payed: false, enrolled: false })
-    );
-    test(
-      'Fires an authorized event for authorized users',
-      [courseArb],
-      this.testOverAssignments('authorized', true, true, { authenticated: true, payed: true, enrolled: true })
-    );
+    test('Computes expected auth result', [courseArb, AuthResultArb], async (course: Course, authResult: AuthResult) => {
+      const auth = this.shadowRoot.querySelector('prendus-assignment-authorization');
+      const { author, viewer, instructor, data } = await setupTestCourse(course);
+      const _authResult = {...authResult, courseId: data.id };
+      const { authenticated, enrolled, payed, instructor: owner } = authResult;
+      const user = owner ? instructor : viewer;
+      if (authenticated) this.authenticate(user);
+      if (enrolled) await enrollInTestCourse(user.id, data.id);
+      if (payed) await payForTestCourse(user.id, data.id);
+      const eventName = authenticated && (owner || (enrolled && payed)) ? 'authorized' : 'unauthorized';
+      try {
+        const success = (await asyncMap(
+          data.assignments,
+          waitForEvent(auth, eventName, _authResult)
+        )).every(result => result === true);
+        await cleanupTestCourse(data, author, viewer, instructor);
+        this.clearState();
+        return success;
+      } catch(e) {
+        console.error(e);
+        await cleanupTestCourse(data, author, viewer, instructor);
+        this.clearState();
+        return false;
+      }
+    });
   }
 
   stateChange(e: CustomEvent) {
@@ -134,11 +97,14 @@ function waitForEvent(auth, eventName: string, expected: object): (assignment: A
     const event = getListener(eventName, auth);
     auth.assignmentId = assignment.id;
     const e = await event;
-    const { result: { authenticated, payed, enrolled, courseId } } = e.detail;
-    return authenticated === expected.authenticated &&
-      payed === expected.payed &&
+    const { result: { authenticated, payed, enrolled, courseId, instructor } } = e.detail;
+    return authenticated === expected.authenticated && (
+      !authenticated ||
+      (payed === expected.payed &&
       enrolled === expected.enrolled &&
-      (courseId === expected.courseId || !authenticated);
+      instructor === expected.instructor &&
+      courseId === expected.courseId)
+    );
   }
 }
 

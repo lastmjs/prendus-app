@@ -10,7 +10,6 @@ import {
 } from '../../../../src/services/constants-service';
 import {
   RubricArb,
-  escapedString
 } from '../../services/arbitraries-service';
 import {
   getListener,
@@ -31,7 +30,11 @@ const SET_POINTS = 'setPoints';
 const COMMANDS = [ADD_CATEGORY, REMOVE_CATEGORY, ADD_SCALE, REMOVE_SCALE, SET_CATEGORY, SET_DESCRIPTION, SET_POINTS];
 
 const commandArb = jsc.elements(COMMANDS);
-const rubricArb = jsc.nonshrink(RubricArb);
+const rubricArb = RubricArb;
+//I am using this arbitrary because it won't include line sequences, carriage returns and newlines.
+//The rubric table seems to handle these fine but the browser strips those sort of charcters
+//when processing a change event so it causes the tests to fail
+const escapedString = jsc.asciinestring.smap(str => str.replace(/\\|"/g, ''), str => str);
 
 class PrendusRubricTableTest extends Polymer.Element {
 
@@ -83,7 +86,9 @@ function tableIsEditable(table) {
       const expected = getExpected(table, command, category, option, name, points);
       executeCommand(table, command, category, option, name, points);
       await event;
-      return verifyTable(expected, table);
+      const success = verifyTable(expected, table);
+      console.log(expected.rubric, table.rubric, expected.categories, table.categories, success);
+      return success;
     }
   );
 }
@@ -119,7 +124,7 @@ function getEvent(table, command: string, category: number, option: number, name
   const categoryDependent = [ADD_SCALE, REMOVE_SCALE, SET_CATEGORY, SET_OPTION, SET_DESCRIPTION, SET_POINTS];
   const optionDependent = [SET_OPTION, SET_DESCRIPTION, SET_POINTS];
   const blankName = obj => !obj.name.length;
-  const sameName = str => obj => obj.name === str;
+  const sameName = str => obj => obj.name.trim() === str.trim();
   if (
     (categoryDependent.includes(command) && category < 0) ||
     (optionDependent.includes(command) && option < 0) ||

@@ -26,7 +26,7 @@ const courseArb = jsc.nonshrink(CourseArb);
 
 class PrendusRespondAssignmentTest extends Polymer.Element {
 
-  static get is() { return 'prendus-take-assignment-test' }
+  static get is() { return 'prendus-respond-assignment-test' }
 
   constructor() {
     super();
@@ -34,16 +34,8 @@ class PrendusRespondAssignmentTest extends Polymer.Element {
   }
 
   authenticate(user: User) {
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'userToken',
-      value: user.token
-    };
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'user',
-      value: user
-    };
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: user.token };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: user };
   }
 
   testOverAssignment(testFn) {
@@ -81,14 +73,17 @@ function verifyLoad(takeAssignment) {
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
     takeAssignment.assignmentId = assignment.id;
     await setup;
-    return verifyAssignment(assignment, takeAssignment);
+    return verifyAssignment(assignment, takeAssignment, analytics);
   }
 }
 
 
-function verifyAssignment(assignment: Assignment, takeAssignment): boolean {
+function verifyAssignment(assignment: Assignment, takeAssignment, analytics): boolean {
   return takeAssignment.assignment.id === assignment.id &&
-    assignment.questions.some(q => q.id === takeAssignment.question.id);
+    (
+      analytics.finished ||
+      assignment.questions.some(q => q.id === takeAssignment.question.id)
+    );
 }
 
 window.customElements.define(PrendusRespondAssignmentTest.is, PrendusRespondAssignmentTest);

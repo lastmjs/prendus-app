@@ -66,7 +66,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
     return parseRubric(response.questionResponse.question.code);
   }
 
-  async loadItem(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
     const data = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     const { assignment, essays } = data;
     const random = randomWithUngradedFirst(essays, assignment.numGradeResponses);
@@ -165,6 +165,7 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
           }
         }
       }) {
+        id
         value
         questionResponse {
           id

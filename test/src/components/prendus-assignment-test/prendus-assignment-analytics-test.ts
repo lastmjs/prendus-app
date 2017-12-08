@@ -44,16 +44,14 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
   }
 
   authenticate(user: User) {
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'userToken',
-      value: user.token
-    };
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'user',
-      value: user
-    };
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: user.token };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: user };
+  }
+
+  clearState() {
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: null };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: null };
+    this.action = { type: 'SET_PROPERTY', key: 'assignment', value: null };
   }
 
   testOverAssignments(testFn, authorize: boolean, error: boolean) {
@@ -70,10 +68,12 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
           testFn(analytics, data.id)
         )).every(result => result === true);
         await cleanupTestCourse(data, author, viewer, instructor);
+        this.clearState();
         return success;
       } catch(e) {
         console.error(e);
         await cleanupTestCourse(data, author, viewer, instructor);
+        this.clearState();
         return false;
       }
     }
@@ -100,7 +100,7 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
 
 function getAnalyticsAssignment(course: Course, error: boolean): AnalyticsAssignment {
   return {
-    load: async assignmentId => {
+    loadItems: async assignmentId => {
       const assignment = course.assignments.find(a => a.id === assignmentId);
       return {
         title: 'Test',
@@ -109,7 +109,7 @@ function getAnalyticsAssignment(course: Course, error: boolean): AnalyticsAssign
       };
     },
     error: () => error ? 'Test error' : null,
-    submit: async question => question.id
+    submitItem: async question => question.id
   };
 }
 
@@ -167,10 +167,13 @@ function testSubmitItem(analytics, courseId: string): (assignment: Assignment) =
     const event = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
     await event;
+    if (!assignment.questions.length) {
+      const notStarted = await checkAnalytics(assignment.id, []);
+      return notStarted && analytics.finished === true && analytics.loaded === true;
+    }
     const next = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
     let i = 0;
-    const analytic = analyticBuilder(courseId, assignmentId);
-    const finished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const analytic = analyticBuilder(courseId, assignment.id);
     const start = analytic(VerbType.STARTED, null);
     const statements = await asyncMap(
       analytics.items,
@@ -184,9 +187,8 @@ function testSubmitItem(analytics, courseId: string): (assignment: Assignment) =
       }
     );
     const submitted = analytic(VerbType.SUBMITTED, null);
-    const expected = assignment.questions.length
-      ? [start, ...statements, submitted]
-      : [];
+    const expected = [start, ...statements, submitted];
+    const finished = getListener(ASSIGNMENT_SUBMITTED, analytics);
     await finished;
     const success = await checkAnalytics(assignment.id, expected);
     return success && analytics.finished === true;

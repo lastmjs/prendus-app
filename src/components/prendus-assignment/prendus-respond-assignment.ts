@@ -33,7 +33,7 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
   _assignment: AnalyticsAssignment;
   question: Question;
 
-  static get is() { return 'prendus-take-assignment' }
+  static get is() { return 'prendus-respond-assignment' }
 
   static get properties() {
     return {
@@ -52,7 +52,7 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
   }
 
   async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
-    const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleError.bind(this));
+    const { assignment } = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment.questions.length > assignment.numResponseQuestions
       ? shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions)

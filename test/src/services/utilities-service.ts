@@ -65,7 +65,6 @@ export const assignCourseUserIds = (course: Course, instructorId: string, studen
 
 export async function checkAnalytics(assignmentId: string, expected: object[]): Promise<boolean> {
   const analytics = await getAnalytics({ assignment: { id: assignmentId } });
-  console.log(analytics, expected);
   return expected.length === analytics.length && analytics.every(
     (analytic, i) =>
       analytic.verb === expected[i].verb &&

@@ -310,6 +310,7 @@ export interface AuthResult {
   readonly authenticated: boolean;
   readonly enrolled: boolean;
   readonly payed: boolean;
+  readonly instructor: boolean;
   readonly courseId: string;
 }
 

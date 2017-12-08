@@ -254,8 +254,8 @@ export async function deleteCourseArbitrary(courseId: string): Promise<object> {
   return deleteArbitrary(data.Course, 'createCourse');
 }
 
-export async function authorizeTestUserOnCourse(userId: string, courseId: string): Promise<object> {
-  const data = await GQLRequest(`
+export function enrollInTestCourse(userId: string, courseId: string): Promise<object> {
+  return GQLRequest(`
     mutation authorizeUserOnCourse($userId: ID!, $courseId: ID!) {
       addToStudentsAndCourses(
         enrolledCoursesCourseId: $courseId,
@@ -265,6 +265,13 @@ export async function authorizeTestUserOnCourse(userId: string, courseId: string
           id
         }
       }
+    }
+  `, { userId, courseId }, AUTH_TOKEN, handleError);
+}
+
+export function payForTestCourse(userId: string, courseId: string): Promise<object> {
+  return GQLRequest(`
+    mutation authorizeUserOnCourse($userId: ID!, $courseId: ID!) {
       createPurchase(
         amount: 1000,
         stripeTokenId: "fake-token-for-testing",
@@ -275,7 +282,11 @@ export async function authorizeTestUserOnCourse(userId: string, courseId: string
       }
     }
   `, { userId, courseId }, AUTH_TOKEN, handleError);
-  return data.createPurchase;
+}
+
+export async function authorizeTestUserOnCourse(userId: string, courseId: string): Promise<object> {
+  await enrollInTestCourse(userId, courseId);
+  await payForTestCourse(userId, courseId);
 }
 
 export async function getAnalytics(filter: object): Promise<object> {

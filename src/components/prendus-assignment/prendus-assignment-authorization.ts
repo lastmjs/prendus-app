@@ -74,13 +74,14 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
         this.action = setNotification('Authorization error', NotificationType.ERROR);
       else {
         const courseId = data.assignment.course.id;
-        const owner = data.user.ownedCourses.some(c => c.id === courseId);
-        const payed = owner || data.user.purchases.some(p => p.course.id === data.assignment.course.id);
-        const enrolled = owner || data.user.enrolledCourses.some(c => c.id === data.assignment.course.id);
+        const instructor = data.user.ownedCourses.some(c => c.id === courseId);
+        const payed = data.user.purchases.some(p => p.course.id === data.assignment.course.id);
+        const enrolled = data.user.enrolledCourses.some(c => c.id === data.assignment.course.id);
         this.action = fireLocalAction(this.componentId, 'result', {
           authenticated: true,
           payed,
           enrolled,
+          instructor,
           courseId
         });
       }
@@ -88,8 +89,8 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
   }
 
   _processResult(result: AuthResult) {
-    const { authenticated, payed, enrolled } = result;
-    if (authenticated && payed && enrolled)
+    const { authenticated, instructor, payed, enrolled } = result;
+    if (authenticated && (instructor || (payed && enrolled)))
       this.dispatchEvent(new CustomEvent('authorized', { detail: {result} }));
     else
       this.dispatchEvent(new CustomEvent('unauthorized', { detail: {result} }));

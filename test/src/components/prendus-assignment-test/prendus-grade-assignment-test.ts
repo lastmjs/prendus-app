@@ -34,22 +34,14 @@ class PrendusGradeAssignmentTest extends Polymer.Element {
   }
 
   authenticate(user: User) {
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'userToken',
-      value: user.token
-    };
-    this.action = {
-      type: 'SET_PROPERTY',
-      key: 'user',
-      value: user
-    };
+    this.action = { type: 'SET_PROPERTY', key: 'userToken', value: user.token };
+    this.action = { type: 'SET_PROPERTY', key: 'user', value: user };
   }
 
   testOverAssignment(testFn) {
     return async course => {
       const gradeAssignment = this.shadowRoot.querySelector('prendus-grade-assignment');
-      const { author, viewer, instructor, data } = await this.setup(course);
+      const { author, viewer, instructor, data } = await setupTestCourse(course);
       await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
       try {
@@ -57,11 +49,11 @@ class PrendusGradeAssignmentTest extends Polymer.Element {
           data.assignments,
           testFn(gradeAssignment)
         )).every(result => result === true);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return success;
       } catch (e) {
         console.error(e);
-        await this.cleanup(data, author, viewer, instructor);
+        await cleanupTestCourse(data, author, viewer, instructor);
         return false;
       }
     }
@@ -81,17 +73,17 @@ function verifyLoad(gradeAssignment) {
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
     gradeAssignment.assignmentId = assignment.id;
     await setup;
-    return verifyAssignment(assignment, gradeAssignment);
+    return verifyAssignment(assignment, gradeAssignment, analytics);
   }
 }
 
-function verifyAssignment(assignment: Assignment, gradeAssignment): boolean {
+function verifyAssignment(assignment: Assignment, gradeAssignment, analytics): boolean {
     const responses = assignment.questions
       .map(q => q.responses)
       .reduce(flatten, [])
       .map(res => res.userEssays)
       .reduce(flatten, []);
-  return responses.some(r => r === gradeAssignment.response);
+  return analytics.finished || responses.some(r => r.id === gradeAssignment.response.id);
 }
 
 function flatten(arr: any[], el: any): any[] {
