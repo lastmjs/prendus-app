@@ -31,21 +31,23 @@
 
     <div hidden$="[[!loaded]]">
 
-      <prendus-carousel
-        id="carousel"
-        label="[[label]]"
-        next-text="Submit"
-        hide-back="[[hideBack]]"
-        hide-next="[[hideNext]]"
-        items="[[items]]"
-        on-next="_next"
-        on-item-changed="_item"
-        on-finished-changed="_finished"
-      >
-        <div hidden$="[[finished]]" slot="content">
-          <slot name="assignment"></slot>
-        </div>
-      </prendus-carousel>
+      <div hidden$="[[finished]]">
+        <prendus-carousel
+          id="carousel"
+          label="[[label]]"
+          next-text="Submit"
+          hide-back="[[hideBack]]"
+          hide-next="[[hideNext]]"
+          items="[[items]]"
+          on-next="_next"
+          on-item-changed="_item"
+          on-finished-changed="_finished"
+        >
+          <div slot="content">
+            <slot name="assignment"></slot>
+          </div>
+        </prendus-carousel>
+      </div>
 
       <div hidden$="[[!_message(finished, unauthorized)]]">
         <h4>Done</h4>

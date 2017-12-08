@@ -11,7 +11,8 @@
       .buttons {
         margin-top: 20px;
         display: flex;
-        justify-content: between;
+        justify-content: space-between;
+        flex-direction: row-reverse;
       }
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -24,8 +25,8 @@
     <slot name="content"></slot>
 
     <div class="buttons">
-      <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]" on-click="_notifyPrevious">[[backText]]</button>
       <button id="next-button" class="prendus-button prendus-button--recommended" hidden$="[[_hideNext(hideNext, finished)]]" on-click="_notifyNext">[[nextText]]</button>
+      <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]" on-click="_notifyPrevious">[[backText]]</button>
     </div>
   </template>
 

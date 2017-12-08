@@ -106,6 +106,14 @@ functions:
         type: resolver
         schema: ./functions/assignment-lti-grade/assignment-lti-grade.graphql
 
+    update-question-ratings:
+        handler:
+            code:
+                src: ./functions/update-question-ratings/update-question-ratings.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: subscription
+        query: ./functions/update-question-ratings/update-question-ratings.graphql
 permissions:
 
 #### File Permissions

@@ -22,15 +22,15 @@ const averageScore = question => (result, categoryScore) => {
 const update = `
   mutation updateQuestionRatings(
     $id: ID!
-    $overall: Int!
-    $language: Int!
-    $learningCategory: Int!
-    $difficulty: Int!
-    $conceptAlignment: Int!
-    $inclusion: Int!,
-    $plagiarism: Int!
+    $overall: Float!
+    $language: Float!
+    $learningCategory: Float!
+    $difficulty: Float!
+    $conceptAlignment: Float!
+    $inclusion: Float!,
+    $plagiarism: Float!
   ) {
-    UpdateQuestion(
+    updateQuestion(
       id: $id
       overall: $overall
       language: $language
@@ -45,15 +45,19 @@ const update = `
   }
 `;
 
-export default async (event: FunctionEvent) => {
-  const rating = event.QuestionRating.node;
+export default (event: FunctionEvent) => {
+  const rating = event.data.QuestionRating.node;
   const averages = rating.scores.reduce(averageScore(rating.question), {});
-  const values = Object.values(averages);
+  const values = Object.keys(averages).map(k => averages[k]);
   const variables = {
+    id: rating.question.id,
     ...averages,
     overall: values.reduce((sum, num) => sum + num, 0) / (values.length || 1)
   };
   const api = fromEvent(event).api('simple/v1');
-  await api.request(update, variables);
-  return {data: event.data};
+  return new Promise((resolve, reject) => {
+    api.request(update, variables)
+      .then(_ => resolve({ data: event.data }))
+      .catch(error => reject({ error: error.message }) );
+  });
 };

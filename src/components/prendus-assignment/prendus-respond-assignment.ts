@@ -121,22 +121,7 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
         numResponseQuestions
         questionType
         questions(filter: {
-          AND: [{
-            author: {
-              id_not: $userId
-            }
-          }, {
-            ratings_some: {}
-          }, {
-              ratings_every: {
-                scores_some: {
-                  category: "Inclusion"
-                  score_gt: 1
-                }
-              }
-          }, {
-            flags_none: {}
-          }]
+          flags_none: {}
         }) {
           id
         }

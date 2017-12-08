@@ -159,9 +159,11 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     const finished = e.detail.value;
     this.action = fireLocalAction(this.componentId, 'finished', finished);
     if (finished && this.items && this.items.length) {
+      this.action = fireLocalAction(this.componentId, 'loaded', false);
       await this._sendStatement(VerbType.SUBMITTED, null);
       this.dispatchEvent(new CustomEvent(ASSIGNMENT_SUBMITTED));
       await this._gradePassback();
+      this.action = fireLocalAction(this.componentId, 'loaded', true);
     }
   }
 
