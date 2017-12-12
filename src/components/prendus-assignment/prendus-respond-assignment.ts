@@ -24,7 +24,6 @@ import {
 } from '../../node_modules/prendus-shared/services/graphql-service';
 
 class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssignment {
-  loaded: boolean;
   action: SetComponentPropertyAction;
   componentId: string;
   userToken: string;
@@ -32,6 +31,7 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
   assignment: Assignment;
   _assignment: AnalyticsAssignment;
   question: Question;
+  attempted: string[];
 
   static get is() { return 'prendus-respond-assignment' }
 
@@ -64,8 +64,8 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
     };
   }
 
-  error(): null {
-    return null; //validation taken care of while saving response
+  error(question: Question): string | null {
+    return this.attempted.indexOf(question.id) > -1 ? null : 'You must select an answer and click "Check" first';
   }
 
   async submitItem(question: Question): Promise<string> {
@@ -77,15 +77,16 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
       ? validateEssay(e.detail.userEssays)
       : validateMultipleChoice(e.detail.userRadios);
     if (err) {
-      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
-      this.action = setNotification(err, NotificationType.ERROR);
+      alert(err);
       return;
+    } else {
+      this.action = fireLocalAction(this.componentId, 'attempted', this.attempted.concat(this.question.id));
     }
     await saveResponse({
       ...e.detail,
       questionId: this.question.id,
       authorId: this.user.id
-    });
+    }, this.userToken, this._handleError.bind(this));
   }
 
   _question(e: CustomEvent) {
@@ -99,10 +100,10 @@ class PrendusRespondAssignment extends Polymer.Element implements AnalyticsAssig
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    this.loaded = componentState.loaded || false;
     this.assignment = componentState.assignment;
     this._assignment = componentState._assignment;
     this.question = componentState.question;
+    this.attempted = componentState.attempted || [];
     this.userToken = state.userToken;
     this.user = state.user;
   }
@@ -114,16 +115,30 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
     query getAssignment($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
-        course {
-          id
-        }
         title
         numResponseQuestions
         questionType
         questions(filter: {
-          flags_none: {}
+          AND: [{
+            author: {
+              id_not: $userId
+            }
+          }, {
+            ratings_some: {}
+          }, {
+            ratings_every: {
+              scores_some: {
+                category: "Inclusion"
+                score_gt: 1
+              }
+            }
+          }, {
+            flags_none: {}
+          }]
         }) {
           id
+          text
+          code
         }
         taken: questions(filter: {
           responses_some: {

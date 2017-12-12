@@ -29,7 +29,6 @@ import {
 } from '../../services/code-to-question-service';
 
 class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignment {
-  loaded: boolean = false;
   action: SetComponentPropertyAction;
   componentId: string;
   userToken: string;
@@ -107,7 +106,6 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    this.loaded = componentState.loaded;
     this.response = componentState.response;
     this.grades = componentState.grades;
     this.assignment = componentState.assignment;
@@ -135,9 +133,6 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
     query getAssignmentResponses($assignmentId: ID!, $userId: ID!) {
       assignment: Assignment(id: $assignmentId) {
         id
-        course {
-          id
-        }
         title
         questionType
         numGradeResponses

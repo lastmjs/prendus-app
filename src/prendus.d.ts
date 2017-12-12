@@ -322,6 +322,6 @@ export interface AnalyticsAssignmentLoadResult {
 
 export interface AnalyticsAssignment {
   loadItems(assignmentId: string): AnalyticsAssignmentLoadResult;
-  error(): string | null;
+  error(item: object): string | null;
   submitItem(item: object): string;
 }

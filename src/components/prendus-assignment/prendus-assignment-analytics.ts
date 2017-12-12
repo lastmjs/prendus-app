@@ -107,7 +107,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     if (taken)
       this.action = setNotification(DONE_MESSAGE, NotificationType.WARNING);
     if (error)
-      this.action = fireLocalAction(this.componentId, 'message', error);
+      this.action = setNotification(error, NotificationType.ERROR);
     else if (!items.length)
       this.action = fireLocalAction(this.componentId, 'message', INSUFFICIENT_MESSAGE);
     else
@@ -127,10 +127,11 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     if (this.finished)
       return;
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const err = this.assignment.error();
+    const err = this.assignment.error(this.item);
     if (err) {
       this.action = setNotification(err, NotificationType.ERROR);
       this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
+      this.action = fireLocalAction(this.componentId, 'loaded', true);
       return;
     }
     const questionId = await this.assignment.submitItem(this.item);
@@ -138,6 +139,11 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     this.shadowRoot.querySelector('#carousel').next();
     this.action = fireLocalAction(this.componentId, 'loaded', true);
+  }
+
+  _previous() {
+    if (!this.hideBack)
+      this.shadowRoot.querySelector('#carousel').previous();
   }
 
   _item(e: CustomEvent) {

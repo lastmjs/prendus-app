@@ -132,7 +132,6 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
     this._assignment = componentState._assignment;
     this.question = componentState.question;
@@ -147,15 +146,12 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
   const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
     Assignment(id: $assignmentId) {
       id
-      course {
-        id
-      }
       title
       questionType
       numReviewQuestions
       questions(filter: {
         author: {
-          id: $userId
+          id_not: $userId
         }
       }) {
         id
