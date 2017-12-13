@@ -20,25 +20,6 @@
 
 import { fromEvent, FunctionEvent } from 'graphcool-lib'
 
-const categoryCamelCase = category =>
-  category
-  .replace(/^(\w)/, (m, c) => c.toLowerCase())
-  .replace(/\s+(\w)/g, (m, c) => c.toUpperCase());
-
-const averageScore = question => (result, categoryScore) => {
-  const { category, score } = categoryScore;
-  const { count } = question._ratingsMeta;
-  const field = categoryCamelCase(category);
-  if (!question.hasOwnProperty(field))
-    return result;
-  const oldAverage = question[field];
-  const average = (oldAverage * count + score) / (count + 1);
-  return {
-    ...result,
-    [field]: average
-  };
-};
-
 const update = `
   mutation updateQuestionRatings(
     $id: ID!
@@ -82,3 +63,26 @@ export default async (event: FunctionEvent) => {
     return { error: err.message };
   }
 };
+
+function categoryCamelCase(category: string): string {
+  return category
+  .replace(/^(\w)/, (m, c) => c.toLowerCase())
+  .replace(/\s+(\w)/g, (m, c) => c.toUpperCase());
+}
+
+function averageScore(question) {
+  return (result, categoryScore) {
+    const { category, score } = categoryScore;
+    const { count } = question._ratingsMeta;
+    const field = categoryCamelCase(category);
+    if (!question.hasOwnProperty(field))
+      return result;
+    const oldAverage = question[field];
+    const average = (oldAverage * count + score) / (count + 1);
+    return {
+      ...result,
+      [field]: average
+    };
+  }
+}
+
