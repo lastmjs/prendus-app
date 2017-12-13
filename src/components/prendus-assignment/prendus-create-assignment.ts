@@ -1,8 +1,8 @@
 import {
   User,
   Assignment,
-  AnalyticsAssignment,
-  AnalyticsAssignmentLoadResult,
+  AssignmentFunctions,
+  AssignmentFunctionsLoadResult,
   Question
 } from '../../prendus.d';
 import {
@@ -20,7 +20,7 @@ import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssignment {
+class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunctions {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
@@ -28,7 +28,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
   question: number; //index
   questions: string[]; //ids of created questions
   userToken: string;
-  _assignment: AnalyticsAssignment;
+  functions: AssignmentFunctions;
 
   static get is() { return 'prendus-create-assignment' }
 
@@ -45,10 +45,10 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, '_assignment', this);
+    this.action = fireLocalAction(this.componentId, 'functions', this);
   }
 
-  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AssignmentFunctionsLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = (new Array(assignment.numCreateQuestions)).fill(null).map((_, i) => i);
@@ -97,7 +97,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AnalyticsAssign
     const componentState = state.components[this.componentId] || {};
     this.loaded = componentState.loaded;
     this.assignment = componentState.assignment;
-    this._assignment = componentState._assignment;
+    this.functions = componentState.functions;
     this.question = componentState.question;
     this.questions = componentState.questions;
     this.load = componentState.load;

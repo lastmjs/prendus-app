@@ -3,7 +3,7 @@
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="prendus-assignment-analytics.html">
+<link rel="import" href="prendus-assignment-shared.html">
 
 <dom-module id="prendus-grade-assignment">
 
@@ -12,11 +12,11 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-analytics
+    <prendus-assignment-shared
       label="Response"
       hide-back
       assignment-id="[[assignmentId]]"
-      assignment="[[assignment]]"
+      functions="[[functions]]"
       verb="GRADED"
       on-item-changed="_response"
     >
@@ -29,7 +29,7 @@
         <p>[[response.value]]</p>
         <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_grades"></prendus-rubric-dropdowns>
       </div>
-    </prendus-assignment-analytics>
+    </prendus-assignment-shared>
 
   </template>
 

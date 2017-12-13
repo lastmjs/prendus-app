@@ -1,6 +1,6 @@
 import {
   User,
-  AnalyticsAssignment,
+  AssignmentFunctions,
   AuthResult
 } from '../../prendus.d';
 import {
@@ -31,7 +31,7 @@ const INSUFFICIENT_MESSAGE = 'There are not enough questions to take this assign
 const GRADE_SUCCESS = 'Grade passback succeeded';
 const GRADE_FAILED = 'Grade passback failed';
 
-class PrendusAssignmentAnalytics extends Polymer.Element {
+class PrendusAssignmentShared extends Polymer.Element {
   componentId: string;
   action: SetPropertyAction | SetComponentPropertyAction;
   user: User;
@@ -40,7 +40,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   unauthorized: boolean;
   authResult: AuthResult;
   assignmentId: string;
-  assignment: AnalyticsAssignment;
+  functions: AssignmentFunctions;
   items: object[];
   finished: boolean;
   verb: string;
@@ -48,20 +48,20 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   message: string;
   success: boolean;
 
-  static get is() { return 'prendus-assignment-analytics' }
+  static get is() { return 'prendus-assignment-shared' }
 
   static get properties() {
     return {
       assignmentId: String,
-      assignment: {
+      functions: {
         type: Object,
         value: {
-          load: async assignmentId => ({
+          loadItems: async assignmentId => ({
             items: [],
             error: 'Load function was not supplied'
           }),
           error: () => null,
-          submit: async item => null
+          submitItem: async item => null
         }
       },
       verb: String,
@@ -101,7 +101,7 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'authResult', result);
     this.action = fireLocalAction(this.componentId, 'unauthorized', false);
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const { title, items, taken, error } = await this.assignment.loadItems(this.assignmentId);
+    const { title, items, taken, error } = await this.functions.loadItems(this.assignmentId);
     this.action = fireLocalAction(this.componentId, 'title', title);
     this.action = fireLocalAction(this.componentId, 'items', items);
     if (taken)
@@ -127,14 +127,14 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
     if (this.finished)
       return;
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    const err = this.assignment.error(this.item);
+    const err = this.functions.error(this.item);
     if (err) {
       this.action = setNotification(err, NotificationType.ERROR);
       this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = fireLocalAction(this.componentId, 'loaded', true);
       return;
     }
-    const questionId = await this.assignment.submitItem(this.item);
+    const questionId = await this.functions.submitItem(this.item);
     await this._sendStatement(this.verb, questionId);
     this.dispatchEvent(new CustomEvent(STATEMENT_SENT));
     this.shadowRoot.querySelector('#carousel').next();
@@ -204,4 +204,4 @@ class PrendusAssignmentAnalytics extends Polymer.Element {
   }
 }
 
-window.customElements.define(PrendusAssignmentAnalytics.is, PrendusAssignmentAnalytics);
+window.customElements.define(PrendusAssignmentShared.is, PrendusAssignmentShared);

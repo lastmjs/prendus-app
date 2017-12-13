@@ -4,7 +4,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-table/prendus-rubric-table.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="prendus-assignment-analytics.html">
+<link rel="import" href="prendus-assignment-shared.html">
 
 <dom-module id="prendus-review-assignment">
 
@@ -13,9 +13,9 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-analytics
+    <prendus-assignment-shared
       assignment-id="[[assignmentId]]"
-      assignment="[[_assignment]]"
+      functions="[[functions]]"
       verb="REVIEWED"
       hide-back
       on-item-changed="_question"
@@ -37,7 +37,7 @@
         <br>
         <prendus-rubric-dropdowns id="dropdowns" rubric="[[evaluationRubric]]" on-scores-changed="_ratings"></prendus-rubric-dropdowns>
       </div>
-    </prendus-assignment-analytics>
+    </prendus-assignment-shared>
   </template>
 
   <script type="module" src="prendus-review-assignment.ts"></script>

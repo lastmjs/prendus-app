@@ -5,8 +5,8 @@ import {
   SetComponentPropertyAction,
   SetPropertyAction,
   Assignment,
-  AnalyticsAssignment,
-  AnalyticsAssignmentLoadResult,
+  AssignmentFunctions,
+  AssignmentFunctionsLoadResult,
 } from '../../prendus.d';
 import {
   createUUID,
@@ -30,13 +30,13 @@ import {
   setNotification,
 } from '../../redux/actions';
 
-class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssignment {
+class PrendusReviewAssignment extends Polymer.Element implements AssignmentFunctions {
   action: SetComponentPropertyAction;
   user: User;
   userToken: string;
   assignmentId: string;
   assignment: Assignment;
-  _assignment: AnalyticsAssignment;
+  functions: AssignmentFunctions;
   question: Question;
   ratings: CategoryScore[];
   essayType: boolean;
@@ -72,7 +72,7 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, '_assignment', this);
+    this.action = fireLocalAction(this.componentId, 'functions', this);
   }
 
   _computeEssayType(assignment: Assignment): boolean {
@@ -89,7 +89,7 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
     return parseRubric(question.code, 'evaluationRubric');
   }
 
-  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AssignmentFunctionsLoadResult> {
     const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
     const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
@@ -133,7 +133,7 @@ class PrendusReviewAssignment extends Polymer.Element implements AnalyticsAssign
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
     this.assignment = componentState.assignment;
-    this._assignment = componentState._assignment;
+    this.functions = componentState.functions;
     this.question = componentState.question;
     this.ratings = componentState.ratings;
     this.user = state.user;

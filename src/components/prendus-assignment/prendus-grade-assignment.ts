@@ -4,8 +4,8 @@ import {
   UserEssay,
   Rubric,
   Assignment,
-  AnalyticsAssignment,
-  AnalyticsAssignmentLoadResult
+  AssignmentFunctions,
+  AssignmentFunctionsLoadResult
 } from '../../prendus.d';
 import {
   createUUID,
@@ -28,13 +28,13 @@ import {
   extractVariables
 } from '../../services/code-to-question-service';
 
-class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignment {
+class PrendusGradeAssignment extends Polymer.Element implements AssignmentFunctions {
   action: SetComponentPropertyAction;
   componentId: string;
   userToken: string;
   user: User;
   assignmentId: string;
-  assignment: AnalyticsAssignment;
+  functions: AssignmentFunctions;
   rubric: Rubric;
   response: UserEssay;
 
@@ -57,7 +57,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
 
   connectedCallback() {
     super.connectedCallback();
-    this.action = fireLocalAction(this.componentId, 'assignment', this);
+    this.action = fireLocalAction(this.componentId, 'functions', this);
   }
 
   _computeRubric(response: UserEssay): Rubric | null {
@@ -65,7 +65,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
     return parseRubric(response.questionResponse.question.code);
   }
 
-  async loadItems(assignmentId: string): Promise<AnalyticsAssignmentLoadResult> {
+  async loadItems(assignmentId: string): Promise<AssignmentFunctionsLoadResult> {
     const data = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
     const { assignment, essays } = data;
     const random = randomWithUngradedFirst(essays, assignment.numGradeResponses);
@@ -108,7 +108,7 @@ class PrendusGradeAssignment extends Polymer.Element implements AnalyticsAssignm
     const componentState = state.components[this.componentId] || {};
     this.response = componentState.response;
     this.grades = componentState.grades;
-    this.assignment = componentState.assignment;
+    this.functions = componentState.functions;
     this.userToken = state.userToken;
     this.user = state.user;
   }

@@ -314,14 +314,14 @@ export interface AuthResult {
   readonly courseId: string;
 }
 
-export interface AnalyticsAssignmentLoadResult {
+export interface AssignmentFunctionsLoadResult {
   title: string;
   items: object[];
   taken: boolean;
 }
 
-export interface AnalyticsAssignment {
-  loadItems(assignmentId: string): AnalyticsAssignmentLoadResult;
+export interface AssignmentFunctions {
+  loadItems(assignmentId: string): AssignmentFunctionsLoadResult;
   error(item: object): string | null;
   submitItem(item: object): string;
 }

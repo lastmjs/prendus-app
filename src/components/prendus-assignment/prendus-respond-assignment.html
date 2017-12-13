@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
-<link rel="import" href="prendus-assignment-analytics.html">
+<link rel="import" href="prendus-assignment-shared.html">
 <link rel="import" href="../prendus-flaggable-question/prendus-flaggable-question.html">
 
 <dom-module id="prendus-respond-assignment">
@@ -11,16 +11,16 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-analytics
+    <prendus-assignment-shared
       assignment-id="[[assignmentId]]"
-      assignment="[[_assignment]]"
+      functions="[[functions]]"
       verb="RESPONDED"
       on-item-changed="_question"
     >
       <div slot="assignment">
         <prendus-flaggable-question  question="[[question]]" on-question-response="_response"></prendus-flaggable-question>
       </div>
-    </prendus-assignment-analytics>
+    </prendus-assignment-shared>
 
   </template>
 

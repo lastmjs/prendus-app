@@ -2,8 +2,9 @@ import {RootReducer} from '../../../../src/redux/reducers';
 import {
   Assignment,
   User,
+  AssignmentFunctions,
   Course
-} from '../../../../src/typings/index.d';
+} from '../../../../src/prendus.d';
 import {
   asyncMap,
   asyncForEach,
@@ -33,9 +34,9 @@ const jsc = require('jsverify');
 
 const courseArb = jsc.nonshrink(CourseArb);
 
-class PrendusAssignmentAnalyticsTest extends Polymer.Element {
+class PrendusAssignmentSharedTest extends Polymer.Element {
 
-  static get is() { return 'prendus-assignment-analytics-test'; }
+  static get is() { return 'prendus-assignment-shared-test'; }
 
   constructor() {
     super();
@@ -56,12 +57,12 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
 
   testOverAssignments(testFn, authorize: boolean, error: boolean) {
     return async course => {
-      const analytics = this.shadowRoot.querySelector('prendus-assignment-analytics');
+      const analytics = this.shadowRoot.querySelector('prendus-assignment-shared');
       const { author, viewer, instructor, data } = await setupTestCourse(course);
       if (authorize)
         await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
-      this.action = fireLocalAction(this.componentId, 'assignment', getAnalyticsAssignment(data, error));
+      this.action = fireLocalAction(this.componentId, 'assignment', getAssignmentFunctions(data, error));
       try {
         const success = (await asyncMap(
           data.assignments,
@@ -98,7 +99,7 @@ class PrendusAssignmentAnalyticsTest extends Polymer.Element {
   }
 }
 
-function getAnalyticsAssignment(course: Course, error: boolean): AnalyticsAssignment {
+function getAssignmentFunctions(course: Course, error: boolean): AssignmentFunctions {
   return {
     loadItems: async assignmentId => {
       const assignment = course.assignments.find(a => a.id === assignmentId);
@@ -195,5 +196,5 @@ function testSubmitItem(analytics, courseId: string): (assignment: Assignment) =
   }
 }
 
-window.customElements.define(PrendusAssignmentAnalyticsTest.is, PrendusAssignmentAnalyticsTest);
+window.customElements.define(PrendusAssignmentSharedTest.is, PrendusAssignmentSharedTest);
 

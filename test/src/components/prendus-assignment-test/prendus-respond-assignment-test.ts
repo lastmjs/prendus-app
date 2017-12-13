@@ -69,7 +69,7 @@ class PrendusRespondAssignmentTest extends Polymer.Element {
 
 function verifyLoad(takeAssignment) {
   return async assignment => {
-    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const analytics = takeAssignment.shadowRoot.querySelector('prendus-assignment-shared');
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
     takeAssignment.assignmentId = assignment.id;
     await setup;

@@ -69,7 +69,7 @@ class PrendusReviewAssignmentTest extends Polymer.Element {
 
 function verifyLoad(reviewAssignment) {
   return async assignment => {
-    const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-analytics');
+    const analytics = reviewAssignment.shadowRoot.querySelector('prendus-assignment-shared');
     const setup = getListener(ASSIGNMENT_LOADED, analytics);
     reviewAssignment.assignmentId = assignment.id;
     await setup;

@@ -3,7 +3,7 @@
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html">
 <link rel="import" href="../prendus-scaffold/prendus-multiple-choice-scaffold.html">
-<link rel="import" href="prendus-assignment-analytics.html">
+<link rel="import" href="prendus-assignment-shared.html">
 
 <dom-module id="prendus-create-assignment">
 
@@ -12,10 +12,10 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <prendus-assignment-analytics
-      id="analytics"
+    <prendus-assignment-shared
+      id="shared"
       assignment-id="[[assignmentId]]"
-      assignment="[[_assignment]]"
+      functions="[[functions]]"
       verb="CREATED"
       hide-back
       hide-next
@@ -29,7 +29,7 @@
           <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
         </div>
       </div>
-    </prendus-assignment-analytics>
+    </prendus-assignment-shared>
   </template>
 
   <script type="module" src="prendus-create-assignment.ts"></script>
