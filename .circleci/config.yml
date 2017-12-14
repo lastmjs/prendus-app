@@ -2,7 +2,7 @@ version: 2
 
 jobs:
     build:
-        working_directory: ~/prendus
+        working_directory: ~/prendus-app
         docker:
             - image: circleci/node:8.4.0
         steps:
