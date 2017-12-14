@@ -87,7 +87,6 @@ function tableIsEditable(table) {
       executeCommand(table, command, category, option, name, points);
       await event;
       const success = verifyTable(expected, table);
-      console.log(expected.rubric, table.rubric, expected.categories, table.categories, success);
       return success;
     }
   );

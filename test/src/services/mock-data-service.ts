@@ -331,7 +331,8 @@ export async function cleanupTestCourse(data, author, viewer, instructor) {
 }
 
 function handleError(err: any) {
-  console.error(err);
+  console.error(JSON.stringify(err));
+  console.error(err.message);
 }
 
 function flatten(arr: any[], el: any): any[] {
