@@ -46,9 +46,20 @@ const update = `
   }
 `;
 
+const CATEGORIES = [
+  'language',
+  'learningCategory',
+  'difficulty',
+  'conceptAlignment',
+  'inclusion',
+  'plagiarism'
+];
+
 export default async (event: FunctionEvent) => {
   const rating = event.data.QuestionRating.node;
   const averages = rating.scores.reduce(averageScore(rating.question), {});
+  if (CATEGORIES.some(c => !averages.hasOwnProperty(c)))
+    return { data: event.data };
   const values = Object.keys(averages).map(k => averages[k]);
   const variables = {
     id: rating.question.id,

@@ -61,25 +61,25 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
       await deleteTestUsers(student, instructor);
       this.shadowRoot.removeChild(table);
     } catch (e) {
-      console.error(e);
+      console.error(JSON.stringify(e));
     }
   }
 
   prepareTests(test) {
 
-    test('Set course id without residual state', [courseArb], async (course: Course) => {
-      try {
-        const { student, instructor, courseData } = (await setupData(course));
-        const table = this.attachTable();
-        this.authenticate(instructor);
-        const success = await changeCourseId(table, courseData);
-        await this.cleanup(table, [courseData], student, instructor);
-        return success;
-      } catch (e) {
-        console.error(e);
-        return false;
-      }
-    });
+    //    test('Set course id without residual state', [courseArb], async (course: Course) => {
+    //      try {
+    //        const { student, instructor, courseData } = (await setupData(course));
+    //        const table = this.attachTable();
+    //        this.authenticate(instructor);
+    //        const success = await changeCourseId(table, courseData);
+    //        await this.cleanup(table, [courseData], student, instructor);
+    //        return success;
+    //      } catch (e) {
+    //        console.error(e);
+    //        return false;
+    //      }
+    //    });
 
     test('Set course id with residual state', [coursesArb], async (courses: Courses) => {
       try {
@@ -102,7 +102,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, coursesData, student, instructor);
         return success;
       } catch (e) {
-        console.error(e);
+        console.error(JSON.stringify(e));
         return false;
       }
     });
@@ -117,7 +117,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, [courseData], student, instructor);
         return success;
       } catch (e) {
-        console.error(e);
+        console.error(JSON.stringify(e));
         return false;
       }
     });
@@ -132,7 +132,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, [courseData], student, instructor);
         return success;
       } catch (e) {
-        console.error(e);
+        console.error(JSON.stringify(e));
         return false;
       }
     });

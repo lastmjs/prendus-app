@@ -148,7 +148,6 @@ function testAssignmentFunctions(analytics, courseId: string): (assignment: Assi
         const done = Promise.race([getListener(STATEMENT_SENT, analytics), getListener(ASSIGNMENT_VALIDATION_ERROR, analytics)]);
         next.click();
         const e = await done;
-        console.log(e);
         if (e.type === ASSIGNMENT_VALIDATION_ERROR)
           return null;
         return analytic('TEST', assignment.questions[i++]);
