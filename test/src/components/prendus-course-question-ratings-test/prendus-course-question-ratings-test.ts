@@ -61,7 +61,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
       await deleteTestUsers(student, instructor);
       this.shadowRoot.removeChild(table);
     } catch (e) {
-      console.error(JSON.stringify(e));
+      console.error(e.message);
     }
   }
 
@@ -102,7 +102,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, coursesData, student, instructor);
         return success;
       } catch (e) {
-        console.error(JSON.stringify(e));
+        console.error(e.message);
         return false;
       }
     });
@@ -117,7 +117,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, [courseData], student, instructor);
         return success;
       } catch (e) {
-        console.error(JSON.stringify(e));
+        console.error(e.message);
         return false;
       }
     });
@@ -132,7 +132,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
         await this.cleanup(table, [courseData], student, instructor);
         return success;
       } catch (e) {
-        console.error(JSON.stringify(e));
+        console.error(e.message);
         return false;
       }
     });
@@ -267,7 +267,7 @@ function verifyTable(table: PrendusCourseQuestionRatings, course: object): boole
       && table.sortField === 'Overall';
   }
   catch (e) {
-    console.error(e);
+    console.error(e.message);
     return false;
   }
 }

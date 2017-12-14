@@ -5,6 +5,7 @@ import {
 import {assignCourseUserIds} from './utilities-service';
 import {schema} from '../graphcool/testSchema';
 import {GQLRequest} from '../../../../src/node_modules/prendus-shared/services/graphql-service';
+import {createUUID} from '../../../../src/node_modules/prendus-shared/services/utilities-service';
 
 const {
   getNamedType,
@@ -159,7 +160,8 @@ function flattenTypedIds(data, type) {
 }
 
 export async function createTestUser(role: string, name: string): Promise<User> {
-  const email = `test-${role}${name || ''}@test-prendus.com`;
+  const uid = createUUID();
+  const email = `test-${role}${name || ''}${uid}@test-prendus.com`;
   const data = await GQLRequest(`mutation create($email: String!) {
     signupUser(email: $email, password: "test") {
       id
