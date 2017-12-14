@@ -54,7 +54,7 @@ class PrendusRespondAssignment extends Polymer.Element implements AssignmentFunc
   async loadItems(assignmentId: string): Promise<AssignmentFunctionsLoadResult> {
     const { assignment } = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleError.bind(this));
     this.action = fireLocalAction(this.componentId, 'assignment', assignment);
-    const questions = assignment.questions.length > assignment.numResponseQuestions
+    const questions = assignment.questions.length >= assignment.numResponseQuestions
       ? shuffleArray(assignment.questions).slice(0, assignment.numResponseQuestions)
       : [];
     return {

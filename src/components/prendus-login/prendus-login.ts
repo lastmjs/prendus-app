@@ -113,7 +113,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
           await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
-          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
+          navigate(this.redirectUrl || (getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses'));
 
           if (getCookie('redirectUrl')) {
               deleteCookie('redirectUrl');

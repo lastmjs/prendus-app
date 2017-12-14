@@ -52,17 +52,17 @@ class PrendusAssignmentSharedTest extends Polymer.Element {
   clearState() {
     this.action = { type: 'SET_PROPERTY', key: 'userToken', value: null };
     this.action = { type: 'SET_PROPERTY', key: 'user', value: null };
-    this.action = { type: 'SET_PROPERTY', key: 'assignment', value: null };
+    this.action = { type: 'SET_PROPERTY', key: 'functions', value: null };
   }
 
-  testOverAssignments(testFn, authorize: boolean, error: boolean) {
+  testOverAssignments(testFn, authorize: boolean) {
     return async course => {
       const analytics = this.shadowRoot.querySelector('prendus-assignment-shared');
       const { author, viewer, instructor, data } = await setupTestCourse(course);
       if (authorize)
         await authorizeTestUserOnCourse(viewer.id, data.id);
       this.authenticate(viewer);
-      this.action = fireLocalAction(this.componentId, 'assignment', getAssignmentFunctions(data, error));
+      this.action = fireLocalAction(this.componentId, 'functions', getAssignmentFunctions(data));
       try {
         const success = (await asyncMap(
           data.assignments,
@@ -82,24 +82,20 @@ class PrendusAssignmentSharedTest extends Polymer.Element {
 
   prepareTests(test) {
 
-    test('Displays error message to unauthorized users', [courseArb], this.testOverAssignments(testUnauthorizedMessage, false, false));
+    test('Displays error message to unauthorized users', [courseArb], this.testOverAssignments(testUnauthorizedMessage, false));
 
-    test('Loads data with load function', [courseArb], this.testOverAssignments(testLoadItems, true, false));
-
-    test('Checks for errors with error function', [courseArb], this.testOverAssignments(testError, true, true));
-
-    test('Generates analytics with the submit function', [courseArb], this.testOverAssignments(testSubmitItem, true, false));
+    test('Test assignment functions', [courseArb], this.testOverAssignments(testAssignmentFunctions, true));
 
   }
 
   stateChange(e: CustomEvent) {
     const { state } = e.detail;
     const componentState = state.components[this.componentId] || {};
-    this.assignment = componentState.assignment;
+    this.functions = componentState.functions;
   }
 }
 
-function getAssignmentFunctions(course: Course, error: boolean): AssignmentFunctions {
+function getAssignmentFunctions(course: Course): AssignmentFunctions {
   return {
     loadItems: async assignmentId => {
       const assignment = course.assignments.find(a => a.id === assignmentId);
@@ -109,7 +105,7 @@ function getAssignmentFunctions(course: Course, error: boolean): AssignmentFunct
         taken: false
       };
     },
-    error: () => error ? 'Test error' : null,
+    error: () => (.5 - Math.random()) < 0 ? 'Test error' : null,
     submitItem: async question => question.id
   };
 }
@@ -129,45 +125,13 @@ function testUnauthorizedMessage(analytics, courseId: string): (assignment: Assi
   }
 }
 
-
-function testLoadItems(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
+function testAssignmentFunctions(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
   return async assignment => {
-    const event = getListener(ASSIGNMENT_LOADED, analytics);
+    const loaded = getListener(ASSIGNMENT_LOADED, analytics);
     analytics.assignmentId = assignment.id;
-    await event;
-    const { items, unauthorized, finished, loaded } = analytics;
-    return items.length === assignment.questions.length &&
-      items.every(q => assignment.questions.some(_q => q.id === _q.id)) &&
-      unauthorized === false &&
-      finished === (items.length === 0) &&
-      loaded === true;
-  }
-}
-
-function testError(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
-  return async assignment => {
-    const event = getListener(ASSIGNMENT_LOADED, analytics);
-    analytics.assignmentId = assignment.id;
-    await event;
-    const first = analytics.item;
-    const next = analytics.shadowRoot.querySelector('prendus-carousel').shadowRoot.querySelector('#next-button');
-    asyncForEach(
-      analytics.items,
-      async _ => {
-        const error = getListener(ASSIGNMENT_VALIDATION_ERROR, analytics);
-        next.click();
-        await error;
-      }
-    );
-    return first === analytics.item && analytics.finished === (analytics.items.length === 0);
-  }
-}
-
-function testSubmitItem(analytics, courseId: string): (assignment: Assignment) => Promise<boolean> {
-  return async assignment => {
-    const event = getListener(ASSIGNMENT_LOADED, analytics);
-    analytics.assignmentId = assignment.id;
-    await event;
+    await loaded;
+    if (!verifyLoad(assignment, analytics, courseId))
+      return false;
     if (!assignment.questions.length) {
       const notStarted = await checkAnalytics(assignment.id, []);
       return notStarted && analytics.finished === true && analytics.loaded === true;
@@ -181,19 +145,31 @@ function testSubmitItem(analytics, courseId: string): (assignment: Assignment) =
       async _ => {
         if (analytics.item !== assignment.questions[i])
           throw new Error('Wrong question in analytics assignment');
-        const sent = getListener(STATEMENT_SENT, analytics);
+        const done = Promise.race([getListener(STATEMENT_SENT, analytics), getListener(ASSIGNMENT_VALIDATION_ERROR, analytics)]);
         next.click();
-        await sent;
+        const e = await done;
+        console.log(e);
+        if (e.type === ASSIGNMENT_VALIDATION_ERROR)
+          return null;
         return analytic('TEST', assignment.questions[i++]);
       }
     );
     const submitted = analytic(VerbType.SUBMITTED, null);
-    const expected = [start, ...statements, submitted];
-    const finished = getListener(ASSIGNMENT_SUBMITTED, analytics);
+    const expected = [start, ...statements, (i === analytics.items.length ? submitted : null)];
+    const finished = i === analytics.items.length ? getListener(ASSIGNMENT_SUBMITTED, analytics) : Promise.resolve();
     await finished;
-    const success = await checkAnalytics(assignment.id, expected);
-    return success && analytics.finished === true;
+    const success = await checkAnalytics(assignment.id, expected.filter(statement => statement !== null));
+    return success && (analytics.finished === (i === analytics.items.length));
   }
+}
+
+function verifyLoad(assignment: Assignment, analytics, courseId: string): boolean {
+  const { items, unauthorized, finished, loaded } = analytics;
+  return items.length === assignment.questions.length &&
+    items.every(q => assignment.questions.some(_q => q.id === _q.id)) &&
+    unauthorized === false &&
+    finished === (items.length === 0) &&
+    loaded === true;
 }
 
 window.customElements.define(PrendusAssignmentSharedTest.is, PrendusAssignmentSharedTest);
