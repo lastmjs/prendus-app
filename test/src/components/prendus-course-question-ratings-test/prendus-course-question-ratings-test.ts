@@ -59,6 +59,7 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
     try {
       await asyncForEach(coursesData, course => deleteArbitrary(course, 'createCourse'));
       await deleteTestUsers(student, instructor);
+      table.shadowRoot.querySelector('redux-store').unsubscribe();
       this.shadowRoot.removeChild(table);
     } catch (e) {
       console.error(e.message);
@@ -66,20 +67,6 @@ class PrendusCourseQuestionRatingsTest extends Polymer.Element {
   }
 
   prepareTests(test) {
-
-    //    test('Set course id without residual state', [courseArb], async (course: Course) => {
-    //      try {
-    //        const { student, instructor, courseData } = (await setupData(course));
-    //        const table = this.attachTable();
-    //        this.authenticate(instructor);
-    //        const success = await changeCourseId(table, courseData);
-    //        await this.cleanup(table, [courseData], student, instructor);
-    //        return success;
-    //      } catch (e) {
-    //        console.error(e);
-    //        return false;
-    //      }
-    //    });
 
     test('Set course id with residual state', [coursesArb], async (courses: Courses) => {
       try {
