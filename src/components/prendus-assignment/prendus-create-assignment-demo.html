@@ -48,27 +48,148 @@
 
         <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
 
-        <paper-tabs id="paperTabs" selected="[[selected]]" scrollable on-selected-changed="selectedChanged">
-            <paper-tab>Step 0</paper-tab>
-            <paper-tab>Step 1</paper-tab>
-            <paper-tab>Step 2</paper-tab>
-            <paper-tab>Step 3</paper-tab>
-            <paper-tab>Step 4</paper-tab>
-            <paper-tab>Step 5</paper-tab>
-        </paper-tabs>
+        <div class="grid-container">
+            <div style="grid-column-start: 1">
+                <paper-tabs id="paperTabs" selected="[[selected]]" scrollable on-selected-changed="selectedChanged">
+                    <paper-tab>Overview</paper-tab>
+                    <paper-tab>Multiple Choice</paper-tab>
+                    <paper-tab>Multiple Select</paper-tab>
+                    <paper-tab>Inputs</paper-tab>
+                    <paper-tab>Variables</paper-tab>
+                    <paper-tab>Math Symbols</paper-tab>
+                </paper-tabs>
 
-        <iron-pages selected="[[selected]]">
+                <iron-pages selected="[[selected]]">
+                    <div>
+                        <!-- <h4>For this assignment you will create an exam level question for you and your class to practice for the upcoming exam.</h4>
+                        <h4>Follow these instructions:</h4> -->
+
+                        <ol>
+                            <li>
+                                Select a concept for your question:
+                                <select>
+                                    <option disabled selected></option>
+                                    <option>Math</option>
+                                    <option>Science</option>
+                                    <option>History</option>
+                                    <option>Writing</option>
+                                </select>
+                            </li>
+
+                            <br>
+
+                            <li>
+                                Add a helpful resource for your question:
+                                <paper-input type="text" label="textbook page 100, https://en.wikipedia.org/wiki/Mathematics, etc"></paper-input>
+                            </li>
+
+                            <br>
+
+                            <li>
+                                Use the editor to create your question. Use the tabs above for help
+                            </li>
+
+                            <br>
+
+                            <li>
+                                When you are satisfied with your question, click <button on-click="submitClick">Submit</button>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <ol>
+                            <li>
+                                Start by asking a question:
+                                <paper-input type="text"></paper-input>
+                            </li>
+
+                            <li>
+                                Add multiple choice options:
+                                <br>
+                                <br>
+                                Use the Radio button option in the text editor or
+                                <button on-click="instructionsMultipleChoiceOptionClick">Click Here</button>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <ol>
+                            <li>
+                                Start by asking a question:
+                                <paper-input type="text"></paper-input>
+                            </li>
+
+                            <li>
+                                Add multiple select options:
+                                <br>
+                                <br>
+                                Use the Checkbox option in the text editor or
+                                <button on-click="instructionsMultipleSelectOptionClick">Click Here</button>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <ol>
+                            <li>Type your question into the editor</li>
+
+                            <br>
+
+                            <li>
+                                When you need an input:
+                                <br>
+                                <br>
+                                Use the Input option in the text editor or
+                                <button on-click="instructionsInputOptionClick">Click Here</button>
+                            </li>
+                        </ol>
+                    </div>
+                </iron-pages>
+            </div>
+
+            <div style="grid-column-start: 2">
+                <prendus-edit-question no-save></prendus-edit-question>
+            </div>
+        </div>
+
+        <!-- <iron-pages selected="[[selected]]">
             <div class="grid-container">
                 <div style="grid-column-start: 1">
-                    <h3>Instructions</h3>
+                    <h4>For this assignment you will create an exam level question for you and your class to practice for the upcoming exam.</h4>
+                    <h4>Follow these instructions:</h4>
 
-                    <ul>
-                        <li>For this assignment you will create an exam level question for you and your class to practice for the upcoming exam</li>
-                        <li>We will guide you through the question creation process</li>
-                        <li>Feel free to use the editor directly at any point along the way, or just follow the instructions</li>
-                        <li>You can check that your question is working correctly at any time by using the question preview below the editor</li>
-                        <li>Get started by clicking the next button below or clicking on the Step 1 tab</li>
-                    </ul>
+                    <ol>
+                        <li>
+                            Select a concept for your question:
+                            <select>
+                                <option disabled selected></option>
+                                <option>Math</option>
+                                <option>Science</option>
+                                <option>History</option>
+                                <option>Writing</option>
+                            </select>
+                        </li>
+
+                        <br>
+
+                        <li>
+                            Add a helpful resource for your question: <paper-input type="text" label="textbook page 100, https://en.wikipedia.org/wiki/Mathematics, etc"></paper-input>
+                        </li>
+
+                        <br>
+
+                        <li>
+                            Use the editor to create your question. Use the tabs above for help
+                        </li>
+
+                        <br>
+
+                        <li>
+                            When you are satisfied with your question, click <button on-click="submitClick">Submit</button>
+                        </li>
+                    </ol>
                 </div>
 
                 <div style="grid-column-start: 2">
@@ -200,9 +321,9 @@
                     </div>
                 </div>
             </div>
-        </iron-pages>
+        </iron-pages> -->
 
-        <dom-if if="[[showPrevButton(selected)]]">
+        <!-- <dom-if if="[[showPrevButton(selected)]]">
             <template>
                 <button class="prendus-button prendus-button--recommended" on-click="prevClick">Prev</button>
             </template>
@@ -218,7 +339,7 @@
             <template>
                 <button class="prendus-button prendus-button--recommended" on-click="submitClick">Submit</button>
             </template>
-        </dom-if>
+        </dom-if> -->
 
     </template>
 
