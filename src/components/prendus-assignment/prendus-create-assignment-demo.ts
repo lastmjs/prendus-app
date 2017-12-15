@@ -1,8 +1,8 @@
 import {createUUID, shuffleArray} from '../../services/utilities-service'; //TODO: use prendus-shared
 import {SetComponentPropertyAction} from '../../typings/actions';
 import {State} from '../../typings/state';
-import {compileToAssessML} from '../../node_modules/assessml/assessml';
-import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
+import {compileToAssessML, parse} from '../../node_modules/assessml/assessml';
+import {AST, Content} from '../../node_modules/assessml/assessml.d';
 
 class PrendusCreateAssignmentDemo extends Polymer.Element {
     componentId: string;
@@ -67,9 +67,19 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
         this.action = fireLocalAction(this.componentId, 'incorrectAnswer2RadioNumber', radioNumbers[2]);
         this.action = fireLocalAction(this.componentId, 'incorrectAnswer3RadioNumber', radioNumbers[3]);
         this.action = fireLocalAction(this.componentId, 'question', {
-            text: '',
-            // code: `answer = radio${radioNumbers[0]} === true;`
+            text: ' ',
             code: 'answer = true;'
+        });
+
+        //TODO this is hacky and should be changed
+        setTimeout(() => {
+            this.action = fireLocalAction(this.componentId, 'question', {
+                text: '',
+                code: 'answer = true;'
+            });
+
+            //TODO provide a declarative way of doing this from the prendus-edit-question element
+            this.shadowRoot.querySelector('#editor').shadowRoot.querySelector('#textEditor').shadowRoot.querySelector('#editable').focus();
         });
     }
 
@@ -206,6 +216,66 @@ class PrendusCreateAssignmentDemo extends Polymer.Element {
 
     showSubmitButton(selected: number) {
         return selected === 5;
+    }
+
+    instructionsMultipleChoiceOptionClick() {
+        this.shadowRoot.querySelector('#editor').clickRadioTool();
+    }
+
+    instructionsMultipleSelectOptionClick() {
+        this.shadowRoot.querySelector('#editor').clickCheckTool();
+    }
+
+    instructionsInputOptionClick() {
+        this.shadowRoot.querySelector('#editor').clickInputTool();
+    }
+
+    instructionsVariableOptionClick() {
+        this.shadowRoot.querySelector('#editor').clickVariableTool();
+    }
+
+    instructionsMathSymbolsOptionClick() {
+        this.shadowRoot.querySelector('#editor').clickMathTool();
+    }
+
+    multipleChoiceQuestionInputValueChanged() {
+        const multipleChoiceQuestionInput = this.shadowRoot.querySelector('#multipleChoiceQuestionInput');
+
+        const ast: AST = parse(this.question.text, () => 5, () => '', () => [], () => []);
+        const newContent: Content = {
+            type: 'CONTENT',
+            content: multipleChoiceQuestionInput.value,
+            varName: 'content'
+        };
+        const newAst: AST = {
+            ...ast,
+            ast: ast.ast[0] && ast.ast[0].type === 'CONTENT' ? [newContent, ...ast.ast.slice(1)] : [newContent, ...ast.ast]
+        };
+
+        this.action = fireLocalAction(this.componentId, 'question', {
+            ...this.question,
+            text: compileToAssessML(newAst, () => 5, () => '', () => [], () => [])
+        });
+    }
+
+    multipleSelectQuestionInputValueChanged() {
+        const multipleSelectQuestionInput = this.shadowRoot.querySelector('#multipleSelectQuestionInput');
+
+        const ast: AST = parse(this.question.text, () => 5, () => '', () => [], () => []);
+        const newContent: Content = {
+            type: 'CONTENT',
+            content: multipleSelectQuestionInput.value,
+            varName: 'content'
+        };
+        const newAst: AST = {
+            ...ast,
+            ast: ast.ast[0] && ast.ast[0].type === 'CONTENT' ? [newContent, ...ast.ast.slice(1)] : [newContent, ...ast.ast]
+        };
+
+        this.action = fireLocalAction(this.componentId, 'question', {
+            ...this.question,
+            text: compileToAssessML(newAst, () => 5, () => '', () => [], () => [])
+        });
     }
 
     stateChange(e: CustomEvent) {
