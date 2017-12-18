@@ -29,6 +29,7 @@
   <script>
     if (window.ELECTRON_CONSOLE_ARGUMENTS.autoRun) {
       setTimeout(() => {
+        document.getElementById('testRunner').numTests = 10;
         document.getElementById('testRunner').autoRun = true;
       }, 5000);
     }
