@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
@@ -28,7 +29,7 @@
         /*This is because the app-drawer has padding of 120px. Annoying. Open to other ways to get rid of the padding*/
         margin-top: -184px;
       }
-      #menu-items  paper-item{
+      .menu-items  paper-item{
         cursor: pointer;
         text-transform: uppercase;
         font-style: normal;
@@ -43,7 +44,7 @@
         color: gray;
         width: 100%;
       }
-      #menu-items  paper-item:hover{
+      .menu-items  paper-item:hover{
         color: var(--prendus-primary-color);
       }
       #legal-links{
@@ -82,22 +83,15 @@
 
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
     <app-drawer-layout>
-      <app-drawer id="menu" slot="drawer" align="right" fullbleed>
+      <app-drawer id="menu" slot="drawer" align="right" opened="[[menuOpen]]" on-opened-changed="changeMenuOpen">
         <app-header id="prendus-navbar" fixed>
           <app-toolbar>
             <paper-menu-button vertical-align="bottom" horizontal-align="left" id='account-info'>
-              <paper-item id="account-item" slot="dropdown-trigger"><iron-icon icon="account-circle"></iron-icon>&nbsp; <span id="truncated-email">[[user.email]]</span></paper-item>
-              <a slot="dropdown-content" class="prendus-button prendus-button--recommended navbar-text" on-click="logout">Log out</a>
-              <paper-listbox >
-                <!-- Need to fix this later -->
-                <paper-item on-click="logout">Share</paper-item>
-                <paper-item>Settings</paper-item>
-                <paper-item>Help</paper-item>
-              </paper-listbox>
+              <paper-item id="account-item" slot="dropdown-trigger" on-click="openUserInfoDialog"><iron-icon icon="account-circle"></iron-icon>&nbsp; <span id="truncated-email">[[user.email]]</span></paper-item>
             </paper-menu-button>
           <app-toolbar>
         </app-header>
-        <paper-listbox id="menu-items">
+        <paper-listbox class="menu-items">
           <a href="/questions/view"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
           <hr>
           <a href="/quizzes/view"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
@@ -115,6 +109,14 @@
         </div>
       </app-drawer>
     </app-drawer-layout>
+    <paper-dialog id="user-info" vertical-align="top" horizontal-align="right" on-open-changed="modalChangeLog">
+      <paper-listbox class="menu-items">
+        Signed in as [[user.email]]
+        <a href="/account"><paper-item><iron-icon icon="account-circle"></iron-icon>&nbsp; My Profile</paper-item></a>
+        <hr>
+        <a><paper-item on-click="logout">Log Out</paper-item></a>
+      </paper-listbox>
+    </paper-dialog>
   </template>
 
   <script type="module" src="prendus-menu.ts"></script>

@@ -13,18 +13,23 @@ class PrendusNavbar extends Polymer.Element {
       this.shadowRoot.querySelector('#drawer').toggle();
     }
     logout() {
-      console.log('logout')
       if (this.userToken){
         this.action = removeUser();
         this.action = removeUserToken();
         navigate(`/login`)
       }
     }
+    openMenu(){
+      this.action = {
+          type: 'SET_PROPERTY',
+          key: 'menuOpen',
+          value: true
+      };
+    }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         const componentState = state.components[this.componentId] || {};
         const keys = Object.keys(componentState);
-
         this.user = state.user;
         this.userToken = state.userToken;
     }

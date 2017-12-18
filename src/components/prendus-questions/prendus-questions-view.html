@@ -20,7 +20,7 @@
           --paper-fab-background: var(--prendus-primary-color);
           position: fixed;
           bottom: 30px;
-          right: 300px;
+          right: calc(5vw + 256px);
         }
         #questions-block{
           display: flex;
@@ -30,6 +30,12 @@
         prendus-question-viewer-wrapper{
           margin-left: 2vw;
           margin-bottom: 2vh;
+          min-width: 350px;
+        }
+        @media (max-width: 645px) {
+          paper-fab{
+            right: 5vw;
+          }
         }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>

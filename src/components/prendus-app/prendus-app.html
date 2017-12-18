@@ -70,12 +70,18 @@
             padding: 3vh 3vw;
           }
   			}
-
-            .question-editor-container {
-                min-width: 50vw;
-                max-width: 100vw;
-                width: calc((1000px - 100%) * 1000);
-            }
+        @media (max-width: 645px) {
+          #prendus-menu{
+            /*If this isn't set, the width of the menu will be the width of the words instead of the width of the drawer*/
+            min-width: 0px;
+            width: 0px;
+          }
+        }
+        .question-editor-container {
+            min-width: 50vw;
+            max-width: 100vw;
+            width: calc((1000px - 100%) * 1000);
+        }
       </style>
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
 
@@ -143,7 +149,7 @@
 
         <app-route route="[[route]]" pattern="/questions/view" data="{{viewQuestionsRouteData}}" active="{{viewQuestionsRouteActive}}"></app-route>
 
-        <prendus-navbar></prendus-navbar>
+        <prendus-navbar on-open="openMenu"></prendus-navbar>
         <div id="main-content">
           <iron-lazy-pages id="app-container" attr-for-selected="show" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive, createQuizRouteActive, editQuizRouteActive, viewQuizRouteActive, viewQuizzesRouteActive)]]">
 

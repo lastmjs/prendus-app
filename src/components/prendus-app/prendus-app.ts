@@ -287,9 +287,6 @@ class PrendusApp extends Polymer.Element {
         navigate(`/login`)
       }
     }
-    narrowToggle(){
-      this.shadowRoot.querySelector('#prendus-drawer').forceNarrow = true;
-    }
     //TODO put the route in redux
       // subscribedToStore() {
      //     this.subscribedToStore = true;

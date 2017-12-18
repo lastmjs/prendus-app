@@ -35,7 +35,11 @@
                 <a class="prendus-button prendus-button--recommended navbar-text" href="login">Login</a>
               </template>
             </dom-if>
-            <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
+            <dom-if if="[[user]]">
+              <template>
+                <paper-icon-button icon="menu" on-click="openMenu"></paper-icon-button>
+              </template>
+            </dom-if>
           <app-toolbar>
         </app-header>
     </template>
