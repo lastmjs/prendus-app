@@ -106,7 +106,7 @@
                 </paper-card>
                 <dom-repeat items="[[quizQuestions]]">
                   <template>
-                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" edit delete></prendus-question-viewer-wrapper>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-deleted="removeFromQuiz" edit delete></prendus-question-viewer-wrapper>
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>

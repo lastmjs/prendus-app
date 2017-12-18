@@ -40,6 +40,9 @@ class PrendusMenu extends Polymer.Element {
     modalChangeLog(e){
       console.log('e.change', e)
     }
+    closeUserInfoDialog(e){
+      this.shadowRoot.querySelector('#user-info').close();
+    }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         const componentState = state.components[this.componentId] || {};

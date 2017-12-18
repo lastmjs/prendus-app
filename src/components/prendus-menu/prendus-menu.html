@@ -112,7 +112,7 @@
     <paper-dialog id="user-info" vertical-align="top" horizontal-align="right" on-open-changed="modalChangeLog">
       <paper-listbox class="menu-items">
         Signed in as [[user.email]]
-        <a href="/account"><paper-item><iron-icon icon="account-circle"></iron-icon>&nbsp; My Profile</paper-item></a>
+        <a href="/account"><paper-item on-click="closeUserInfoDialog"><iron-icon icon="account-circle"></iron-icon>&nbsp; My Profile</paper-item></a>
         <hr>
         <a><paper-item on-click="logout">Log Out</paper-item></a>
       </paper-listbox>

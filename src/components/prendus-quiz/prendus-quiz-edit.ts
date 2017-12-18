@@ -92,6 +92,17 @@ class PrendusQuizEdit extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'quizQuestions', newQuizQuestions);
     }, 10)
   }
+  removeFromQuiz(e:any){
+    const newQuizQuestions = this.quizQuestions.reduce((newQuestions: object[], question: Question)=>{
+      if(question.id !== e.detail.questionId) newQuestions.push(question);
+      return newQuestions;
+    },[]);
+    this.action = fireLocalAction(this.componentId, 'quizQuestions', newQuizQuestions);
+    setTimeout(() => { //hack because the component won't show unless this is fired twice. Figure out the fix if iron-list doesn't fix this.
+      this.action = fireLocalAction(this.componentId, 'quizQuestions', newQuizQuestions);
+    }, 10)
+  }
+
   async saveQuiz(){
     const title = this.shadowRoot.querySelector('#quizInput').value;
     if(!title){

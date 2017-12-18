@@ -64,7 +64,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
   fireAddQuestion(e){
-    const questionId = e.target.id;
+    const questionId = e.target.dataset.questionid;
     this.dispatchEvent(new CustomEvent('added', {
         bubbles: false,
         detail: {
@@ -73,8 +73,9 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     }));
   }
   fireRemoveQuestion(e){
-    const questionId = e.target.id;
-    this.dispatchEvent(new CustomEvent('removed', {
+    const questionId = e.target.dataset.questionid;
+    console.log('questionId', questionId);
+    this.dispatchEvent(new CustomEvent('deleted', {
         bubbles: false,
         detail: {
           questionId,
