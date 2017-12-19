@@ -127,7 +127,6 @@ class PrendusApp extends Polymer.Element {
           return 'createAssignmentView';
         }
         if (demoAssignmentRouteActive){
-          console.log('assignment demo')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'assignmentDemoView';

@@ -42,7 +42,6 @@
     "paper-tooltip": "PolymerElements/paper-tooltip#^2.0.0",
     "iron-location": "https://github.com/Prendus/iron-location.git#^2.0.2",
     "wysiwyg-e": "^2.1.0",
-    "juicy-ace-editor": "^2.0.1",
     "iron-lazy-pages": "^2.0.2",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",

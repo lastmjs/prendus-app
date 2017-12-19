@@ -65,7 +65,7 @@
   			}
 
             .question-editor-container {
-                min-width: 50vw;
+                min-width: 75vw;
                 max-width: 100vw;
                 width: calc((1000px - 100%) * 1000);
             }
@@ -190,7 +190,10 @@
             <prendus-course-question-ratings class="app-window app-window-wide" show="courseQuestionRatingsView" course-id="[[courseQuestionRatingsRouteData.courseId]]" filter-by-user="[[_isStudent(user)]]" data-path="../prendus-course-question-ratings/prendus-course-question-ratings.html"></prendus-course-question-ratings>
             <prendus-course-payment show="paymentCourseView" course-id="[[paymentCourseRouteData.courseId]]" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-course-payment/prendus-course-payment.html"></prendus-course-payment>
 
-            <prendus-create-assignment-demo show="assignmentDemoView" assignment-id="[[demoAssignmentRouteData.assignmentId]]" data-path="../prendus-assignment/prendus-create-assignment-demo.html"></prendus-create-assignment-demo>
+            <div class="question-editor-container" show="assignmentDemoView" data-path="../prendus-assignment/prendus-create-assignment-demo.html">
+                <prendus-create-assignment-demo assignment-id="[[demoAssignmentRouteData.assignmentId]]"></prendus-create-assignment-demo>
+            </div>
+
             <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
             <prendus-create-assignment class="app-window" show="assignmentCreateView" assignment-id="[[assignmentCreateRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-create-assignment.html"></prendus-create-assignment>
             <prendus-review-assignment class="app-window" show="assignmentReviewView" assignment-id="[[assignmentReviewRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-review-assignment.html"></prendus-review-assignment>
