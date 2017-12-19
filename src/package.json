@@ -7,6 +7,6 @@
     "redux-store-element": "^1.2.13"
   },
   "devDependencies": {
-    "zwitterion": "^0.17.0"
+    "zwitterion": "^0.16.1"
   }
 }
