@@ -48,9 +48,6 @@
         paper-autocomplete-suggestions{
           --suggestions-item
         }
-        .hidden-institution{
-          display: none;
-        }
         </style>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <dom-if if="[[loaded]]">
@@ -63,17 +60,26 @@
                 <paper-input id="confirm-password" name="confirm-password" label="Confirm Password" type="password" required minlength="6" on-focusout="hardValidateConfirmedPassword" on-keyup="validateConfirmedPassword" error-message="Passwords do not match."></paper-input>
                 <!-- <paper-autocomplete id="institution" name="institution" label="Institution" on-keydown="findInstitution" value="[[institution.name]]" no-label-float source="[[institutions]]"></paper-autocomplete> -->
                 <!-- If the above autocomplete doesn't work, use this. -->
-                <paper-input id="user-institution" name="userInstitution" label="Institution" value="[[user.institution]]"></paper-input>
-                <div class="autocomplete-wrapper" class="hidden-institution">
-                  <paper-input class="hidden-institution" id="institution" name="institution" label="Institution" on-keydown="findInstitution" value="[[institution.name]]"></paper-input>
-                  <paper-autocomplete-suggestions class="hidden-institution" for="institution" source="[[institutions]]" on-autocomplete-selected="institutionAutoSelected"></paper-autocomplete-suggestions>
-                </div>
-                <prendus-search class="hidden-institution" search-index="Institutions" search-parameter="[[institutionPartialName]]" attributes-to-retrieve="[[attributesToRetrieve]]" on-result="loadInstitutions"></prendus-search>
+                <dom-if if="[[user.institution]]">
+                  <template>
+                    <paper-input id="user-institution" name="userInstitution" label="Institution" value="[[user.institution]]"></paper-input>
+                  </template>
+                </dom-if>
+                <dom-if if="[[!user.institution]]">
+                  <template>
+                    <div class="autocomplete-wrapper">
+                      <paper-input id="institution" name="institution" label="Institution" on-keydown="findInstitution" value="[[institution.name]]"></paper-input>
+                      <paper-autocomplete-suggestions for="institution" source="[[institutions]]" on-autocomplete-selected="institutionAutoSelected"></paper-autocomplete-suggestions>
+                    </div>
+                    <prendus-search search-index="Institutions" search-parameter="[[institutionPartialName]]" attributes-to-retrieve="[[attributesToRetrieve]]" on-result="loadInstitutions"></prendus-search>
+                    <!-- <span>Don't see your institution? <span id="addInstitution" on-click="openCreateInstitutionModal">Add your Institution</span> -->
+                  </template>
+                </dom-if>
               </form>
-              <span class="hidden-institution">Don't see your institution? <span id="addInstitution" on-click="openCreateInstitutionModal">Add your Institution</span>
-            <div>
-              <button class="giveMeSomeSpace prendus-button prendus-button--recommended" disabled="[[!signupButtonEnabled]]" on-click="signupClick">Submit</button>
-            </div>
+              <!-- Add this back when we're ready to let people update their profiles -->
+              <!-- <div>
+                <button class="giveMeSomeSpace prendus-button prendus-button--recommended" disabled="[[!updateProfileButtonEnabled]]" on-click="updateProfileClick">Update Profile</button>
+              </div> -->
             </paper-card>
             <paper-dialog id="create-institution-modal" modal opened="[[createInstitutionModalOpen]]">
               <!-- Wrapped in a div solely for stylistic issues -->

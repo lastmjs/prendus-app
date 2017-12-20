@@ -74,7 +74,6 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   }
   fireRemoveQuestion(e){
     const questionId = e.target.dataset.questionid;
-    console.log('questionId', questionId);
     this.dispatchEvent(new CustomEvent('deleted', {
         bubbles: false,
         detail: {

@@ -52,7 +52,33 @@ class PrendusQuestionsView extends Polymer.Element {
     }
   }
 
+  confirmDelete(e){
+    this.shadowRoot.querySelector('#confirmDeleteQuestionModal').open()
+  }
 
+  async deleteQuestion(e: any){
+    try{
+      this.shadowRoot.querySelector('#confirmDeleteQuestionModal').close()
+      this.action = fireLocalAction(this.componentId, 'loaded', false);
+      const questionId = e.target.id;
+      console.log('button questionId', questionId)
+      const deletedQuestionId = await deleteQuestion(this.user.id, this.userToken, questionId);
+      console.log('deletedQuestionId', deletedQuestionId)
+      const newUserQuestions = this.questions.reduce((newUserQuestionsArray: Question[], question: Question) => {
+        console.log('deletedQ ID', deletedQuestionId)
+        console.log('question ID', question.id)
+        if(question.id !== deletedQuestionId)  newUserQuestionsArray.push(question);
+        return newUserQuestionsArray;
+      }, []);
+      console.log('this.userQuestions', this.questions)
+      console.log('this.newquestions', newUserQuestions)
+      this.action = fireLocalAction(this.componentId, 'questions', newUserQuestions);
+      this.action = fireLocalAction(this.componentId, 'loaded', true);
+    }catch(error){
+      this.action = setNotification(error.message, NotificationType.ERROR);
+      this.action = fireLocalAction(this.componentId, 'loaded', true)
+    }
+  }
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
@@ -89,4 +115,17 @@ async function getUserQuestions(userId: String, userToken: String) {
       throw error;
     });
     return data.allQuestions;
+}
+
+async function deleteQuestion(userId: String, userToken: string, questionId: string) {
+    const data = await GQLRequest(`
+      mutation deleteQuestion($questionId: ID!){
+        deleteQuestion(id: $questionId){
+          id
+        }
+      }
+    `, {questionId}, userToken, (error: any) => {
+      throw error;
+    });
+    return data.deleteQuestion.id;
 }

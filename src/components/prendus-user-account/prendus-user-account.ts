@@ -17,7 +17,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     password: string;
     email: string;
     confirmedPassword: string;
-    signupButtonEnabled: boolean;
+    updateProfileButtonEnabled: boolean;
     user: User | null;
     client: any;
     index: any;
@@ -44,7 +44,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
         this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", false);
         this.action = fireLocalAction(this.componentId, "attributesToRetrieve", ['Name']);
         this.action = fireLocalAction(this.componentId, "loaded", true);
-        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false);
+        this.action = fireLocalAction(this.componentId, "updateProfileButtonEnabled", false);
     }
     openCreateInstitutionModal(e: any){
       this.shadowRoot.querySelector('#create-institution-modal').open();
@@ -93,7 +93,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
       if(emailElement && emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
-      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "updateProfileButtonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
       this.shadowRoot.querySelector('#email').validate();
@@ -101,7 +101,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     validatePassword(): void {
       const pass: string = this.shadowRoot.querySelector('#password').value;
       if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
-      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
+      this.action = fireLocalAction(this.componentId, "updateProfileButtonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
     }
     hardValidatePassword(): void {
       this.shadowRoot.querySelector('#password').validate();
@@ -115,17 +115,16 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
       this.shadowRoot.querySelector('#confirm-password').validate();
     }
     createUserOnEnter(e: any): void {
-      if(e.keyCode === 13 && enableSignup(this.email, this.password, this.confirmedPassword)) this.signupClick();
+      if(e.keyCode === 13 && enableSignup(this.email, this.password, this.confirmedPassword)) this.updateProfileClick();
     }
 
-    async signupClick() {
+    async updateProfileClick() {
         try{
           this.action = fireLocalAction(this.componentId, "loaded", false)
-          const email: string = this.shadowRoot.querySelector('#email').value;
+          const email: string = this.shadowRoot.querySelector('#email').value === this.user.email ? this.user.email : this.shadowRoot.querySelector('#email').value;
           const password: string = this.shadowRoot.querySelector('#password').value;
-          const signupData = await performSignupMutation(this, email, password, this.userToken);
+          const updateData = password ? await performUpdateMutationWithPassword(this, email, password, this.userToken) : await performUpdateMutationWithoutPassword(this, email, password, this.userToken);
           if(this.institution && this.institution.id){
-            console.log('trying to add institution')
             await addUserInstitution(this, signupData.id, this.institution.id, this.userToken);
           }
           this.action = persistUserToken(signupData.signupUser.token);
@@ -136,9 +135,6 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
           deleteCookie('redirectUrl');
 
-          this.shadowRoot.querySelector('#email').value = '';
-          this.shadowRoot.querySelector('#password').value;
-          _clearFormData(this);
           this.action = fireLocalAction(this.componentId, "loaded", true)
         }catch(error){
           console.log('error', error)
@@ -154,7 +150,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
         if (keys.includes('email')) this.email = componentState.email;
         if (keys.includes('password')) this.password = componentState.password;
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
-        if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
+        if (keys.includes('updateProfileButtonEnabled')) this.updateProfileButtonEnabled = componentState.updateProfileEnabled;
         if (keys.includes('institution')) this.institution = componentState.institution;
         if (keys.includes('institutionPartialName')) this.institutionPartialName = componentState.institutionPartialName;
         if (keys.includes('institutions')) this.institutions = componentState.institutions;
@@ -178,11 +174,11 @@ function enableSignup(email: string, password: string, confirmedPassword: string
   }
 }
 
-async function performSignupMutation(context: PrendusUserAccount, email: string, password: string, userToken: string | null) {
+async function performUpdatateMutationWithPassword(context: PrendusUserAccount, email: string, password: string, userToken: string | null) {
     // signup the user and login the user
     const data = await GQLRequest(`
-        mutation signupUser($email: String!, $password: String!) {
-            signupUser(email: $email, password: $password) {
+        mutation updateUser($email: String!, $password: String!) {
+            updateUser(email: $email, password: $password) {
                 id
                 token
             }
@@ -194,7 +190,22 @@ async function performSignupMutation(context: PrendusUserAccount, email: string,
 
     return data;
 }
+async function performUpdatateMutationWithoutPassword(context: PrendusUserAccount, email: string, userToken: string | null) {
+    // signup the user and login the user
+    const data = await GQLRequest(`
+        mutation updateUser($email: String!, $password: String!) {
+            updateUser(email: $email, password: $password) {
+                id
+                token
+            }
+        }
+    `, {email, password}, userToken, (error: any) => {
+        console.log('error in signup', error)
+        context.action = setNotification(error.message, NotificationType.ERROR)
+    });
 
+    return data;
+}
 async function addUserInstitution(context: PrendusUserAccount, userId: string, institutionId: string, userToken: string | null){
   const data = await GQLRequest(`
       mutation addUserInstitution($email: String!, $password: String!) {
