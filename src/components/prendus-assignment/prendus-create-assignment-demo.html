@@ -7,44 +7,25 @@
         <style include="prendus-styles">
         </style>
 
-        <ol>
-            <br>
+        <br>
 
-            <li>
-                Select a concept for your question:
-                <select>
-                    <option disabled selected></option>
-                    <option>Math</option>
-                    <option>Science</option>
-                    <option>History</option>
-                    <option>Writing</option>
-                </select>
-            </li>
+        Select a concept for your question:
+        <select>
+            <option disabled selected></option>
+            <option>Math</option>
+            <option>Science</option>
+            <option>History</option>
+            <option>Writing</option>
+        </select>
 
-            <br>
-
-            <li>
-                Add a helpful resource for your question:
-                <paper-input type="text" label="e.g. textbook page 100, https://en.wikipedia.org/wiki/Mathematics"></paper-input>
-            </li>
-
-            <br>
-
-            <li>
-                Use the editor to create your question
-            </li>
-
-            <br>
-
-            <li>
-                When you are satisfied with your question, click <button on-click="submitClick">Submit</button>
-            </li>
-
-            <br>
-        </ol>
+        <br>
+        <br>
 
         <div style="margin-bottom: 5vh">
             <prendus-edit-question no-save></prendus-edit-question>
+            <div style="display: flex; margin-top: 1vh">
+                <button class="prendus-button prendus-button--recommended" style="margin-left: auto" on-click="submitClick">Submit</button>
+            </div>
         </div>
     </template>
 
