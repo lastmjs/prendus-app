@@ -84,7 +84,8 @@
               </div>
             </div>
             <div class="quizTitle">
-              <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]"></paper-input>
+              <!-- Trying to get the quiz title to validate, but I have not been able to figure it out -->
+              <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]" autofocus on-change="validateTitle" pattern="^(?!\s*$).+" error-message="Please enter a title."></paper-input>
               <div class="titleActions" hidden$="[[!editTitle]]">
                 <button class="prendus-button" on-click="saveQuizTitle" ><iron-icon class="saveTitle" icon="check"></iron-icon>&nbsp;Done</button>
                 <button class="prendus-button prendus-button--minor" on-click="stopEditingQuizTitle">Cancel</button>
@@ -95,7 +96,7 @@
                 <h2 class="questionHeader">My Questions</h2>
                 <dom-repeat items="[[userQuestions]]">
                   <template>
-                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-added="addToQuiz" add edit delete></prendus-question-viewer-wrapper>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-added="addToQuiz" add edit></prendus-question-viewer-wrapper>
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
                   </template>
                 </dom-repeat>

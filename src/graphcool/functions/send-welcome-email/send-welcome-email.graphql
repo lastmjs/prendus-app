@@ -1,0 +1,7 @@
+type SendWelcomeEmailPayload {
+    email: String!
+}
+
+extend type Mutation {
+    SendWelcomeEmail(email: String!): SendWelcomeEmailPayload
+}

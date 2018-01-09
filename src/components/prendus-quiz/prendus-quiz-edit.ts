@@ -65,6 +65,10 @@ class PrendusQuizEdit extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'loaded', true)
     }
   }
+  validateTitle() : void{
+    console.log('validate', this.shadowRoot.querySelector('#quizInput'))
+    this.shadowRoot.querySelector('#quizInput').validate();
+  }
 
   async loadQuiz(){
     try{
@@ -78,7 +82,6 @@ class PrendusQuizEdit extends Polymer.Element {
       this.action = fireLocalAction(this.componentId, 'loaded', true)
     }
   }
-
   addToQuiz(e: any){
     const questionToAddToQuiz = this.userQuestions.filter((question)=>{
       return e.detail.questionId == question.id;
@@ -119,6 +122,8 @@ class PrendusQuizEdit extends Polymer.Element {
     });
     const quizId = (this.quizId) ? await updateQuiz(this.quizId, quizQuestionIds, title, this.userToken) : await createQuiz(quizQuestionIds, title, this.user.id, this.userToken);
     this.action = fireLocalAction(this.componentId, 'quizId', quizId);
+    this.action = fireLocalAction(this.componentId, 'quizQuestions', []);
+    this.action = fireLocalAction(this.componentId, 'quizTitle', '');
     navigate('/quizzes/view');
   }
   startEditingQuizTitle(){

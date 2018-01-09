@@ -31,6 +31,11 @@
           margin-left: 2vw;
           margin-bottom: 2vh;
         }
+        .title{
+          display: flex;
+          justify-content: center;
+          margin-bottom: 5vh;
+        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
@@ -39,6 +44,11 @@
             <dom-if if="[[!quizzes.length]]">
               <template>
                 <prendus-no-content-card parent-component="Quiz" plural="Quizzes" primary-redirect-url="quiz/create" secondary-redirect-url="quiz/search" display-icon="editor:format-list-bulleted"></prendus-no-content-card>
+              </template>
+            </dom-if>
+            <dom-if if="[[quizzes.length]]">
+              <template>
+                <h1 class="title">My Quizzes</h1>
               </template>
             </dom-if>
             <!-- Need to get an iron list working.  -->

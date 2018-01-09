@@ -37,6 +37,11 @@
             right: 5vw;
           }
         }
+        .title{
+          display: flex;
+          justify-content: center;
+          margin-bottom: 5vh;
+        }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
 
@@ -45,6 +50,11 @@
             <dom-if if="[[!questions]]">
               <template>
                 <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
+              </template>
+            </dom-if>
+            <dom-if if="[[questions]]">
+              <template>
+                <h1 class="title">My Questions</h1>
               </template>
             </dom-if>
             <!-- Need to get an iron list working.  -->

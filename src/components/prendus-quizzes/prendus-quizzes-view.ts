@@ -8,7 +8,7 @@ import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from 
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
-import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {Assignment} from '../../typings/assignment'
 
 class PrendusQuizzesView extends Polymer.Element {
@@ -32,12 +32,13 @@ class PrendusQuizzesView extends Polymer.Element {
   }
 
   async connectedCallback() {
-    this.action = fireLocalAction(this.componentId, 'loaded', false)
     await this.loadQuizzes();
+    this.subscribeToData();
     super.connectedCallback();
   }
 
   async loadQuizzes(){
+    this.action = fireLocalAction(this.componentId, 'loaded', false)
     try{
       setTimeout(async () => {
         this.action = checkForUserToken();
@@ -68,6 +69,33 @@ class PrendusQuizzesView extends Polymer.Element {
     }
 
     // const newQuizArray = this.quizzes.filter()
+  }
+  subscribeToData() {
+    //I'm trying to get this subscription set up but it is not working for me. 
+    setTimeout(async () => {
+      this.action = checkForUserToken();
+      this.action = await getAndSetUser();
+      GQLSubscribe(`
+          subscription changedQuiz {
+              Quiz(
+                  filter: {
+                      mutation_in: [CREATED, UPDATED, DELETED]
+                      node: {
+                        author :{
+                          id: "${this.user.id}"
+                        }
+                      }
+                  }
+              ) {
+                  node {
+                    id
+                  }
+              }
+          }
+      `, this.componentId, (data: any) => {
+          this.loadQuizzes;
+      });
+    }, 0);
   }
 
   stateChange(e: CustomEvent) {
