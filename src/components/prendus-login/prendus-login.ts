@@ -35,9 +35,9 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
     async connectedCallback() {
         super.connectedCallback();
-        this.action = fireLocalAction(this.componentId, 'loaded', true)
-        this.action = fireLocalAction(this.componentId, 'loginDisabled', true)
-        this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false)
+        this.action = fireLocalAction(this.componentId, 'loaded', true);
+        this.action = fireLocalAction(this.componentId, 'loginDisabled', true);
+        this.action = fireLocalAction(this.componentId, 'resetPasswordDialogOpen', false);
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', true);
     }
 
@@ -81,9 +81,8 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
       }
     }
     async resetPassword() {
-        const email = this.shadowRoot.querySelector('#reset-password-email').value;
         this.action = fireLocalAction(this.componentId, 'loaded', false);
-        sendResetPasswordEmail(email);
+        await sendResetPasswordEmail(this.shadowRoot.querySelector('#reset-password-email').value);
         this.action = fireLocalAction(this.componentId, 'loaded', true);
         this.closeResetPasswordDialog();
         //Eventually redirect to another landing page that says they will get an email if the
@@ -118,7 +117,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           };
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
-          addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
+          await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
 
           if (getCookie('redirectUrl')) {
@@ -186,7 +185,6 @@ async function getUser(email: string, password: string, userToken: string | null
         }
       }
     `, {email}, userToken, (error: any) => {
-      console.log('error', error)
       error.message = "An unexpected error occurred fetching user data. Please reload and try again."
       throw error;
     });
@@ -205,8 +203,11 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
           userId: user ? user.id : 'user is null',
           jwt: ltiJWT
       }, userToken, (error: any) => {
-        error.message = "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help"
-        throw error;
+        const updatedError = {
+          ...error,
+          message: "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
+        }
+        throw updatedError;
       });
   }
 }
