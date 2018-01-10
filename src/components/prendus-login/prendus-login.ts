@@ -71,7 +71,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
   	async checkPasswordResetAndSubmitIfEnter(e: any): void {
       const email = this.shadowRoot.querySelector('#reset-password-email').value;
-      if (this.enableResetPassword(email)) {
+      if (enableResetPassword(email)) {
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', false);
     		if(e.keyCode === 13) {
           this.resetPassword();
