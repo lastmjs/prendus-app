@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+<dom-module id="prendus-carousel">
+
+  <template>
+
+    <style include="prendus-styles">
+      #back-button, #next-button {
+        margin-top: 20px;
+      }
+      #back-button {
+        float: left;
+      }
+      #next-button {
+        float: right;
+      }
+      [hidden] {
+        display: none;
+      }
+    </style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <dom-if if="[[!finished]]">
+      <template>
+        <h3>[[label]] [[_plusOne(currentIndex)]]/[[data.length]]</h3>
+      </template>
+    </dom-if>
+    <br>
+
+    <slot></slot>
+
+    <button id="back-button" class="prendus-button prendus-button--recommended" hidden$="[[hideBack]]">[[backText]]</button>
+    <button id="next-button" class="prendus-button prendus-button--recommended" hidden$="[[_hideNext(hideNext, finished)]]" on-click="_notifyNext">[[nextText]]</button>
+  </template>
+
+  <script type="module" src="prendus-carousel.ts"></script>
+
+</dom-module>

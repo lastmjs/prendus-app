@@ -1,0 +1,8 @@
+{
+	SomeUserExists(filter: {
+       AND: [{
+      	id: $user_id
+        role: ADMIN
+      }]
+  })
+}

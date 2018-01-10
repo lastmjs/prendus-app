@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-why-prendus">
+    <template>
+      <style include ="prendus-styles">
+    .page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      flex-direction: column;
+    }
+    .main-paragraph
+    {
+      padding: calc(24px - 2vw);
+      max-width: 60vw;
+    }
+    #header {
+      padding: 9em 0 9em 0 ;
+      /*background-color: rgba(0, 0, 0, 0.75);*/
+      color: white;
+      background-attachment: fixed,		fixed,							fixed;
+      background-image: linear-gradient(rgba(100,100,100,0.4),rgba(100,100,150,0.4)), url("../../images/meeting.jpg");
+      background-position: top left, center center,	center center;
+      background-size: cover;
+      overflow: hidden;
+
+      position: relative;
+      text-align: center;
+      background-repeat: no-repeat;
+    }
+      </style>
+      <section id="header">
+        <div class="inner">
+          <span class="icon major fa-cloud"></span>
+          <h1>Why Prendus?</h1>
+          <p> You may ask, ”But why Prendus? Why not just have students share questions through the cloud or use Quizlet?” To answer that, here’s what sets Prendus apart.</p>
+          <!-- <ul class="actions">
+            <li><a href="#one" class="button scrolly">Discover</a></li>
+          </ul> -->
+        </div>
+      </section>
+
+      <div class="page">
+
+        <h2>Instructors</h2>
+        <div class="main-paragraph">
+          <h3>Better Teaching, Made Easy</h3>
+          <p> We offer higher-level thinking activities for students without significant teacher time commitment. Telling students to share questions with each other doesn’t take much time either, but it doesn’t allow for dynamic feedback or help students develop their metacognitive abilities.</p>
+        </div>
+
+        <div class="main-paragraph">
+          <h3>Save Time</h3>
+          <p>You’ll have access to an instructor-only question repository, full of questions that can be used for future homework assignments, quizzes, open-ended responses, and exams, giving you more time for your students.</p>
+        </div>
+        <div class="main-paragraph">
+          <h3>Consolidate</h3>
+          <p>Prendus can cover all of your assessment needs, from formative and reading quizzes to homework, exams, worksheet generation, and adaptive testing. Detailed item statistics for exam, quiz, and homework questions</p>
+        </div>
+        <div class="main-paragraph">
+          <h3>Personalized. For you.</h3>
+          <p>You’ll have access to an instructor-only question repository, full of questions that can be used for future homework assignments, quizzes, open-ended responses, and exams, giving you more time for your students.</p>
+        </div>
+
+        <h2>Students</h2>
+        <div class="main-paragraph">
+          <h3>Save Money</h3>
+          <p>Most textbook homework systems charge a steep premium for creating material, while other platforms charge for editing material. We put the power to create and curate in your hands, allowing you to learn better and cheaper.</p>
+        </div>
+        <div class="main-paragraph">
+          <h3>Meta Memory</h3>
+          <p> We provide game-changing metacognitive tools to help you understand your strengths and weaknesses. Ever get out of a test with a score lower than you expected? Use Prendus and have a more accurate expectation before you go in.</p>
+        </div>
+        <div class="main-paragraph">
+          <h3>Help Other</h3>
+          <p> when you use Prendus, you learn from the questions you write and benefit from those that your classmates write. These questions don’t get thrown away at the end of the term though. They stick around to help your peers learn and practice concepts. Thank you for taking time to help your friends from the future! </p>
+        </div>
+      </div>
+    </template>
+
+    <script type="module" src="prendus-why-prendus.ts"></script>
+</dom-module>

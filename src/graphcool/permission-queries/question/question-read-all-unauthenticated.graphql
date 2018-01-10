@@ -1,0 +1,8 @@
+{
+  SomeQuestionExists(
+    filter: {
+      id: $node_id,
+      visibility: PUBLIC
+    }
+  )
+}

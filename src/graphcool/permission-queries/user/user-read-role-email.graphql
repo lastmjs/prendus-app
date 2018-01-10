@@ -1,0 +1,18 @@
+query($user_id: ID!, $node_id: ID!) {
+  SomeUserExists(
+    filter: {
+      id: $user_id
+      OR:[{
+        id: $node_id
+      }, {
+        role: ADMIN
+      }, {
+        ownedCourses_some: {
+          enrolledStudents_some: {
+            id: $node_id
+          }
+        }
+      }]
+    }
+  )
+}

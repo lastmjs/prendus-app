@@ -19,6 +19,15 @@ export function getGraphcoolHTTPEndpoint() {
     }
 }
 
+export function getGraphcoolHTTPFileEndpoint() {
+    if (window.process.env.NODE_ENV === 'production') {
+        return 'https://api.graph.cool/file/v1/cj48qaw2u6uyd01411y8gj8fr';
+    }
+    else {
+        return 'https://api.graph.cool/file/v1/cj36de9q4dem00134bhkwm44r';
+    }
+}
+
 export function getGraphcoolWebSocketEndpoint() {
     if (window.process.env.NODE_ENV === 'production') {
         return 'wss://subscriptions.us-west-2.graph.cool/v1/cj48qaw2u6uyd01411y8gj8fr';
@@ -74,12 +83,19 @@ export const getQuestionScaffoldAnswers = (questionScaffold: QuestionScaffold): 
   });
 };
 
+//Fisher-Yates in place shuffle
 export function shuffleArray(array: any[]): any[] {
-    const newArray = [...array];
-    return newArray.sort((element) => {
-        return .5 - Math.random();
-    });
+  const copy = [...array];
+  let remaining = copy.length;
+  while (remaining) {
+    const i = Math.floor(Math.random() * remaining--);
+    const temp = copy[remaining];
+    copy[remaining] = copy[i];
+    copy[i] = temp;
+  }
+  return copy;
 }
+
 export function createUUID() {
     //From persistence.js; Copyright (c) 2010 Zef Hemel <zef@zef.me> * * Permission is hereby granted, free of charge, to any person * obtaining a copy of this software and associated documentation * files (the "Software"), to deal in the Software without * restriction, including without limitation the rights to use, * copy, modify, merge, publish, distribute, sublicense, and/or sell * copies of the Software, and to permit persons to whom the * Software is furnished to do so, subject to the following * conditions: * * The above copyright notice and this permission notice shall be * included in all copies or substantial portions of the Software. * * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR * OTHER DEALINGS IN THE SOFTWARE.
 	var s: any[] = [];

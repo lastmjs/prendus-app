@@ -1,11 +1,11 @@
 import {ContainerElement} from '../../typings/container-element';
 import {State} from '../../typings/state';
-import {GQLQuery, GQLMutate, GQLSubscribe} from '../../services/graphql-service';
+import {User} from '../../typings/user';
+import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
 import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
-import {createUUID, navigate, getCookie, deleteCookie} from '../../services/utilities-service';
-import {EMAIL_REGEX} from '../../services/constants-service';
-import {NotificationType} from '../../services/constants-service';
+import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
+import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
 class PrendusSignup extends Polymer.Element implements ContainerElement {
     componentId: string;
@@ -13,6 +13,11 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     userToken: string | null;
     redirectUrl: string;
     loaded: boolean;
+    password: string;
+    email: string;
+    confirmedPassword: string;
+    signupButtonEnabled: boolean;
+    user: User | null;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -29,139 +34,121 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         this.componentId = createUUID();
     }
 
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
+        this.action = fireLocalAction(this.componentId, "loaded", true)
+        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
     }
 
-    loadData() {
-
-    }
-
-    subscribeToData() {
-
+    validateEmail(): void {
+      const emailElement: string = this.shadowRoot.querySelector('#email').value;
+      if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      emailElement.validate();
+      this.shadowRoot.querySelector('#email').validate();
     }
-
-    softValidateEmail(): void {
-      const emailElement: any = this.shadowRoot.querySelector('#email');
-      if(this.email.match(EMAIL_REGEX) !== null) emailElement.invalid = false;
+    validatePassword(): void {
+      const pass: string = this.shadowRoot.querySelector('#password').value;
+      if(pass && pass.length >= 6) this.action = fireLocalAction(this.componentId, "password", pass)
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(this.email, pass, this.confirmedPassword))
     }
     hardValidatePassword(): void {
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      passwordElement.validate();
+      this.shadowRoot.querySelector('#password').validate();
     }
-
-    softValidatePassword(): void {
-
-      const passwordElement: any = this.shadowRoot.querySelector('#password');
-      if(this.password.length >= 6) passwordElement.invalid = false;
+    validateConfirmedPassword(): void {
+      const confirmedPass: string = this.shadowRoot.querySelector('#confirm-password').value;
+      if(confirmedPass && confirmedPass.length >=6) this.action = fireLocalAction(this.componentId, "confirmedPassword", confirmedPass);
+      this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(this.email, this.password, confirmedPass));
     }
-
-    hardValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password !== this.confirmPassword) confirmPasswordElement.invalid = true;
+    hardValidateConfirmedPassword(): void {
+      this.shadowRoot.querySelector('#confirm-password').validate();
     }
-
-    softValidateConfirmPassword(): void {
-      const confirmPasswordElement: any = this.shadowRoot.querySelector('#confirm-password');
-      if(this.password === this.confirmPassword) confirmPasswordElement.invalid = false;
-    }
-
-    enableSignup(userType: string, email: string, password: string, confirmPassword: string): boolean {
-      return	userType !== ''
-          &&	email.match(EMAIL_REGEX) !== null
-          &&	password !== ''
-          &&	confirmPassword !== ''
-          &&	password === confirmPassword;
-    }
-
     createUserOnEnter(e: any): void {
-      if(e.keyCode === 13 && this.enableSignup(this.userType, this.email, this.password, this.confirmPassword)) this.createUser(e);
+      if(e.keyCode === 13 && enableSignup(this.email, this.password, this.confirmedPassword)) this.signupClick();
     }
 
     async signupClick() {
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: false
-        };
+        try{
+          this.action = fireLocalAction(this.componentId, "loaded", false)
+          const email: string = this.shadowRoot.querySelector('#email').value;
+          const password: string = this.shadowRoot.querySelector('#password').value;
+          const signupData = await performSignupMutation(this, email, password, this.userToken);
+          this.action = persistUserToken(signupData.signupUser.token);
+          this.action = await getAndSetUser();
+          const ltiJWT = getCookie('ltiJWT');
+          deleteCookie('ltiJWT');
+          async addLTIUser(this.user, ltiJWT, signupData.signupUser.token);
+          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
+          deleteCookie('redirectUrl');
+          this.action = fireLocalAction(this.componentId, "loaded", true)
 
-        const email: string = this.shadowRoot.querySelector('#email').value;
-        const password: string = this.shadowRoot.querySelector('#password').value;
-        const signupData = await performSignupMutation(email, password, this.userToken);
-        // deleteCookie('ltiJWT');
-        // if (this.ltiUserId) await performLTIUserLinkMutation(this.ltiUserId, signupData.createUser.id, this.userToken);
-        const loginData = await performLoginMutation(email, password, this.userToken);
-        this.action = persistUserToken(loginData.signinUser.token);
-        this.action = await getAndSetUser(this.userToken);
-        navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
-        deleteCookie('redirectUrl');
-
-        this.action = {
-            type: 'SET_COMPONENT_PROPERTY',
-            componentId: this.componentId,
-            key: 'loaded',
-            value: true
-        };
-
-        async function performSignupMutation(email: string, password: string, userToken: string | null) {
-            // signup the user and login the user
-            const data = await GQLMutate(`
-                mutation {
-                    createUser(
-                            authProvider: {
-                                email: {
-                                    email: "${email}"
-                                    password: "${password}"
-                                }
-                            }
-                            ltiJWT: "${getCookie('ltiJWT')}"
-                        ) {
-                            id
-                        }
-                }
-            `, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
-            });
-
-            return data;
-        }
-
-        async function performLoginMutation(email: string, password: string, userToken: string | null) {
-            const data = await GQLMutate(`
-                mutation {
-                    signinUser(email: {
-                        email: "${email}"
-                        password: "${password}"
-                    }) {
-                        token
-                    }
-                }
-            `, userToken, (error: any) => {
-                this.action = setNotification(error.message, NotificationType.ERROR)
-            });
-
-            return data;
+        }catch(error){
+          this.action = setNotification(error.message, NotificationType.ERROR);
+          this.action = fireLocalAction(this.componentId, 'loaded', true);
         }
     }
 
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-
-        if (Object.keys(state.components[this.componentId] || {}).includes('loaded')) this.loaded = state.components[this.componentId].loaded;
+        const componentState = state.components[this.componentId] || {};
+        const keys = Object.keys(componentState);
+        if (keys.includes('loaded')) this.loaded = componentState.loaded;
+        if (keys.includes('email')) this.email = componentState.email;
+        if (keys.includes('password')) this.password = componentState.password;
+        if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
+        if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
+        this.user = state.user;
         this.userToken = state.userToken;
     }
 }
 
 window.customElements.define(PrendusSignup.is, PrendusSignup);
+
+function enableSignup(email: string, password: string, confirmedPassword: string){
+  if(email && password && confirmedPassword){
+    return	email.match(EMAIL_REGEX) !== null
+        &&	password.length >= 6
+        &&	confirmedPassword.length >= 6
+        &&	password === confirmedPassword;
+  }else{
+    return false
+  }
+}
+
+async function performSignupMutation(context: PrendusSignup, email: string, password: string, userToken: string | null) {
+    // signup the user and login the user
+    const data = await GQLRequest(`
+        mutation signupUser($email: String!, $password: String!) {
+            signupUser(email: $email, password: $password) {
+                id
+                token
+            }
+        }
+    `, {email, password}, userToken, (error: any) => {
+        context.action = setNotification(error.message, NotificationType.ERROR)
+    });
+
+    return data;
+}
+//TODO put this in Prendus Shared because it is used in the Login component as well
+async function addLTIUser(ltiJWT: string, user: User, userToken: string){
+  if (ltiJWT) {
+      await GQLRequest(`
+          mutation addLTIUser($userId: ID!, $jwt: String!) {
+              addLTIUser(userId: $userId, jwt: $jwt) {
+                  id
+              }
+          }
+      `, {
+          userId: user ? user.id : 'user is null',
+          jwt: ltiJWT
+      }, userToken, (error: any) => {
+        const updatedError = {
+          ...error,
+          message: "There was a problem adding the LTI token to your user account. Contact support@prendus.com for help."
+        }
+        throw updatedError;
+      });
+  }
+}

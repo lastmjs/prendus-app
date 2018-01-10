@@ -1,0 +1,11 @@
+{
+  SomeSubjectExists(filter: {
+	 discipline: {
+      courses_some:{
+        author:{
+          id:$user_id
+        }
+      }
+  	}
+  })
+}
