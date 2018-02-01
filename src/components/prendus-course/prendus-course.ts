@@ -284,6 +284,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#create-assignment').close();
+        await this.loadData();
+        // this.shadowRoot.querySelector('#create-assignment').close();
         // navigate(`assignment/${data.createAssignment.id}/edit`)
       }else{
         setNotification("Input a title to add Assignment", NotificationType.WARNING)
@@ -303,7 +305,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadData();
     }
     async loadData() {
-        this._fireLocalAction('loaded', false)
         const data = await GQLRequest(`
             query getAssignments($courseId: ID!) {
                 allAssignments(filter: {
@@ -352,7 +353,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             this._fireLocalAction('customSubject', true)
           }
         }
-        this._fireLocalAction('loaded', false)
     }
     subscribeToData() {
         GQLSubscribe(`
