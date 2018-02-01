@@ -21,12 +21,6 @@ types: ./types.graphql
 rootTokens:
 - cloudFunctionsRootToken
 
-
-# Organize your code into modules
-# You can find modules from the community here:
-# https://github.com/graphcool/modules
-# modules: {}
-
 functions:
     signup:
         handler:

@@ -242,6 +242,8 @@ class PrendusApp extends Polymer.Element {
           window.ga('send', 'pageview');
           return 'passwordResetView';
         }
+      
+        return '404View';
     }
 
     logout() {

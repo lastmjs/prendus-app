@@ -248,6 +248,12 @@ type LTIUser @model {
 }
 
 type PrendusAnalytics @model {
+  user: User @relation(name: "UserOnPrendusAnalytics")
+  contextId: String! @migrationValue(value: "NO_CONTEXT_ID")
+  contextType: ContextType! @migrationValue(value: QUESTION)
+  verb: String!
+  object: String! @migrationValue(value: "NO_OBJECT")
+  createdAt: DateTime!
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
