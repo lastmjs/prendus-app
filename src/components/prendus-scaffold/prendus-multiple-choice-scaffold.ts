@@ -1,9 +1,11 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {Concept} from '../../typings/concept';
+import {
+  SetPropertyAction,
+  SetComponentPropertyAction,
+  AnswerTypes
+} from '../../prendus.d';
 import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {AnswerTypes} from '../../typings/answer-types';
-import {NotificationType} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {setNotification} from '../../redux/actions';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
@@ -158,9 +160,9 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     const mChoice = (choice, comment, correct) => {
       const text = choice ? choice.text : '';
       const picture = choice ? choice.picture : null;
-      return {text, comment, correct, picture, type: AnswerTypes.MultipleChoice}
+      return {text, comment, correct, picture, type: AnswerTypes.MultipleChoice};
     };
-    return [mChoice(answer, hints ? hints[0] : '', true), ...(distractors || []).map((distractor, i) => mChoice(distractor, (hints ? hints[i+1]: ''), false))];
+    return [mChoice(answer, (hints ? hints[0] : ''), true), ...(distractors || []).map((distractor, i) => mChoice(distractor, (hints ? hints[i+1]: ''), false))];
   }
 
   showNext(i: number): boolean {
@@ -181,6 +183,7 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionStem, this.answer, this.distractors, this.hints);
     } catch (e) {
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }

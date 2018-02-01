@@ -1,11 +1,6 @@
 import {RootReducer} from '../../redux/reducers';
 import {navigate} from '../../node_modules/prendus-shared/services/utilities-service';
-import {Reducer} from '../../typings/reducer';
-import {State} from '../../typings/state';
-import {User} from '../../typings/user';
-import {Notification} from '../../typings/notification';
 import {checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
-import {SetPropertyAction, DefaultAction} from '../../typings/actions';
 
 class PrendusApp extends Polymer.Element {
     rootReducer: Reducer;
@@ -249,10 +244,6 @@ class PrendusApp extends Polymer.Element {
         }
       
         return '404View';
-    }
-
-    _isStudent(user: User): boolean {
-      return user ? user.role === 'STUDENT' : true;
     }
 
     logout() {

@@ -47,10 +47,13 @@
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "iron-pages": "^2.0.0",
-    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0"
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
+    "iron-list": "^2.0.11",
+    "iron-scroll-threshold": "^1.0.2"
   },
   "resolutions": {
-    "webcomponentsjs": "^1.0.0"
+    "webcomponentsjs": "^1.0.0",
+    "polymer": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0"

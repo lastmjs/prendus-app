@@ -1,11 +1,7 @@
 import {html} from '../../node_modules/lit-html/lit-html';
 import {render} from '../../node_modules/lit-html/lib/lit-extended';
-import {SetComponentPropertyAction, SetPropertyAction, DefaultAction} from '../../typings/actions';
-import {State} from '../../typings/state';
 import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
-import {Course} from '../../typings/course';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {getStripeKey} from '../../services/utilities-service';
 import {NotificationType} from '../../services/constants-service';

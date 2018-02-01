@@ -1,5 +1,3 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {Concept} from '../../typings/concept';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 
 /*

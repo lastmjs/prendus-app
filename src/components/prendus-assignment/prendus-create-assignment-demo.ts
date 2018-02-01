@@ -1,6 +1,4 @@
 import {createUUID, shuffleArray} from '../../services/utilities-service'; //TODO: use prendus-shared
-import {SetComponentPropertyAction} from '../../typings/actions';
-import {State} from '../../typings/state';
 import {compileToAssessML} from '../../node_modules/assessml/assessml';
 import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
 

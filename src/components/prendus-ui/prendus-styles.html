@@ -7,8 +7,7 @@
     <style>
 
 
-    body
-    {
+    body {
       height: 100%;
       margin:0;
       padding:0;
@@ -17,270 +16,274 @@
       overflow-x: hidden;
     }
 
-        .hero{
-          background-image: url("images/landing-image.jpg");
-          }
-				/* COLORS */
+    .hero{
+      background-image: url("images/landing-image.jpg");
+      }
+    /* COLORS */
 
-				:host > * {
-					--prendus-primary-color: var(--paper-indigo-500);
-					--prendus-primary-color-emphasis: var(--paper-indigo-700);
-					--prendus-primary-color-light: var(--paper-indigo-50);
-					--prendus-off-white: #fafafa;
-					--prendus-grey: #f0f0f0;
-					--prendus-green: var(--paper-green-500);
-					--prendus-blue: var(--paper-blue-500);
-					--prendus-yellow: var(--paper-yellow-500);
-					--prendus-red: var(--paper-red-500);
-          margin: 0;
-				}
-        #right-side{
-          align-content: right;
-        }
-        #logo {
-          height: 50px;
-        }
-        #home-link {
-          margin-right: auto;
-        }
-        #prendus-navbar{
-          background-color: var(--prendus-primary-color);
-        }
-				/* TEXT */
+    :host > * {
+      --prendus-primary-color: var(--paper-indigo-500);
+      --prendus-primary-color-emphasis: var(--paper-indigo-700);
+      --prendus-primary-color-light: var(--paper-indigo-50);
+      --prendus-off-white: #fafafa;
+      --prendus-grey: #f0f0f0;
+      --prendus-green: var(--paper-green-500);
+      --prendus-blue: var(--paper-blue-500);
+      --prendus-yellow: var(--paper-yellow-500);
+      --prendus-red: var(--paper-red-500);
+      margin: 0;
+    }
+    #right-side{
+      align-content: right;
+    }
+    #logo {
+      height: 50px;
+    }
+    #home-link {
+      margin-right: auto;
+    }
+    #prendus-navbar{
+      background-color: var(--prendus-primary-color);
+    }
+    /* TEXT */
 
-				* {
-					font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-					word-wrap: break-word;
-					min-width: 0;
-				}
+    * {
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      word-wrap: break-word;
+      min-width: 0;
+    }
 
-				code {
-					font-family: 'Inconsolata', 'Monaco', 'Consolas', 'Courier New', Courier;
-					font-size: .9em;
-					background-color: var(--prendus-grey)
-				}
+    code {
+      font-family: 'Inconsolata', 'Monaco', 'Consolas', 'Courier New', Courier;
+      font-size: .9em;
+      background-color: var(--prendus-grey)
+    }
 
-				a {
-				  text-decoration: none;
-				}
+    a {
+      text-decoration: none;
+    }
 
-				a:hover {
-					text-decoration: underline;
-				}
+    a:hover {
+      text-decoration: underline;
+    }
 
-				h1 {
-				  font-weight: 300;
-				  font-size: calc(1.8em + 2vw);
-				}
+    h1 {
+      font-weight: 300;
+      font-size: calc(1.8em + 2vw);
+    }
 
-				h2 {
-				  font-weight: 300;
-				  font-size: calc(1.3em + 1vw);
-				}
+    h2 {
+      font-weight: 300;
+      font-size: calc(1.3em + 1vw);
+    }
 
-				h3 {
-				  font-weight: 200;
-				  font-size: calc(.9em + 1vw);
-				  color: #777;
-				}
+    h3 {
+      font-weight: 200;
+      font-size: calc(.9em + 1vw);
+      color: #777;
+    }
 
-				p,
-				h1,
-				h2,
-				h3,
-				h4,
-				h5,
-				h6 {
-					margin: 0;
-				}
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 0;
+    }
 
-				/* TODO: replace this obnoxious thing with :matches or equivalent once implemented */
-				/* See http://caniuse.com/#search=%3Amatches */
+    /* TODO: replace this obnoxious thing with :matches or equivalent once implemented */
+    /* See http://caniuse.com/#search=%3Amatches */
 
-				p + p,
-				p + h1,
-				p + h2,
-				p + h3,
-				p + h4,
-				h1 + p,
-				h1 + h1,
-				h1 + h2,
-				h1 + h3,
-				h1 + h4,
-				h2 + p,
-				h2 + h1,
-				h2 + h2,
-				h2 + h3,
-				h2 + h4,
-				h3 + p,
-				h3 + h1,
-				h3 + h2,
-				h3 + h3,
-				h3 + h4,
-				h4 + p,
-				h4 + h1,
-				h4 + h2,
-				h4 + h3,
-				h4 + h4 {
-					margin-top: .7em;
-				}
+    p + p,
+    p + h1,
+    p + h2,
+    p + h3,
+    p + h4,
+    h1 + p,
+    h1 + h1,
+    h1 + h2,
+    h1 + h3,
+    h1 + h4,
+    h2 + p,
+    h2 + h1,
+    h2 + h2,
+    h2 + h3,
+    h2 + h4,
+    h3 + p,
+    h3 + h1,
+    h3 + h2,
+    h3 + h3,
+    h3 + h4,
+    h4 + p,
+    h4 + h1,
+    h4 + h2,
+    h4 + h3,
+    h4 + h4 {
+      margin-top: .7em;
+    }
 
-				/* NOTIFICATIONS */
+    /* NOTIFICATIONS */
 
-				.prendus-notification {
-					width: 100%;
-				}
+    .prendus-notification {
+      width: 100%;
+    }
 
-				.prendus-notification--success {
-					background: var(--prendus-green);
-				}
+    .prendus-notification--success {
+      background: var(--prendus-green);
+    }
 
-				.prendus-notification--info {
-					background: var(--prendus-blue);
-				}
+    .prendus-notification--info {
+      background: var(--prendus-blue);
+    }
 
-				.prendus-notification--warning {
-					background: var(--prendus-yellow);
-				}
+    .prendus-notification--warning {
+      background: var(--prendus-yellow);
+    }
 
-				.prendus-notification--error {
-					background: var(--prendus-red);
-				}
+    .prendus-notification--error {
+      background: var(--prendus-red);
+    }
 
-				/* CONTAINERS */
+    /* CONTAINERS */
 
-				.prendus-vertical-container > * + * {
-					margin-top: 15px;
-				}
+    .prendus-vertical-container > * + * {
+      margin-top: 15px;
+    }
 
-				.prendus-horizontal-container > * + * {
-					margin-left: 5px;
-				}
+    .prendus-horizontal-container > * + * {
+      margin-left: 5px;
+    }
 
-				.prendus-card {
-					border-radius: 2px;
-					padding: 15px;
-					background-color: white;
+    .prendus-card {
+      border-radius: 2px;
+      padding: 15px;
+      background-color: white;
 
-					/* material design shadows */
-					@apply(--shadow-elevation-2dp);
-				}
+      /* material design shadows */
+      @apply(--shadow-elevation-2dp);
+    }
 
-				.prendus-card--no-padding {
-					padding: 0;
-				}
+    .prendus-card--no-padding {
+      padding: 0;
+    }
 
-				/* BUTTONS */
+    /* BUTTONS */
 
-				.prendus-button {
-					color: black;
-					font-size: 1em;
-					background-color: var(--paper-grey-200);
-					border-radius: 3px;
-					padding: .7em 1.4em;
-					box-sizing: border-box;
-					user-select: none;
-					display: inline-flex;
-					align-items: center;
-					justify-content: center;
-					border: none;
-					cursor: pointer;
-				}
+    .prendus-button {
+      color: black;
+      font-size: 1em;
+      background-color: var(--paper-grey-200);
+      border-radius: 3px;
+      padding: .7em 1.4em;
+      box-sizing: border-box;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+    }
 
-				.prendus-button:hover {
-					text-decoration: none;
-					background-color: var(--paper-grey-300);
-				}
+    .prendus-button:hover {
+      text-decoration: none;
+      background-color: var(--paper-grey-300);
+    }
 
-				.prendus-button:focus {
-					font-weight: bold;
-					outline: none;
-				}
+    .prendus-button:focus {
+      font-weight: bold;
+      outline: none;
+    }
 
-				.prendus-button[disabled] {
-					color: var(--paper-grey-500);
-					background-color: var(--paper-grey-200);
-					cursor: default;
-				}
+    .prendus-button[disabled] {
+      color: var(--paper-grey-500);
+      background-color: var(--paper-grey-200);
+      cursor: default;
+    }
 
-				.prendus-button[disabled]:hover {
-					background-color: var(--paper-grey-200);
-				}
+    .prendus-button[disabled]:hover {
+      background-color: var(--paper-grey-200);
+    }
 
-				.prendus-button iron-icon {
-					height: 1.3em;
-					width: 1.3em;
-					flex-shrink: 0;
-				}
+    .prendus-button iron-icon {
+      height: 1.3em;
+      width: 1.3em;
+      flex-shrink: 0;
+    }
 
-				.prendus-button > * + * {
-					margin-left: 5px;
-				}
+    .prendus-button > * + * {
+      margin-left: 5px;
+    }
 
-				.prendus-button--recommended {
-					color: white;
-					background-color: var(--prendus-primary-color);
-				}
+    .prendus-button--recommended {
+      color: white;
+      background-color: var(--prendus-primary-color);
+    }
 
-				.prendus-button--recommended:hover {
-					background-color: var(--prendus-primary-color-emphasis);
-				}
+    .prendus-button--recommended:hover {
+      background-color: var(--prendus-primary-color-emphasis);
+    }
 
-				.prendus-button--minor {
-					color: var(--prendus-primary-color);
-					background: none;
-				}
+    .prendus-button--minor {
+      color: var(--prendus-primary-color);
+      background: none;
+    }
 
-				.prendus-button--minor:hover {
-					text-decoration: underline;
-					background: none;
-				}
+    .prendus-button--minor:hover {
+      text-decoration: underline;
+      background: none;
+    }
 
-				.prendus-button--destructive {
-					color: var(--paper-red-500);
-					background-color: white;
-				}
+    .prendus-button--destructive {
+      color: var(--paper-red-500);
+      background-color: white;
+    }
 
-				.prendus-button--destructive:hover {
-					color: white;
-					background-color: var(--paper-red-500);
-				}
+    .prendus-button--destructive:hover {
+      color: white;
+      background-color: var(--paper-red-500);
+    }
 
-				.prendus-button--big {
-					font-size: 1.1em;
-					padding: .9em 1.8em;
-				}
+    .prendus-button--big {
+      font-size: 1.1em;
+      padding: .9em 1.8em;
+    }
 
-				/* Formats buttons in any div with the class "buttons" */
-				.buttons .prendus-button + .prendus-button {
-					margin-left: 5px;
-				}
+    /* Formats buttons in any div with the class "buttons" */
+    .buttons .prendus-button + .prendus-button {
+      margin-left: 5px;
+    }
 
-				/* For buttons that look like inline text links */
-				.prendus-link-button {
-					color: var(--prendus-primary-color);
-					background-color: inherit;
-					font-size: 1em;
-					padding: 0;
-					cursor: pointer;
-					border: none;
-					display: inline;
-				}
+    /* For buttons that look like inline text links */
+    .prendus-link-button {
+      color: var(--prendus-primary-color);
+      background-color: inherit;
+      font-size: 1em;
+      padding: 0;
+      cursor: pointer;
+      border: none;
+      display: inline;
+    }
 
-				.prendus-link-button:hover {
-					text-decoration: underline;
-				}
+    .prendus-link-button:hover {
+      text-decoration: underline;
+    }
 
-				.prendus-icon-button {
-					flex-shrink: 0;
-					cursor: pointer;
-					opacity: .6;
-					color: initial;
-				}
+    .prendus-icon-button {
+      flex-shrink: 0;
+      cursor: pointer;
+      opacity: .6;
+      color: initial;
+    }
 
-				.prendus-icon-button:hover {
-					opacity: 1;
-				}
+    .prendus-icon-button:hover {
+      opacity: 1;
+    }
+
+    [hidden] {
+      display: none;
+    }
 
     </style>
 

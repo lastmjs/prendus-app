@@ -2,6 +2,30 @@
 export const MAX_NUM_ATTEMPTS_REACHED = 'Maximum number of attempts reached';
 export const NO_ANSWER_FEEDBACK_ALLOWED = 'No answer feedback allowed';
 export const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+export const GQL_SORT_DESC = '_DESC';
+export const GQL_SORT_ASC = '_ASC';
+export const ARIA_SORT_ASC = 'ascending';
+export const ARIA_SORT_DESC = 'descending';
+export const ARIA_SORT_NONE = 'none';
+export const STUDENT = 'Student';
+export const OVERALL = 'Overall';
+export const ALL = 'ALL';
+//Event names mostly used for testing
+export const ASSIGNMENT_LOADED = 'assignment-loaded';
+export const ASSIGNMENT_SUBMITTED = 'assignment-submitted';
+export const ASSIGNMENT_VALIDATION_ERROR = 'assignment-validation-error';
+export const STATEMENT_SENT = 'statement-sent';
+export const SCORES_CHANGED = 'scores-changed';
+export const CATEGORIES_CHANGED = 'categories-changed';
+export const ITEM_CHANGED = 'item-changed';
+export const ITEMS_CHANGED = 'items-changed';
+export const RUBRIC_CHANGED = 'rubric-changed';
+export const FINISHED_CHANGED = 'finished-changed';
+export const Role = {
+  INSTRUCTOR: 'INSTRUCTOR',
+  STUDENT: 'STUDENT',
+  ADMIN: 'ADMIN'
+};
 export const QuestionType = {
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
   ESSAY: 'ESSAY'
@@ -31,6 +55,10 @@ export const ObjectType = {
   RESPOND: "RESPOND",
   GRADE: "GRADE",
   QUIZ: "QUIZ"
+};
+export const KeyCode = {
+  ENTER: 13,
+  SPACE: 32
 };
 export const DEFAULT_EVALUATION_RUBRIC = {
   Language: {

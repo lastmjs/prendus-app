@@ -1,13 +1,13 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {Assignment} from '../../typings/assignment';
-import {Concept} from '../../typings/concept';
-import {AnswerTypes} from '../../typings/answer-types';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {generateEssay} from '../../services/question-to-code-service';
 import {setNotification} from '../../redux/actions';
-import {EXAMPLE_GRADING_RUBRIC, DEFAULT_EVALUATION_RUBRIC, NotificationType} from '../../services/constants-service';
+import {
+  EXAMPLE_GRADING_RUBRIC,
+  DEFAULT_EVALUATION_RUBRIC,
+  ASSIGNMENT_VALIDATION_ERROR,
+  NotificationType,
+} from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
   loaded: boolean;
@@ -74,7 +74,7 @@ class PrendusEssayScaffold extends Polymer.Element {
   }
 
   _handleRubric(e: CustomEvent) {
-    this._fireLocalAction('rubric', e.detail.rubric);
+    this._fireLocalAction('rubric', e.detail.value);
   }
 
   _triggerPicture(e: Event) {
@@ -130,6 +130,7 @@ class PrendusEssayScaffold extends Polymer.Element {
     try {
       validate(this.concept, this.resource, this.questionText, this.rubric);
     } catch (e) {
+      this.dispatchEvent(new CustomEvent(ASSIGNMENT_VALIDATION_ERROR));
       this.action = setNotification(e.message, NotificationType.ERROR);
       return;
     }

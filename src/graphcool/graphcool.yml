@@ -100,6 +100,14 @@ functions:
         type: resolver
         schema: ./functions/assignment-lti-grade/assignment-lti-grade.graphql
 
+    update-question-ratings:
+        handler:
+            code:
+                src: ./functions/update-question-ratings/update-question-ratings.ts
+        context:
+            rootToken: cloudFunctionsRootToken
+        type: subscription
+        query: ./functions/update-question-ratings/update-question-ratings.graphql
 permissions:
 
 #### File Permissions
@@ -576,6 +584,15 @@ permissions:
 
 - operation: CourseSubject.connect
 - operation: CourseSubject.disconnect
+
+- operation: QuestionOnPrendusAnalytics.connect
+- operation: QuestionOnPrendusAnalytics.disconnect
+
+- operation: CourseOnPrendusAnalytics.connect
+- operation: CourseOnPrendusAnalytics.disconnect
+
+- operation: AssignmentOnPrendusAnalytics.connect
+- operation: AssignmentOnPrendusAnalytics.disconnect
 
 - operation: UserOnPrendusAnalytics.connect
 - operation: UserOnPrendusAnalytics.disconnect

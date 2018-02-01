@@ -1,0 +1,14 @@
+<link rel="import" href="../../../../src/bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../src/components/prendus-assignment/prendus-respond-assignment.html">
+<link rel="import" href="../../../../src/node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-respond-assignment-test">
+
+  <template>
+    <redux-store root-reducer="[[rootReducer]]" action="[[action]]"></redux-store>
+    <prendus-respond-assignment style="display: none;"></prendus-respond-assignment>
+  </template>
+
+  <script type="module" src="prendus-respond-assignment-test.ts"></script>
+
+</dom-module>
