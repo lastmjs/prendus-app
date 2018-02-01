@@ -248,17 +248,17 @@ type LTIUser @model {
 }
 
 type PrendusAnalytics @model {
-  user: User @relation(name: "UserOnPrendusAnalytics")
-  contextId: String! @migrationValue(value: "NO_CONTEXT_ID")
-  contextType: ContextType! @migrationValue(value: QUESTION)
-  verb: String!
-  object: String! @migrationValue(value: "NO_OBJECT")
-  createdAt: DateTime!
-  id: ID! @isUnique
-  updatedAt: DateTime!
-  course: Course @relation(name: "CourseOnPrendusAnalytics")
-  assignment: Assignment @relation(name: "AssignmentOnPrendusAnalytics")
-  question: Question @relation(name: "QuestionOnPrendusAnalytics")
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    user: User @relation(name: "UserOnPrendusAnalytics")
+    verb: String!
+    course: Course @relation(name: "CourseOnPrendusAnalytics")
+    assignment: Assignment @relation(name: "AssignmentOnPrendusAnalytics")
+    question: Question @relation(name: "QuestionOnPrendusAnalytics")
+    contextId: String
+    contextType: ContextType
+    object: String
 }
 
 type Purchase @model {
