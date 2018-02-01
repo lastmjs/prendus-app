@@ -34,6 +34,10 @@
           max-width: 80%;
   				width: 100%;
   			}
+        .authentication-pages {
+            margin-top: 5vh;
+        }
+
         .app-window-wide {
           max-width: 1200px;
         }
@@ -42,6 +46,10 @@
           max-width: 100%;
           margin:0;
           padding:0;
+        }
+
+        .not-found {
+            margin-top: 25vh;
         }
 
   			.loading-spinner {
@@ -55,6 +63,9 @@
   				.app-window {
   					padding: 10px 20px;
   				}
+          .authentication-pages {
+            padding: 3vh 3vw;
+          }
   			}
 
             .question-editor-container {
@@ -151,8 +162,8 @@
             <prendus-oer class="app-window landing" show="oerView" data-path="../prendus-marketing/prendus-oer.html"></prendus-oer>
             <prendus-open-source show="openSourceView"></prendus-open-source>
 
-            <prendus-signup class="app-window" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
-            <prendus-login show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
+            <prendus-signup class="authentication-pages" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
+            <prendus-login class="authentication-pages" show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
             <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]" data-path="../prendus-authenticate/prendus-authenticate.html"></prendus-authenticate>
             <prendus-password-reset show="passwordResetView" active="[[passwordResetRouteActive]]" jwt="[[passwordResetRouteData.jwt]]" data-path="../prendus-password-reset/prendus-password-reset.html"></prendus-password-reset>
 
@@ -206,6 +217,14 @@
             <prendus-concept class="app-window" show="createConceptView" concept-id="[[createConceptRouteData.conceptId]]" subject-id="[[queryParams.subjectId]]" mode="create" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
             <prendus-concept class="app-window" show="viewConceptView" concept-id="[[viewConceptRouteData.conceptId]]" mode="view" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
             <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
+
+            <div show="404View">
+                <div class="not-found">
+                    <h1>
+                        This page could not be found
+                    </h1>
+                </div>
+            </div>
 
         </iron-lazy-pages>
         <dom-if if="[[user]]">
