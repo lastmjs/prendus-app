@@ -1,5 +1,4 @@
 import {removeUser, removeUserToken} from '../../redux/actions';
-import {SetPropertyAction} from '../../typings/actions';
 
 class PrendusAuthenticate extends Polymer.Element {
     action: SetPropertyAction;

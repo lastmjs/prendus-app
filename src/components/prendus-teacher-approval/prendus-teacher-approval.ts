@@ -1,7 +1,4 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {User} from '../../typings/user';
 import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {setNotification} from '../../redux/actions'
 import {NotificationType} from '../../services/constants-service';

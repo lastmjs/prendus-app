@@ -1,6 +1,3 @@
-import {Question} from '../typings/question';
-import {GuiQuestion} from '../typings/gui-question';
-import {GuiAnswer} from '../typings/gui-answer';
 import {DEFAULT_EVALUATION_RUBRIC} from '../services/constants-service';
 
 // generates code for a multiple choice question

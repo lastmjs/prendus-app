@@ -1,10 +1,6 @@
-import {State} from '../typings/state';
 import {InitialState} from './initial-state';
-import {Action, SetPropertyAction, SetComponentPropertyAction} from '../typings/actions';
 import {generateMultipleChoice} from '../services/question-to-code-service';
 import {shuffleArray} from '../node_modules/prendus-shared/services/utilities-service';
-import {Reducer} from '../typings/reducer';
-import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
 export const RootReducer: Reducer = (state: State = InitialState, action: Action): State => {
     switch(action.type) {

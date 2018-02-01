@@ -1,13 +1,19 @@
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  SetComponentPropertyAction,
+  Rubric,
+  CategoryScore,
+} from '../../prendus.d';
+import {
+  createUUID,
+  fireLocalAction
+} from '../../node_modules/prendus-shared/services/utilities-service';
 
-class PrendusRubricDropdowns extends Polymer.Element {
+export class PrendusRubricDropdowns extends Polymer.Element {
   loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction;
-  scores: {[key: string]: number};
+  action: SetComponentPropertyAction;
+  rubric: Rubric;
+  scores: CategoryScore[];
   componentId: string;
-  userToken: string | null;
-  user: User;
 
   static get is() { return 'prendus-rubric-dropdowns' }
 
@@ -16,6 +22,10 @@ class PrendusRubricDropdowns extends Polymer.Element {
       rubric: {
         type: Object,
         observer: '_initScores'
+      },
+      scores: {
+        type: Array,
+        notify: true
       }
     }
   }
@@ -25,25 +35,24 @@ class PrendusRubricDropdowns extends Polymer.Element {
     this.componentId = createUUID();
   }
 
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
+  connectedCallback() {
+    super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-  reset() {
-    const scores = Object.keys(this.rubric || {}).reduce((result, category) => {
-      return {...result, [category]: -1 }
-    }, {});
-    this._fireLocalAction('scores', scores);
-    this._notify(scores);
+  resetDropdowns(rubric: Rubric) {
+    if (rubric)
+      this.action = fireLocalAction(this.componentId, 'scores', Object.keys(rubric).map(resetScores));
+    const dropdowns = this.shadowRoot.querySelectorAll('paper-dropdown-menu paper-listbox');
+    if (!dropdowns)
+      return;
+    dropdowns.forEach(dropdown => {
+      dropdown.selected = null;
+    });
   }
 
   _initScores(rubric: Rubric) {
-    this.reset();
+    this.resetDropdowns(rubric);
   }
 
   _categories(rubric: Rubric): string[] {
@@ -61,40 +70,35 @@ class PrendusRubricDropdowns extends Polymer.Element {
   }
 
   _scoreCategory(e) {
-    const { category, option } = e.model;
+    const option = e.detail.value;
+    if (!option)
+      return; //Resetting.
+    const { category } = e.model;
     const { points } = this.rubric[category][option];
-    const newScores = {...this.scores, [category]: points };
-    this._fireLocalAction('scores', newScores);
-    this._notify(newScores);
+    const newScores = this.scores.map(scoreCategory(category, Number(points)));
+    this.action = fireLocalAction(this.componentId, 'scores', newScores);
   }
 
-  _notify(scores: object) {
-    const formatted = Object.keys(scores).map(category => {
-      return {category, score: Number(scores[category]}
-    }));
-    const evt = new CustomEvent('scores-changed', {composed: true, detail: {scores: formatted}});
-    this.dispatchEvent(evt);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._fireLocalAction('loaded', true);
-  }
-
-  categoryId(category: string, option: string): string {
-    return category.replace(/\s/g, '-') + option.replace(/\s/g, '-');
+  categoryId(categoryIndex: number, optionIndex: number): string {
+    return `category${categoryIndex}${optionIndex}`;
   }
 
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('scores')) this.scores = componentState.scores;
-    this.userToken = state.userToken;
-    this.user = state.user;
+    this.loaded = componentState.loaded;
+    this.scores = componentState.scores;
   }
+}
 
+function scoreCategory(category: string, points: number): (categoryScore: CategoryScore) => CategoryScore {
+  return (categoryScore) => categoryScore.category === category
+    ? { category, score: points }
+    : categoryScore;
+}
+
+function resetScores(category) {
+  return {category, score: -1};
 }
 
 window.customElements.define(PrendusRubricDropdowns.is, PrendusRubricDropdowns)

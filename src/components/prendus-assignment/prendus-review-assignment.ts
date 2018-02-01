@@ -1,32 +1,67 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {createUUID, navigate, getCourseIdFromAssignmentId, isUserAuthorizedOnCourse, getCookie} from '../../node_modules/prendus-shared/services/utilities-service';
-import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {sendStatement} from '../../services/analytics-service';
-import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {extractVariables} from '../../services/code-to-question-service';
-import {NotificationType, QuestionType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
-import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
-import {LTIPassback} from '../../services/lti-service';
-import {DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {
+  Rubric,
+  CategoryScore,
+  Question,
+  SetComponentPropertyAction,
+  SetPropertyAction,
+  Assignment,
+  AssignmentFunctions,
+  AssignmentFunctionsLoadResult,
+} from '../../prendus.d';
+import {
+  createUUID,
+  fireLocalAction,
+} from '../../node_modules/prendus-shared/services/utilities-service';
+import {
+  shuffleArray
+} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
+import {
+  GQLRequest
+} from '../../node_modules/prendus-shared/services/graphql-service';
+import {
+  extractVariables
+} from '../../services/code-to-question-service';
+import {
+  NotificationType,
+  QuestionType,
+  DEFAULT_EVALUATION_RUBRIC
+} from '../../services/constants-service';
+import {
+  setNotification,
+} from '../../redux/actions';
 
-class PrendusReviewAssignment extends Polymer.Element {
-  loaded: boolean;
-  action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
-  componentId: string;
-  ratings: CategoryScore[];
-  rubric: Rubric;
-  userToken: string;
+class PrendusReviewAssignment extends Polymer.Element implements AssignmentFunctions {
+  action: SetComponentPropertyAction;
   user: User;
+  userToken: string;
+  assignmentId: string;
+  assignment: Assignment;
+  functions: AssignmentFunctions;
+  question: Question;
+  ratings: CategoryScore[];
+  essayType: boolean;
+  evaluationRubric: Rubric;
+  gradingRubric: Rubric;
 
   static get is() { return 'prendus-review-assignment' }
 
   static get properties() {
     return {
-      assignmentId: {
-        type: String,
-        observer: 'loadAssignment'
-      }
+      assignmentId: String,
+      essayType: {
+        type: Boolean,
+        value: false,
+        computed: '_computeEssayType(assignment)'
+      },
+      gradingRubric: {
+        type: Object,
+        computed: '_computeGradingRubric(question)'
+      },
+      evaluationRubric: {
+        type: Object,
+        value: {},
+        computed: '_computeEvaluationRubric(question)'
+      },
     }
   }
 
@@ -37,187 +72,145 @@ class PrendusReviewAssignment extends Polymer.Element {
 
   connectedCallback() {
     super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'functions', this);
+  }
+
+  _computeEssayType(assignment: Assignment): boolean {
+    return assignment && assignment.questionType === QuestionType.ESSAY;
+  }
+
+  _computeGradingRubric(question: Question): Rubric | null {
+    if (!question || !question.code) return null;
+    return parseRubric(question.code, 'gradingRubric');
+  }
+
+  _computeEvaluationRubric(question: Question): Rubric | null {
+    if (!question || !question.code) return null;
+    return parseRubric(question.code, 'evaluationRubric');
+  }
+
+  async loadItems(assignmentId: string): Promise<AssignmentFunctionsLoadResult> {
+    const assignment = await loadAssignment(assignmentId, this.user.id, this.userToken, this._handleGQLError.bind(this));
+    this.action = fireLocalAction(this.componentId, 'assignment', assignment);
+    const questions = assignment && assignment.questions.length >= assignment.numReviewQuestions
+      ? randomWithUnreviewedFirst(assignment.questions, assignment.numReviewQuestions)
+      : [];
+    return {
+      title: assignment.title + ' Review Assignment',
+      items: questions,
+      taken: assignment.rated.length > 0
+    }
+  }
+
+  error(): string | null {
+    if (!this.ratings || !this.evaluationRubric)
+      return 'Prendus error, ratings or rubric was undefined';
+    if (this.ratings.length !== Object.keys(this.evaluationRubric).length)
+      return 'Prendus error, ratings did not match rubric';
+    if (this.ratings.some(score => score.score < 0))
+      return 'You must rate each category';
+    return null;
+  }
+
+  async submitItem(question: Question): Promise<string> {
+    await submit(question.id, this.user.id, this.ratings, this.userToken, this._handleGQLError.bind(this));
+    return question.id;
+  }
+
+  _question(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'question', e.detail.value);
+  }
+
+  _ratings(e: CustomEvent) {
+    this.action = fireLocalAction(this.componentId, 'ratings', e.detail.value);
   }
 
   _handleGQLError(err: any) {
     this.action = setNotification(err.message, NotificationType.ERROR);
   }
 
-  continueToHome(){
-      this.shadowRoot.querySelector("#unauthorizedAccessModal").close();
-      navigate('/');
-    }
-
-  _handleNextRequest(e: CustomEvent) {
-    try {
-      validate(this.rubric, this.ratings);
-      this._submit(this.question, this.ratings)
-      this.shadowRoot.querySelector('#carousel').nextData();
-    } catch (err) {
-      this.action = setNotification(err.message, NotificationType.ERROR);
-    }
-  }
-
-  _handleNextQuestion(e: CustomEvent) {
-    const { data } = e.detail;
-    this._fireLocalAction('question', data);
-    if (data && data === this.questions[0])
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.STARTED, ObjectType.REVIEW);
-    else
-      sendStatement(this.userToken, this.user.id, this.assignment.id, ContextType.ASSIGNMENT, VerbType.REVIEWED, ObjectType.REVIEW);
-    if (data) {
-      this._fireLocalAction('rubric', null); //to clear rubric dropdown selections
-      setTimeout(() => {
-        this._fireLocalAction('rubric', this._parseRubric(data.code, 'evaluationRubric'));
-      });
-    } else {
-      this.gradePassback();
-    }
-  }
-
-  async gradePassback() {
-      try {
-          await LTIPassback(this.userToken, this.user.id, this.assignment.id, ObjectType.CREATE, getCookie('ltiSessionIdJWT'));
-          this.action = setNotification('Grade passback succeeded.', NotificationType.SUCCESS);
-      }
-      catch(error) {
-          this.action = setNotification('Grade passback failed. Retrying...', NotificationType.ERROR);
-          setTimeout(() => {
-              this.gradePassback();
-          }, 5000);
-      }
-  }
-
-  _handleRatings(e: CustomEvent) {
-    this._fireLocalAction('ratings', e.detail.scores);
-  }
-
-  _parseRubric(code: string, varName: string): Rubric {
-    if (!code) return {};
-    const { evaluationRubric, gradingRubric } = extractVariables(code);
-    if (varName === 'evaluationRubric' && evaluationRubric)
-      return JSON.parse(evaluationRubric.value);
-    else if (varName === 'evaluationRubric')
-      return DEFAULT_EVALUATION_RUBRIC;
-    else if (varName === 'gradingRubric' && gradingRubric)
-      return JSON.parse(gradingRubric.value);
-    else return {};
-  }
-
-  async _submit(question: Question, ratings: CategoryScore[]) {
-    const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
-      createQuestionRating (
-        raterId: $raterId
-        questionId: $questionId
-        scores: $ratings
-      ) {
-        id
-      }
-    }`;
-    const variables = {
-      questionId: question.id,
-      ratings,
-      raterId: this.user.id
-    };
-    await GQLRequest(query, variables, this.userToken, this._handleGQLError.bind(this));
-  }
-
-  _fireLocalAction(key: string, value: any) {
-    this.action = {
-      type: 'SET_COMPONENT_PROPERTY',
-      componentId: this.componentId,
-      key,
-      value
-    };
-  }
-
-  async loadAssignment(assignmentId: string): Assignment {
-      this._fireLocalAction('loaded', true);
-
-      setTimeout(async () => {
-          this._fireLocalAction('loaded', false);
-
-          this.action = checkForUserToken();
-        this.action = await getAndSetUser();
-
-        if (!this.user) {
-            navigate('/authenticate');
-            return;
-        }
-
-        const courseId = await getCourseIdFromAssignmentId(assignmentId, this.userToken);
-        const {userOnCourse, userPaidForCourse} = await isUserAuthorizedOnCourse(this.user.id, this.userToken, assignmentId, courseId);
-
-        if (!userOnCourse) {
-            this.shadowRoot.querySelector("#unauthorizedAccessModal").open();
-            return;
-        }
-
-        if (!userPaidForCourse) {
-            navigate(`/course/${courseId}/payment?redirectUrl=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
-            return;
-        }
-
-
-        const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
-          Assignment(id: $assignmentId) {
-            id
-            title
-            questionType
-            numReviewQuestions
-            questions(filter: {
-              author: {
-                id_not: $userId
-              }
-            }) {
-              id
-              text
-              code
-              explanation
-              concept {
-                title
-              }
-              resource
-              answerComments {
-                text
-              }
-              _ratingsMeta {
-                count
-              }
-            }
-          }
-        }`, {assignmentId, userId: this.user.id}, this.userToken, this._handleGQLError.bind(this));
-        if (!data) {
-          return;
-        }
-        this._fireLocalAction('assignment', data.Assignment);
-        this._fireLocalAction('questions', randomWithUnreviewedFirst(data.Assignment.questions, data.Assignment.numReviewQuestions));
-        this._fireLocalAction('loaded', true);
-      });
-  }
-
-  isEssayType(questionType: string): boolean {
-    return questionType === QuestionType.ESSAY;
-  }
-
-  isMultipleChoiceType(questionType: string): boolean {
-    return questionType === QuestionType.MULTIPLE_CHOICE;
-  }
-
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
-    const keys = Object.keys(componentState);
-    if (keys.includes('loaded')) this.loaded = componentState.loaded;
-    if (keys.includes('assignment')) this.assignment = componentState.assignment;
-    if (keys.includes('questions')) this.questions = componentState.questions;
-    if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('rubric')) this.rubric = componentState.rubric;
-    if (keys.includes('ratings')) this.ratings = componentState.ratings;
-    this.userToken = state.userToken;
+    this.assignment = componentState.assignment;
+    this.functions = componentState.functions;
+    this.question = componentState.question;
+    this.ratings = componentState.ratings;
     this.user = state.user;
+    this.userToken = state.userToken;
   }
 
+}
+
+async function loadAssignment(assignmentId: string, userId: string, userToken: string, cb: (err: any) => void): Assignment | null {
+  const data = await GQLRequest(`query getAssignment($assignmentId: ID!, $userId: ID!) {
+    Assignment(id: $assignmentId) {
+      id
+      title
+      questionType
+      numReviewQuestions
+      questions(filter: {
+        author: {
+          id_not: $userId
+        }
+      }) {
+        id
+        text
+        code
+        explanation
+        concept {
+          title
+        }
+        resource
+        answerComments {
+          text
+        }
+        _ratingsMeta {
+          count
+        }
+      }
+      rated: questions(filter: {
+        ratings_some: {
+          rater: {
+            id: $userId
+          }
+        }
+      }) {
+        id
+      }
+    }
+  }`, {assignmentId, userId}, userToken, cb);
+  return data.Assignment;
+}
+
+function submit(questionId: string, raterId: string, ratings: CategoryScore[], userToken: string, cb: (err: any) => void) {
+  const query = `mutation rateQuestion($questionId: ID!, $ratings: [QuestionRatingscoresCategoryScore!]!, $raterId: ID!) {
+    createQuestionRating (
+      raterId: $raterId
+      questionId: $questionId
+      scores: $ratings
+    ) {
+      id
+    }
+  }`;
+  const variables = {
+    questionId,
+    ratings,
+    raterId
+  };
+  return GQLRequest(query, variables, userToken, cb);
+}
+
+function parseRubric(code: string, varName: string): Rubric {
+  if (!code) return {};
+  const { evaluationRubric, gradingRubric } = extractVariables(code);
+  if (varName === 'evaluationRubric' && evaluationRubric)
+    return JSON.parse(evaluationRubric.value);
+  else if (varName === 'evaluationRubric')
+    return DEFAULT_EVALUATION_RUBRIC;
+  else if (varName === 'gradingRubric' && gradingRubric)
+    return JSON.parse(gradingRubric.value);
+  else return {};
 }
 
 function randomWithUnreviewedFirst(questions: Question[], num: number): Question[] {
@@ -228,13 +221,6 @@ function randomWithUnreviewedFirst(questions: Question[], num: number): Question
     return shuffleArray(questions).slice(0, num);
   const reviewed = questions.filter(question => question._ratingsMeta.count);
   return [...shuffleArray(unreviewed), ...shuffleArray(reviewed).slice(0, num-unreviewed.length)];
-}
-
-function validate(rubric: Rubric, ratings: CategoryScore[]) {
-  if (!ratings) throw new Error('You must rate the question');
-  if (ratings.length !== Object.keys(rubric).length) throw new Error('You must rate each category');
-  if (ratings.reduce((bitOr, score) => bitOr || !rubric.hasOwnProperty(score.category) || score.score < 0, false))
-    throw new Error('You must rate each category');
 }
 
 window.customElements.define(PrendusReviewAssignment.is, PrendusReviewAssignment)
