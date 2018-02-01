@@ -12,7 +12,7 @@ const {
   GraphQLObjectType,
 } = require('graphql');
 
-const AUTH_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MDQxOTcxNzMsImNsaWVudElkIjoiY2o1bDg3cmQwMzVoaTAxMzQ0bzAwNW5maCIsInByb2plY3RJZCI6ImNqNW12aXNoaW5ucGYwMTM0OG04Z3p0YjAiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqNzBvNXJldTA0ZmEwMTk4a2ZlNnkwaXIifQ.LbuydRKQjQgbMiMggFU-wOr-IKSxzcO5ZA5mAZGEUjU';
+const AUTH_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MDgyNTUyOTAsImNsaWVudElkIjoiY2oyd2lmdnZmM29raTAxNTRtZnN0c2lscCIsInByb2plY3RJZCI6ImNqOGRsenhnbjBveXIwMTQ0NTc0dTJpdmIiLCJwZXJtYW5lbnRBdXRoVG9rZW5JZCI6ImNqOHZzOWFuMjA1ZDgwMTI0dTE5eXJxamEifQ.X7W_f3RjpNr032pFpn0lG6eCAiUzC1kmizA-YBR6Uss';
 
 const dependencyTree = [
   'Discipline',
@@ -340,4 +340,3 @@ function handleError(err: any) {
 function flatten(arr: any[], el: any): any[] {
   return arr.concat(Array.isArray(el) ? el.reduce(flatten, []) : el);
 }
-
