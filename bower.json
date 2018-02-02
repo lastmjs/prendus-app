@@ -54,7 +54,7 @@
   "resolutions": {
     "webcomponentsjs": "^1.0.0",
     "iron-component-page": "^3.0.0",
-    "iron-doc-viewer": "^3.0.0"
+    "iron-doc-viewer": "^3.0.0",
     "polymer": "^2.0.0"
   },
   "devDependencies": {
