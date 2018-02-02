@@ -1,225 +1,32 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
-<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../prendus-scaffold/prendus-scaffold-concept.html">
 <link rel="import" href="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <dom-module id="prendus-create-assignment-demo">
     <template>
         <style include="prendus-styles">
-            * {
-                font-size: calc(40px - 1vw);
-                font-family: Ubuntu;
-            }
-
-            #paperTabs {
-                /*width: calc(1000px - 10vw);*/
-                /*margin: 0 auto;*/
-                /*font-size: calc(50px - 1vw);*/
-                --paper-tabs-selection-bar-color: #2a9af2;
-                /*--paper-tab-ink: grey;*/
-                /*--paper-tab-content: {*/
-                    /*font-family: Ubuntu;*/
-                    /*padding: 25px;*/
-                }
-                /*height: auto;*/
-            }
-
-            paper-tab {
-                color: grey;
-            }
-
-            paper-tab.iron-selected {
-                border: 1px solid rgba(0, 0, 0, .2500);
-                box-shadow: 0px 0px 3px grey;
-                color: black;
-            }
-
-            .grid-container {
-                display: grid;
-                grid-template-columns: 40vw 40vw;
-                grid-column-gap: 5vw;
-            }
         </style>
 
-        <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
+        <br>
 
-        <paper-tabs id="paperTabs" selected="[[selected]]" scrollable on-selected-changed="selectedChanged">
-            <paper-tab>Step 0</paper-tab>
-            <paper-tab>Step 1</paper-tab>
-            <paper-tab>Step 2</paper-tab>
-            <paper-tab>Step 3</paper-tab>
-            <paper-tab>Step 4</paper-tab>
-            <paper-tab>Step 5</paper-tab>
-        </paper-tabs>
+        Select a concept for your question:
+        <select>
+            <option disabled selected></option>
+            <option>Math</option>
+            <option>Science</option>
+            <option>History</option>
+            <option>Writing</option>
+        </select>
 
-        <iron-pages selected="[[selected]]">
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Instructions</h3>
+        <br>
+        <br>
 
-                    <ul>
-                        <li>For this assignment you will create an exam level question for you and your class to practice for the upcoming exam</li>
-                        <li>We will guide you through the question creation process</li>
-                        <li>Feel free to use the editor directly at any point along the way, or just follow the instructions</li>
-                        <li>You can check that your question is working correctly at any time by using the question preview below the editor</li>
-                        <li>Get started by clicking the next button below or clicking on the Step 1 tab</li>
-                    </ul>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
-                </div>
+        <div style="margin-bottom: 5vh">
+            <prendus-edit-question no-save></prendus-edit-question>
+            <div style="display: flex; margin-top: 1vh">
+                <button class="prendus-button prendus-button--recommended" style="margin-left: auto" on-click="submitClick">Submit</button>
             </div>
-
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Tag Concept</h3>
-
-                    <ul>
-                        <li>Select or enter a concept</li>
-                        <li>A concept is the topic of a question</li>
-                    </ul>
-
-                    <select>
-                        <option>Derivatives</option>
-                        <option>Integrals</option>
-                        <option>Series</option>
-                    </select>
-
-                    <br>
-                    <br>
-
-                    <h3>Add Resource</h3>
-
-                    <ul>
-                        <li>Make sure the resource aligns with the selected concept</li>
-                        <li>Use any resource pertinent to the class or online - a textbook, YouTube link, Wikipedia article, etc</li>
-                        <li>Do not copy material directly from the resource. Anything plagiarized will be removed and your instructor will be notified</li>
-                    </ul>
-
-                    <paper-input type="text" label="Resource (e.g., textbook page 100)"></paper-input>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
-                </div>
-            </div>
-
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Ask Question</h3>
-
-                    <ul>
-                        <li>This will be used as an exam practice question for the class</li>
-                        <li>Create a question that could be on the exam</li>
-                        <li>Ask a question or provide a partial sentence</li>
-                        <li>The question should present a clear problem. A question like "Which one of these is not true" does not present a clear problem</li>
-                    </ul>
-
-                    <div>
-                        <paper-input id="questionInput" type="text" label="Type your question" on-value-changed="questionInputChanged"></paper-input>
-                    </div>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
-                </div>
-            </div>
-
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Correctly Answer Question</h3>
-
-                    <div>
-                        <paper-input id="correctAnswerInput" type="text" label="Type the correct answer" on-value-changed="correctAnswerInputChanged"></paper-input>
-                    </div>
-
-                    <br>
-                    <br>
-
-                    <h3>Provide a Solution</h3>
-
-                    <paper-input type="text" label="Solution (optional)"></paper-input>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
-                </div>
-            </div>
-
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Incorrectly Answer Question</h3>
-
-                    <ul>
-                        <li>Each alternative should seem like a valid answer</li>
-                        <li>Each alternative should look the same with its content and length</li>
-                        <li>All of the above and none of the above should not be used</li>
-                        <li>Hints should help students identify misconceptions</li>
-                    </ul>
-
-                    <div style="display: flex">
-                        <paper-input style="flex: 1" id="incorrectAnswerInput1" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput1Changed"></paper-input>
-                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
-                    </div>
-
-                    <div style="display: flex">
-                        <paper-input style="flex: 1" id="incorrectAnswerInput2" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput2Changed"></paper-input>
-                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
-                    </div>
-
-                    <div style="display: flex">
-                        <paper-input style="flex: 1" id="incorrectAnswerInput3" type="text" label="Type an incorrect answer" on-value-changed="incorrectAnswerInput3Changed"></paper-input>
-                        <paper-input type="text" label="Type a hint" style="margin-left: 1vw; flex: 1"></paper-input>
-                    </div>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <prendus-edit-question question="[[question]]" no-save></prendus-edit-question>
-                </div>
-            </div>
-
-            <div class="grid-container">
-                <div style="grid-column-start: 1">
-                    <h3>Review Question</h3>
-
-                    <ul>
-                        <li>Test your question out and see if it works</li>
-                        <li>If everything looks good, go ahead and submit</li>
-                    </ul>
-                </div>
-
-                <div style="grid-column-start: 2">
-                    <div style="box-shadow: 0px 0px 3px grey; padding: calc(40px - 1vw);">
-                        <prendus-view-question question="[[question]]"></prendus-view-question>
-                    </div>
-                </div>
-            </div>
-        </iron-pages>
-
-        <dom-if if="[[showPrevButton(selected)]]">
-            <template>
-                <button class="prendus-button prendus-button--recommended" on-click="prevClick">Prev</button>
-            </template>
-        </dom-if>
-
-        <dom-if if="[[showNextButton(selected)]]">
-            <template>
-                <button class="prendus-button prendus-button--recommended" on-click="nextClick">Next</button>
-            </template>
-        </dom-if>
-
-        <dom-if if="[[showSubmitButton(selected)]]">
-            <template>
-                <button class="prendus-button prendus-button--recommended" on-click="submitClick">Submit</button>
-            </template>
-        </dom-if>
-
+        </div>
     </template>
 
     <script type="module" src="prendus-create-assignment-demo.ts"></script>
