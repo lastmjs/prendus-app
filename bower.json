@@ -47,12 +47,15 @@
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "iron-pages": "^2.0.0",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
+    "iron-list": "^2.0.11",
+    "iron-scroll-threshold": "^1.0.2",
     "paper-toggle-button": "^2.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0",
     "iron-component-page": "^3.0.0",
     "iron-doc-viewer": "^3.0.0"
+    "polymer": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0"

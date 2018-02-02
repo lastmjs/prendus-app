@@ -1,8 +1,4 @@
-import {ContainerElement} from '../../typings/container-element';
-import {State} from '../../typings/state';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {SetPropertyAction, SetComponentPropertyAction} from '../../typings/actions';
-import {User} from '../../typings/user';
 import {persistUserToken, setNotification} from '../../redux/actions';
 import {navigate, createUUID, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
@@ -71,7 +67,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
 
   	async checkPasswordResetAndSubmitIfEnter(e: any): void {
       const email = this.shadowRoot.querySelector('#reset-password-email').value;
-      if (this.enableResetPassword(email)) {
+      if (enableResetPassword(email)) {
         this.action = fireLocalAction(this.componentId, 'submitPasswordDisabled', false);
     		if(e.keyCode === 13) {
           this.resetPassword();
@@ -117,7 +113,7 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
           await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
-          navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses');
+          navigate(this.redirectUrl || (getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses'));
 
           if (getCookie('redirectUrl')) {
               deleteCookie('redirectUrl');

@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-carousel/prendus-carousel.html">
+<link rel="import" href="prendus-unauthorized-modal.html">
+<link rel="import" href="prendus-assignment-authorization.html">
+
+<dom-module id="prendus-assignment-shared">
+  <template>
+    <style include="prendus-styles"></style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <prendus-assignment-authorization
+      assignment-id="[[assignmentId]]"
+      user-id="[[user.id]]"
+      user-token="[[userToken]]"
+      on-authorized="_load"
+      on-unauthorized="_unauthorized"
+    ></prendus-assignment-authorization>
+
+    <prendus-unauthorized-modal
+      open="[[unauthorized]]"
+      result="[[authResult]]"
+    ></prendus-unauthorized-modal>
+
+    <h2>[[title]]</h2>
+
+    <div hidden$="[[loaded]]">
+      Loading...
+    </div>
+
+    <div hidden$="[[!loaded]]">
+
+      <div hidden$="[[finished]]">
+        <prendus-carousel
+          id="carousel"
+          label="[[label]]"
+          next-text="Submit"
+          hide-back="[[hideBack]]"
+          hide-next="[[hideNext]]"
+          items="[[items]]"
+          on-next="_next"
+          on-previous="_previous"
+          on-item-changed="_item"
+          on-finished-changed="_finished"
+        >
+          <div slot="content">
+            <slot name="assignment"></slot>
+          </div>
+        </prendus-carousel>
+      </div>
+
+      <div hidden$="[[!_message(finished, unauthorized)]]">
+        <h4>Done</h4>
+        <p>[[message]]</p>
+        <br>
+        <button hidden$="[[success]]" class="prendus-button prendus-button--recommended" on-click="_gradePassback">Retry Grade Passback</button>
+      </div>
+
+    </div>
+
+  </template>
+
+  <script type="module" src="prendus-assignment-shared.ts"></script>
+</dom-module>

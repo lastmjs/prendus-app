@@ -229,7 +229,7 @@
           </template>
           <template is="dom-if" if="[[!showNext(selectedIndex)]]">
             <div class="next">
-              <button id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
+              <button hidden$="[[showNext(selectedIndex)]]" id="submit-button" class="prendus-button prendus-button--recommended" on-click="submit">Submit</button>
             </div>
           </template>
         </div>

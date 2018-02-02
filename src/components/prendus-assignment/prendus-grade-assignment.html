@@ -1,73 +1,35 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-rubric-dropdowns/prendus-rubric-dropdowns.html">
-<link rel="import" href="../prendus-carousel/prendus-carousel.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="prendus-assignment-shared.html">
 
 <dom-module id="prendus-grade-assignment">
 
   <template>
 
-    <style include="prendus-styles">
-      .question-picture {
-        max-height: 200px;
-        max-width: 200px;
-      }
+    <style include="prendus-styles"></style>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-      #unauthorizedAccessModal{
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .unauthorizedAccessModalListItem{
-          margin-top: 30px;
-        }
-    </style>
-    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
-
-    <dom-if if="[[loaded]]">
-        <template>
-            <h2>[[assignment.title]] Grade Assignment</h2>
-            <br>
-            <prendus-carousel id="carousel" hide-back next-text="Submit" label="Response" data="[[responses]]" on-carousel-next="_handleNextRequest" on-carousel-data="_handleNextResponse">
-              <div hidden$="[[!response]]">
-                <h4>Question</h4>
-                <p>[[_questionText(response.questionResponse.question.text)]]</p>
-                <p><img class="question-picture" src$="[[_questionPicture(response.questionResponse.question.text)]]"></p>
-                <h4>Response</h4>
-                <p>[[response.value]]</p>
-                <prendus-rubric-dropdowns rubric="[[rubric]]" on-scores-changed="_handleGrades"></prendus-rubric-dropdowns>
-              </div>
-              <div hidden$="[[response]]">
-                <h3>Done</h3>
-                <p>You have finished all the responses for this grading assignment</p>
-              </div>
-            </prendus-carousel>
-
-        </template>
-    </dom-if>
-
-    <dom-if if="[[!loaded]]">
-        <template>
-            Loading...
-        </template>
-    </dom-if>
-
-    <paper-dialog id="unauthorizedAccessModal" modal>
-        <div class="content">
-          <h1>Unauthorized to Access this page</h1>
-          <p class="unauthorizedAccessModalListItem">If you are using this in a course, launch from your Learning Management System to properly access the course.</p>
-          <p class="unauthorizedAccessModalListItem">If you are unsure of how to access the content through your LMS, contact your intructor to get added to the course</p>
-          <p class="unauthorizedAccessModalListItem">For customer assistance, please contact Prendus help at prendushe
-        <div>
-        <div id="continueButton" class="buttons">
-          <button class="prendus-button prendus-button--recommended" on-click="continueToHome">Go To Homepage</button>
+    <prendus-assignment-shared
+      label="Response"
+      hide-back
+      assignment-id="[[assignmentId]]"
+      functions="[[functions]]"
+      verb="GRADED"
+      on-item-changed="_response"
+    >
+      <div slot="assignment">
+        <h4>Question as seen in quiz</h4>
+        <div class="question">
+          <prendus-view-question question="[[response.questionResponse.question]]"></prendus-view-question>
         </div>
-    </paper-dialog>
+        <h4>Response</h4>
+        <p>[[response.value]]</p>
+        <prendus-rubric-dropdowns id="dropdowns" rubric="[[rubric]]" on-scores-changed="_grades"></prendus-rubric-dropdowns>
+      </div>
+    </prendus-assignment-shared>
 
   </template>
 

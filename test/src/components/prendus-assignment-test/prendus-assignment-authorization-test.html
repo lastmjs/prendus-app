@@ -1,0 +1,17 @@
+<link rel="import" href="../../../../src/bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../src/components/prendus-assignment/prendus-assignment-authorization.html">
+<link rel="import" href="../../../../src/node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-assignment-authorization-test">
+
+  <template>
+    <redux-store root-reducer="[[rootReducer]]" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <prendus-assignment-authorization
+      user-id="[[user.id]]"
+      user-token="[[userToken]]"
+    ></prendus-assignment-authorization>
+  </template>
+
+  <script type="module" src="prendus-assignment-authorization-test.ts"></script>
+
+</dom-module>

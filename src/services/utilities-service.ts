@@ -1,5 +1,3 @@
-import {QuestionScaffold} from '../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
 
 export function getStripeKey() {
     if (window.process.env.NODE_ENV === 'production') {
