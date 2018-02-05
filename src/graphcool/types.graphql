@@ -94,13 +94,13 @@ type Question @model {
   visibility: QuestionVisibility! @defaultValue(value: COURSE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
   analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
-  overall: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  language: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  learningCategory: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  conceptAlignment: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  difficulty: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  plagiarism: Float! @defaultValue(value: 0) @migrationValue(value: 0)
-  inclusion: Float! @defaultValue(value: 0) @migrationValue(value: 0)
+  overall: Float! @defaultValue(value: 0)
+  language: Float! @defaultValue(value: 0)
+  learningCategory: Float! @defaultValue(value: 0)
+  conceptAlignment: Float! @defaultValue(value: 0)
+  difficulty: Float! @defaultValue(value: 0)
+  plagiarism: Float! @defaultValue(value: 0)
+  inclusion: Float! @defaultValue(value: 0)
 }
 
 type QuestionFlag @model {
