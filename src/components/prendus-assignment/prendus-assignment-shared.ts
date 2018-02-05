@@ -6,6 +6,7 @@ import {
 import {
   createUUID,
   fireLocalAction,
+  getCookie
 } from '../../node_modules/prendus-shared/services/utilities-service';
 import {
   sendStatement
@@ -156,6 +157,7 @@ class PrendusAssignmentShared extends Polymer.Element {
       this.action = setNotification(GRADE_SUCCESS, NotificationType.SUCCESS);
     }
     catch(error) {
+      console.log(error);
       this.action = setNotification(GRADE_FAILED, NotificationType.ERROR);
       this.action = fireLocalAction(this.componentId, 'success', false);
     }
