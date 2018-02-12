@@ -1,23 +1,21 @@
 import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-service';
 
-export async function sendStatement(userToken: string, userId: string, contextId: string, contextType: string, verb: string, obj: string): Promise<void> {
-  const createStatement = await GQLRequest(`
-    mutation analytics($contextId: String!, $contextType: ContextType!, $verb: String!, $obj: String!, $userId: ID!) {
+function handleError(err: any) {
+  console.error(err);
+}
+
+export async function sendStatement(userToken: string, variables: object): Promise<void> {
+  return GQLRequest(`
+    mutation analytics($userId: ID!, $verb: String!, $questionId: ID, $assignmentId: ID, $courseId: ID) {
       createPrendusAnalytics(
-        contextId: $contextId
-        contextType: $contextType
+        assignmentId: $assignmentId
+        courseId: $courseId
         verb: $verb
-        object: $obj
+        questionId: $questionId
         userId: $userId
       ){
         id
       }
     }
-    `,
-    {userId, contextId, contextType, verb, obj},
-    userToken, //TODO: pass in user token or retrieve it from redux
-    (error: any) => {
-      console.log(error);
-    }
-  )
+  `, variables, userToken, handleError)
 };

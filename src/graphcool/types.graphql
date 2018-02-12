@@ -45,6 +45,7 @@ type Course @model {
   enrolledStudents: [User!]! @relation(name: "StudentsAndCourses")
   price: Int! @defaultValue(value: 1000)
   purchases: [Purchase!]! @relation(name: "CoursePurchased")
+  analytics: [PrendusAnalytics!]! @relation(name: "CourseOnPrendusAnalytics")
 }
 
 type Assignment @model {
@@ -62,6 +63,7 @@ type Assignment @model {
   numReviewQuestions: Int! @defaultValue(value: 3)
   numResponseQuestions: Int! @defaultValue(value: 10)
   numGradeResponses: Int! @defaultValue(value: 3)
+  analytics: [PrendusAnalytics!]! @relation(name: "AssignmentOnPrendusAnalytics")
 }
 
 type Quiz @model {
@@ -92,13 +94,14 @@ type Question @model {
   images: [File!]! @relation(name: "ImagesOnQuestions")
   visibility: QuestionVisibility! @defaultValue(value: COURSE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
-  overall: Int! @defaultValue(value: 0)
-  language: Int! @defaultValue(value: 0)
-  learningCategory: Int! @defaultValue(value: 0)
-  conceptAlignment: Int! @defaultValue(value: 0)
-  difficulty: Int! @defaultValue(value: 0)
-  plagiarism: Int! @defaultValue(value: 0)
-  inclusion: Int! @defaultValue(value: 0)
+  analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
+  overall: Float! @defaultValue(value: 0)
+  language: Float! @defaultValue(value: 0)
+  learningCategory: Float! @defaultValue(value: 0)
+  conceptAlignment: Float! @defaultValue(value: 0)
+  difficulty: Float! @defaultValue(value: 0)
+  plagiarism: Float! @defaultValue(value: 0)
+  inclusion: Float! @defaultValue(value: 0)
 }
 
 type QuestionFlag @model {
@@ -246,14 +249,17 @@ type LTIUser @model {
 }
 
 type PrendusAnalytics @model {
-  user: User @relation(name: "UserOnPrendusAnalytics")
-  contextId: String!
-  contextType: ContextType!
-  verb: String!
-  object: String!
-  createdAt: DateTime!
-  id: ID! @isUnique
-  updatedAt: DateTime!
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    user: User @relation(name: "UserOnPrendusAnalytics")
+    verb: String!
+    course: Course @relation(name: "CourseOnPrendusAnalytics")
+    assignment: Assignment @relation(name: "AssignmentOnPrendusAnalytics")
+    question: Question @relation(name: "QuestionOnPrendusAnalytics")
+    contextId: String
+    contextType: ContextType
+    object: String
 }
 
 type Purchase @model {
@@ -304,13 +310,6 @@ enum ContextType {
   ASSIGNMENT
   QUIZ
   COURSE
-}
-
-enum ResponseType {
-  VARIABLE
-  INPUT
-  CHECK
-  RADIO
 }
 
 enum QuestionType {

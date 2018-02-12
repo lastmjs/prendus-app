@@ -1,7 +1,3 @@
-import {Question} from '../typings/question';
-import {GuiQuestion} from '../typings/gui-question';
-import {GuiAnswer} from '../typings/gui-answer';
-import {AnswerTypes} from '../typings/answer-types';
 import {parse} from '../node_modules/assessml/assessml';
 
 export function compileToGuiQuestion(text: string, code: string): GuiQuestion {

@@ -41,19 +41,23 @@
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-tooltip": "PolymerElements/paper-tooltip#^2.0.0",
     "iron-location": "https://github.com/Prendus/iron-location.git#^2.0.2",
-    "wysiwyg-e": "^2.0.4",
-    "juicy-ace-editor": "^2.0.1",
+    "wysiwyg-e": "^2.1.0",
     "iron-lazy-pages": "^2.0.2",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "iron-pages": "^2.0.0",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
-    "iron-list": "PolymerElements/iron-list#^2.0.11",
     "paper-autocomplete": "^3.4.0",
-    "paper-fab": "PolymerElements/paper-fab#^2.0.0"
+    "paper-fab": "PolymerElements/paper-fab#^2.0.0",
+    "iron-list": "^2.0.12",
+    "iron-scroll-threshold": "^1.0.2",
+    "paper-toggle-button": "^2.0.0"
   },
   "resolutions": {
-    "webcomponentsjs": "^1.0.0"
+    "webcomponentsjs": "^1.0.0",
+    "iron-component-page": "^3.0.0",
+    "iron-doc-viewer": "^3.0.0",
+    "polymer": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0"

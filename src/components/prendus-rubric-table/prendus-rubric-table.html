@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -76,26 +76,26 @@
         <div class="grid-cell col-header">Points</div>
       </div>
 
-      <dom-if if="[[editable]]" hidden>
+      <dom-if if="[[editable]]">
         <template>
-          <dom-repeat id="categories" items="[[categories]]" as="category" hidden>
+          <dom-repeat id="categories" items="[[categories]]" as="category">
             <template>
-              <div class="grid-row grid-outer-row">
-                <div class="grid-cell"><input type="text" placeholder="Category..." value="[[category.name]]" on-change="setCategory"></div>
+              <div class="grid-row grid-outer-row category">
+                <div class="grid-cell"><input class="category-name" type="text" placeholder="Category..." value="[[category.name]]" on-change="setCategory"></div>
                 <div class="grid">
-                  <dom-repeat items="[[category.options]]" as="option" hidden>
+                  <dom-repeat items="[[category.options]]" as="option">
                     <template>
-                      <div class="grid-row grid-inner-row">
-                        <div class="grid-cell"><input type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
-                        <div class="grid-cell"><input type="text" placeholder="Description..." value="[[option.description]]" on-change="setDescription"></div>
-                        <div class="grid-cell"><input type="number" placeholder="Points..." value="[[option.points]]" min="0" on-change="setPoints"></div>
+                      <div class="grid-row grid-inner-row option">
+                        <div class="grid-cell"><input class="option-name" type="text" placeholder="Scale..." value="[[option.name]]" on-change="setOption"></div>
+                        <div class="grid-cell"><input class="description" type="text" placeholder="Description..." value="[[option.description]]" on-change="setDescription"></div>
+                        <div class="grid-cell"><input class="points" type="number" placeholder="Points..." value="[[option.points]]" min="0" on-change="setPoints"></div>
                       </div>
                     </template>
                   </dom-repeat>
                   <div class="grid-row grid-inner-row">
                     <div class="grid-cell">
-                      <button on-click="addScale"><iron-icon icon="add"></iron-icon></button>
-                      <button on-click="removeScale"><iron-icon icon="remove"></iron-icon></button>
+                      <button class="add-scale" on-click="addScale"><iron-icon icon="add"></iron-icon></button>
+                      <button class="remove-scale" on-click="removeScale"><iron-icon icon="remove"></iron-icon></button>
                     </div>
                   </div>
                 </div>
@@ -104,21 +104,21 @@
           </dom-repeat>
           <div class="grid-row grid-outer-row">
             <div class="grid-cell">
-              <button on-click="addCategory"><iron-icon icon="add"></iron-icon></button>
-              <button on-click="removeCategory"><iron-icon icon="remove"></iron-icon></button>
+              <button id="add-category" on-click="addCategory"><iron-icon icon="add"></iron-icon></button>
+              <button id="remove-category" on-click="removeCategory"><iron-icon icon="remove"></iron-icon></button>
             </div>
           </div>
         </template>
       </dom-if>
 
-      <dom-if if="[[!editable]]" hidden>
+      <dom-if if="[[!editable]]">
         <template>
-          <dom-repeat items="[[categories]]" as="category" hidden>
+          <dom-repeat items="[[categories]]" as="category">
             <template>
               <div class="grid-row grid-outer-row">
                 <div class="grid-cell">[[category.name]]</div>
                 <div class="grid">
-                  <dom-repeat items="[[category.options]]" as="option" hidden>
+                  <dom-repeat items="[[category.options]]" as="option">
                     <template>
                       <div class="grid-row grid-inner-row">
                         <div class="grid-cell">[[option.name]]</div>

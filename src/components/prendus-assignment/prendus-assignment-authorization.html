@@ -1,0 +1,10 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-assignment-authorization">
+  <template>
+    <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+  </template>
+
+  <script type="module" src="prendus-assignment-authorization.ts"></script>
+</dom-module>

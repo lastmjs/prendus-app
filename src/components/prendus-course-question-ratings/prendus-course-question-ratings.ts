@@ -16,6 +16,9 @@ import {
   ARIA_SORT_ASC,
   ARIA_SORT_NONE,
   ARIA_SORT_DESC,
+  STUDENT,
+  OVERALL,
+  ALL
 } from '../../services/constants-service';
 import {setNotification} from '../../redux/actions'
 import {
@@ -24,11 +27,7 @@ import {
   Rubric,
   SetComponentPropertyAction,
   SetPropertyAction,
-} from '../../typings/index.d';
-
-const STUDENT = 'Student';
-const OVERALL = 'Overall';
-const ALL = 'ALL';
+} from '../../prendus.d';
 
 export class PrendusCourseQuestionRatings extends Polymer.Element {
   action: SetComponentPropertyAction | SetPropertyAction;
@@ -66,7 +65,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
       },
       filter: {
         type: Object,
-        computed: '_computeFilter(courseId, user, assignmentId, conceptId, authorEmail)'
+        computed: '_computeFilter(course, user, assignmentId, conceptId, authorEmail)'
       },
       fetchQuestions: {
         type: Function,
@@ -84,19 +83,23 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
   }
 
   //Computed Properties
-  _computeOrderBy(sortField: string, sortAsc: boolean): string {
+  _computeOrderBy(sortField: string, sortAsc: boolean): string | void {
+    if (!sortField || sortAsc === undefined)
+      return undefined;
     return categoryCamelCase(sortField) + (sortAsc ? GQL_SORT_ASC : GQL_SORT_DESC);
   }
 
   _computeCategories(rubric: Rubric): string[] {
-    return [STUDENT, ...Object.keys(rubric), OVERALL];
+    return [...Object.keys(rubric), OVERALL];
   }
 
-  _computeFilter(courseId: string, user: User, assignmentId: string, conceptId: string, authorEmail: string): object {
+  _computeFilter(course: Course, user: User, assignmentId: string, conceptId: string, authorEmail: string): object | void {
+    if (!course || !user)
+      return undefined;
     const filter = {
       assignment: {
         course: {
-          id: courseId
+          id: course.id
         }
       },
       author: {},
@@ -104,7 +107,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     };
     if (authorEmail)
       filter.author.email = authorEmail;
-    if (!user || user.role !== Role.INSTRUCTOR)
+    if (user.role !== Role.INSTRUCTOR)
       filter.author.id = (user || {}).id;
     if (assignmentId !== ALL)
       filter.assignment.id = assignmentId;
@@ -113,7 +116,7 @@ export class PrendusCourseQuestionRatings extends Polymer.Element {
     return filter;
   }
 
-  _computeFetchQuestions(orderBy: string, filter: object, userToken: string): (i: number, n: number) => Promise<object> {
+  _computeFetchQuestions(orderBy: string, filter: object, userToken: string): (i: number, n: number) => Promise<object> | void {
     if (!orderBy || !filter || !userToken)
       return undefined;
     return async (pageIndex, pageAmount) => loadQuestions({
@@ -199,24 +202,6 @@ function categoryCamelCase(category: string) {
   return category
     .replace(/^(\w)/, (m, c) => c.toLowerCase())
     .replace(/\s+(\w)/g, (m, c) => c.toUpperCase());
-}
-
-function flatten(arr: any[]): any[] {
-  return arr.reduce((acc, elem) => {
-    return acc.concat(Array.isArray(elem) ? flatten(elem) : elem);
-  },[]);
-}
-
-function filterProp(prop: string, val: string): (obj: object) => boolean {
-  return obj => obj[prop] === val;
-}
-
-function uniqueProp(arr: object[], prop: string): object[] {
-  return arr.reduce((filtered: object[], obj: object) => {
-    if (filtered.filter(filterProp(prop, obj[prop])).length === 0)
-      filtered.push(obj);
-    return filtered;
-  }, []);
 }
 
 async function loadCourse(courseId: string, userToken: string, cb: (err: any) => void): Course {

@@ -1,9 +1,4 @@
-import {ContainerElement} from '../../typings/container-element';
-import {State} from '../../typings/state';
-import {User} from '../../typings/user';
-import {Institution} from '../../typings/institution';
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {SetPropertyAction, DefaultAction, SetComponentPropertyAction} from '../../typings/actions';
 import {persistUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
@@ -132,7 +127,11 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
           this.action = await getAndSetUser();
           const ltiJWT = getCookie('ltiJWT');
           deleteCookie('ltiJWT');
+<<<<<<< HEAD
           if(ltiJWT) addLTIUser(this.user, ltiJWT, signupData.signupUser.token);
+=======
+          if (ltiJWT) await addLTIUser(this.user, ltiJWT, signupData.signupUser.token);
+>>>>>>> develop
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
           deleteCookie('redirectUrl');
 

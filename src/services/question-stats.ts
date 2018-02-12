@@ -3,7 +3,7 @@ import {
   CategoryScore,
   QuestionRating,
   QuestionRatingStats,
-} from '../typings/index.d';
+} from '../../prendus.d';
 
 /*
  * Reducer to sum the numbers in an array

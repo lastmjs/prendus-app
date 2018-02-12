@@ -1,12 +1,4 @@
 import {GQLRequest, GQLSubscribe} from '../../node_modules/prendus-shared/services/graphql-service';
-import {ContainerElement} from '../../typings/container-element';
-import {Mode} from '../../typings/mode';
-import {Subject} from '../../typings/subject';
-import {Discipline} from '../../typings/discipline';
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {Assignment} from '../../typings/assignment';
-import {Course} from '../../typings/course';
-import {User} from '../../typings/user';
 import {checkForUserToken, getAndSetUser, setNotification} from '../../redux/actions';
 import {createUUID, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
 import {NotificationType, QuestionType} from '../../services/constants-service';
@@ -292,6 +284,8 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#create-assignment').close();
+        await this.loadData();
+        // this.shadowRoot.querySelector('#create-assignment').close();
         // navigate(`assignment/${data.createAssignment.id}/edit`)
       }else{
         setNotification("Input a title to add Assignment", NotificationType.WARNING)
@@ -311,7 +305,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
       this.loadData();
     }
     async loadData() {
-        this._fireLocalAction('loaded', false)
         const data = await GQLRequest(`
             query getAssignments($courseId: ID!) {
                 allAssignments(filter: {
@@ -360,7 +353,6 @@ class PrendusCourse extends Polymer.Element implements ContainerElement {
             this._fireLocalAction('customSubject', true)
           }
         }
-        this._fireLocalAction('loaded', false)
     }
     subscribeToData() {
         GQLSubscribe(`

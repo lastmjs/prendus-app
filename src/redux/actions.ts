@@ -1,11 +1,4 @@
 import {GQLRequest} from '../node_modules/prendus-shared/services/graphql-service';
-import {SetPropertyAction, DefaultAction} from '../typings/actions';
-import {State} from '../typings/state';
-import {Question} from '../typings/question';
-import {QuestionScaffold} from '../typings/question-scaffold';
-import {QuestionScaffoldAnswer} from '../typings/question-scaffold-answer';
-import {Concept} from '../typings/concept';
-import {Quiz} from '../typings/quiz';
 
 export function checkForUserToken(): SetPropertyAction | DefaultAction {
     const userToken = window.localStorage.getItem('userToken');
@@ -47,11 +40,11 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
     if (originalUserToken) {
         const data = await GQLRequest(`
             query {
-                user {
-                    id
-                    email
-                    role
-                }
+              user {
+                id
+                email
+                role
+              }
             }
         `, {}, originalUserToken, (error: any) => {
             throw error;

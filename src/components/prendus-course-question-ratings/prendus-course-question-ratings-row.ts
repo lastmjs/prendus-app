@@ -1,13 +1,14 @@
 import {parse} from '../../node_modules/assessml/assessml';
 import {categoryScores} from '../../services/question-stats';
 import {
+  OVERALL,
+} from '../../services/constants-service';
+import {
   Question,
   CategoryScore,
   SetComponentPropertyAction,
-} from '../../typings/index.d';
+} from '../../prendus.d';
 
-const STUDENT = 'Student';
-const OVERALL = 'Overall';
 class PrendusCourseQuestionRatingsRow extends Polymer.Element {
   action: SetComponentPropertyAction;
   question: Question;
@@ -39,7 +40,7 @@ class PrendusCourseQuestionRatingsRow extends Polymer.Element {
   }
 
   _computeCategories(categories: string[]): string[] {
-    return categories.filter(category => category !== STUDENT && category !== OVERALL);
+    return categories.filter(category => category !== OVERALL);
   }
 
   _scores(scores: object, category: string) {

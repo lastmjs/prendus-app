@@ -1,5 +1,9 @@
 import {createUUID, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 
+/**
+ * TODO: Handle scrolling DOWN so that we don't keep too many records in memory.
+ * TODO: Handle jumping between cursor positions by adding an observer to cursor to asynchronously reload the appropriate state
+ */
 class PrendusInfiniteList extends Polymer.Element {
   action: SetComponentPropertyAction;
   next: (i: number, n: number) => any[];
@@ -88,7 +92,6 @@ class PrendusInfiniteList extends Polymer.Element {
     else
       threshold.clearLower();
     this.action = fireLocalAction(this.componentId, 'loading', false);
-    this.dispatchEvent(new CustomEvent('items-loaded'));
   }
 
   stateChange(e: CustomEvent) {

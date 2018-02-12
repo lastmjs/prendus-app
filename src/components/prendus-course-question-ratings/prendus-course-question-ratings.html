@@ -57,8 +57,18 @@
       }
 
       .question-meta {
-        justify-content: normal !important;
+        justify-content: normal;
       }
+
+      #question-modal {
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 30%;
+        min-height: 30%;
+      }
+
 
     </style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -93,6 +103,7 @@
         <!-- Table Header -->
         <div id="table-header" class="question-row" role="row">
           <div class="table-cell column-header question-meta" scope="col" role="columnheader" aria-sort="none">Question</div>
+          <div class="table-cell column-header" scope="col" role="columnheader" aria-sort="none">Student</div>
           <dom-repeat items="[[categories]]">
             <template>
               <div

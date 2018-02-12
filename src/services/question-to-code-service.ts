@@ -1,6 +1,3 @@
-import {Question} from '../typings/question';
-import {GuiQuestion} from '../typings/gui-question';
-import {GuiAnswer} from '../typings/gui-answer';
 import {DEFAULT_EVALUATION_RUBRIC} from '../services/constants-service';
 
 // generates code for a multiple choice question
@@ -12,9 +9,9 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   const text: string  = `<p>${guiQuestion.stem.text}</p>`
     + (guiQuestion.stem.picture ? `<p><img src="${guiQuestion.stem.picture.url.replace(/files/, 'images')}/x300"/></p>` : '')
     + answers.reduce((prevText, answer, index) => {
-      return prevText + `<p style="display: flex; align-items: start;">[*]${answer.text}`
+      return prevText + `<p>[radio start]${answer.text}`
         + (answer.picture ? `<span>&nbsp;<img src="${answer.picture.url.replace(/files/, 'images')}/x200"/></span>` : '')
-        + `[*]</p>`;
+        + `[radio end]</p>`;
     }, '');
   // define code string with answers
   const code: string = "evaluationRubric = '" + rubricStr(DEFAULT_EVALUATION_RUBRIC) + "'; "
