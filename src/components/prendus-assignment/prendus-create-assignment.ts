@@ -12,6 +12,7 @@ import {
 import {
   QuestionType,
   VerbType,
+  NotificationType
 } from '../../services/constants-service';
 import {
   setNotification,
