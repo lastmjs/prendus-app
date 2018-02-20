@@ -221,6 +221,7 @@ class PrendusApp extends Polymer.Element {
           return 'createQuestionView';
         }
         if (editQuestionRouteActive){
+          console.log('edit question route')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'editQuestionView';

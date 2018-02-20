@@ -36,7 +36,8 @@
           padding-right: 5vw;
           padding-top: 5vh;
           padding-bottom: 5vh;
-          width: 100%;
+          /* Just took this out. Seems to make the view more readable */
+          /* width: 100%; */
           min-height: calc(100vh - 64px);
         }
         #prendus-menu{
@@ -85,8 +86,11 @@
         }
         .question-editor-container {
             min-width: 50vw;
-            max-width: 100vw;
-            width: calc((1000px - 100%) * 1000);
+            max-width: 90vw;
+            /* Changed this to percent because we're working with flexbox because of the menu. Using viewwidths makes the sizing off because of the menu. */
+            width: 90%;
+            /* Need to remove this because we're in a flexbox. Should be responsive now, and should look a bit better.*/
+            /* width: calc((1000px - 100%) * 1000); */
         }
       </style>
         <redux-store id="reduxStoreElement" root-reducer="[[rootReducer]]" on-statechange="stateChange" action="[[action]]"></redux-store>
@@ -106,7 +110,6 @@
         <app-route route="[[route]]" pattern="/signup" active="{{signupRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/login" active="{{loginRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/authenticate" active="{{authenticateRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/account" active="{{userAccountRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/open-source" active="{{openSourceRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/password-reset/:jwt" data="{{passwordResetRouteData}}" active="{{passwordResetRouteActive}}"></app-route>
 
@@ -153,100 +156,101 @@
         <app-route route="[[route]]" pattern="/question/:questionId/demo" data="{{editDemoQuestionRouteData}}" active="{{editDemoQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/examples" data="{{examplesQuestionRouteData}}" active="{{examplesQuestionRouteActive}}"></app-route>
 
+        <!-- Maybe consider getting ride of the id in the url to make it more simple? We don't really need it here, because each URL is unique to the user? -->
+        <app-route route="[[route]]" pattern="/user/:userId/questions" data="{{viewQuestionsRouteData}}" active="{{viewQuestionsRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="user/:userId/account" active="{{userAccountRouteActive}}"></app-route>
 
-        <app-route route="[[route]]" pattern="/questions/view" data="{{viewQuestionsRouteData}}" active="{{viewQuestionsRouteActive}}"></app-route>
 
         <prendus-navbar on-open="openMenu"></prendus-navbar>
         <div id="main-content">
-        <iron-lazy-pages id="app-container" attr-for-selected="show" hide-immediately fallback-selection="404View" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive)]]">
+          <iron-lazy-pages id="app-container" attr-for-selected="show" hide-immediately fallback-selection="404View" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, viewQuestionsRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive, userAccountRouteActive, createQuizRouteActive, editQuizRouteActive, viewQuizRouteActive, viewQuizzesRouteActive)]]">
 
-            <prendus-home-page class="app-window landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
-            <prendus-what-is-prendus class="app-window" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
-            <prendus-why-prendus class="app-window landing" show="whyPrendusView" data-path="../prendus-marketing/prendus-why-prendus.html"></prendus-why-prendus>
-            <prendus-how-it-works class="app-window landing" show="howItWorksView" data-path="../prendus-marketing/prendus-how-it-works.html"></prendus-how-it-works>
-            <prendus-course-setup class="app-window" show="courseSetupView" data-path="../prendus-marketing/prendus-course-setup.html"></prendus-course-setup>
-            <prendus-research class="app-window" show="researchView" data-path="../prendus-marketing/prendus-research-background.html"></prendus-research>
-            <prendus-oer class="app-window landing" show="oerView" data-path="../prendus-marketing/prendus-oer.html"></prendus-oer>
-            <prendus-open-source show="openSourceView"></prendus-open-source>
+              <prendus-home-page class="app-window landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
+              <prendus-what-is-prendus class="app-window" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
+              <prendus-why-prendus class="app-window landing" show="whyPrendusView" data-path="../prendus-marketing/prendus-why-prendus.html"></prendus-why-prendus>
+              <prendus-how-it-works class="app-window landing" show="howItWorksView" data-path="../prendus-marketing/prendus-how-it-works.html"></prendus-how-it-works>
+              <prendus-course-setup class="app-window" show="courseSetupView" data-path="../prendus-marketing/prendus-course-setup.html"></prendus-course-setup>
+              <prendus-research class="app-window" show="researchView" data-path="../prendus-marketing/prendus-research-background.html"></prendus-research>
+              <prendus-oer class="app-window landing" show="oerView" data-path="../prendus-marketing/prendus-oer.html"></prendus-oer>
+              <prendus-open-source show="openSourceView"></prendus-open-source>
 
-            <prendus-signup class="authentication-pages" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
-            <prendus-login class="authentication-pages" show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
-            <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]" data-path="../prendus-authenticate/prendus-authenticate.html"></prendus-authenticate>
-            <prendus-password-reset show="passwordResetView" active="[[passwordResetRouteActive]]" jwt="[[passwordResetRouteData.jwt]]" data-path="../prendus-password-reset/prendus-password-reset.html"></prendus-password-reset>
+              <prendus-signup class="authentication-pages" show="signupView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-signup/prendus-signup.html"></prendus-signup>
+              <prendus-login class="authentication-pages" show="loginView" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-login/prendus-login.html"></prendus-login>
+              <prendus-authenticate show="authenticateView" active="[[authenticateRouteActive]]" data-path="../prendus-authenticate/prendus-authenticate.html"></prendus-authenticate>
+              <prendus-password-reset show="passwordResetView" active="[[passwordResetRouteActive]]" jwt="[[passwordResetRouteData.jwt]]" data-path="../prendus-password-reset/prendus-password-reset.html"></prendus-password-reset>
 
-            <div show="viewQuestionView" class="viewQuestionContainer" data-path="../../node_modules/prendus-question-elements/prendus-view-question.html">
-                <div class="viewQuestionWrapper">
-                    <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
-                </div>
-            </div>
+              <div show="viewQuestionView" class="viewQuestionContainer" data-path="../../node_modules/prendus-question-elements/prendus-view-question.html">
+                  <div class="viewQuestionWrapper">
+                      <prendus-view-question question-id="[[viewQuestionRouteData.questionId]]"></prendus-view-question>
+                  </div>
+              </div>
+              <!-- I moved both of these elements here so that the flexbox could work correctly with the styling -->
+              <prendus-edit-question class="question-editor-container app-window" show="createQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+              <prendus-edit-question class="question-editor-container app-window" show="editQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+              <!-- <div class="question-editor-container" show="editQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
+                  <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+              </div> -->
 
-            <div class="question-editor-container" show="createQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
-            </div>
+              <!-- <div class="question-editor-container" show="editDemoQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
+                  <prendus-edit-question question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
+              </div> -->
 
-            <div class="question-editor-container" show="editQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
-            </div>
+              <prendus-question-examples show="examplesQuestionView" data-path="../prendus-question-examples/prendus-question-examples.html"></prendus-question-examples>
+              <prendus-questions-view class="app-window" show="viewQuestionsView" data-path="../prendus-questions/prendus-questions-view.html"></prendus-questions-view>
+              <prendus-courses class="app-window" show="coursesView" data-path="../prendus-courses/prendus-courses.html"></prendus-courses>
+              <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create" data-path="../prendus-course/prendus-course.html"></prendus-course>
+              <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view" data-path="../prendus-course/prendus-course.html"></prendus-course>
+              <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit" data-path="../prendus-course/prendus-course.html"></prendus-course>
+              <prendus-course-question-ratings class="app-window app-window-wide" show="courseQuestionRatingsView" course-id="[[courseQuestionRatingsRouteData.courseId]]" data-path="../prendus-course-question-ratings/prendus-course-question-ratings.html"></prendus-course-question-ratings>
+              <prendus-course-payment show="paymentCourseView" course-id="[[paymentCourseRouteData.courseId]]" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-course-payment/prendus-course-payment.html"></prendus-course-payment>
 
-            <div class="question-editor-container" show="editDemoQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
-            </div>
 
-            <prendus-question-examples show="examplesQuestionView" data-path="../prendus-question-examples/prendus-question-examples.html"></prendus-question-examples>
 
-            <prendus-courses class="app-window" show="coursesView" data-path="../prendus-courses/prendus-courses.html"></prendus-courses>
-            <prendus-course class="app-window" show="createCourseView" course-id="[[createCourseRouteData.courseId]]" mode="create" data-path="../prendus-course/prendus-course.html"></prendus-course>
-            <prendus-course class="app-window" show="viewCourseView" course-id="[[viewCourseRouteData.courseId]]" mode="view" data-path="../prendus-course/prendus-course.html"></prendus-course>
-            <prendus-course class="app-window" show="editCourseView" course-id="[[editCourseRouteData.courseId]]" mode="edit" data-path="../prendus-course/prendus-course.html"></prendus-course>
-            <prendus-course-question-ratings class="app-window app-window-wide" show="courseQuestionRatingsView" course-id="[[courseQuestionRatingsRouteData.courseId]]" data-path="../prendus-course-question-ratings/prendus-course-question-ratings.html"></prendus-course-question-ratings>
-            <prendus-course-payment show="paymentCourseView" course-id="[[paymentCourseRouteData.courseId]]" redirect-url="[[queryParams.redirectUrl]]" data-path="../prendus-course-payment/prendus-course-payment.html"></prendus-course-payment>
+              <div class="question-editor-container" show="assignmentDemoView" data-path="../prendus-assignment/prendus-create-assignment-demo.html">
+                  <prendus-create-assignment-demo assignment-id="[[demoAssignmentRouteData.assignmentId]]"></prendus-create-assignment-demo>
+              </div>
 
-            <div class="question-editor-container" show="assignmentDemoView" data-path="../prendus-assignment/prendus-create-assignment-demo.html">
-                <prendus-create-assignment-demo assignment-id="[[demoAssignmentRouteData.assignmentId]]"></prendus-create-assignment-demo>
-            </div>
+              <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
+              <prendus-create-assignment class="app-window" show="assignmentCreateView" assignment-id="[[assignmentCreateRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-create-assignment.html"></prendus-create-assignment>
+              <prendus-review-assignment class="app-window" show="assignmentReviewView" assignment-id="[[assignmentReviewRouteData.assignmentId]]" data-path="../prendus-assignment/prendus-review-assignment.html"></prendus-review-assignment>
+              <prendus-grade-assignment class="app-window" show="assignmentGradeView" assignment-id="[[assignmentGradeRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-grade-assignment.html"></prendus-grade-assignment>
+              <prendus-respond-assignment class="app-window" show="assignmentQuizView" assignment-id="[[assignmentQuizRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-respond-assignment.html"></prendus-respond-assignment>
+              <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
 
-            <prendus-assignment class="app-window" show="createAssignmentView" assignment-id="[[createAssignmentRouteData.assignmentId]]" course-id="[[queryParams.courseId]]" mode="create" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
-            <prendus-create-assignment class="app-window" show="assignmentCreateView" assignment-id="[[assignmentCreateRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-create-assignment.html"></prendus-create-assignment>
-            <prendus-review-assignment class="app-window" show="assignmentReviewView" assignment-id="[[assignmentReviewRouteData.assignmentId]]" data-path="../prendus-assignment/prendus-review-assignment.html"></prendus-review-assignment>
-            <prendus-grade-assignment class="app-window" show="assignmentGradeView" assignment-id="[[assignmentGradeRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-grade-assignment.html"></prendus-grade-assignment>
-            <prendus-respond-assignment class="app-window" show="assignmentQuizView" assignment-id="[[assignmentQuizRouteData.assignmentId]]"  data-path="../prendus-assignment/prendus-respond-assignment.html"></prendus-respond-assignment>
-            <prendus-assignment class="app-window" show="editAssignmentView" assignment-id="[[editAssignmentRouteData.assignmentId]]" mode="edit" data-path="../prendus-assignment/prendus-assignment.html"></prendus-assignment>
+              <prendus-quiz-edit class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quiz-edit class="app-window" show="editQuizView" quiz-id="[[editQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
+              <prendus-quiz-view class="app-window" show="viewQuizView" quiz-id="[[viewQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-view.html"></prendus-quiz-view>
+              <prendus-quizzes-view class="app-window" show="viewQuizzesView" data-path="../prendus-quizzes/prendus-quizzes-view.html"></prendus-quizzes-view>
 
-            <prendus-quiz-edit class="app-window" show="createQuizView" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
-            <prendus-quiz-edit class="app-window" show="editQuizView" quiz-id="[[editQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-edit.html"></prendus-quiz-edit>
-            <prendus-quiz-view class="app-window" show="viewQuizView" quiz-id="[[viewQuizRouteData.quizId]]" data-path="../prendus-quiz/prendus-quiz-view.html"></prendus-quiz-view>
-            <prendus-quizzes-view class="app-window" show="viewQuizzesView" data-path="../prendus-quizzes/prendus-quizzes-view.html"></prendus-quizzes-view>
+              <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>
 
-            <prendus-learning-structure show="learningStructureView" mode="view" data-path="../prendus-learning-structure/prendus-learning-structure.html"></prendus-learning-structure>
+              <prendus-discipline class="app-window" show="createDisciplineView" discipline-id="[[createDisciplineRouteData.disciplineId]]" mode="create" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
+              <prendus-discipline class="app-window" show="viewDisciplineView" discipline-id="[[viewDisciplineRouteData.disciplineId]]" mode="view" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
+              <prendus-discipline class="app-window" show="editDisciplineView" discipline-id="[[editDisciplineRouteData.disciplineId]]" mode="edit" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
 
-            <prendus-discipline class="app-window" show="createDisciplineView" discipline-id="[[createDisciplineRouteData.disciplineId]]" mode="create" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
-            <prendus-discipline class="app-window" show="viewDisciplineView" discipline-id="[[viewDisciplineRouteData.disciplineId]]" mode="view" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
-            <prendus-discipline class="app-window" show="editDisciplineView" discipline-id="[[editDisciplineRouteData.disciplineId]]" mode="edit" data-path="../prendus-learning-structure/prendus-discipline.html"></prendus-discipline>
+              <prendus-subject class="app-window" show="createSubjectView" subject-id="[[createSubjectRouteData.subjectId]]" discipline-id="[[queryParams.disciplineId]]" mode="create" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
+              <prendus-subject class="app-window" show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
+              <prendus-subject class="app-window" show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
 
-            <prendus-subject class="app-window" show="createSubjectView" subject-id="[[createSubjectRouteData.subjectId]]" discipline-id="[[queryParams.disciplineId]]" mode="create" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
-            <prendus-subject class="app-window" show="viewSubjectView" subject-id="[[viewSubjectRouteData.subjectId]]" mode="view" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
-            <prendus-subject class="app-window" show="editSubjectView" subject-id="[[editSubjectRouteData.subjectId]]" mode="edit" data-path="../prendus-learning-structure/prendus-subject.html"></prendus-subject>
+              <prendus-teacher-approval show="teacherApprovalView" mode="view" data-path="../prendus-teacher-approval/prendus-teacher-approval.html"></prendus-teacher-approval>
 
-            <prendus-teacher-approval show="teacherApprovalView" mode="view" data-path="../prendus-teacher-approval/prendus-teacher-approval.html"></prendus-teacher-approval>
-
-            <prendus-concept class="app-window" show="createConceptView" concept-id="[[createConceptRouteData.conceptId]]" subject-id="[[queryParams.subjectId]]" mode="create" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
-            <prendus-concept class="app-window" show="viewConceptView" concept-id="[[viewConceptRouteData.conceptId]]" mode="view" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
-            <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
-
-            <div show="404View">
-                <div class="not-found">
-                    <h1>
-                        This page could not be found
-                    </h1>
-                </div>
-            </div>
-
-        </iron-lazy-pages>
-        <dom-if if="[[user]]">
-          <template>
-            <prendus-menu id="prendus-menu"></prendus-menu>
-          </template>
-        </dom-if>
+              <prendus-concept class="app-window" show="createConceptView" concept-id="[[createConceptRouteData.conceptId]]" subject-id="[[queryParams.subjectId]]" mode="create" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
+              <prendus-concept class="app-window" show="viewConceptView" concept-id="[[viewConceptRouteData.conceptId]]" mode="view" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
+              <prendus-concept class="app-window" show="editConceptView" concept-id="[[editConceptRouteData.conceptId]]" mode="edit" data-path="../prendus-learning-structure/prendus-concept.html"></prendus-concept>
+              <div show="404View">
+                  <div class="not-found app-window">
+                      <h1>
+                          This page could not be found
+                      </h1>
+                  </div>
+              </div>
+          </iron-lazy-pages>
+          <dom-if if="[[user]]">
+            <template>
+              <prendus-menu id="prendus-menu"></prendus-menu>
+            </template>
+          </dom-if>
+        </div>
         <dom-if if="[[!user]]">
           <template>
             <prendus-footer-marketing></prendus-footer-marketing>

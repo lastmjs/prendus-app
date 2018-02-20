@@ -1,7 +1,5 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {Question} from '../../typings/question';
-import {GQLVariables} from '../../typings/gql-variables';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../prendus.d';
+import {User, Question, Assignment} from '../../prendus.d';
 import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
@@ -9,7 +7,6 @@ import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/act
 import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
-import {Assignment} from '../../typings/assignment'
 
 class PrendusQuestionsView extends Polymer.Element {
   loaded: boolean;
@@ -52,8 +49,11 @@ class PrendusQuestionsView extends Polymer.Element {
     }
   }
 
-  confirmDelete(e){
+  openConfirmDeleteQuestionModal(e){
     this.shadowRoot.querySelector('#confirmDeleteQuestionModal').open()
+  }
+  closeConfirmDeleteQuestionModal(e){
+    this.shadowRoot.querySelector('#confirmDeleteQuestionModal').close()
   }
 
   async deleteQuestion(e: any){
@@ -85,6 +85,7 @@ class PrendusQuestionsView extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('questions')) this.questions = componentState.questions;
+    if (keys.includes('questions')) console.log(componentState.questions);
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
     if (keys.includes('error')) this.error = componentState.error;
@@ -96,7 +97,7 @@ class PrendusQuestionsView extends Polymer.Element {
 
 window.customElements.define(PrendusQuestionsView.is, PrendusQuestionsView)
 
-async function getUserQuestions(userId: String, userToken: String) {
+async function getUserQuestions(userId: string, userToken: string) {
     const data = await GQLRequest(`
       query getQuestions($userId: ID!) {
         allQuestions(

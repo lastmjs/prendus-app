@@ -7,7 +7,6 @@
 <!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
 <link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
 <link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
@@ -52,7 +51,7 @@
                 <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
               </template>
             </dom-if>
-            <dom-if if="[[questions]]">
+            <dom-if if="[[questions.length]]">
               <template>
                 <h1 class="title">My Questions</h1>
               </template>
@@ -61,14 +60,15 @@
             <div id="questions-block">
               <dom-repeat items="[[questions]]">
                 <template>
-                  <prendus-question-viewer-wrapper question="[[item]]" on-deleted="confirmDelete" edit delete></prendus-question-viewer-wrapper>
+                  <prendus-question-viewer-wrapper question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
                   <paper-dialog id="confirmDeleteQuestionModal" modal>
+                    <h2>Confirm Delete</h2>
                     <div class="content">
                       Are you sure you want to delete this question? This action is irreversible.
                     </div>
                     <div class="buttons">
-                      <button class="prendus-button prendus-button--minor" on-click="closeDeleteQuestionDialog">Cancel</button>
-                      <button id="[[item.id]]"class="prendus-button prendus-button--recommended" on-click="deleteQuestion">Confirm Delete</button>
+                      <button class="prendus-button prendus-button--minor" on-click="closeConfirmDeleteQuestionModal">Cancel</button>
+                      <button id="[[item.id]]"class="prendus-button prendus-button--destructive" on-click="deleteQuestion">Confirm Delete</button>
                     </div>
                   </paper-dialog>
                 </template>

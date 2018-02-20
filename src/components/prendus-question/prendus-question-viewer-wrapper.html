@@ -30,7 +30,7 @@
           <template>
             <paper-card>
               <div id="question-wrapper">
-                <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse"></prendus-view-question>
+                <prendus-view-question class="prendus-question" question="[[question]]" on-question-response="_handleResponse" user-token="[[userToken]]"></prendus-view-question>
               </div>
             </div>
             <div class="card-actions" hidden$="[[noActions]]">

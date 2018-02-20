@@ -92,12 +92,12 @@
           <app-toolbar>
         </app-header>
         <paper-listbox class="menu-items">
-          <a href="/questions/view"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
+          <a href="/user/[[user.id]]/questions"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
           <hr>
           <a href="/quizzes/view"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
           <hr>
           <!--
-          Adding courses after the kickstarter
+          Adding courses...eventually
           <a href="/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
           <hr> -->
         </paper-listbox>

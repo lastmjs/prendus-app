@@ -1,7 +1,5 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../typings/actions';
-import {User} from '../../typings/user';
-import {Question} from '../../typings/question';
-import {GQLVariables} from '../../typings/gql-variables';
+import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../prendus.d';
+import {User, Question, Assignment} from '../../prendus.d';
 import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
@@ -19,9 +17,8 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   assignment: Assignment;
   flagQuestionModalOpened: boolean;
   noUserQuestions: boolean;
-  questionIds: string[];
+  questionId: string;
   question:  Question;
-  questions:  Question[];
   add: boolean;
   delete: boolean;
   edit: boolean;
@@ -33,6 +30,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     return {
         question: {
             type: Question,
+            observer: 'questionLoaded',
         },
         add: {
           type: Boolean,
@@ -63,6 +61,9 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     !this.noActions ? this.action = fireLocalAction(this.componentId, 'noActions', false) : this.noActions;
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
+  questionLoaded(e){
+    this.action = fireLocalAction(this.componentId, 'question', this.question);
+  }
   fireAddQuestion(e){
     const questionId = e.target.dataset.questionid;
     this.dispatchEvent(new CustomEvent('added', {
@@ -92,7 +93,6 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
     if (keys.includes('noActions')) this.noActions = componentState.noActions;
     if (keys.includes('assignment')) this.assignment = componentState.assignment;
     if (keys.includes('question')) this.question = componentState.question;
-    if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
     if (keys.includes('error')) this.error = componentState.error;
