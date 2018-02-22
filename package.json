@@ -17,11 +17,15 @@
     "type": "git",
     "url": "git+https://github.com/lastmjs/prendus-app.git"
   },
-  "author": "Jordan Last <jordan.michael.last@gmail.com>",
+  "author": "Prendus",
+  "contributors": [
+    "Jordan Last <jordan.michael.last@gmail.com>"
+  ],
   "bugs": {
     "url": "https://github.com/lastmjs/prendus-app/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-app#readme",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",

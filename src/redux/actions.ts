@@ -50,6 +50,16 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
             throw error;
         });
 
+        //TODO I am not sure if this function is the place for this to happen, because we are expecting to only set the user from this function, but the userToken ends up getting set
+        //if data.user is null, that probably means the authentication token is invalid, in most cases that will probably occur becuase the token has expired
+        if (data && data.user === null) {
+            return {
+                type: 'SET_PROPERTY',
+                key: 'userToken',
+                value: null
+            };
+        }
+
         // The user token might be set to null while the request is off...if it is, we do not want to set the user because we are expecting the user to stay null
         const currentUserToken = window.localStorage.getItem('userToken');
         if (currentUserToken) {

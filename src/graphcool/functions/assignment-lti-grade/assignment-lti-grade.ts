@@ -13,9 +13,11 @@ export default async (event: any) => {
         const api: any = graphcool.api('simple/v1');
         const ltiSessionIdJWT: string = event.data.ltiSessionIdJWT; //this JWT is signed in the assignment-lti-launch function and merely contains the ltiSessionId, which is the actual graph.cool id of the LTISession stored in the database
         const ltiSessionId: string = JWT.verify(ltiSessionIdJWT, process.env.PRENDUS_JWT_SECRET).ltiSessionId;
+        console.log('ltiSessionId', ltiSessionId);
         const outcomeService: object | null = await getOutcomeService(api, ltiSessionId); //this service allows for the grade to be passed back to the LTI consumer. It has a method that abstracts away that functionality for us
+        console.log('outcomeService', outcomeService);
         if (outcomeService !== null) await sendGrade(outcomeService, 1); //only pass back a grade if the LTI consumer has setup grade passback
-        await deleteLTISession(api, ltiSessionId); //we do not keep LTISessions in the database. The user creates a session when they launch, and the session ends completely when they submit their grade
+        // await deleteLTISession(api, ltiSessionId); //we do not keep LTISessions in the database. The user creates a session when they launch, and the session ends completely when they submit their grade
 
         return {
             data: {
@@ -86,7 +88,12 @@ async function deleteLTISession(api: any, ltiSessionId: string): Promise<string>
 
 function sendGrade(outcomeService: any, grade: number): Promise<void> {
     return new Promise((resolve, reject) => {
+        console.log('grade', grade);
+        console.log('outcomeService.send_replace_result', outcomeService.send_replace_result);
         outcomeService.send_replace_result(grade, (error: any, result: any) => {
+            console.log('error', error);
+            console.log('result', result);
+
             if (error) {
                 reject(error);
             }
