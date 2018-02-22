@@ -12,7 +12,8 @@ import {
   GQLRequest
 } from '../../node_modules/prendus-shared/services/graphql-service';
 import {
-  setNotification
+  setNotification,
+  getAndSetUser
 } from '../../redux/actions';
 import {
   NotificationType
@@ -62,7 +63,8 @@ class PrendusAssignmentAuthorization extends Polymer.Element {
   }
 
   async _computeAuthResult(assignmentId: string, userId: string, userToken: string) {
-    if (userToken === null)
+      this.action = await getAndSetUser();
+    if (this.userToken === null)
       this.action = fireLocalAction(this.componentId, 'result', {
         authenticated: false,
       });
