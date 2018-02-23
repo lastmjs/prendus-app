@@ -100,7 +100,7 @@ type Question @model {
   conceptAlignment: Float! @defaultValue(value: 0)
   difficulty: Float! @defaultValue(value: 0)
   plagiarism: Float! @defaultValue(value: 0)
-  useInTest: Float! @defaultValue(value: 0) @rename(oldName: "inclusion")
+  useInTest: Float! @defaultValue(value: 0)
 }
 
 type QuestionFlag @model {
