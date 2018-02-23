@@ -131,7 +131,7 @@ export const DEFAULT_EVALUATION_RUBRIC = {
       description: "You have evidence to support that this question was plagiarized"
     }
   },
-  Inclusion: {
+  'Use in Test': {
     Yes: {
       points: 2,
       description: "The question is accurate and would be good exam practice for all students"
