@@ -375,6 +375,9 @@ function verifySort(sortField: number, sortAsc: number, sorted: Question[]): boo
   return sorted.reduce((result, next, i) => {
     if (!i) return true;
     const prev = sorted[i-1];
+
+    //TODO I do not believe this function is actually testing the sort correctly. The toLowerCase below makes it so that nearly ever time the prevStat and nextStat are 0
+    //TODO the sortField should not be lower cased, but when it is lower cased, the test fails. I do not believe the sort is actually performaing correctly because of this
     const prevStat = averageCategoryScores(prev)[sortField.toLowerCase()] || 0;
     const nextStat = averageCategoryScores(next)[sortField.toLowerCase()] || 0;
     if (sortAsc) {

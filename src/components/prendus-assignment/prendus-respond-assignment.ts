@@ -128,7 +128,7 @@ function loadAssignment(assignmentId: string, userId: string, userToken: string,
           }, {
             ratings_every: {
               scores_some: {
-                category: "Inclusion"
+                category: "Use in Test"
                 score_gt: 1
               }
             }
