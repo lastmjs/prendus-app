@@ -35,7 +35,7 @@ async function getOriginalEntities(client, cursor, pageSize) {
             }
         }
     `, {
-        cursor,
+        cursor: 0,
         pageSize
     });
 

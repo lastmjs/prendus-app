@@ -12,7 +12,9 @@ catch(error) {
 async function countOriginalEntities(client) {
     const data = await client.request(`
       query {
-        _allCategoryScoresMeta {
+        _allCategoryScoresMeta(filter: {
+            category: "Inclusion"
+        }) {
           count
         }
       }`);
@@ -25,13 +27,16 @@ async function getOriginalEntities(client, cursor, pageSize) {
             allCategoryScores(
                 skip: $cursor
                 first: $pageSize
+                filter: {
+                    category: "Inclusion"
+                }
             ) {
                 id
                 category
             }
         }
     `, {
-        cursor,
+        cursor: 0,
         pageSize
     });
 
@@ -44,7 +49,7 @@ function buildMutations(categoryScores) {
         const categoryScoreIdVariableValue = categoryScore.id;
 
         const categoryScoreCategoryKey = `categoryScoreCategory${index}`;
-        const categoryScoreCategoryValue = categoryScore.category === 'Inclusion' ? 'Use in Test' : categoryScore.category;
+        const categoryScoreCategoryValue = 'Use in Test';
 
         return {
             ...result,
