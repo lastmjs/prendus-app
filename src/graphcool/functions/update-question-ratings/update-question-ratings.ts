@@ -9,7 +9,7 @@
  * and then include an orderBy field like this
  * allQuestions(orderBy: {
  *  averageRatings: {
- *    category: "Inclusion"
+ *    category: "Use in Test"
  *    score_asc
  *  }
  * }
@@ -28,7 +28,7 @@ const update = `
     $learningCategory: Float!
     $difficulty: Float!
     $conceptAlignment: Float!
-    $inclusion: Float!,
+    $useInTest: Float!,
     $plagiarism: Float!
   ) {
     updateQuestion(
@@ -38,7 +38,7 @@ const update = `
       learningCategory: $learningCategory
       difficulty: $difficulty
       conceptAlignment: $conceptAlignment
-      inclusion: $inclusion
+      useInTest: $useInTest
       plagiarism: $plagiarism
     ) {
       id
@@ -51,7 +51,7 @@ const CATEGORIES = [
   'learningCategory',
   'difficulty',
   'conceptAlignment',
-  'inclusion',
+  'useInTest',
   'plagiarism'
 ];
 
@@ -96,4 +96,3 @@ function averageScore(question) {
     };
   }
 }
-
