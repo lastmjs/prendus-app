@@ -73,9 +73,9 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
           this.action = persistUserToken(signupData.signupUser.token);
           this.action = await getAndSetUser();
           const ltiJWT = getCookie('ltiJWT');
-          deleteCookie('ltiJWT');
           if (ltiJWT) await addLTIUser(ltiJWT, this.user, signupData.signupUser.token);
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
+          deleteCookie('ltiJWT');
           deleteCookie('redirectUrl');
           this.action = fireLocalAction(this.componentId, "loaded", true)
 
