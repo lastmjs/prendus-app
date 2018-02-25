@@ -17,7 +17,7 @@ async function countOriginalEntities(client) {
           }
         }
      `);
-    return data._allCategoryScoresMeta.count;
+    return data._allQuestionsMeta.count;
 }
 
 async function getOriginalEntities(client, cursor, pageSize) {
@@ -32,7 +32,7 @@ async function getOriginalEntities(client, cursor, pageSize) {
             }
         }
     `, {
-        cursor: 0,
+        cursor,
         pageSize
     });
 
@@ -78,8 +78,8 @@ function transformText(oldText) {
 function transformTextRecursion(text, start, index) {
     if (start) {
         const transformedText = text.replace('[radio start]', `[radio${index}]`);
-        const moreSymbols = transformedText.includes('[radio start]');
-        return moreSymbols ? transformTextRecursion(transformedText, false, index + 1) : transformedText;
+        const moreSymbols = transformedText.includes('[radio end]');
+        return moreSymbols ? transformTextRecursion(transformedText, false, index) : transformedText;
     }
     else {
         const transformedText = text.replace('[radio end]', `[radio${index}]`);
