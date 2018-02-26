@@ -44,6 +44,7 @@ export async function getAndSetUser(): Promise<SetPropertyAction | DefaultAction
                 id
                 email
                 role
+                createAssignmentEditorChosen
               }
             }
         `, {}, originalUserToken, (error: any) => {

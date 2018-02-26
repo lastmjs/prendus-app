@@ -28,6 +28,7 @@ type User @model {
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
   purchases: [Purchase!]! @relation(name: "UserPurchases")
+  createAssignmentEditorChosen: Boolean! @defaultValue(value: false) @migrationValue(value: false)
 }
 
 type Course @model {

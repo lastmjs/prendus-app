@@ -1,9 +1,9 @@
 const migrate = require('./migrate');
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 1000;
 
 try {
-    migrate(50, countOriginalEntities, getOriginalEntities, buildMutations);
+    migrate(1000, countOriginalEntities, getOriginalEntities, buildMutations);
 }
 catch(error) {
     console.log(error);

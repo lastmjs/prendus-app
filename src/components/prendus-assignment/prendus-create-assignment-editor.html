@@ -1,0 +1,30 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-edit-question.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-scaffold/prendus-scaffold-concept.html">
+
+<dom-module id="prendus-create-assignment-editor">
+    <template>
+        <style include="prendus-styles">
+        </style>
+
+        <redux-store action="[[action]]" on-statechange="stateChange"></redux-store>
+
+        <prendus-scaffold-concept selected-concept="[[concept]]" assignment="[[assignment]]" on-concept-selected="handleConcept"></prendus-scaffold-concept>
+
+        <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-value-changed="handleResource"></paper-input>
+
+        <br>
+        <br>
+
+        <div style="margin-bottom: 5vh">
+            <prendus-edit-question id="question-editor" question="[[_question]]"></prendus-edit-question>
+            <div style="display: flex; margin-top: 1vh">
+                <button class="prendus-button prendus-button--recommended" style="margin-left: auto" on-click="submitClick">Submit</button>
+            </div>
+        </div>
+    </template>
+
+    <script type="module" src="prendus-create-assignment-editor.ts"></script>
+</dom-module>
