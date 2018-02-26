@@ -16,6 +16,7 @@ import {
 } from '../../services/constants-service';
 import {
   setNotification,
+  getAndSetUser
 } from '../../redux/actions';
 import {
   GQLRequest
@@ -59,6 +60,20 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
       items: questions,
       taken: false,
     };
+  }
+
+  async createAssignmentEditorChosen() {
+      await GQLRequest(`
+          mutation($userId: ID!, $createAssignmentEditorChosen: Boolean!) {
+              updateUser(id: $userId, createAssignmentEditorChosen: $createAssignmentEditorChosen) {
+                  id
+              }
+          }`, {
+              userId: this.user.id,
+              createAssignmentEditorChosen: !this.user.createAssignmentEditorChosen
+          }, this.userToken, this._handleGQLError.bind(this));
+
+         this.action = await getAndSetUser();
   }
 
   error(): null {
