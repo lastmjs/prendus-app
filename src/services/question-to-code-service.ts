@@ -9,9 +9,9 @@ export const generateMultipleChoice = (guiQuestion: GuiQuestion): { text: string
   const text: string  = `<p>${guiQuestion.stem.text}</p>`
     + (guiQuestion.stem.picture ? `<p><img src="${guiQuestion.stem.picture.url.replace(/files/, 'images')}/x300"/></p>` : '')
     + answers.reduce((prevText, answer, index) => {
-      return prevText + `<p>[radio start]${answer.text}`
+      return prevText + `<p>[radio${index + 1}]${answer.text}`
         + (answer.picture ? `<span>&nbsp;<img src="${answer.picture.url.replace(/files/, 'images')}/x200"/></span>` : '')
-        + `[radio end]</p>`;
+        + `[radio${index + 1}]</p>`;
     }, '');
   // define code string with answers
   const code: string = "evaluationRubric = '" + rubricStr(DEFAULT_EVALUATION_RUBRIC) + "'; "
@@ -34,7 +34,7 @@ export const generateEssay = (guiQuestion: GuiQuestion): { text: string, code: s
   const { stem, gradingRubric, evaluationRubric, imageUrls } = guiQuestion;
   const text: string = `<p>${stem}</p>`
     + (imageUrls.length ? `<p><img src="${imageUrls[0]}"/></p>` : '')
-    + `<p>[essay]</p>`;
+    + `<p>[essay1]</p>`;
   const code: string = `
     gradingRubric = '${rubricStr(gradingRubric)}';
     evaluationRubric = '${rubricStr(evaluationRubric)}';
