@@ -1,9 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
-<link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html">
+<!-- <link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html"> -->
 <link rel="import" href="../prendus-scaffold/prendus-multiple-choice-scaffold.html">
 <link rel="import" href="prendus-assignment-shared.html">
+<link rel="import" href="prendus-create-assignment-editor.html">
 
 <dom-module id="prendus-create-assignment">
 
@@ -22,11 +23,14 @@
       on-item-changed="_question"
     >
       <div slot="assignment">
-        <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
+        <!-- <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
           <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
-        </div>
-        <div hidden$="[[isEssayType(assignment.questionType)]]">
+        </div> -->
+        <div hidden$="[[user.createAssignmentEditorChosen]]">
           <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
+        </div>
+        <div hidden$="[[!user.createAssignmentEditorChosen]]">
+            <prendus-create-assignment-editor question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-create-assignment-editor>
         </div>
       </div>
     </prendus-assignment-shared>

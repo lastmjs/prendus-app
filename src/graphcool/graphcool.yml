@@ -141,6 +141,12 @@ permissions:
   authenticated: true
   query: ./permission-queries/user/user-read-role-email.graphql
 
+- operation: User.read
+  fields:
+    - createAssignmentEditorChosen
+  authenticated: true
+  query: ./permission-queries/user/user-read-create-assignment-editor-chosen.graphql
+
 # User Update
 - operation: User.update
   authenticated: true

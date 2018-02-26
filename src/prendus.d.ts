@@ -38,6 +38,7 @@ export interface User {
   readonly quizzes: Quiz[];
   readonly questions: Question[];
   readonly role: string;
+  readonly createAssignmentEditorChosen: boolean;
 }
 
 export interface LTIUser {

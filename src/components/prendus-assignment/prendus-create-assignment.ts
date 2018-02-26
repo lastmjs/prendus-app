@@ -30,6 +30,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
   questions: string[]; //ids of created questions
   userToken: string;
   functions: AssignmentFunctions;
+  user: User;
 
   static get is() { return 'prendus-create-assignment' }
 
@@ -82,11 +83,11 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
   }
 
   isEssayType(questionType: string): boolean {
-    return questionType === QuestionType.ESSAY;
+    return questionType === QuestionType.ESSAY && !this.user.createAssignmentEditorChosen;
   }
 
   isMultipleChoiceType(questionType: string): boolean {
-    return questionType === QuestionType.MULTIPLE_CHOICE;
+    return questionType === QuestionType.MULTIPLE_CHOICE && !this.user.createAssignmentEditorChosen;
   }
 
   _handleGQLError(err: any) {
@@ -104,6 +105,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
     this.load = componentState.load;
     this.submit = componentState.submit;
     this.userToken = state.userToken;
+    this.user = state.user;
   }
 
 }
