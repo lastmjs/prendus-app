@@ -10,6 +10,8 @@
 <link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
 <link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-infinite-list/prendus-infinite-list.html">
+
 
 
 <dom-module id="prendus-questions-view">
@@ -58,6 +60,21 @@
             </dom-if>
             <!-- Need to get an iron list working.  -->
             <div id="questions-block">
+              <!-- <prendus-infinite-list next="[[fetchQuestions]]" on-items-loaded="questionsLoaded">
+                <template>
+                  <prendus-question-viewer-wrapper question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
+                  <paper-dialog id="confirmDeleteQuestionModal" modal>
+                    <h2>Confirm Delete</h2>
+                    <div class="content">
+                      Are you sure you want to delete this question? This action is irreversible.
+                    </div>
+                    <div class="buttons">
+                      <button class="prendus-button prendus-button--minor" on-click="closeConfirmDeleteQuestionModal">Cancel</button>
+                      <button id="[[item.id]]"class="prendus-button prendus-button--destructive" on-click="deleteQuestion">Confirm Delete</button>
+                    </div>
+                  </paper-dialog>
+                </template>
+              </prendus-infinite-list> -->
               <dom-repeat items="[[questions]]">
                 <template>
                   <prendus-question-viewer-wrapper question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
@@ -74,7 +91,7 @@
                 </template>
               </dom-repeat>
             </div>
-            <a href="/question/create"><paper-fab icon="add"></paper-fab></a>
+            <a href="/question/create" id="addQuestionButton"><paper-fab icon="add"></paper-fab></a>
           </template>
       </dom-if>
 

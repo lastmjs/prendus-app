@@ -8,7 +8,7 @@ import {persistUserToken, getAndSetUser, setNotification} from '../../redux/acti
 import {createUUID, navigate, getCookie, deleteCookie, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
 import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
 
-class PrendusUserAccount extends Polymer.Element implements ContainerElement {
+class PrendusUserProfile extends Polymer.Element implements ContainerElement {
     componentId: string;
     action: SetPropertyAction | DefaultAction | SetComponentPropertyAction;
     userToken: string | null;
@@ -27,7 +27,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     attributesToRetrieve: string[]
     createInstitutionModalOpen: boolean;
 
-    static get is() { return 'prendus-user-account'; }
+    static get is() { return 'prendus-user-profile'; }
     static get properties() {
         return {
             redirectUrl: {
@@ -161,7 +161,7 @@ class PrendusUserAccount extends Polymer.Element implements ContainerElement {
     }
 }
 
-window.customElements.define(PrendusUserAccount.is, PrendusUserAccount);
+window.customElements.define(PrendusUserProfile.is, PrendusUserProfile);
 
 function enableSignup(email: string, password: string, confirmedPassword: string){
   if(email && password && confirmedPassword){
@@ -236,7 +236,7 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
       });
   }
 }
-function _clearFormData(context: PrendusUserAccount){
+function _clearFormData(context: PrendusUserProfile){
   context.shadowRoot.querySelector('#email').value = '';
   context.shadowRoot.querySelector('#password').value = '';
   context.shadowRoot.querySelector('#confirm-password').value = '';

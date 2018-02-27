@@ -8,19 +8,25 @@ import {LTIPassback} from '../../services/lti-service';
 import {sendStatement} from '../../services/analytics-service';
 import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 
-class PrendusQuestionsView extends Polymer.Element {
+export class PrendusQuestionsView extends Polymer.Element {
   loaded: boolean;
   action: SetPropertyAction | SetComponentPropertyAction | DefaultAction;
   componentId: string;
   userToken: string;
   user: User;
+  userId: string;
   noUserQuestions: boolean;
   questionIds: string[];
   questions:  Question[];
   static get is() { return 'prendus-questions-view' }
 
   static get properties() {
-
+    return{
+        userId: {
+        type: String,
+        observer: 'loadQuestions'
+      }
+    }
   }
 
   constructor() {
@@ -29,9 +35,8 @@ class PrendusQuestionsView extends Polymer.Element {
   }
 
   async connectedCallback() {
-    this.action = fireLocalAction(this.componentId, 'loaded', false)
-    await this.loadQuestions();
     super.connectedCallback();
+    // this.action = fireLocalAction(this.componentId, 'loaded', false)
   }
 
   async loadQuestions(){
@@ -39,7 +44,8 @@ class PrendusQuestionsView extends Polymer.Element {
       setTimeout(async () => {
         this.action = checkForUserToken();
         this.action = await getAndSetUser();
-        const userQuestions = await getUserQuestions(this.user.id, this.userToken);
+
+        const userQuestions = await getUserQuestions(this.userId, this.userToken);
         this.action = fireLocalAction(this.componentId, 'questions', userQuestions)
         this.action = fireLocalAction(this.componentId, 'loaded', true)
       }, 0);
@@ -85,7 +91,7 @@ class PrendusQuestionsView extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('questions')) this.questions = componentState.questions;
-    if (keys.includes('questions')) console.log(componentState.questions);
+    // if (keys.includes('questions')) console.log(componentState.questions);
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
     if (keys.includes('error')) this.error = componentState.error;
