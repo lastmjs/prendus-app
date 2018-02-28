@@ -68,7 +68,8 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
           ...!this.concept.id && {concept: this.concept},
           resource: this.resource,
           answerComments: [],
-          imageIds: []
+          imageIds: [],
+          visibility: 'COURSE'
         };
 
         this.dispatchEvent(new CustomEvent('question-created', {

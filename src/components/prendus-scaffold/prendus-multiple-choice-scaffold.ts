@@ -207,7 +207,8 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       explanation: this.solution,
       resource: this.resource,
       answerComments: answers.map(answer => Object.assign({}, {text: answer.comment})),
-      imageIds
+      imageIds,
+      visibility: 'COURSE'
     };
     const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
     this.dispatchEvent(evt);

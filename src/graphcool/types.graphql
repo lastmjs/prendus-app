@@ -92,7 +92,7 @@ type Question @model {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
-  visibility: QuestionVisibility! @defaultValue(value: PUBLIC)
+  visibility: QuestionVisibility! @defaultValue(value: PRIVATE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
   analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
   overall: Float! @defaultValue(value: 0)
@@ -318,6 +318,7 @@ enum QuestionType {
 enum QuestionVisibility {
   COURSE
   PUBLIC
+  PRIVATE
 }
 
 enum LicenseType {

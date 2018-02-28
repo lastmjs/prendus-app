@@ -152,7 +152,8 @@ class PrendusEssayScaffold extends Polymer.Element {
       text,
       code,
       imageIds,
-      answerComments: []
+      answerComments: [],
+      visibility: 'COURSE'
     };
     const evt = new CustomEvent('question-created', {composed: true, detail: {question}});
     this.dispatchEvent(evt);
