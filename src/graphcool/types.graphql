@@ -102,7 +102,7 @@ type Question @model {
   difficulty: Float! @defaultValue(value: 0)
   plagiarism: Float! @defaultValue(value: 0)
   useInTest: Float! @defaultValue(value: 0)
-  license: License @relation(name: "LicenseOnQuestion")
+  license: License! @relation(name: "LicenseOnQuestion")
 }
 
 type QuestionFlag @model {

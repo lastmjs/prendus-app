@@ -647,3 +647,6 @@ permissions:
 
 - operation: FlagOnQuestion.connect
 - operation: FlagOnQuestion.disconnect
+
+- operation: LicenseOnQuestion.connect
+- operation: LicenseOnQuestion.disconnect

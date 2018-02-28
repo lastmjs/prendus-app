@@ -149,8 +149,8 @@ export const DEFAULT_EVALUATION_RUBRIC = {
 export const EXAMPLE_GRADING_RUBRIC = {
   Language: {
     Professional: {
-      description: 'The language is of good academic quality in vocabulary and grammar',
-      points: 2
+        description: 'The language is of good academic quality in vocabulary and grammar',
+        points: 2
     },
     Casual: {
       description: 'The answer has a more conversational tone',
@@ -160,4 +160,7 @@ export const EXAMPLE_GRADING_RUBRIC = {
       description: 'The answer contains grammar and spelling errors',
       points: 0
     }
-  }
+}
+};
+
+  export const DEFAULT_QUESTION_LICENSE_ID = window.process.env.NODE_ENV === 'production' ? 'cje7p5cg051940189kq9gy6to' : 'cje4ugv8u4fjx0189dmif4moc';
