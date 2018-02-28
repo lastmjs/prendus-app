@@ -28,7 +28,7 @@ type User @model {
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
   purchases: [Purchase!]! @relation(name: "UserPurchases")
-  createAssignmentEditorChosen: Boolean! @defaultValue(value: false) @migrationValue(value: false)
+  createAssignmentEditorChosen: Boolean! @defaultValue(value: false)
 }
 
 type Course @model {
@@ -92,7 +92,7 @@ type Question @model {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
-  visibility: QuestionVisibility! @defaultValue(value: COURSE)
+  visibility: QuestionVisibility! @defaultValue(value: PRIVATE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
   analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
   overall: Float! @defaultValue(value: 0)
@@ -102,6 +102,7 @@ type Question @model {
   difficulty: Float! @defaultValue(value: 0)
   plagiarism: Float! @defaultValue(value: 0)
   useInTest: Float! @defaultValue(value: 0)
+  license: License @relation(name: "LicenseOnQuestion")
 }
 
 type QuestionFlag @model {
@@ -280,6 +281,16 @@ type LTISession @model {
     serializedOutcomeService: Json!
 }
 
+type License @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    type: LicenseType!
+    questions: [Question!]! @relation(name: "LicenseOnQuestion")
+    hyperlink: String!
+    description: String!
+}
+
 enum UserRole {
   INSTRUCTOR
   STUDENT
@@ -307,4 +318,10 @@ enum QuestionType {
 enum QuestionVisibility {
   COURSE
   PUBLIC
+  PRIVATE
+}
+
+enum LicenseType {
+    CC_0_V_1_0
+    PRENDUS
 }
