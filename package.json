@@ -10,8 +10,8 @@
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
     "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components graphcool",
-    "graphcool-deploy-development": "cd src/graphcool && graphcool-framework deploy --target development",
-    "graphcool-deploy-production": "cd src/graphcool && graphcool-framework deploy --target production"
+    "graphcool-deploy-development": "source ~/prendus-secrets/development-environment-variables && cd src/graphcool && graphcool-framework deploy --target development",
+    "graphcool-deploy-production": "source ~/prendus-secrets/production-environment-variables && cd src/graphcool && graphcool-framework deploy --target production"
   },
   "repository": {
     "type": "git",
