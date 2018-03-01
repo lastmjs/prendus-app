@@ -32,8 +32,12 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
       this.componentId = createUUID();
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
+
+        //TODO load and set the licenses and visibilities
+        const licenses = await loadLicenses();
+        const visibilities = await loadVisibilities();
     }
 
     questionChanged() {
