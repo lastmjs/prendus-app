@@ -160,6 +160,7 @@ async function saveQuestion(variables: object, userToken: string, handleError): 
     $imageIds: [ID!]!
     $answerComments: [QuestionanswerCommentsAnswerComment!]!
     $visibility: QuestionVisibility!
+    $licenseId: ID!
   ) {
     createQuestion(
       authorId: $authorId,
@@ -171,6 +172,7 @@ async function saveQuestion(variables: object, userToken: string, handleError): 
       imagesIds: $imageIds
       answerComments: $answerComments
       visibility: $visibility
+      licenseId: $licenseId
     ) {
       id
     }
@@ -188,6 +190,7 @@ async function saveQuestionAndConcept(variables: object, userToken: string, hand
     $assignmentId: ID!,
     $answerComments: [QuestionanswerCommentsAnswerComment!]!
     $visibility: QuestionVisibility!
+    $licenseId: ID!
   ) {
     createQuestion(
       authorId: $authorId,
@@ -198,6 +201,7 @@ async function saveQuestionAndConcept(variables: object, userToken: string, hand
       code: $code
       answerComments: $answerComments
       visibility: $visibility
+      licenseId: $licenseId
     ) {
       id
     }

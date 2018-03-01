@@ -7,6 +7,7 @@ import {
   DEFAULT_EVALUATION_RUBRIC,
   ASSIGNMENT_VALIDATION_ERROR,
   NotificationType,
+  DEFAULT_QUESTION_LICENSE_ID
 } from '../../services/constants-service';
 
 class PrendusEssayScaffold extends Polymer.Element {
@@ -153,7 +154,8 @@ class PrendusEssayScaffold extends Polymer.Element {
       code,
       imageIds,
       answerComments: [],
-      visibility: 'COURSE'
+      visibility: 'COURSE',
+      licenseId: DEFAULT_QUESTION_LICENSE_ID
     };
     const evt = new CustomEvent('question-created', {composed: true, detail: {question}});
     this.dispatchEvent(evt);
