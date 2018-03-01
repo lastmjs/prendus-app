@@ -1,4 +1,4 @@
-import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID} from '../../services/constants-service';
 import {fireLocalAction, createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {compileToAssessML} from '../../node_modules/assessml/assessml';
 import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
@@ -69,7 +69,8 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
           resource: this.resource,
           answerComments: [],
           imageIds: [],
-          visibility: 'COURSE'
+          visibility: 'COURSE',
+          licenseId: DEFAULT_QUESTION_LICENSE_ID
         };
 
         this.dispatchEvent(new CustomEvent('question-created', {
