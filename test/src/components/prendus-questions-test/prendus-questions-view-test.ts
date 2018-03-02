@@ -48,8 +48,14 @@ class PrendusQuestionsViewTest extends HTMLElement {
         }
       });
       test("Set userId", [jsc.array(QuestionArb)], async (questions: Question[])=>{
+        //for some reason the Redux store is not being set unless it is created here.
+        const reduxStoreElement = document.createElement('redux-store');
+        this.shadowRoot.appendChild(reduxStoreElement);
+        reduxStoreElement.rootReducer = RootReducer;
+
         const prendusQuestionsView = document.createElement('prendus-questions-view');
         this.shadowRoot.appendChild(prendusQuestionsView);
+
         prendusQuestionsView.loaded = true;
         const user = await createTestUser('STUDENT');
         const questionsWithIds = questions.map(question => ({
@@ -67,8 +73,8 @@ class PrendusQuestionsViewTest extends HTMLElement {
         prendusQuestionsView.userId = user.id;
         return new Promise((resolve, reject)=>{
           setTimeout(()=>{
-            const questionsHTML = prendusQuestionsView.shadowRoot.querySelector('#questions-block');
-            console.log(questionsHTML);
+            const questionsInDOM = prendusQuestionsView.shadowRoot.querySelector('#questionsList');
+            console.log(questionsInDOM);
             //Cleanup everything we have made
             cleanup(user, testQuestions);
           });

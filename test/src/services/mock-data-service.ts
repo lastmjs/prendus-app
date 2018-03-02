@@ -199,6 +199,7 @@ export async function createTestQuestions(user: User, questions: Question[]): Pr
         ) {
             createQuestion(
                 authorId: $authorId
+                licenseId: "cje4v9u7x4ftk0189pzb1sbkj"
                 text: $text
                 code: $code
             ) {

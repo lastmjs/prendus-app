@@ -19,18 +19,19 @@ export class PrendusQuestionsView extends Polymer.Element {
   questionIds: string[];
   questions:  Question[];
   fetchQuestions: (pageIndex: number, pageAmount: number) => any[];
-  deletedQuestionId: string;
+  deleteItem: (questionId: string, userToken: string, questions: Question[]) => any[];
 
   static get is() { return 'prendus-questions-view' }
 
   static get properties() {
     return{
         userId: {
-        type: String
+        type: String,
+        observer: 'loadUser'
       },
       fetchQuestions: {
         type: Function,
-        computed: '_computeFetchQuestions(user, userToken)'
+        computed: 'computeFetchQuestions(user, userToken)'
       },
     }
   }
@@ -42,31 +43,38 @@ export class PrendusQuestionsView extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
+    this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
 
-
+  async loadUser(){
+    this.action = checkForUserToken();
+    if(!this.user)
+      this.action = await getAndSetUser();
+  }
   openConfirmDeleteQuestionModal(e){
     this.shadowRoot.querySelector('#questionsList').shadowRoot.querySelector(`#${e.detail.questionId}`).open="false";
     this.shadowRoot.querySelector('#questionsList').shadowRoot.querySelector(`#${e.detail.questionId}`).open="true";
   }
 
-  _computeFetchQuestions(user: User, userToken: string): (i: number, n: number) => Promise<object> | void {
-    //TODO Need to make sure that the user is set right here - we need to pull questions based on a userId
-    return async (pageIndex: number, pageAmount: number) => getUserQuestions(
-      user.id, userToken, pageIndex, pageAmount
-    );
-  }
+  computeFetchQuestions(user: User, userToken: string): (i: number, n: number) => Promise<object> | void {
+    //The load user function will check if the user is logged in. This ensures that the user is set before returning this function.
+    //computeFetchQuestions gets called when the user gets set, so this just prevents the function from getting returned when the userToken is setTimeout
+    if(user)
+      return async (pageIndex: number, pageAmount: number) => getUserQuestions(
+        user.id, userToken, pageIndex, pageAmount
+      );
+  };
 
   async deleteQuestion(e: any){
     try{
       this.action = fireLocalAction(this.componentId, 'loaded', false);
       const questionId = e.target.id;
-      const deletedQuestionId = await deleteQuestion(this.userToken, questionId);
-      this.action = fireLocalAction(this.componentId, 'deletedQuestionId', deletedQuestionId);
+      // const deletedQuestionId = await deleteQuestion(questionId, this.userToken);
+      this.action = fireLocalAction(this.componentId, 'deleteItem', async (questions: Question[]) => deleteQuestionFromGraphQLAndDOM(questionId, this.userToken, questions));
       //Just raise an event notifiying the infinite list of the deleted item
-      questionElement.parentNode.removeChild(questionElement);
       this.action = fireLocalAction(this.componentId, 'loaded', true);
     }catch(error){
+      console.log('error', error)
       this.action = setNotification(error.message, NotificationType.ERROR);
       this.action = fireLocalAction(this.componentId, 'loaded', true)
     }
@@ -79,7 +87,7 @@ export class PrendusQuestionsView extends Polymer.Element {
     if (keys.includes('questions')) this.questions = componentState.questions;
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
-    if (keys.includes('deletedQuestion')) this.deletedQuestion = componentState.deletedQuestion;
+    if (keys.includes('deleteItem')) this.deleteItem = componentState.deleteItem;
     if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
@@ -111,7 +119,15 @@ async function getUserQuestions(userId: string, userToken: string, pageIndex: nu
     return data.allQuestions;
 }
 
-async function deleteQuestion(questionId: string, userToken: string) {
+async function deleteQuestionFromGraphQLAndDOM(questionId: string, userToken: string, questions: Question[]) {
+  const deletedQuestionId =  await performGQLDeleteQuestionGraphQLMutation(questionId, userToken);
+  console.log('deleteQuestionId', deletedQuestionId);
+  return questions.filter((question: Question) => {
+    return question.id !== deletedQuestionId;
+  })
+
+}
+async function performGQLDeleteQuestionGraphQLMutation(questionId: string, userToken: string){
   const data = await GQLRequest(`
     mutation deleteQuestion($questionId: ID!){
       deleteQuestion(id: $questionId){
@@ -119,7 +135,6 @@ async function deleteQuestion(questionId: string, userToken: string) {
       }
     }
   `, {questionId}, userToken, (error: any) => {
-    console.log('error', error)
     throw error;
   });
   return data.deleteQuestion.id;

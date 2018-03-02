@@ -23,8 +23,8 @@ class PrendusInfiniteList extends Polymer.Element {
         type: Function,
         observer: '_init'
       },
-      itemsToRemoveById: {
-        type: Array,
+      deleteItems: {
+        type: Function,
         observer: '_deleteItems'
       },
       pageSize: {
@@ -84,8 +84,21 @@ class PrendusInfiniteList extends Polymer.Element {
     this.action = fireLocalAction(this.componentId, 'loading', false);
     this.dispatchEvent(new CustomEvent('items-loaded'));
   }
-  async _deleteItems(deleteItems: (userToken: string, items: string[]) => any[]) {
-    console.log('delete happening')
+  async _deleteItems(deleteItems: (items: any[]) => any[]){
+    console.log('deleteItems', deleteItems)
+    const newItems = await deleteItems(this.items);
+    console.log('newQuestions', newItems)
+    this.action = fireLocalAction(this.componentId, 'items', newItems);
+    this.action = fireLocalAction(this.componentId, 'cursor', this.cursor - 1);
+    const threshold = this.shadowRoot.querySelector('#threshold');
+    if (newItems.length < this.pageSize)
+      this.action = fireLocalAction(this.componentId, 'lowerThreshold', null);
+    else
+      threshold.clearLower();
+    // const newItems = this.items.filter((item) => {
+    //
+    //   return item.id !== deletedItemId;
+    // })
   }
 
   async loadMore(e: CustomEvent) {
