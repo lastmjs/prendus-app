@@ -535,6 +535,9 @@ permissions:
 # Purchase Update
 # Purchase Delete
 
+#### License Permissions
+- operation: License.read
+
 #### Relations Permissions
 
 - operation: RaterOnQuestionRating.connect

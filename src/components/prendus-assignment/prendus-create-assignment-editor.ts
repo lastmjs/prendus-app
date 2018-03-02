@@ -4,6 +4,7 @@ import {compileToAssessML} from '../../node_modules/assessml/assessml';
 import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
 import {Concept, SetComponentPropertyAction, User, Assignment, State, Rubric} from '../../prendus.d';
 import {setNotification} from '../../redux/actions';
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
 
 class PrendusCreateAssignmentEditor extends Polymer.Element {
     componentId: string;
@@ -15,6 +16,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
     concept: Concept;
     resource: string;
     user: User | null;
+    userToken: string | null;
     assignment: Assignment;
 
     static get is() { return 'prendus-create-assignment-editor'; }
@@ -36,8 +38,9 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         super.connectedCallback();
 
         //TODO load and set the licenses and visibilities
-        const licenses = await loadLicenses();
-        const visibilities = await loadVisibilities();
+        const licenses = await loadLicenses(this.userToken || 'USER_TOKEN_NOT_SET', this.handleGQLError.bind(this));
+        this.action = fireLocalAction(this.componentId, 'licenses', licenses);
+        // const visibilities = await loadVisibilities();
     }
 
     questionChanged() {
@@ -84,12 +87,20 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         }));
     }
 
+    infoIconClick(e) {
+        console.log(e.model.item);
+    }
+
     handleConcept(e: CustomEvent) {
         this.action = fireLocalAction(this.componentId, 'concept', e.detail.concept);
     }
 
     handleResource(e: Event) {
       this.action = fireLocalAction(this.componentId, 'resource', e.target.value);
+    }
+
+    handleGQLError(err: any) {
+      this.action = setNotification(err.message, NotificationType.ERROR);
     }
 
     stateChange(e: CustomEvent) {
@@ -100,9 +111,13 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         if (keys.includes('concept')) this.concept = componentState.concept;
         if (keys.includes('resource')) this.resource = componentState.resource;
         if (keys.includes('_question')) this._question = componentState._question;
+        if (keys.includes('licenses')) this.licenses = componentState.licenses;
         this.user = state.user;
+        this.userToken = state.userToken;
     }
 }
+
+window.customElements.define(PrendusCreateAssignmentEditor.is, PrendusCreateAssignmentEditor);
 
 function validate(concept: Concept, resource: string) {
     const empty = (str: any) => str == undefined || str.toString().trim() === '';
@@ -114,4 +129,16 @@ function rubricStr(rubric: Rubric): string {
   return JSON.stringify(rubric).replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/\n/g, '\\n');
 }
 
-window.customElements.define(PrendusCreateAssignmentEditor.is, PrendusCreateAssignmentEditor);
+async function loadLicenses(userToken: string, handleError: any) {
+    const data = await GQLRequest(`
+        query {
+            allLicenses(orderBy: precedence_ASC) {
+                commonName
+                description
+                hyperlink
+            }
+        }
+    `, {}, userToken, handleError);
+
+    return data.allLicenses;
+}
