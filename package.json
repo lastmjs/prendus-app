@@ -10,18 +10,23 @@
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
     "attribution": "generate-attribution && cd src && generate-attribution",
     "build-static": "npm install && cd src && node_modules/.bin/zwitterion --target ES2015 --build-static --exclude-dirs bower_components graphcool",
-    "graphcool-deploy-development": "cd src/graphcool && graphcool-framework deploy --target development",
-    "graphcool-deploy-production": "cd src/graphcool && graphcool-framework deploy --target production"
+    "graphcool-deploy-development": "source ~/prendus-secrets/development-environment-variables && cd src/graphcool && graphcool-framework deploy --target development",
+    "graphcool-deploy-production": "source ~/prendus-secrets/production-environment-variables && cd src/graphcool && graphcool-framework deploy --target production"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lastmjs/prendus-app.git"
   },
-  "author": "Jordan Last <jordan.michael.last@gmail.com>",
+  "author": "Prendus",
+  "contributors": [
+    "Jordan Last <jordan.michael.last@gmail.com>"
+  ],
   "bugs": {
     "url": "https://github.com/lastmjs/prendus-app/issues"
   },
   "homepage": "https://github.com/lastmjs/prendus-app#readme",
+  "license": "MIT",
+  "dependencies": {},
   "devDependencies": {
     "@types/stripe-checkout": "^1.0.0",
     "dompurify": "^1.0.3",

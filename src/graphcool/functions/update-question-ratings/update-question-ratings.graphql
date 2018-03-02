@@ -14,7 +14,7 @@ subscription {
         language
         learningCategory
         conceptAlignment
-        inclusion
+        useInTest
         plagiarism
         difficulty
         _ratingsMeta {

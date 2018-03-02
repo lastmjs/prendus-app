@@ -14,13 +14,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
     confirmedPassword: string;
     signupButtonEnabled: boolean;
     user: User | null;
-    client: any;
-    index: any;
-    institution: Institution;
-    institutionPartialName: string;
-    institutions: string[];
-    attributesToRetrieve: string[]
-    createInstitutionModalOpen: boolean;
 
     static get is() { return 'prendus-signup'; }
     static get properties() {
@@ -30,64 +23,22 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
             }
         };
     }
+
     constructor() {
         super();
+
         this.componentId = createUUID();
     }
+
     connectedCallback() {
         super.connectedCallback();
-        this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", false);
-        this.action = fireLocalAction(this.componentId, "attributesToRetrieve", ['Name']);
-        this.action = fireLocalAction(this.componentId, "loaded", true);
-        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false);
+        this.action = fireLocalAction(this.componentId, "loaded", true)
+        this.action = fireLocalAction(this.componentId, "signupButtonEnabled", false)
     }
-    openCreateInstitutionModal(e: any){
-      this.shadowRoot.querySelector('#create-institution-modal').open();
-      // this.action = fireLocalAction(this.componentId, "createInstitutionModalOpen", true);
-    }
-    closeCreateInstitutionModal(){
-      this.shadowRoot.querySelector('#create-institution-modal').close();
-    }
-    loadInstitutions(e: any){
-      //This is so that the autocomplete will function correctly.
-      const institutions = e.detail.results.map((result: Institution) => {
-        return {
-          id: "id",
-          //change to result.name once Algolia is updated
-          text: result.Name,
-          value: result.Name
-        }
-      })
-      this.action = fireLocalAction(this.componentId, "institutions", institutions)
-    }
-    findInstitution(){
-      this.action = fireLocalAction(this.componentId, "institutionPartialName", this.shadowRoot.querySelector('#institution').value)
-      // this.action = fireLocalAction(this.componentId, "institutionPartialName", this.shadowRoot.querySelector('#institution').shadowRoot.querySelector('#autocompleteInput').value)
-      const institutionPartialName: string = this.shadowRoot.querySelector('#institution').value;
-    }
-    institutionAutoSelected(e: any){
-      const institution = {
-        id: e.detail.id,
-        //needs to be updated when Algolia is fixed. Also add in other fields once Algolia is updated.
-        name: e.detail.text,
-        // country: e.detail.country,
-        // state: e.detail.state,
-        // city: e.detail.city
-      }
-      this.action = fireLocalAction(this.componentId, "institution", institution);
-    }
-    setInstitution(e: any){
-      const institution = {
-        id: e.detail.institution.id,
-        text: e.detail.institution.name,
-        value: e.detail.institution.name
-      }
-      this.action = fireLocalAction(this.componentId, "institution", e.detail.institution);
-      this.closeCreateInstitutionModal();
-    }
+
     validateEmail(): void {
       const emailElement: string = this.shadowRoot.querySelector('#email').value;
-      if(emailElement && emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
+      if(emailElement.match(EMAIL_REGEX) !== null) this.action = fireLocalAction(this.componentId, "email", emailElement);
       this.action = fireLocalAction(this.componentId, "signupButtonEnabled", enableSignup(emailElement, this.password, this.confirmedPassword))
     }
     hardValidateEmail(): void {
@@ -119,28 +70,16 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
           const email: string = this.shadowRoot.querySelector('#email').value;
           const password: string = this.shadowRoot.querySelector('#password').value;
           const signupData = await performSignupMutation(this, email, password, this.userToken);
-          if(this.institution && this.institution.id){
-            console.log('trying to add institution')
-            await addUserInstitution(this, signupData.id, this.institution.id, this.userToken);
-          }
           this.action = persistUserToken(signupData.signupUser.token);
           this.action = await getAndSetUser();
           const ltiJWT = getCookie('ltiJWT');
-          deleteCookie('ltiJWT');
-<<<<<<< HEAD
-          if(ltiJWT) addLTIUser(this.user, ltiJWT, signupData.signupUser.token);
-=======
-          if (ltiJWT) await addLTIUser(this.user, ltiJWT, signupData.signupUser.token);
->>>>>>> develop
+          if (ltiJWT) await addLTIUser(ltiJWT, this.user, signupData.signupUser.token);
           navigate(this.redirectUrl || getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/');
+          deleteCookie('ltiJWT');
           deleteCookie('redirectUrl');
-
-          this.shadowRoot.querySelector('#email').value = '';
-          this.shadowRoot.querySelector('#password').value;
-          _clearFormData(this);
           this.action = fireLocalAction(this.componentId, "loaded", true)
+
         }catch(error){
-          console.log('error', error)
           this.action = setNotification(error.message, NotificationType.ERROR);
           this.action = fireLocalAction(this.componentId, 'loaded', true);
         }
@@ -155,11 +94,6 @@ class PrendusSignup extends Polymer.Element implements ContainerElement {
         if (keys.includes('password')) this.password = componentState.password;
         if (keys.includes('confirmedPassword')) this.confirmedPassword = componentState.confirmedPassword;
         if (keys.includes('signupButtonEnabled')) this.signupButtonEnabled = componentState.signupButtonEnabled;
-        if (keys.includes('institution')) this.institution = componentState.institution;
-        if (keys.includes('institutionPartialName')) this.institutionPartialName = componentState.institutionPartialName;
-        if (keys.includes('institutions')) this.institutions = componentState.institutions;
-        if (keys.includes('attributesToRetrieve')) this.attributesToRetrieve = componentState.attributesToRetrieve;
-        if (keys.includes('createInstitutionModalOpen')) this.createInstitutionModalOpen = componentState.createInstitutionModalOpen;
         this.user = state.user;
         this.userToken = state.userToken;
     }
@@ -188,24 +122,10 @@ async function performSignupMutation(context: PrendusSignup, email: string, pass
             }
         }
     `, {email, password}, userToken, (error: any) => {
-        console.log('error in signup', error)
         context.action = setNotification(error.message, NotificationType.ERROR)
     });
 
     return data;
-}
-
-async function addUserInstitution(context: PrendusSignup, userId: string, institutionId: string, userToken: string | null){
-  const data = await GQLRequest(`
-      mutation addUserInstitution($email: String!, $password: String!) {
-          addToUsersInstitution(usersUserId: $userId, institutionInstitutionId: $institutionId) {
-              id
-          }
-      }
-  `, {userId, institutionId}, userToken, (error: any) => {
-      context.action = setNotification(error.message, NotificationType.ERROR)
-  });
-  return data;
 }
 //TODO put this in Prendus Shared because it is used in the Login component as well
 async function addLTIUser(ltiJWT: string, user: User, userToken: string){
@@ -227,10 +147,4 @@ async function addLTIUser(ltiJWT: string, user: User, userToken: string){
         throw updatedError;
       });
   }
-}
-function _clearFormData(context: PrendusSignup){
-  context.shadowRoot.querySelector('#email').value = '';
-  context.shadowRoot.querySelector('#password').value = '';
-  context.shadowRoot.querySelector('#confirm-password').value = '';
-  context.action = fireLocalAction(context.componentId, "institution", '');
 }

@@ -1,9 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
-<link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html">
+<!-- <link rel="import" href="../prendus-scaffold/prendus-essay-scaffold.html"> -->
 <link rel="import" href="../prendus-scaffold/prendus-multiple-choice-scaffold.html">
 <link rel="import" href="prendus-assignment-shared.html">
+<link rel="import" href="prendus-create-assignment-editor.html">
 
 <dom-module id="prendus-create-assignment">
 
@@ -11,6 +13,16 @@
 
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+    <div style="display: flex; justify-content: center; margin-bottom: 50px;">
+        <div hidden$="[[user.createAssignmentEditorChosen]]">
+            <paper-button raised style="background-color: #2a9af2" on-click="createAssignmentEditorChosen">Try the new Question Editor for a cleaner and more flexible experience with multiple choice, multiple select, fill in the blank, and images</paper-button>
+        </div>
+
+        <div hidden$="[[!user.createAssignmentEditorChosen]]">
+            <paper-button raised on-click="createAssignmentEditorChosen">I don't want to use the question editor</paper-button>
+        </div>
+    </div>
 
     <prendus-assignment-shared
       id="shared"
@@ -22,11 +34,14 @@
       on-item-changed="_question"
     >
       <div slot="assignment">
-        <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
+        <!-- <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
           <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
-        </div>
-        <div hidden$="[[isEssayType(assignment.questionType)]]">
+        </div> -->
+        <div hidden$="[[user.createAssignmentEditorChosen]]">
           <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
+        </div>
+        <div hidden$="[[!user.createAssignmentEditorChosen]]">
+            <prendus-create-assignment-editor question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-create-assignment-editor>
         </div>
       </div>
     </prendus-assignment-shared>

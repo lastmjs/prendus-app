@@ -5,7 +5,7 @@ if (process.argv.length <= 3) {
   process.exit(-1);
 }
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 1000;
 const ENDPOINT = process.argv[2];
 const AUTH_TOKEN = process.argv[3];
 const client = new GraphQLClient(ENDPOINT, {

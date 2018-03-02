@@ -12,9 +12,11 @@ import {
 import {
   QuestionType,
   VerbType,
+  NotificationType
 } from '../../services/constants-service';
 import {
   setNotification,
+  getAndSetUser
 } from '../../redux/actions';
 import {
   GQLRequest
@@ -29,6 +31,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
   questions: string[]; //ids of created questions
   userToken: string;
   functions: AssignmentFunctions;
+  user: User;
 
   static get is() { return 'prendus-create-assignment' }
 
@@ -59,6 +62,20 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
     };
   }
 
+  async createAssignmentEditorChosen() {
+      await GQLRequest(`
+          mutation($userId: ID!, $createAssignmentEditorChosen: Boolean!) {
+              updateUser(id: $userId, createAssignmentEditorChosen: $createAssignmentEditorChosen) {
+                  id
+              }
+          }`, {
+              userId: this.user.id,
+              createAssignmentEditorChosen: !this.user.createAssignmentEditorChosen
+          }, this.userToken, this._handleGQLError.bind(this));
+
+         this.action = await getAndSetUser();
+  }
+
   error(): null {
     return null; //validation handled by scaffolds
   }
@@ -81,11 +98,11 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
   }
 
   isEssayType(questionType: string): boolean {
-    return questionType === QuestionType.ESSAY;
+    return questionType === QuestionType.ESSAY && !this.user.createAssignmentEditorChosen;
   }
 
   isMultipleChoiceType(questionType: string): boolean {
-    return questionType === QuestionType.MULTIPLE_CHOICE;
+    return questionType === QuestionType.MULTIPLE_CHOICE && !this.user.createAssignmentEditorChosen;
   }
 
   _handleGQLError(err: any) {
@@ -103,6 +120,7 @@ class PrendusCreateAssignment extends Polymer.Element implements AssignmentFunct
     this.load = componentState.load;
     this.submit = componentState.submit;
     this.userToken = state.userToken;
+    this.user = state.user;
   }
 
 }
@@ -141,6 +159,8 @@ async function saveQuestion(variables: object, userToken: string, handleError): 
     $assignmentId: ID!
     $imageIds: [ID!]!
     $answerComments: [QuestionanswerCommentsAnswerComment!]!
+    $visibility: QuestionVisibility!
+    $licenseId: ID!
   ) {
     createQuestion(
       authorId: $authorId,
@@ -151,6 +171,8 @@ async function saveQuestion(variables: object, userToken: string, handleError): 
       code: $code,
       imagesIds: $imageIds
       answerComments: $answerComments
+      visibility: $visibility
+      licenseId: $licenseId
     ) {
       id
     }
@@ -167,6 +189,8 @@ async function saveQuestionAndConcept(variables: object, userToken: string, hand
     $code: String!,
     $assignmentId: ID!,
     $answerComments: [QuestionanswerCommentsAnswerComment!]!
+    $visibility: QuestionVisibility!
+    $licenseId: ID!
   ) {
     createQuestion(
       authorId: $authorId,
@@ -176,6 +200,8 @@ async function saveQuestionAndConcept(variables: object, userToken: string, hand
       text: $text,
       code: $code
       answerComments: $answerComments
+      visibility: $visibility
+      licenseId: $licenseId
     ) {
       id
     }

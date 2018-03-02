@@ -112,10 +112,10 @@ class PrendusLogin extends Polymer.Element implements ContainerElement {
             value: gqlUser.User
           };
           const ltiJWT = getCookie('ltiJWT');
-          deleteCookie('ltiJWT');
-          await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
+          if (ltiJWT) await addLTIUser(ltiJWT, gqlUser.User, data.authenticateUser.token);
           navigate(this.redirectUrl || (getCookie('redirectUrl') ? decodeURIComponent(getCookie('redirectUrl')) : false || '/courses'));
 
+          deleteCookie('ltiJWT');
           if (getCookie('redirectUrl')) {
               deleteCookie('redirectUrl');
               //TODO horrible hack until assignments reload with properties correctly, not sure why they aren't

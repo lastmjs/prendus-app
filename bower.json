@@ -51,7 +51,8 @@
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "iron-list": "^2.0.12",
     "iron-scroll-threshold": "^1.0.2",
-    "paper-toggle-button": "^2.0.0"
+    "paper-toggle-button": "^2.0.0",
+    "web-animations-js": "^2.3.1"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0",

@@ -29,6 +29,7 @@ type User @model {
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
   purchases: [Purchase!]! @relation(name: "UserPurchases")
   institution: [Institution!]! @relation(name: "UsersInstitution")
+  createAssignmentEditorChosen: Boolean! @defaultValue(value: true)
 }
 
 type Course @model {
@@ -92,7 +93,7 @@ type Question @model {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
-  visibility: QuestionVisibility! @defaultValue(value: COURSE)
+  visibility: QuestionVisibility! @defaultValue(value: PRIVATE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
   analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
   overall: Float! @defaultValue(value: 0)
@@ -101,7 +102,8 @@ type Question @model {
   conceptAlignment: Float! @defaultValue(value: 0)
   difficulty: Float! @defaultValue(value: 0)
   plagiarism: Float! @defaultValue(value: 0)
-  inclusion: Float! @defaultValue(value: 0)
+  useInTest: Float! @defaultValue(value: 0)
+  license: License! @relation(name: "LicenseOnQuestion")
 }
 
 type QuestionFlag @model {
@@ -279,7 +281,6 @@ type LTISession @model {
     updatedAt: DateTime!
     serializedOutcomeService: Json!
 }
-
 type Institution @model {
     id: ID! @isUnique
     createdAt: DateTime!
@@ -291,6 +292,15 @@ type Institution @model {
     city: String!
     users: [User!]! @relation(name: "UsersInstitution")
     approved: PrendusApproved! @defaultValue(value: TBD)
+  }
+type License @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    type: LicenseType!
+    questions: [Question!]! @relation(name: "LicenseOnQuestion")
+    hyperlink: String!
+    description: String!
 }
 
 enum UserRole {
@@ -320,4 +330,10 @@ enum QuestionType {
 enum QuestionVisibility {
   COURSE
   PUBLIC
+  PRIVATE
+}
+
+enum LicenseType {
+    CC_0_V_1_0
+    PRENDUS
 }
