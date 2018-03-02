@@ -1,6 +1,6 @@
 import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../prendus.d';
 import {User, Question, Assignment} from '../../prendus.d';
-import {createUUID, navigate, fireLocalAction} from '../../node_modules/prendus-shared/services/utilities-service';
+import {createUUID, navigate, fireLocalAction, asyncForEach} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
 import {setNotification, getAndSetUser, checkForUserToken} from '../../redux/actions';
@@ -18,14 +18,20 @@ export class PrendusQuestionsView extends Polymer.Element {
   noUserQuestions: boolean;
   questionIds: string[];
   questions:  Question[];
+  fetchQuestions: (pageIndex: number, pageAmount: number) => any[];
+  deletedQuestionId: string;
+
   static get is() { return 'prendus-questions-view' }
 
   static get properties() {
     return{
         userId: {
-        type: String,
-        observer: 'loadQuestions'
-      }
+        type: String
+      },
+      fetchQuestions: {
+        type: Function,
+        computed: '_computeFetchQuestions(user, userToken)'
+      },
     }
   }
 
@@ -36,49 +42,29 @@ export class PrendusQuestionsView extends Polymer.Element {
 
   async connectedCallback() {
     super.connectedCallback();
-    // this.action = fireLocalAction(this.componentId, 'loaded', false)
   }
 
-  async loadQuestions(){
-    try{
-      setTimeout(async () => {
-        this.action = checkForUserToken();
-        this.action = await getAndSetUser();
-
-        const userQuestions = await getUserQuestions(this.userId, this.userToken);
-        this.action = fireLocalAction(this.componentId, 'questions', userQuestions)
-        this.action = fireLocalAction(this.componentId, 'loaded', true)
-      }, 0);
-    }catch(error){
-      this.action = setNotification(error.message, NotificationType.ERROR);
-      this.action = fireLocalAction(this.componentId, 'loaded', true)
-    }
-  }
 
   openConfirmDeleteQuestionModal(e){
-    this.shadowRoot.querySelector('#confirmDeleteQuestionModal').open()
+    this.shadowRoot.querySelector('#questionsList').shadowRoot.querySelector(`#${e.detail.questionId}`).open="false";
+    this.shadowRoot.querySelector('#questionsList').shadowRoot.querySelector(`#${e.detail.questionId}`).open="true";
   }
-  closeConfirmDeleteQuestionModal(e){
-    this.shadowRoot.querySelector('#confirmDeleteQuestionModal').close()
+
+  _computeFetchQuestions(user: User, userToken: string): (i: number, n: number) => Promise<object> | void {
+    //TODO Need to make sure that the user is set right here - we need to pull questions based on a userId
+    return async (pageIndex: number, pageAmount: number) => getUserQuestions(
+      user.id, userToken, pageIndex, pageAmount
+    );
   }
 
   async deleteQuestion(e: any){
     try{
-      this.shadowRoot.querySelector('#confirmDeleteQuestionModal').close()
       this.action = fireLocalAction(this.componentId, 'loaded', false);
       const questionId = e.target.id;
-      console.log('button questionId', questionId)
-      const deletedQuestionId = await deleteQuestion(this.user.id, this.userToken, questionId);
-      console.log('deletedQuestionId', deletedQuestionId)
-      const newUserQuestions = this.questions.reduce((newUserQuestionsArray: Question[], question: Question) => {
-        console.log('deletedQ ID', deletedQuestionId)
-        console.log('question ID', question.id)
-        if(question.id !== deletedQuestionId)  newUserQuestionsArray.push(question);
-        return newUserQuestionsArray;
-      }, []);
-      console.log('this.userQuestions', this.questions)
-      console.log('this.newquestions', newUserQuestions)
-      this.action = fireLocalAction(this.componentId, 'questions', newUserQuestions);
+      const deletedQuestionId = await deleteQuestion(this.userToken, questionId);
+      this.action = fireLocalAction(this.componentId, 'deletedQuestionId', deletedQuestionId);
+      //Just raise an event notifiying the infinite list of the deleted item
+      questionElement.parentNode.removeChild(questionElement);
       this.action = fireLocalAction(this.componentId, 'loaded', true);
     }catch(error){
       this.action = setNotification(error.message, NotificationType.ERROR);
@@ -91,9 +77,9 @@ export class PrendusQuestionsView extends Polymer.Element {
     const keys = Object.keys(componentState);
     if (keys.includes('loaded')) this.loaded = componentState.loaded;
     if (keys.includes('questions')) this.questions = componentState.questions;
-    // if (keys.includes('questions')) console.log(componentState.questions);
     if (keys.includes('questionIds')) this.questionIds = componentState.questionIds;
     if (keys.includes('noUserQuestions')) this.noUserQuestions = componentState.noUserQuestions;
+    if (keys.includes('deletedQuestion')) this.deletedQuestion = componentState.deletedQuestion;
     if (keys.includes('error')) this.error = componentState.error;
     this.userToken = state.userToken;
     this.user = state.user;
@@ -103,11 +89,12 @@ export class PrendusQuestionsView extends Polymer.Element {
 
 window.customElements.define(PrendusQuestionsView.is, PrendusQuestionsView)
 
-async function getUserQuestions(userId: string, userToken: string) {
+async function getUserQuestions(userId: string, userToken: string, pageIndex: number, pageAmount: number) {
     const data = await GQLRequest(`
-      query getQuestions($userId: ID!) {
+      query getQuestions($userId: ID!, $pageIndex: Int!, $pageAmount: Int!) {
         allQuestions(
-          first: 10
+          skip: $pageIndex
+          first: $pageAmount
           filter: {
             author: {
               id: $userId
@@ -118,21 +105,22 @@ async function getUserQuestions(userId: string, userToken: string) {
           code
         }
       }
-    `, {userId}, userToken, (error: any) => {
+    `, {userId, pageIndex, pageAmount}, userToken, (error: any) => {
       throw error;
     });
     return data.allQuestions;
 }
 
-async function deleteQuestion(userId: String, userToken: string, questionId: string) {
-    const data = await GQLRequest(`
-      mutation deleteQuestion($questionId: ID!){
-        deleteQuestion(id: $questionId){
-          id
-        }
+async function deleteQuestion(questionId: string, userToken: string) {
+  const data = await GQLRequest(`
+    mutation deleteQuestion($questionId: ID!){
+      deleteQuestion(id: $questionId){
+        id
       }
-    `, {questionId}, userToken, (error: any) => {
-      throw error;
-    });
-    return data.deleteQuestion.id;
+    }
+  `, {questionId}, userToken, (error: any) => {
+    console.log('error', error)
+    throw error;
+  });
+  return data.deleteQuestion.id;
 }

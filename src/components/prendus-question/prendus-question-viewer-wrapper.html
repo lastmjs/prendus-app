@@ -19,9 +19,13 @@
     <template>
       <style include="prendus-styles">
         #question-wrapper{
+          /* The height and width need to be set so that the infinite lists can function properly */
           width: 30vw;
           min-width: 350px;
+          height: 350px;
+          min-height: 350px;
           background-color: white;
+          overflow: auto;
         }
       </style>
       <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>

@@ -3,16 +3,14 @@
 <link rel="import" href="../prendus-notification/prendus-notification.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html"> -->
 <!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
-<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../prendus-ui/prendus-delete-confirmation-modal.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
 <link rel="import" href="../prendus-infinite-list/prendus-infinite-list.html">
-
-
 
 <dom-module id="prendus-questions-view">
     <template>
@@ -38,6 +36,10 @@
             right: 5vw;
           }
         }
+        #questionsList{
+          width: calc(100vw - 256px);
+          height: calc(100vh - 100px);
+        }
         .title{
           display: flex;
           justify-content: center;
@@ -58,38 +60,16 @@
                 <h1 class="title">My Questions</h1>
               </template>
             </dom-if>
-            <!-- Need to get an iron list working.  -->
             <div id="questions-block">
-              <!-- <prendus-infinite-list next="[[fetchQuestions]]" on-items-loaded="questionsLoaded">
+              <prendus-infinite-list id="questionsList" next="[[fetchQuestions]]" items-to-remove-by-id="[[deletedQuestion]]" on-items-loaded="questionsLoaded">
                 <template>
-                  <prendus-question-viewer-wrapper question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
-                  <paper-dialog id="confirmDeleteQuestionModal" modal>
-                    <h2>Confirm Delete</h2>
-                    <div class="content">
-                      Are you sure you want to delete this question? This action is irreversible.
-                    </div>
-                    <div class="buttons">
-                      <button class="prendus-button prendus-button--minor" on-click="closeConfirmDeleteQuestionModal">Cancel</button>
-                      <button id="[[item.id]]"class="prendus-button prendus-button--destructive" on-click="deleteQuestion">Confirm Delete</button>
-                    </div>
-                  </paper-dialog>
-                </template>
-              </prendus-infinite-list> -->
-              <dom-repeat items="[[questions]]">
-                <template>
-                  <prendus-question-viewer-wrapper question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
-                  <paper-dialog id="confirmDeleteQuestionModal" modal>
-                    <h2>Confirm Delete</h2>
-                    <div class="content">
-                      Are you sure you want to delete this question? This action is irreversible.
-                    </div>
-                    <div class="buttons">
-                      <button class="prendus-button prendus-button--minor" on-click="closeConfirmDeleteQuestionModal">Cancel</button>
-                      <button id="[[item.id]]"class="prendus-button prendus-button--destructive" on-click="deleteQuestion">Confirm Delete</button>
-                    </div>
-                  </paper-dialog>
-                </template>
-              </dom-repeat>
+                  <!-- Style is inline because this component is embedded in the infinite list and the shadowDOM prevents access to setting the styles. -->
+                  <div class="question-item" style="padding-top:75px; padding-left:25px;">
+                    <prendus-question-viewer-wrapper id="question[[item.id]]" question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
+                    <prendus-delete-confirmation-modal id="[[item.id]]" on-delete="deleteQuestion"></prendus-delete-confirmation-modal>
+                  </div>
+                  </template>
+              </prendus-infinite-list>
             </div>
             <a href="/question/create" id="addQuestionButton"><paper-fab icon="add"></paper-fab></a>
           </template>
