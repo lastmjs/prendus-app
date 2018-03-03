@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-scaffold/prendus-scaffold-concept.html">
@@ -20,21 +21,31 @@
 
         <paper-input id="resource" type="text" label="Resource (e.g., textbook page 100)" value="[[resource]]" on-value-changed="handleResource"></paper-input>
 
-        <div>
-            <paper-dropdown-menu id="licenseDropdown" label="License">
-                <paper-listbox slot="dropdown-content" selected="0">
-                    <dom-repeat items="[[licenses]]">
-                        <template>
-                            <div style="display: flex">
-                                <paper-item style="cursor: pointer">[[item.commonName]]</paper-item>
-                                <iron-icon icon="info" on-click="infoIconClick" style="cursor: pointer"></iron-icon>
-                            </div>
-                        </template>
-                    </dom-repeat>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <!-- <paper-tooltip for="licenseDropdown">Select a license for your question. Hover over each license in the dropdown to learn more.</paper-tooltip> -->
-        </div>
+        <paper-dropdown-menu id="licenseDropdown" label="License">
+            <paper-listbox slot="dropdown-content" selected="0">
+                <dom-repeat items="[[licenses]]">
+                    <template>
+                        <paper-item style="cursor: pointer" on-click="licenseSelected">[[item.commonName]]</paper-item>
+                    </template>
+                </dom-repeat>
+            </paper-listbox>
+        </paper-dropdown-menu>
+
+        <dom-repeat items=[[licenses]]>
+            <template>
+                <iron-icon id="licenseInfoIcon[[item.type]]" icon="info" on-click="licenseInfoIconClick" style="cursor: pointer;" hidden="[[getLicenseInfoIconHidden(selectedLicenseId, item)]]"></iron-icon>
+            </template>
+        </dom-repeat>
+
+        <dom-repeat items=[[licenses]]>
+            <template>
+                <paper-dialog id="licenseInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px; padding-bottom: 25px">
+                    <h2>[[item.commonName]]</h2>
+                    <p><a href="[[item.hyperlink]]" target="_blank">Read the official license information</a></p>
+                    <p>[[item.description]]</p>
+                </paper-dialog>
+            </template>
+        </dom-repeat>
 
         <br>
         <br>

@@ -18,6 +18,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
     user: User | null;
     userToken: string | null;
     assignment: Assignment;
+    selectedLicenseId: string;
 
     static get is() { return 'prendus-create-assignment-editor'; }
     static get properties() {
@@ -40,6 +41,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         //TODO load and set the licenses and visibilities
         const licenses = await loadLicenses(this.userToken || 'USER_TOKEN_NOT_SET', this.handleGQLError.bind(this));
         this.action = fireLocalAction(this.componentId, 'licenses', licenses);
+        if (licenses[0]) this.action = fireLocalAction(this.componentId, 'selectedLicenseId', licenses[0].id);
         // const visibilities = await loadVisibilities();
     }
 
@@ -77,7 +79,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
           answerComments: [],
           imageIds: [],
           visibility: 'COURSE',
-          licenseId: DEFAULT_QUESTION_LICENSE_ID
+          licenseId: this.selectedLicenseId
         };
 
         this.dispatchEvent(new CustomEvent('question-created', {
@@ -87,8 +89,17 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         }));
     }
 
-    infoIconClick(e) {
-        console.log(e.model.item);
+    licenseInfoIconClick(e) {
+        e.stopPropagation();
+        this.shadowRoot.querySelector(`#licenseInfoDialog${e.model.item.type}`).open();
+    }
+
+    licenseSelected(e) {
+        this.action = fireLocalAction(this.componentId, 'selectedLicenseId', e.model.item.id);
+    }
+
+    getLicenseInfoIconHidden(selectedLicenseId, item) {
+        return selectedLicenseId !== item.id;
     }
 
     handleConcept(e: CustomEvent) {
@@ -112,6 +123,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         if (keys.includes('resource')) this.resource = componentState.resource;
         if (keys.includes('_question')) this._question = componentState._question;
         if (keys.includes('licenses')) this.licenses = componentState.licenses;
+        if (keys.includes('selectedLicenseId')) this.selectedLicenseId = componentState.selectedLicenseId;
         this.user = state.user;
         this.userToken = state.userToken;
     }
@@ -133,9 +145,11 @@ async function loadLicenses(userToken: string, handleError: any) {
     const data = await GQLRequest(`
         query {
             allLicenses(orderBy: precedence_ASC) {
+                id
                 commonName
                 description
                 hyperlink
+                type
             }
         }
     `, {}, userToken, handleError);
