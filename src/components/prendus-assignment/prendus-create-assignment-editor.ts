@@ -1,4 +1,4 @@
-import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID, DEFAULT_QUESTION_VISIBILITY_ID} from '../../services/constants-service';
 import {fireLocalAction, createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {compileToAssessML} from '../../node_modules/assessml/assessml';
 import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
@@ -19,6 +19,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
     userToken: string | null;
     assignment: Assignment;
     selectedLicenseId: string;
+    selectedVisibilityId: string;
 
     static get is() { return 'prendus-create-assignment-editor'; }
     static get properties() {
@@ -38,11 +39,13 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
     async connectedCallback() {
         super.connectedCallback();
 
-        //TODO load and set the licenses and visibilities
         const licenses = await loadLicenses(this.userToken || 'USER_TOKEN_NOT_SET', this.handleGQLError.bind(this));
         this.action = fireLocalAction(this.componentId, 'licenses', licenses);
         if (licenses[0]) this.action = fireLocalAction(this.componentId, 'selectedLicenseId', licenses[0].id);
-        // const visibilities = await loadVisibilities();
+
+        const visibilities = await loadVisibilities(this.userToken || 'USER_TOKEN_NOT_SET', this.handleGQLError.bind(this));
+        this.action = fireLocalAction(this.componentId, 'visibilities', licenses);
+        if (visibilities[0]) this.action = fireLocalAction(this.componentId, 'selectedVisibilityId', visibilities[0].id);
     }
 
     questionChanged() {
@@ -78,8 +81,8 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
           resource: this.resource,
           answerComments: [],
           imageIds: [],
-          visibility: 'COURSE',
-          licenseId: this.selectedLicenseId
+          licenseId: this.selectedLicenseId,
+          visibilityId: this.selectedVisibilityId
         };
 
         this.dispatchEvent(new CustomEvent('question-created', {
@@ -100,6 +103,19 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
 
     getLicenseInfoIconHidden(selectedLicenseId, item) {
         return selectedLicenseId !== item.id;
+    }
+
+    visibilityInfoIconClick(e) {
+        e.stopPropagation();
+        this.shadowRoot.querySelector(`#visibilityInfoDialog${e.model.item.type}`).open();
+    }
+
+    visibilitySelected(e) {
+        this.action = fireLocalAction(this.componentId, 'selectedVisibilityId', e.model.item.id);
+    }
+
+    getVisibilityInfoIconHidden(selectedVisibilityId, item) {
+        return selectedVisibilityId !== item.id;
     }
 
     handleConcept(e: CustomEvent) {
@@ -124,6 +140,8 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         if (keys.includes('_question')) this._question = componentState._question;
         if (keys.includes('licenses')) this.licenses = componentState.licenses;
         if (keys.includes('selectedLicenseId')) this.selectedLicenseId = componentState.selectedLicenseId;
+        if (keys.includes('visibilities')) this.visibilities = componentState.visibilities;
+        if (keys.includes('selectedVisibilityId')) this.selectedVisibilityId = componentState.selectedVisibilityId;
         this.user = state.user;
         this.userToken = state.userToken;
     }
@@ -155,4 +173,19 @@ async function loadLicenses(userToken: string, handleError: any) {
     `, {}, userToken, handleError);
 
     return data.allLicenses;
+}
+
+async function loadVisibilities(userToken: string, handleError: any) {
+    const data = await GQLRequest(`
+        query {
+            allVisibilities(orderBy: precedence_ASC) {
+                id
+                commonName
+                description
+                type
+            }
+        }
+    `, {}, userToken, handleError);
+
+    return data.allVisibilities;
 }

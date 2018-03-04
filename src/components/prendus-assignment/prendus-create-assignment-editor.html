@@ -47,6 +47,31 @@
             </template>
         </dom-repeat>
 
+        <paper-dropdown-menu id="visibilityDropdown" label="Visibility">
+            <paper-listbox slot="dropdown-content" selected="0">
+                <dom-repeat items="[[visibilities]]">
+                    <template>
+                        <paper-item style="cursor: pointer" on-click="visibilitySelected">[[item.commonName]]</paper-item>
+                    </template>
+                </dom-repeat>
+            </paper-listbox>
+        </paper-dropdown-menu>
+
+        <dom-repeat items=[[visibilities]]>
+            <template>
+                <iron-icon id="visibilityInfoIcon[[item.type]]" icon="info" on-click="visibilityInfoIconClick" style="cursor: pointer;" hidden="[[getVisibilityInfoIconHidden(selectedVisibilityId, item)]]"></iron-icon>
+            </template>
+        </dom-repeat>
+
+        <dom-repeat items=[[visibilities]]>
+            <template>
+                <paper-dialog id="visibilityInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px; padding-bottom: 25px">
+                    <h2>[[item.commonName]]</h2>
+                    <p>[[item.description]]</p>
+                </paper-dialog>
+            </template>
+        </dom-repeat>
+
         <br>
         <br>
 
