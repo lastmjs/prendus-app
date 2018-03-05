@@ -4,7 +4,7 @@ jobs:
     build:
         working_directory: ~/prendus-app
         docker:
-            - image: circleci/node:8.9.3
+            - image: circleci/node:8.9.4
         steps:
             - checkout
             - run:
@@ -12,12 +12,6 @@ jobs:
                 command: sudo chown -R circleci /usr/local/lib/node_modules && sudo chown -R circleci /usr/local/bin
             - run:
                 name: Install Electron dependencies
-                command: sudo apt-get update && sudo apt-get install xvfb && sudo apt-get install libgtk2.0-0 && sudo apt-get install libxtst6 && sudo apt-get install libXss1 && sudo apt-get install Libgconf-2-4 && sudo apt-get install libnss3 && sudo apt-get install libasound2 && sudo apt-get install libgles2-mesa && sudo apt-get install libgles2-mesa-dev
+                command: sudo apt-get update && sudo apt-get install xvfb && sudo apt-get install libgtk2.0-0 && sudo apt-get install libxtst6 && sudo apt-get install libXss1 && sudo apt-get install Libgconf-2-4 && sudo apt-get install libnss3 && sudo apt-get install libasound2
             - run: npm install
-            - run:
-                name: libgles2-mesa file paths
-                command: dpkg -L libgles2-mesa && ls /home/circleci/prendus-app/node_modules/electron/dist
-            - run:
-                name: Symbolic Links
-                command: sudo ln -s /usr/lib/x86_64-linux-gnu/libGLESv2.so.2 /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so
             - run: npm test
