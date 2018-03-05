@@ -92,7 +92,6 @@ type Question @model {
   concept: Concept @relation(name: "ConceptOnQuestion")
   resource: String
   images: [File!]! @relation(name: "ImagesOnQuestions")
-  visibility: QuestionVisibility! @defaultValue(value: PRIVATE)
   flags: [QuestionFlag!]! @relation(name: "FlagOnQuestion")
   analytics: [PrendusAnalytics!]! @relation(name: "QuestionOnPrendusAnalytics")
   overall: Float! @defaultValue(value: 0)
@@ -103,6 +102,7 @@ type Question @model {
   plagiarism: Float! @defaultValue(value: 0)
   useInTest: Float! @defaultValue(value: 0)
   license: License! @relation(name: "LicenseOnQuestion")
+  visibility: Visibility! @relation(name: "VisibilityOnQuestion")
 }
 
 type QuestionFlag @model {
@@ -286,9 +286,22 @@ type License @model {
     createdAt: DateTime!
     updatedAt: DateTime!
     type: LicenseType!
+    commonName: String! @migrationValue(value: "COMMON_NAME_NOT_SET")
     questions: [Question!]! @relation(name: "LicenseOnQuestion")
     hyperlink: String!
     description: String!
+    precedence: Int! @migrationValue(value: 0)
+}
+
+type Visibility @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    type: VisibilityType!
+    commonName: String!
+    questions: [Question!]! @relation(name: "VisibilityOnQuestion")
+    description: String!
+    precedence: Int!
 }
 
 enum UserRole {
@@ -315,7 +328,7 @@ enum QuestionType {
   ESSAY
 }
 
-enum QuestionVisibility {
+enum VisibilityType {
   COURSE
   PUBLIC
   PRIVATE

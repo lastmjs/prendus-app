@@ -163,4 +163,5 @@ export const EXAMPLE_GRADING_RUBRIC = {
 }
 };
 
-  export const DEFAULT_QUESTION_LICENSE_ID = window.process.env.NODE_ENV === 'production' ? 'cje7p5cg051940189kq9gy6to' : 'cje4ugv8u4fjx0189dmif4moc';
+export const DEFAULT_QUESTION_LICENSE_ID = window.process.env.NODE_ENV === 'production' ? 'cje7p5cg051940189kq9gy6to' : 'cje4ugv8u4fjx0189dmif4moc';
+export const DEFAULT_QUESTION_VISIBILITY_ID = window.process.env.NODE_ENV === 'production' ? 'PRODUCTION_ID_NOT_SET' : 'cjebyzjku5yiq018991vwbbyo';
