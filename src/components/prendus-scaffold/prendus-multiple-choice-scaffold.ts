@@ -5,7 +5,7 @@ import {
 } from '../../prendus.d';
 import {createUUID, asyncMap} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service'; //TODO: Move into prendus-shared when Jordan is back
-import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_QUESTION_LICENSE_ID} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_QUESTION_LICENSE_ID, DEFAULT_QUESTION_VISIBILITY_ID} from '../../services/constants-service';
 import {GQLSaveFile} from '../../services/graphql-file-service';
 import {setNotification} from '../../redux/actions';
 import {generateMultipleChoice} from '../../services/question-to-code-service';
@@ -208,8 +208,8 @@ class PrendusMultipleChoiceScaffold extends Polymer.Element {
       resource: this.resource,
       answerComments: answers.map(answer => Object.assign({}, {text: answer.comment})),
       imageIds,
-      visibility: 'COURSE',
-      licenseId: DEFAULT_QUESTION_LICENSE_ID
+      licenseId: DEFAULT_QUESTION_LICENSE_ID,
+      visibilityId: DEFAULT_QUESTION_VISIBILITY_ID
     };
     const evt = new CustomEvent('question-created', {bubbles: false, composed: true, detail: {question}});
     this.dispatchEvent(evt);

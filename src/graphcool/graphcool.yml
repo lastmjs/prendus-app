@@ -535,6 +535,12 @@ permissions:
 # Purchase Update
 # Purchase Delete
 
+#### License Permissions
+- operation: License.read
+
+#### Visibility Permissions
+- operation: Visibility.read
+
 #### Relations Permissions
 
 - operation: RaterOnQuestionRating.connect
@@ -650,3 +656,6 @@ permissions:
 
 - operation: LicenseOnQuestion.connect
 - operation: LicenseOnQuestion.disconnect
+
+- operation: VisibilityOnQuestion.connect
+- operation: VisibilityOnQuestion.disconnect

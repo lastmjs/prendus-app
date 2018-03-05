@@ -1,4 +1,4 @@
-import {DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID} from '../../../src/services/constants-service';
+import {DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID, DEFAULT_QUESTION_VISIBILITY_ID} from '../../../src/services/constants-service';
 
 const jsc = require('jsverify');
 
@@ -82,7 +82,8 @@ export const QuestionArb = jsc.record({
   concept: ConceptArb,
   ratings: jsc.small(jsc.array(QuestionRatingArb)),
   responses: jsc.array(QuestionResponseArb),
-  licenseId: jsc.constant(DEFAULT_QUESTION_LICENSE_ID)
+  licenseId: jsc.constant(DEFAULT_QUESTION_LICENSE_ID),
+  visibilityId: jsc.constant(DEFAULT_QUESTION_VISIBILITY_ID)
 });
 
 export const AssignmentArb = jsc.record({
