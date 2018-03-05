@@ -19,5 +19,5 @@ jobs:
             - run: npm install
             - run:
                 name: Symbolic Links
-                command: sudo ln -s /usr/lib/x86_64-linux-gnu/libGLESv2.so.2 /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so
+                command: sudo ln -s /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so /usr/lib/x86_64-linux-gnu/libGLESv2.so.2
             - run: npm test
