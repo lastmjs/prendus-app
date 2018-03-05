@@ -573,7 +573,7 @@ permissions:
 - operation: UserOnLTIUser.connect
 # - operation: UserOnLTIUser.disconnect
 
-#- operation: AuthorOnCourse.connect
+- operation: AuthorOnCourse.connect
 #  authenticated: true
 #  query: ./permission-queries/author-on-course/author-on-course-connect.graphql
 # - operation: AuthorOnCourse.disconnect
