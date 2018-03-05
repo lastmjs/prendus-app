@@ -1,4 +1,4 @@
-import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC, DEFAULT_QUESTION_LICENSE_ID, DEFAULT_QUESTION_VISIBILITY_ID} from '../../services/constants-service';
+import {NotificationType, ASSIGNMENT_VALIDATION_ERROR, DEFAULT_EVALUATION_RUBRIC} from '../../services/constants-service';
 import {fireLocalAction, createUUID} from '../../node_modules/prendus-shared/services/utilities-service';
 import {compileToAssessML} from '../../node_modules/assessml/assessml';
 import {AST, Content, Radio} from '../../node_modules/assessml/assessml.d';
