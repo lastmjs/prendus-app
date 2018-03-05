@@ -16,7 +16,7 @@ jobs:
             - run: npm install
             - run:
                 name: libgles2-mesa file paths
-                command: dpkg -L libgles2-mesa && ls /home/circleci/prendus-app/node_modules/electron/dist/swiftshader
+                command: dpkg -L libgles2-mesa && ls /home/circleci/prendus-app/node_modules/electron/dist
             - run:
                 name: Symbolic Links
                 command: sudo ln -s /usr/lib/x86_64-linux-gnu/libGLESv2.so.2 /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so
