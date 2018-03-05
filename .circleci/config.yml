@@ -14,8 +14,10 @@ jobs:
                 name: Install Electron dependencies
                 command: sudo apt-get update && sudo apt-get install xvfb && sudo apt-get install libgtk2.0-0 && sudo apt-get install libxtst6 && sudo apt-get install libXss1 && sudo apt-get install Libgconf-2-4 && sudo apt-get install libnss3 && sudo apt-get install libasound2 && sudo apt-get install libgles2-mesa && sudo apt-get install libgles2-mesa-dev
             - run:
-                name: Symbolic Links
+                name: libgles2-mesa file paths
                 command: dpkg -L libgles2-mesa
-                # command: sudo ln -s /usr/lib/x86_64-linux-gnu/mesa-egl/libGLESv2.so.2 /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so
             - run: npm install
+            - run:
+                name: Symbolic Links
+                command: sudo ln -s /usr/lib/x86_64-linux-gnu/libGLESv2.so.2 /home/circleci/prendus-app/node_modules/electron/dist/swiftshader/libGLESv2.so
             - run: npm test
