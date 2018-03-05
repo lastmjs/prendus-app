@@ -39,10 +39,17 @@
 
         <dom-repeat items=[[licenses]]>
             <template>
-                <paper-dialog id="licenseInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px; padding-bottom: 25px">
+                <paper-dialog id="licenseInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px">
                     <h2>[[item.commonName]]</h2>
+
+                    <br>
+
                     <p><a href="[[item.hyperlink]]" target="_blank">Read the official license information</a></p>
                     <p>[[item.description]]</p>
+
+                    <div style="display: flex">
+                        <paper-button style="margin-left: auto" raised on-click="licenseInfoDialogCloseClick">Close</paper-button>
+                    </div>
                 </paper-dialog>
             </template>
         </dom-repeat>
@@ -67,9 +74,16 @@
 
         <dom-repeat items=[[visibilities]]>
             <template>
-                <paper-dialog id="visibilityInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px; padding-bottom: 25px">
+                <paper-dialog id="visibilityInfoDialog[[item.type]]" style="padding-left: 1vw; padding-right: 1vw; padding-top: 25px">
                     <h2>[[item.commonName]]</h2>
+
+                    <br>
+
                     <p>[[item.description]]</p>
+
+                    <div style="display: flex">
+                        <paper-button style="margin-left: auto" raised on-click="visibilityInfoDialogCloseClick">Close</paper-button>
+                    </div>
                 </paper-dialog>
             </template>
         </dom-repeat>

@@ -118,6 +118,14 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         return selectedVisibilityId !== item.id;
     }
 
+    licenseInfoDialogCloseClick(e) {
+        this.shadowRoot.querySelector(`#licenseInfoDialog${e.model.item.type}`).close();
+    }
+
+    visibilityInfoDialogCloseClick(e) {
+        this.shadowRoot.querySelector(`#visibilityInfoDialog${e.model.item.type}`).close();
+    }
+
     handleConcept(e: CustomEvent) {
         this.action = fireLocalAction(this.componentId, 'concept', e.detail.concept);
     }
