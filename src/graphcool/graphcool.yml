@@ -544,118 +544,120 @@ permissions:
 #### Relations Permissions
 
 - operation: RaterOnQuestionRating.connect
-- operation: RaterOnQuestionRating.disconnect
+# - operation: RaterOnQuestionRating.disconnect
 
 - operation: AuthorOnQuestion.connect
-- operation: AuthorOnQuestion.disconnect
+# - operation: AuthorOnQuestion.disconnect
 
 - operation: SubjectOnConcept.connect
-- operation: SubjectOnConcept.disconnect
+# - operation: SubjectOnConcept.disconnect
 
 - operation: QuestionOnAnswerComment.connect
-- operation: QuestionOnAnswerComment.disconnect
+# - operation: QuestionOnAnswerComment.disconnect
 
 - operation: ConceptOnQuestion.connect
-- operation: ConceptOnQuestion.disconnect
+# - operation: ConceptOnQuestion.disconnect
 
 - operation: CourseOnAssignment.connect
-- operation: CourseOnAssignment.disconnect
+# - operation: CourseOnAssignment.disconnect
 
 - operation: AssignmentOnConcepts.connect
-- operation: AssignmentOnConcepts.disconnect
+# - operation: AssignmentOnConcepts.disconnect
 
 - operation: AuthorOnQuiz.connect
-- operation: AuthorOnQuiz.disconnect
+# - operation: AuthorOnQuiz.disconnect
 
 - operation: DisciplineOnSubject.connect
-- operation: DisciplineOnSubject.disconnect
+# - operation: DisciplineOnSubject.disconnect
 
 - operation: UserOnLTIUser.connect
-- operation: UserOnLTIUser.disconnect
+# - operation: UserOnLTIUser.disconnect
 
 - operation: AuthorOnCourse.connect
-- operation: AuthorOnCourse.disconnect
+#  authenticated: true
+#  query: ./permission-queries/author-on-course/author-on-course-connect.graphql
+# - operation: AuthorOnCourse.disconnect
 
 - operation: AssignmentOnQuiz.connect
-- operation: AssignmentOnQuiz.disconnect
+# - operation: AssignmentOnQuiz.disconnect
 
 - operation: QuizOnQuestion.connect
-- operation: QuizOnQuestion.disconnect
+# - operation: QuizOnQuestion.disconnect
 
 - operation: AuthorOnAssignment.connect
-- operation: AuthorOnAssignment.disconnect
+# - operation: AuthorOnAssignment.disconnect
 
 - operation: AssignmentQuestions.connect
-- operation: AssignmentQuestions.disconnect
+# - operation: AssignmentQuestions.disconnect
 
 - operation: QuestionOnQuestionRating.connect
-- operation: QuestionOnQuestionRating.disconnect
+# - operation: QuestionOnQuestionRating.disconnect
 
 - operation: CourseDiscipline.connect
-- operation: CourseDiscipline.disconnect
+# - operation: CourseDiscipline.disconnect
 
 - operation: CourseSubject.connect
-- operation: CourseSubject.disconnect
+# - operation: CourseSubject.disconnect
 
 - operation: QuestionOnPrendusAnalytics.connect
-- operation: QuestionOnPrendusAnalytics.disconnect
+# - operation: QuestionOnPrendusAnalytics.disconnect
 
 - operation: CourseOnPrendusAnalytics.connect
-- operation: CourseOnPrendusAnalytics.disconnect
+# - operation: CourseOnPrendusAnalytics.disconnect
 
 - operation: AssignmentOnPrendusAnalytics.connect
-- operation: AssignmentOnPrendusAnalytics.disconnect
+# - operation: AssignmentOnPrendusAnalytics.disconnect
 
 - operation: UserOnPrendusAnalytics.connect
-- operation: UserOnPrendusAnalytics.disconnect
+# - operation: UserOnPrendusAnalytics.disconnect
 
 - operation: UserVariablesOnQuestionResponse.connect
-- operation: UserVariablesOnQuestionResponse.disconnect
+# - operation: UserVariablesOnQuestionResponse.disconnect
 
 - operation: ScoresOnQuestionResponseRating.connect
-- operation: ScoresOnQuestionResponseRating.disconnect
+# - operation: ScoresOnQuestionResponseRating.disconnect
 
 - operation: AuthorOnQuestionResponse.connect
-- operation: AuthorOnQuestionResponse.disconnect
+# - operation: AuthorOnQuestionResponse.disconnect
 
 - operation: CoursePurchased.connect
-- operation: CoursePurchased.disconnect
+# - operation: CoursePurchased.disconnect
 
 - operation: UserPurchases.connect
-- operation: UserPurchases.disconnect
+# - operation: UserPurchases.disconnect
 
 - operation: UserRadiosOnQuestionResponse.connect
-- operation: UserRadiosOnQuestionResponse.disconnect
+# - operation: UserRadiosOnQuestionResponse.disconnect
 
 - operation: QuestionOnQuestionResponse.connect
-- operation: QuestionOnQuestionResponse.disconnect
+# - operation: QuestionOnQuestionResponse.disconnect
 
 - operation: UserChecksOnQuestionResponse.connect
-- operation: UserChecksOnQuestionResponse.disconnect
+# - operation: UserChecksOnQuestionResponse.disconnect
 
 - operation: ImagesOnQuestions.connect
-- operation: ImagesOnQuestions.disconnect
+# - operation: ImagesOnQuestions.disconnect
 
 - operation: RaterOnQuestionResponseRating.connect
-- operation: RaterOnQuestionResponseRating.disconnect
+# - operation: RaterOnQuestionResponseRating.disconnect
 
 - operation: UserInputsOnQuestionResponse.connect
-- operation: UserInputsOnQuestionResponse.disconnect
+# - operation: UserInputsOnQuestionResponse.disconnect
 
 - operation: RatingsOnQuestionResponse.connect
-- operation: RatingsOnQuestionResponse.disconnect
+# - operation: RatingsOnQuestionResponse.disconnect
 
 - operation: UserEssaysOnQuestionResponse.connect
-- operation: UserEssaysOnQuestionResponse.disconnect
+# - operation: UserEssaysOnQuestionResponse.disconnect
 
 - operation: ScoresOnQuestionRating.connect
-- operation: ScoresOnQuestionRating.disconnect
+# - operation: ScoresOnQuestionRating.disconnect
 
 - operation: FlagOnQuestion.connect
-- operation: FlagOnQuestion.disconnect
+# - operation: FlagOnQuestion.disconnect
 
 - operation: LicenseOnQuestion.connect
-- operation: LicenseOnQuestion.disconnect
+# - operation: LicenseOnQuestion.disconnect
 
 - operation: VisibilityOnQuestion.connect
-- operation: VisibilityOnQuestion.disconnect
+# - operation: VisibilityOnQuestion.disconnect

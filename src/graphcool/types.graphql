@@ -286,11 +286,11 @@ type License @model {
     createdAt: DateTime!
     updatedAt: DateTime!
     type: LicenseType!
-    commonName: String! @migrationValue(value: "COMMON_NAME_NOT_SET")
+    commonName: String!
     questions: [Question!]! @relation(name: "LicenseOnQuestion")
     hyperlink: String!
     description: String!
-    precedence: Int! @migrationValue(value: 0)
+    precedence: Int!
 }
 
 type Visibility @model {
