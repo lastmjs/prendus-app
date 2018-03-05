@@ -44,7 +44,7 @@ class PrendusCreateAssignmentEditor extends Polymer.Element {
         if (licenses[0]) this.action = fireLocalAction(this.componentId, 'selectedLicenseId', licenses[0].id);
 
         const visibilities = await loadVisibilities(this.userToken || 'USER_TOKEN_NOT_SET', this.handleGQLError.bind(this));
-        this.action = fireLocalAction(this.componentId, 'visibilities', licenses);
+        this.action = fireLocalAction(this.componentId, 'visibilities', visibilities);
         if (visibilities[0]) this.action = fireLocalAction(this.componentId, 'selectedVisibilityId', visibilities[0].id);
     }
 
