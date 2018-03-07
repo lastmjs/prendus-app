@@ -30,7 +30,7 @@ const resolvers = {
     }
 };
 
-const generatedSchemaAST = parse(readFileSync('./src/generated/prisma.graphql').toString());
+const generatedSchemaAST = parse(readFileSync('./generated/prisma.graphql').toString());
 const augmentedQueryAndMutationSchemaAST = parse(`
     type Query {
         monkey: Int!
