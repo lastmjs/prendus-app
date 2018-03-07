@@ -1,4 +1,6 @@
+directive @isAuthenticated on FIELD | FIELD_DEFINITION
+
 type User {
     id: ID! @unique
-    username: String! @unique
+    username: String! @unique @isAuthenticated
 }

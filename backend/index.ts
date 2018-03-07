@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga';
+import {makeExecutableSchema, mergeSchemas} from 'graphql-tools';
 import { Prisma } from './generated/prisma';
 import {readFileSync} from 'fs';
 import {parse, print} from 'graphql';
@@ -15,61 +16,40 @@ const PrismaDBConnection = new Prisma({
 });
 const preparedQuery = prepareResolvers(PrismaDBConnection.query);
 const preparedMutation = prepareResolvers(PrismaDBConnection.mutation);
-const resolvers = {
+const generatedResolvers = {
     Query: {
-        ...preparedQuery,
-        monkey: () => {
-            return 1;
-        }
+        ...preparedQuery
     },
     Mutation: {
-        ...preparedMutation,
-        createMonkey: () => {
-            return 5;
-        }
+        ...preparedMutation
     }
 };
+const generatedSchema = makeExecutableSchema({
+    typeDefs: readFileSync('./generated/prisma.graphql').toString(),
+    resolvers: generatedResolvers
+});
 
-const generatedSchemaAST = parse(readFileSync('./generated/prisma.graphql').toString());
-const augmentedQueryAndMutationSchemaAST = parse(`
-    type Query {
-        monkey: Int!
-    }
-
-    type Mutation {
-        createMonkey: Int!
-    }
-`);
-const augmentedSchemaAST = {
-    ...generatedSchemaAST,
-    definitions: generatedSchemaAST.definitions.map((generatedSchemaDefinition) => {
-        const matchingDefinitionInAugmentedQuerySchema = augmentedQueryAndMutationSchemaAST.definitions.filter((augmentedQueryAndMutationSchemaDefinition) => {
-            return (
-                generatedSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-                augmentedQueryAndMutationSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-                generatedSchemaDefinition.name.kind === 'Name' &&
-                augmentedQueryAndMutationSchemaDefinition.name.kind === 'Name' &&
-                generatedSchemaDefinition.name.value === augmentedQueryAndMutationSchemaDefinition.name.value
-            );
-        })[0];
-
-        if (matchingDefinitionInAugmentedQuerySchema) {
-            const augmentedSchemaDefinition = {
-                ...generatedSchemaDefinition,
-                fields: [...generatedSchemaDefinition.fields, ...matchingDefinitionInAugmentedQuerySchema.fields]
-            };
-
-            return augmentedSchemaDefinition;
+const customSchema = makeExecutableSchema({
+    typeDefs: `
+        type Query {
+            monkey: Int!
         }
-        else {
-            return generatedSchemaDefinition;
+    `,
+    resolvers: {
+        Query: {
+            monkey: () => {
+                return 5;
+            }
         }
-    })
-};
+    }
+});
+
+const finalSchema = mergeSchemas({
+    schemas: [generatedSchema, customSchema]
+});
 
 const server = new GraphQLServer({
-    typeDefs: print(augmentedSchemaAST),
-    resolvers
+    schema: finalSchema
 });
 
 server.start(() => console.log('Server is running on http://localhost:4000'));
