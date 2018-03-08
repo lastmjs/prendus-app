@@ -4,6 +4,7 @@ import { Prisma, Query, Mutation } from './generated/prisma';
 import {readFileSync} from 'fs';
 import {parse, print, ObjectTypeDefinitionNode} from 'graphql';
 import {signup} from './resolvers/signup';
+import {userOwns} from './directive-resolvers/user-owns';
 
 //TODO I don't know exactly how to handle the directive permissions...I would like to get away with not having to maintain two separate schemas...
 //TODO I want Prisma to be like Graphcool as much as possible, but to still maintain the flexibility. One schema, one automatically generated set of resolvers, one location to add custom resolvers and directives
@@ -47,9 +48,7 @@ const generatedSchema = makeExecutableSchema({
     typeDefs: generatedSchemaASTWithDirectives,
     resolvers: generatedResolvers,
     directiveResolvers: {
-        userOwns: (next, source, args, context) => {
-            throw new Error('NOT AUTHENTICATED!');
-        }
+        userOwns
     }
 });
 
