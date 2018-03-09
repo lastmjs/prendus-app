@@ -1,38 +1,53 @@
-import { GraphQLServer } from 'graphql-yoga';
-import {makeExecutableSchema, mergeSchemas} from 'graphql-tools';
-import { Prisma, Query, Mutation } from './generated/prisma';
+import {GraphQLServer} from 'graphql-yoga';
+import {makeExecutableSchema} from 'graphql-tools';
+import {
+    Prisma,
+    Query,
+    Mutation
+} from './generated/prisma';
 import {readFileSync} from 'fs';
-import {parse, print, ObjectTypeDefinitionNode} from 'graphql';
-import {signup} from './resolvers/signup';
-import {userOwns} from './directive-resolvers/user-owns';
+import {
+    parse,
+    print,
+    ObjectTypeDefinitionNode
+} from 'graphql';
+import {
+    signupResolver
+} from './resolvers';
+import {
+    userOwnsDirectiveResolver,
+    privateDirectiveResolver,
+    authenticatedDirectiveResolver
+} from './directive-resolvers';
 import {extractFragmentReplacements} from 'prisma-binding';
+import {mergeTypes} from 'merge-graphql-schemas';
 
 //TODO I don't know exactly how to handle the directive permissions...I would like to get away with not having to maintain two separate schemas...
 //TODO I want Prisma to be like Graphcool as much as possible, but to still maintain the flexibility. One schema, one automatically generated set of resolvers, one location to add custom resolvers and directives
 
-const originalSchemaAST = parse(readFileSync('./datamodel.graphql').toString());
-const originalDirectiveDefinitions = originalSchemaAST.definitions.filter((originalSchemaDefinition) => {
-    return originalSchemaDefinition.kind === 'DirectiveDefinition';
-});
-const generatedSchemaAST = parse(readFileSync('./generated/prisma.graphql').toString());
-const generatedSchemaASTWithDirectives = {
-    ...generatedSchemaAST,
-    definitions: [...originalDirectiveDefinitions, ...generatedSchemaAST.definitions.map((generatedSchemaDefinition) => {
-        const matchingSchemaDefinition: ObjectTypeDefinitionNode = <ObjectTypeDefinitionNode> originalSchemaAST.definitions.find((originalSchemaDefinition) => {
-            return (
-                originalSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-                generatedSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-                originalSchemaDefinition.name.kind === 'Name' &&
-                generatedSchemaDefinition.name.kind === 'Name' &&
-                originalSchemaDefinition.name.value === generatedSchemaDefinition.name.value
-            );
-        });
+// const originalSchemaAST = parse(readFileSync('./datamodel.graphql').toString());
+// const originalDirectiveDefinitions = originalSchemaAST.definitions.filter((originalSchemaDefinition) => {
+//     return originalSchemaDefinition.kind === 'DirectiveDefinition';
+// });
+// const generatedSchemaAST = parse(readFileSync('./generated/prisma.graphql').toString());
+// const generatedSchemaASTWithDirectives = {
+//     ...generatedSchemaAST,
+//     definitions: [...originalDirectiveDefinitions, ...generatedSchemaAST.definitions.map((generatedSchemaDefinition) => {
+//         const matchingSchemaDefinition: ObjectTypeDefinitionNode = <ObjectTypeDefinitionNode> originalSchemaAST.definitions.find((originalSchemaDefinition) => {
+//             return (
+//                 originalSchemaDefinition.kind === 'ObjectTypeDefinition' &&
+//                 generatedSchemaDefinition.kind === 'ObjectTypeDefinition' &&
+//                 originalSchemaDefinition.name.kind === 'Name' &&
+//                 generatedSchemaDefinition.name.kind === 'Name' &&
+//                 originalSchemaDefinition.name.value === generatedSchemaDefinition.name.value
+//             );
+//         });
+//
+//         return matchingSchemaDefinition || generatedSchemaDefinition;
+//     })]
+// };
 
-        return matchingSchemaDefinition || generatedSchemaDefinition;
-    })]
-};
-
-const preparedFieldResolvers = addFragmentToFieldResolvers(parse(readFileSync('./datamodel.graphql').toString()), `{ id }`)
+const preparedFieldResolvers = addFragmentToFieldResolvers(parse(readFileSync('./schema/datamodel.graphql').toString()), `{ id }`)
 const generatedFragmentReplacements = extractFragmentReplacements(preparedFieldResolvers);
 const PrismaDBConnection = new Prisma({
     endpoint: 'http://127.0.0.1:4466/backend/dev', // the endpoint of the Prisma DB service
@@ -42,59 +57,90 @@ const PrismaDBConnection = new Prisma({
 });
 const preparedTopLevelQueryResolvers = prepareTopLevelResolvers(PrismaDBConnection.query);
 const preparedTopLevelMutationResolvers = prepareTopLevelResolvers(PrismaDBConnection.mutation);
-const generatedResolvers = {
+
+const resolvers = {
     Query: {
         ...preparedTopLevelQueryResolvers
     },
     Mutation: {
-        ...preparedTopLevelMutationResolvers
+        ...preparedTopLevelMutationResolvers,
+        signup: signupResolver
     },
     ...preparedFieldResolvers
 };
-const generatedSchema = makeExecutableSchema({
-    typeDefs: generatedSchemaASTWithDirectives,
-    resolvers: generatedResolvers,
-    directiveResolvers: {
-        userOwns
-    }
+const directiveResolvers = {
+    userOwns: userOwnsDirectiveResolver,
+    authenticated: authenticatedDirectiveResolver,
+    private: privateDirectiveResolver
+};
+// const generatedSchema = makeExecutableSchema({
+//     typeDefs: generatedSchemaASTWithDirectives,
+//     resolvers: generatedResolvers,
+//     directiveResolvers
+// });
+
+// const customSchema = makeExecutableSchema({
+//     typeDefs: `
+//         scalar DateTime
+//         ${readFileSync('./datamodel.graphql')}
+//
+//         type AuthPayload {
+//             token: String!
+//             user: User!
+//         }
+//
+//         type Query {
+//             dummy: Int!
+//         }
+//
+//         type Mutation {
+//             signup(email: String, password: String!): AuthPayload!
+//         }
+//     `,
+//     // typeDefs: `
+//     //     ${readFileSync('./datamodel.graphql')}
+//     //     ${readFileSync('./dataops.graphql').toString()}
+//     // `,
+//     // resolvers: {
+//     //     Query: {
+//     //     },
+//     //     Mutation: {
+//     //         signup
+//     //     }
+//     // },
+//     directiveResolvers
+// });
+//
+// const finalSchema = mergeSchemas({
+//     schemas: [generatedSchema, customSchema]
+// });
+
+// const finalSchema = mergeSchemas({
+//     schemas: [
+//         readFileSync('./datamodel.graphql').toString(),
+//         readFileSync('./dataops.graphql').toString(),
+//         readFileSync('./generated/prisma.graphql').toString()
+//     ]
+// });
+
+const ultimateSchemaString = mergeTypes([
+    readFileSync('./schema/datamodel.graphql').toString(),
+    readFileSync('./schema/dataops.graphql').toString(),
+    readFileSync('./schema/directives.graphql').toString(),
+    readFileSync('./generated/prisma.graphql').toString()
+], {
+    all: true
+});
+const ultimateSchema = makeExecutableSchema({
+    typeDefs: ultimateSchemaString,
+    resolvers,
+    directiveResolvers
 });
 
-const customSchema = makeExecutableSchema({
-    typeDefs: `
-        scalar DateTime
-        ${readFileSync('./datamodel.graphql')}
-
-        type AuthPayload {
-            token: String!
-            user: User!
-        }
-
-        type Query {
-            dummy: Int!
-        }
-
-        type Mutation {
-            signup(email: String, password: String!): AuthPayload!
-        }
-    `,
-    resolvers: {
-        Query: {
-        },
-        Mutation: {
-            signup
-        }
-    },
-    directiveResolvers: { //TODO it is kind of redundant to have to put the directiveResolvers in here again. mergeSchemas should merge directives as well. See here: https://github.com/apollographql/graphql-tools/issues/603#issuecomment-371327254
-        userOwns
-    }
-});
-
-const finalSchema = mergeSchemas({
-    schemas: [generatedSchema, customSchema]
-});
+console.log('ultimateSchemaString', ultimateSchemaString);
 
 const server = new GraphQLServer({
-    schema: finalSchema,
+    schema: ultimateSchema,
     context: (req) => {
         return {
             ...req,

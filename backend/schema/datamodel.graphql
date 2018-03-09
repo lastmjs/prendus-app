@@ -1,9 +1,7 @@
-directive @userOwns(field: String) on FIELD | FIELD_DEFINITION
-
 type User {
     id: ID! @unique
     createdAt: DateTime!
     updatedAt: DateTime!
     email: String! @unique @userOwns(field: "id")
-    password: String!
+    password: String! @private
 }

@@ -9,6 +9,7 @@
     "bcryptjs": "^2.4.3",
     "graphql-import": "0.4.5",
     "graphql-yoga": "1.4.3",
+    "merge-graphql-schemas": "^1.5.0",
     "prisma-binding": "1.5.16"
   },
   "devDependencies": {

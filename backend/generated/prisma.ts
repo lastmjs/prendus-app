@@ -434,7 +434,7 @@ input UserWhereUniqueInput {
 }
 `
 
-export type UserOrderByInput =
+export type UserOrderByInput = 
   'id_ASC' |
   'id_DESC' |
   'createdAt_ASC' |
@@ -446,7 +446,7 @@ export type UserOrderByInput =
   'password_ASC' |
   'password_DESC'
 
-export type MutationType =
+export type MutationType = 
   'CREATED' |
   'UPDATED' |
   'DELETED'
@@ -609,7 +609,7 @@ export interface UserConnection {
 }
 
 /*
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number
 
@@ -664,7 +664,7 @@ export type Subscription = {
 }
 
 export class Prisma extends BasePrisma {
-
+  
   constructor({ endpoint, secret, fragmentReplacements, debug }: BasePrismaOptions) {
     super({ typeDefs, endpoint, secret, fragmentReplacements, debug });
   }

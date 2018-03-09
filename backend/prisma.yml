@@ -9,6 +9,6 @@ stage: dev
 secret: mysecret123
 
 # the file path pointing to your data model
-datamodel: datamodel.graphql
+datamodel: schema/datamodel.graphql
 
 cluster: local

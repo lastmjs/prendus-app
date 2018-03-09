@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-export async function signup(parent, args, context, info) {
+export async function signupResolver(parent, args, context, info) {
     const encryptedPassword = await bcrypt.hash(args.password, 10);
     const user = await context.db.mutation.createUser({
         data: {
