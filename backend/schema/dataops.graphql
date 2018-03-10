@@ -1,8 +1,20 @@
+# This is where we define any custom resolvers, and where we add custom directives to any generated Prisma resolvers
+
 type AuthPayload {
     token: String!
     user: User!
 }
 
 type Mutation {
-    signup(email: String, password: String!): AuthPayload! @authenticated
+    # Custom resolvers
+    signup(email: String!, password: String!): AuthPayload!
+    login(email: String!, password: String!): AuthPayload!
+
+    # Generated resolvers
+    createUser(data: UserCreateInput!): User!
+    updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+    deleteUser(where: UserWhereUniqueInput!): User
+    upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+    updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
+    deleteManyUsers(where: UserWhereInput!): BatchPayload!
 }

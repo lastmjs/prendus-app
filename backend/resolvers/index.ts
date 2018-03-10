@@ -17,3 +17,29 @@ export async function signupResolver(parent, args, context, info) {
         user
     };
 }
+
+export async function loginResolver(parent, args, context, info) {
+    const email = args.email;
+    const password = args.password;
+    const user = await context.db.query.user({
+        where: {
+            email
+        }
+    });
+
+    if (!user) {
+        throw new Error(`Invalid email or password`);
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+        throw new Error('Invalid email or password');
+    }
+
+    return {
+        token: jwt.sign({
+            userId: user.id
+        }, process.env.PRENDUS_JWT_SECRET),
+        user
+    };
+}

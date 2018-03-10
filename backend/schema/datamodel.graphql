@@ -1,7 +1,10 @@
+# All types defined here will be fed through the Prisma generation process
+# Essentially, all of these types become database tables
+
 type User {
     id: ID! @unique
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: DateTime! @private
+    updatedAt: DateTime! @private
     email: String! @unique @userOwns(field: "id")
     password: String! @private
 }

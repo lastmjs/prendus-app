@@ -12,7 +12,8 @@ import {
     ObjectTypeDefinitionNode
 } from 'graphql';
 import {
-    signupResolver
+    signupResolver,
+    loginResolver
 } from './resolvers';
 import {
     userOwnsDirectiveResolver,
@@ -24,28 +25,6 @@ import {mergeTypes} from 'merge-graphql-schemas';
 
 //TODO I don't know exactly how to handle the directive permissions...I would like to get away with not having to maintain two separate schemas...
 //TODO I want Prisma to be like Graphcool as much as possible, but to still maintain the flexibility. One schema, one automatically generated set of resolvers, one location to add custom resolvers and directives
-
-// const originalSchemaAST = parse(readFileSync('./datamodel.graphql').toString());
-// const originalDirectiveDefinitions = originalSchemaAST.definitions.filter((originalSchemaDefinition) => {
-//     return originalSchemaDefinition.kind === 'DirectiveDefinition';
-// });
-// const generatedSchemaAST = parse(readFileSync('./generated/prisma.graphql').toString());
-// const generatedSchemaASTWithDirectives = {
-//     ...generatedSchemaAST,
-//     definitions: [...originalDirectiveDefinitions, ...generatedSchemaAST.definitions.map((generatedSchemaDefinition) => {
-//         const matchingSchemaDefinition: ObjectTypeDefinitionNode = <ObjectTypeDefinitionNode> originalSchemaAST.definitions.find((originalSchemaDefinition) => {
-//             return (
-//                 originalSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-//                 generatedSchemaDefinition.kind === 'ObjectTypeDefinition' &&
-//                 originalSchemaDefinition.name.kind === 'Name' &&
-//                 generatedSchemaDefinition.name.kind === 'Name' &&
-//                 originalSchemaDefinition.name.value === generatedSchemaDefinition.name.value
-//             );
-//         });
-//
-//         return matchingSchemaDefinition || generatedSchemaDefinition;
-//     })]
-// };
 
 const preparedFieldResolvers = addFragmentToFieldResolvers(parse(readFileSync('./schema/datamodel.graphql').toString()), `{ id }`)
 const generatedFragmentReplacements = extractFragmentReplacements(preparedFieldResolvers);
@@ -64,7 +43,8 @@ const resolvers = {
     },
     Mutation: {
         ...preparedTopLevelMutationResolvers,
-        signup: signupResolver
+        signup: signupResolver,
+        login: loginResolver
     },
     ...preparedFieldResolvers
 };
@@ -73,55 +53,6 @@ const directiveResolvers = {
     authenticated: authenticatedDirectiveResolver,
     private: privateDirectiveResolver
 };
-// const generatedSchema = makeExecutableSchema({
-//     typeDefs: generatedSchemaASTWithDirectives,
-//     resolvers: generatedResolvers,
-//     directiveResolvers
-// });
-
-// const customSchema = makeExecutableSchema({
-//     typeDefs: `
-//         scalar DateTime
-//         ${readFileSync('./datamodel.graphql')}
-//
-//         type AuthPayload {
-//             token: String!
-//             user: User!
-//         }
-//
-//         type Query {
-//             dummy: Int!
-//         }
-//
-//         type Mutation {
-//             signup(email: String, password: String!): AuthPayload!
-//         }
-//     `,
-//     // typeDefs: `
-//     //     ${readFileSync('./datamodel.graphql')}
-//     //     ${readFileSync('./dataops.graphql').toString()}
-//     // `,
-//     // resolvers: {
-//     //     Query: {
-//     //     },
-//     //     Mutation: {
-//     //         signup
-//     //     }
-//     // },
-//     directiveResolvers
-// });
-//
-// const finalSchema = mergeSchemas({
-//     schemas: [generatedSchema, customSchema]
-// });
-
-// const finalSchema = mergeSchemas({
-//     schemas: [
-//         readFileSync('./datamodel.graphql').toString(),
-//         readFileSync('./dataops.graphql').toString(),
-//         readFileSync('./generated/prisma.graphql').toString()
-//     ]
-// });
 
 const ultimateSchemaString = mergeTypes([
     readFileSync('./schema/datamodel.graphql').toString(),
@@ -136,8 +67,6 @@ const ultimateSchema = makeExecutableSchema({
     resolvers,
     directiveResolvers
 });
-
-console.log('ultimateSchemaString', ultimateSchemaString);
 
 const server = new GraphQLServer({
     schema: ultimateSchema,
