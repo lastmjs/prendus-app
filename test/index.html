@@ -2,27 +2,30 @@
 <html>
 <head>
   <script type="module" src="../node_modules/guesswork/test-runner.ts"></script>
-  <link rel="import" href="src/components/prendus-course-question-ratings-test/prendus-course-question-ratings-test.html">
-  <link rel="import" href="src/components/prendus-assignment-test/prendus-assignment-authorization-test.html">
-  <link rel="import" href="src/components/prendus-assignment-test/prendus-assignment-shared-test.html">
-  <link rel="import" href="src/components/prendus-assignment-test/prendus-review-assignment-test.html">
-  <link rel="import" href="src/components/prendus-assignment-test/prendus-grade-assignment-test.html">
-  <link rel="import" href="src/components/prendus-assignment-test/prendus-respond-assignment-test.html">
-  <link rel="import" href="src/components/prendus-rubric-dropdowns-test/prendus-rubric-dropdowns-test.html">
-  <link rel="import" href="src/components/prendus-rubric-table-test/prendus-rubric-table-test.html">
-  <link rel="import" href="src/components/prendus-carousel-test/prendus-carousel-test.html">
+
+  <script type="module" src="backend/directive-resolvers/authenticated-directive-resolver-test.ts"></script>
+  <!-- <link rel="import" href="src/components/prendus-course-question-ratings-test/prendus-course-question-ratings-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-assignment-test/prendus-assignment-authorization-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-assignment-test/prendus-assignment-shared-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-assignment-test/prendus-review-assignment-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-assignment-test/prendus-grade-assignment-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-assignment-test/prendus-respond-assignment-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-rubric-dropdowns-test/prendus-rubric-dropdowns-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-rubric-table-test/prendus-rubric-table-test.html"> -->
+  <!-- <link rel="import" href="src/components/prendus-carousel-test/prendus-carousel-test.html"> -->
 </head>
 <body>
   <test-runner id="testRunner">
-    <prendus-carousel-test></prendus-carousel-test>
-    <prendus-rubric-dropdowns-test></prendus-rubric-dropdowns-test>
-    <prendus-rubric-table-test></prendus-rubric-table-test>
-    <prendus-course-question-ratings-test></prendus-course-question-ratings-test>
-    <prendus-assignment-shared-test></prendus-assignment-shared-test>
-    <prendus-assignment-authorization-test></prendus-assignment-authorization-test>
-    <prendus-review-assignment-test></prendus-review-assignment-test>
-    <prendus-grade-assignment-test></prendus-grade-assignment-test>
-    <prendus-respond-assignment-test></prendus-respond-assignment-test>
+      <authenticated-directive-resolver-test></authenticated-directive-resolver-test>
+    <!-- <prendus-carousel-test></prendus-carousel-test> -->
+    <!-- <prendus-rubric-dropdowns-test></prendus-rubric-dropdowns-test> -->
+    <!-- <prendus-rubric-table-test></prendus-rubric-table-test> -->
+    <!-- <prendus-course-question-ratings-test></prendus-course-question-ratings-test> -->
+    <!-- <prendus-assignment-shared-test></prendus-assignment-shared-test> -->
+    <!-- <prendus-assignment-authorization-test></prendus-assignment-authorization-test> -->
+    <!-- <prendus-review-assignment-test></prendus-review-assignment-test> -->
+    <!-- <prendus-grade-assignment-test></prendus-grade-assignment-test> -->
+    <!-- <prendus-respond-assignment-test></prendus-respond-assignment-test> -->
 
   </test-runner>
 
