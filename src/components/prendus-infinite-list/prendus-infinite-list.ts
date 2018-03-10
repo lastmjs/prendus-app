@@ -29,7 +29,7 @@ class PrendusInfiniteList extends Polymer.Element {
       },
       pageSize: {
         type: Number,
-        value: 5
+        value: 2
       },
       cursor: {
         type: Number,
@@ -85,16 +85,19 @@ class PrendusInfiniteList extends Polymer.Element {
     this.dispatchEvent(new CustomEvent('items-loaded'));
   }
   async _deleteItems(deleteItems: (items: any[]) => any[]){
-    console.log('deleteItems', deleteItems)
-    const newItems = await deleteItems(this.items);
-    console.log('newQuestions', newItems)
-    this.action = fireLocalAction(this.componentId, 'items', newItems);
-    this.action = fireLocalAction(this.componentId, 'cursor', this.cursor - 1);
+    const deletedItems = await deleteItems(this.items);
+    deletedItems.map((deletedItem: any)=>{
+      this.splice('items', this.items.indexOf(deletedItem), 1);
+    })
     const threshold = this.shadowRoot.querySelector('#threshold');
-    if (newItems.length < this.pageSize)
-      this.action = fireLocalAction(this.componentId, 'lowerThreshold', null);
-    else
-      threshold.clearLower();
+    // this.action = fireLocalAction(this.componentId, 'items', newItems);
+    this.action = fireLocalAction(this.componentId, 'cursor', this.cursor - 1);
+    // const threshold = this.shadowRoot.querySelector('#threshold');
+    console.log('threshold', threshold)
+    // if (newItems.length < this.pageSize)
+    //   this.action = fireLocalAction(this.componentId, 'lowerThreshold', null);
+    // else
+    //   threshold.clearLower();
     // const newItems = this.items.filter((item) => {
     //
     //   return item.id !== deletedItemId;

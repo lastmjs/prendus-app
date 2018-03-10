@@ -123,7 +123,7 @@ async function deleteQuestionFromGraphQLAndDOM(questionId: string, userToken: st
   const deletedQuestionId =  await performGQLDeleteQuestionGraphQLMutation(questionId, userToken);
   console.log('deleteQuestionId', deletedQuestionId);
   return questions.filter((question: Question) => {
-    return question.id !== deletedQuestionId;
+    return question.id === deletedQuestionId;
   })
 
 }

@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
@@ -12,8 +13,8 @@
     <template>
         <style include="prendus-styles">
         </style>
-
-        <paper-dialog id="prendus-modal">
+        
+        <paper-dialog horizontal-align="left" vertical-offset="100" id="prendus-modal">
           <h2>Confirm Delete</h2>
           <div class="content">
             [[content]]
