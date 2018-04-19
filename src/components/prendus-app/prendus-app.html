@@ -174,15 +174,58 @@
             </div>
 
             <div class="question-editor-container" show="createQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+                <prendus-edit-question
+                    user="[[user]]"
+                    user-token="[[userToken]]"
+                    multiple-choice-tool
+                    multiple-select-tool
+                    fill-in-the-blank-tool
+                    essay-tool
+                    code-tool
+                    variable-tool
+                    math-tool
+                    image-tool
+                    graph-tool
+                    reset-tool
+                ></prendus-edit-question>
             </div>
 
             <div class="question-editor-container" show="editQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question show="editQuestionView" question-id="[[editQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]"></prendus-edit-question>
+                <prendus-edit-question
+                    show="editQuestionView"
+                    question-id="[[editQuestionRouteData.questionId]]"
+                    user="[[user]]"
+                    user-token="[[userToken]]"
+                    multiple-choice-tool
+                    multiple-select-tool
+                    fill-in-the-blank-tool
+                    essay-tool
+                    code-tool
+                    variable-tool
+                    math-tool
+                    image-tool
+                    graph-tool
+                    reset-tool
+                ></prendus-edit-question>
             </div>
 
             <div class="question-editor-container" show="editDemoQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
-                <prendus-edit-question question-id="[[editDemoQuestionRouteData.questionId]]" user="[[user]]" user-token="[[userToken]]" no-save></prendus-edit-question>
+                <prendus-edit-question
+                    question-id="[[editDemoQuestionRouteData.questionId]]"
+                    user="[[user]]"
+                    user-token="[[userToken]]"
+                    no-save
+                    multiple-choice-tool
+                    multiple-select-tool
+                    fill-in-the-blank-tool
+                    essay-tool
+                    code-tool
+                    variable-tool
+                    math-tool
+                    image-tool
+                    graph-tool
+                    reset-tool
+                ></prendus-edit-question>
             </div>
 
             <prendus-question-examples show="examplesQuestionView" data-path="../prendus-question-examples/prendus-question-examples.html"></prendus-question-examples>
