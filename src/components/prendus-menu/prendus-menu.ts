@@ -22,6 +22,7 @@ class PrendusMenu extends Polymer.Element {
     async connectedCallback() {
       super.connectedCallback();
       this.action = fireLocalAction(this.componentId, 'menuOpen', true)
+
     }
 
     logout() {
@@ -42,6 +43,13 @@ class PrendusMenu extends Polymer.Element {
     }
     closeUserInfoDialog(e){
       this.shadowRoot.querySelector('#user-info').close();
+    }
+    isInstructor(user: User){
+      console.log('this.user', this.user, user)
+      if(this.user){
+        return this.user.role != "STUDENT" ? true : false;
+      }
+
     }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;

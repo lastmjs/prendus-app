@@ -96,10 +96,12 @@
           <hr>
           <a href="/quizzes/view"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
           <hr>
-          <!--
-          Adding courses...eventually
-          <a href="/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
-          <hr> -->
+          <dom-if if="[[isInstructor(user)]]">
+            <template>
+              <a href="/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
+              <hr>
+            </template>
+          </dom-if>
         </paper-listbox>
         <div id="legal-links">
           <!-- &copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span><br> -->&nbsp;&nbsp;&nbsp;
