@@ -102,7 +102,6 @@
         <app-route route="[[route]]" pattern="/course/:courseId/question-ratings" data="{{courseQuestionRatingsRouteData}}" active="{{courseQuestionRatingsRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/assignment/create" data="{{createAssignmentRouteData}}" active="{{createAssignmentRouteActive}}"></app-route>
-        <app-route route="[[route]]" pattern="/assignment/demo" data="{{demoAssignmentRouteData}}" active="{{demoAssignmentRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/create" data="{{assignmentCreateRouteData}}" active="{{assignmentCreateRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/review" data="{{assignmentReviewRouteData}}" active="{{assignmentReviewRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/assignment/:assignmentId/grade" data="{{assignmentGradeRouteData}}" active="{{assignmentGradeRouteActive}}"></app-route>
@@ -126,6 +125,7 @@
         <app-route route="[[route]]" pattern="/concept/:conceptId/edit" data="{{editConceptRouteData}}" active="{{editConceptRouteActive}}"></app-route>
 
         <app-route route="[[route]]" pattern="/question/create" data="{{createQuestionRouteData}}" active="{{createQuestionRouteActive}}"></app-route>
+        <app-route route="[[route]]" pattern="/question/playground" data="{{playgroundQuestionRouteData}}" active="{{playgroundQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/view" data="{{viewQuestionRouteData}}" active="{{viewQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/edit" data="{{editQuestionRouteData}}" active="{{editQuestionRouteActive}}"></app-route>
         <app-route route="[[route]]" pattern="/question/:questionId/demo" data="{{editDemoQuestionRouteData}}" active="{{editDemoQuestionRouteActive}}"></app-route>
@@ -151,7 +151,7 @@
           <app-toolbar>
         </app-header>
 
-        <iron-lazy-pages id="app-container" attr-for-selected="show" hide-immediately fallback-selection="404View" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, demoAssignmentRouteActive, passwordResetRouteActive)]]">
+        <iron-lazy-pages id="app-container" attr-for-selected="show" hide-immediately fallback-selection="404View" selected="[[getSelectedView(rootRouteActive, whatIsPrendusRouteActive, whyPrendusRouteActive, courseSetupRouteActive, howItWorksRouteActive, researchRouteActive, oerRouteActive, coursesRouteActive, createCourseRouteActive, viewCourseRouteActive, editCourseRouteActive, paymentCourseRouteActive, courseQuestionRatingsRouteActive, createAssignmentRouteActive, assignmentCreateRouteActive, assignmentReviewRouteActive, assignmentGradeRouteActive, assignmentQuizRouteActive, editAssignmentRouteActive, createDisciplineRouteActive, viewDisciplineRouteActive, editDisciplineRouteActive, createSubjectRouteActive, viewSubjectRouteActive, editSubjectRouteActive, createConceptRouteActive, viewConceptRouteActive, editConceptRouteActive, teacherApprovalRouteActive, learningStructureRouteActive, signupRouteActive, loginRouteActive, authenticateRouteActive, viewQuestionRouteActive, createQuestionRouteActive, editQuestionRouteActive, editDemoQuestionRouteActive, examplesQuestionRouteActive, openSourceRouteActive, passwordResetRouteActive, playgroundQuestionRouteActive)]]">
 
             <prendus-home-page class="app-window landing" show="rootView" data-path="../prendus-home-page/prendus-home-page.html"></prendus-home-page>
             <prendus-what-is-prendus class="app-window" show="whatIsPrendusView" data-path="../prendus-marketing/prendus-what-is-prendus.html"></prendus-what-is-prendus>
@@ -173,6 +173,33 @@
                 </div>
             </div>
 
+            <!--TODO put the playground into its own element-->
+            <div class="question-editor-container" show="playgroundQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
+                <br>
+                <h3>Go ahead and play around, everything will save locally.</h3>
+                <h4>The editor is fully open source and can be easily integrated into other applications as a custom HTML element: <a href="https://github.com/Prendus/prendus-question-elements" target="_blank">https://github.com/Prendus/prendus-question-elements</a></h4>
+                <br>
+                <prendus-edit-question
+                    user="[[user]]"
+                    user-token="[[userToken]]"
+                    question="[[getPlaygroundQuestion()]]"
+                    no-save
+                    multiple-choice-tool
+                    multiple-select-tool
+                    fill-in-the-blank-tool
+                    essay-tool
+                    code-tool
+                    variable-tool
+                    math-tool
+                    image-tool
+                    graph-tool
+                    reset-tool
+                    on-text-changed="playgroundQuestionTextChanged"
+                    on-code-changed="playgroundQuestionCodeChanged"
+                ></prendus-edit-question>
+                <br>
+            </div>
+
             <div class="question-editor-container" show="createQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
                 <prendus-edit-question
                     user="[[user]]"
@@ -188,6 +215,7 @@
                     graph-tool
                     reset-tool
                 ></prendus-edit-question>
+                <br>
             </div>
 
             <div class="question-editor-container" show="editQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
@@ -207,6 +235,7 @@
                     graph-tool
                     reset-tool
                 ></prendus-edit-question>
+                <br>
             </div>
 
             <div class="question-editor-container" show="editDemoQuestionView" data-path="../../node_modules/prendus-question-elements/prendus-edit-question.html">
@@ -226,6 +255,7 @@
                     graph-tool
                     reset-tool
                 ></prendus-edit-question>
+                <br>
             </div>
 
             <prendus-question-examples show="examplesQuestionView" data-path="../prendus-question-examples/prendus-question-examples.html"></prendus-question-examples>
