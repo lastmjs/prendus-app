@@ -22,7 +22,11 @@ class PrendusApp extends Polymer.Element {
         this.action = await getAndSetUser();
     }
 
+<<<<<<< HEAD
     getSelectedView(rootRouteActive: any, whatIsPrendusRouteActive: any, whyPrendusRouteActive: any, courseSetupRouteActive: any, howItWorksRouteActive: any, researchRouteActive: any, oerRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, viewQuestionsRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, demoAssignmentRouteActive: any, passwordResetRouteActive: any, userProfileRouteActive: any, createQuizRouteActive: any, editQuizRouteActive: any, viewQuizRouteActive: any, viewQuizzesRouteActive: any) {
+=======
+    getSelectedView(rootRouteActive: any, whatIsPrendusRouteActive: any, whyPrendusRouteActive: any, courseSetupRouteActive: any, howItWorksRouteActive: any, researchRouteActive: any, oerRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, passwordResetRouteActive: any, playgroundQuestionRouteActive: any) {
+>>>>>>> develop
         this.action = checkForUserToken();
         if (rootRouteActive){
           if(this.userToken){
@@ -121,11 +125,6 @@ class PrendusApp extends Polymer.Element {
           window.ga('send', 'pageview');
           return 'createAssignmentView';
         }
-        if (demoAssignmentRouteActive){
-          window.ga('set', 'page', this.route.path);
-          window.ga('send', 'pageview');
-          return 'assignmentDemoView';
-        }
         if (assignmentCreateRouteActive){
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
@@ -209,6 +208,11 @@ class PrendusApp extends Polymer.Element {
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'editConceptView';
+        }
+        if (playgroundQuestionRouteActive) {
+            window.ga('set', 'page', this.route.path);
+            window.ga('send', 'pageview');
+            return 'playgroundQuestionView';
         }
         if (viewQuestionRouteActive){
           window.ga('set', 'page', this.route.path);
@@ -315,6 +319,27 @@ class PrendusApp extends Polymer.Element {
      //     };
      // }
      //
+
+     //TODO put the playground into its own element
+     getPlaygroundQuestion() {
+         return {
+             text: window.localStorage.getItem('playground-question-text') || '',
+             code: window.localStorage.getItem('playground-question-code') || ''
+         };
+     }
+
+     //TODO put the playground into its own element
+     playgroundQuestionTextChanged(e: CustomEvent) {
+        console.log(e.detail);
+        window.localStorage.setItem('playground-question-text', e.detail.text);
+     }
+
+     //TODO put the playground into its own element
+     playgroundQuestionCodeChanged(e: CustomEvent) {
+        console.log(e.detail);
+        window.localStorage.setItem('playground-question-code', e.detail.code);
+     }
+
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
         this.user = state.user;

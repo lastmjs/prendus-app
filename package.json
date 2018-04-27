@@ -4,7 +4,7 @@
   "description": "The Prendus Application",
   "scripts": {
     "start": "cd src && node_modules/.bin/zwitterion --target ES2015 --watch-files",
-    "test": "xvfb-run -a electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
+    "test": "xvfb-run electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
     "test-window": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --window",
     "test-auto": "electron --enable-logging node_modules/scram-engine/main.js --entry-file test/index.html --auto-run",
     "postinstall": "npm install -g bower && bower install && cd src && npm install",
@@ -35,6 +35,10 @@
     "graphql": "^0.11.7",
     "guesswork": "^0.5.3",
     "oss-attribution-generator": "^1.4.0",
+<<<<<<< HEAD
     "scram-engine": "^0.6.18"
+=======
+    "scram-engine": "^0.6.22"
+>>>>>>> develop
   }
 }
