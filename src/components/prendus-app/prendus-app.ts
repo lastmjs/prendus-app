@@ -22,17 +22,13 @@ class PrendusApp extends Polymer.Element {
         this.action = await getAndSetUser();
     }
 
-<<<<<<< HEAD
-    getSelectedView(rootRouteActive: any, whatIsPrendusRouteActive: any, whyPrendusRouteActive: any, courseSetupRouteActive: any, howItWorksRouteActive: any, researchRouteActive: any, oerRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, viewQuestionsRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, demoAssignmentRouteActive: any, passwordResetRouteActive: any, userProfileRouteActive: any, createQuizRouteActive: any, editQuizRouteActive: any, viewQuizRouteActive: any, viewQuizzesRouteActive: any) {
-=======
-    getSelectedView(rootRouteActive: any, whatIsPrendusRouteActive: any, whyPrendusRouteActive: any, courseSetupRouteActive: any, howItWorksRouteActive: any, researchRouteActive: any, oerRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, passwordResetRouteActive: any, playgroundQuestionRouteActive: any) {
->>>>>>> develop
+    getSelectedView(rootRouteActive: any, whatIsPrendusRouteActive: any, whyPrendusRouteActive: any, courseSetupRouteActive: any, howItWorksRouteActive: any, researchRouteActive: any, oerRouteActive: any, coursesRouteActive: any, createCourseRouteActive: any, viewCourseRouteActive: any, editCourseRouteActive: any, paymentCourseRouteActive: any, courseQuestionRatingsRouteActive: any, createAssignmentRouteActive: any, assignmentCreateRouteActive: any, assignmentReviewRouteActive: any, assignmentGradeRouteActive: any, assignmentQuizRouteActive: any, editAssignmentRouteActive: any, createDisciplineRouteActive: any, viewDisciplineRouteActive: any, editDisciplineRouteActive: any, createSubjectRouteActive: any, viewSubjectRouteActive: any, editSubjectRouteActive: any, createConceptRouteActive: any, viewConceptRouteActive: any, editConceptRouteActive: any, teacherApprovalRouteActive: any, learningStructureRouteActive: any, signupRouteActive: any, loginRouteActive: any, authenticateRouteActive: any, viewQuestionRouteActive: any, createQuestionRouteActive: any, editQuestionRouteActive: any, viewQuestionsRouteActive: any, editDemoQuestionRouteActive: any, examplesQuestionRouteActive: any, openSourceRouteActive: any, demoAssignmentRouteActive: any, passwordResetRouteActive: any, userProfileRouteActive: any, viewUserQuestionsRouteActive: any, viewUserQuizzesRouteActive: any, viewUserCoursesRouteActive: any, createQuizRouteActive: any, editQuizRouteActive: any, viewQuizRouteActive: any, viewQuizzesRouteActive: any, playgroundQuestionRouteActive: any) {
         this.action = checkForUserToken();
         if (rootRouteActive){
           if(this.userToken){
             window.ga('set', 'page', '/questions/view');
             window.ga('send', 'pageview');
-            return 'viewQuestionsView';
+            return 'viewUserQuestionsView';
           }else{
             window.ga('set', 'page', '/');
             window.ga('send', 'pageview');
@@ -225,7 +221,6 @@ class PrendusApp extends Polymer.Element {
           return 'createQuestionView';
         }
         if (editQuestionRouteActive){
-          console.log('edit question route')
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'editQuestionView';
@@ -254,6 +249,21 @@ class PrendusApp extends Polymer.Element {
           window.ga('set', 'page', this.route.path);
           window.ga('send', 'pageview');
           return 'userProfileView';
+        }
+        if (viewUserQuestionsRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewUserQuestionsView';
+        }
+        if (viewUserQuizzesRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewUserQuizzesView';
+        }
+        if (viewUserCoursesRouteActive){
+          window.ga('set', 'page', this.route.path);
+          window.ga('send', 'pageview');
+          return 'viewUserCoursesView';
         }
         if (createQuizRouteActive){
           window.ga('set', 'page', this.route.path);
@@ -330,7 +340,6 @@ class PrendusApp extends Polymer.Element {
 
      //TODO put the playground into its own element
      playgroundQuestionTextChanged(e: CustomEvent) {
-        console.log(e.detail);
         window.localStorage.setItem('playground-question-text', e.detail.text);
      }
 

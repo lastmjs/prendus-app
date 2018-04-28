@@ -535,7 +535,6 @@ permissions:
 # Purchase Update
 # Purchase Delete
 
-<<<<<<< HEAD
 # Institution Create
 - operation: Institution.create
 
@@ -551,13 +550,6 @@ permissions:
 - operation: Institution.delete
   authenticated: true
   query: ./permission-queries/institution/institution-delete.graphql
-=======
-#### License Permissions
-- operation: License.read
-
-#### Visibility Permissions
-- operation: Visibility.read
->>>>>>> develop
 
 #### Relations Permissions
 

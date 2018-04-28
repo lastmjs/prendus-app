@@ -29,7 +29,7 @@ class PrendusInfiniteList extends Polymer.Element {
       },
       pageSize: {
         type: Number,
-        value: 2
+        value: 10
       },
       cursor: {
         type: Number,

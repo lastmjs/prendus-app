@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<!-- <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html"> -->
+<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
+<link rel="import" href="../prendus-ui/prendus-delete-confirmation-modal.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-infinite-list/prendus-infinite-list.html">
+
+<dom-module id="prendus-user-questions">
+    <template>
+      <style include="prendus-styles">
+        paper-fab{
+          --paper-fab-background: var(--prendus-primary-color);
+          position: fixed;
+          bottom: 30px;
+          right: calc(5vw + 256px);
+        }
+        #questions-block{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+        prendus-question-viewer-wrapper{
+          margin-left: 2vw;
+          margin-bottom: 2vh;
+          min-width: 350px;
+        }
+        @media (max-width: 645px) {
+          paper-fab{
+            right: 5vw;
+          }
+        }
+        #questionsList{
+          width: calc(100vw - 256px);
+          height: calc(100vh - 100px);
+        }
+        .title{
+          display: flex;
+          justify-content: center;
+          margin-bottom: 5vh;
+        }
+      </style>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+      <dom-if if="[[loaded]]">
+          <template>
+            <dom-if if="[[!questions]]">
+              <template>
+                <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
+              </template>
+            </dom-if>
+            <dom-if if="[[questions.length]]">
+              <template>
+                <h1 class="title">My Questions</h1>
+              </template>
+            </dom-if>
+            <div id="questions-block">
+              <prendus-infinite-list id="questionsList" next="[[fetchQuestions]]" delete-items="[[deleteItem]]">
+                <template>
+                  <!-- Style is inline because this component is embedded in the infinite list and the shadowDOM prevents access to setting the styles. -->
+                  <div class="question-item" style="padding-top:75px; padding-left:25px;">
+                    <prendus-question-viewer-wrapper id="question[[item.id]]" question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
+                    <prendus-delete-confirmation-modal id="[[item.id]]" on-delete="deleteQuestion"></prendus-delete-confirmation-modal>
+                  </div>
+                  </template>
+              </prendus-infinite-list>
+            </div>
+            <a href="/question/create" id="addQuestionButton"><paper-fab icon="add"></paper-fab></a>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-user-questions.ts"></script>
+</dom-module>

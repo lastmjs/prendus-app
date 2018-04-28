@@ -38,14 +38,10 @@ class PrendusMenu extends Polymer.Element {
     openUserInfoDialog(){
       this.shadowRoot.querySelector('#user-info').opened === true ? this.shadowRoot.querySelector('#user-info').close() :  this.shadowRoot.querySelector('#user-info').open()
     }
-    modalChangeLog(e){
-      console.log('e.change', e)
-    }
     closeUserInfoDialog(e){
       this.shadowRoot.querySelector('#user-info').close();
     }
     isInstructor(user: User){
-      console.log('this.user', this.user, user)
       if(this.user){
         return this.user.role != "STUDENT" ? true : false;
       }
