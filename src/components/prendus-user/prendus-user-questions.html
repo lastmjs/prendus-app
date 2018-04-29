@@ -11,6 +11,7 @@
 <link rel="import" href="../prendus-question/prendus-question-viewer-wrapper.html">
 <link rel="import" href="../prendus-ui/prendus-delete-confirmation-modal.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 <link rel="import" href="../prendus-infinite-list/prendus-infinite-list.html">
 
 <dom-module id="prendus-user-questions">
@@ -51,7 +52,9 @@
 
       <dom-if if="[[loaded]]">
           <template>
-            <dom-if if="[[!questions]]">
+            [[questions]]
+            [[questions.length]]
+            <dom-if if="[[!questions.length]]">
               <template>
                 <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
               </template>
