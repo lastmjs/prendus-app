@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
@@ -10,19 +12,28 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
 
 <dom-module id="prendus-courses">
     <template>
         <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
         <style include="prendus-styles">
-          #add-course-button{
+          paper-fab{
+            --paper-fab-background: var(--prendus-primary-color);
+            position: fixed;
+            bottom: 30px;
+            right: calc(5vw + 256px);
+          }
+          #add-course-modal{
             margin-top: 15px;
             display: block;
+            min-width: 300px;
           }
           .course-card{
-            width: 30%;
-            min-width: 300px;
+            width: 26%;
+            min-width: 270px;
             margin-right: 20px;
             margin-bottom: 20px;
             --paper-card-header-text: {
@@ -34,7 +45,11 @@
         </style>
         <dom-if if="[[loaded]]">
             <template>
-      				  <h1>Courses</h1>
+                <dom-if if="[[!courses.length]]">
+                  <template>
+                    <prendus-no-content-card parent-component="Course" plural="Courses" primary-redirect-url="course/create" secondary-redirect-url="course/search" display-icon="social:school"></prendus-no-content-card>
+                  </template>
+                </dom-if>
                 <dom-repeat items="[[courses]]" class="courses-container">
                     <template>
                       <paper-card class="course-card" heading="[[item.title]]">
@@ -52,12 +67,12 @@
                       </paper-card>
                     </template>
                 </dom-repeat>
-                <div id="add-course-button">
-                  <button class="prendus-button prendus-button--recommended" on-click="openCreateCourseDialog">Add Course </button>
-                </div>
                 <paper-dialog id="add-course-modal" modal>
                   <div class="content">
                     <h2>Add Course</h2>
+                    <paper-input id="department" name="department" label="Department" maxlength="50" on-keydown="findDisciplines" required auto-validate error-message="Please enter a department." autoFocus on-keydown="submitOnEnter"></paper-input>
+                    <paper-input id="courseNumber" name="courseNumber" label="Course Number" maxlength="50" required auto-validate error-message="Please enter a course number." autoFocus on-keydown="submitOnEnter"></paper-input>
+                    <paper-input id="subject" name="subject" label="Subject" maxlength="50" required auto-validate error-message="Please enter a subject." autoFocus on-keydown="submitOnEnter"></paper-input>
                     <paper-input id="titleInput" name="title" label="Course Title" maxlength="50" required auto-validate error-message="Please enter a title." autoFocus on-keydown="submitOnEnter"></paper-input>
                   </div>
                   <div class="buttons">
@@ -75,6 +90,7 @@
                     <button class="prendus-button prendus-button--destructive" on-click="deleteCourse">Delete</button>
                   </div>
                 </paper-dialog>
+                <a href="/course/create" id="addCourseButton"><paper-fab icon="add"></paper-fab></a>
             </template>
         </dom-if>
         <dom-if if="[[!loaded]]">

@@ -1,11 +1,12 @@
 import {
   User,
-  Course
-} from '../../../../src/typings/index.d';
+  Course,
+  Question
+} from '../../../src/prendus.d';
 import {assignCourseUserIds} from './utilities-service';
 import {schema} from '../graphcool/testSchema';
-import {GQLRequest} from '../../../../src/node_modules/prendus-shared/services/graphql-service';
-import {createUUID} from '../../../../src/node_modules/prendus-shared/services/utilities-service';
+import {GQLRequest} from '../../../src/node_modules/prendus-shared/services/graphql-service';
+import {asyncMap, asyncForEach, createUUID} from '../../../src/node_modules/prendus-shared/services/utilities-service';
 
 const {
   getNamedType,
@@ -35,9 +36,13 @@ function dependencySort(typeA, typeB): number {
 
 export async function saveArbitrary(arb, name: string): Promise<object> {
   const mut = schema.getMutationType().getFields()[name];
-  const gql = mutation(arb, mut, name);
-  const data = await GQLRequest(gql, arb, AUTH_TOKEN, handleError);
-  return data[name];
+  try{
+    const gql = mutation(arb, mut, name);
+    const data = await GQLRequest(gql, arb, AUTH_TOKEN, handleError);
+    return data[name];
+  }catch(error){
+    return error;
+  }
 }
 
 export async function deleteArbitrary(data, name: string) {
@@ -182,6 +187,33 @@ export async function createTestUser(role: string, name: string): Promise<User> 
     role,
     token: data.authenticateUser.token
   }
+}
+
+export async function createTestQuestions(user: User, questions: Question[]): Promise<Question[]> {
+  const savedQuestions: Question[] = await asyncMap(questions, async (question: Question) => {
+    const data = await GQLRequest(`
+        mutation createQuestion(
+            $authorId: ID!
+            $text: String!
+            $code: String!
+        ) {
+            createQuestion(
+                authorId: $authorId
+                licenseId: "cje4v9u7x4ftk0189pzb1sbkj"
+                text: $text
+                code: $code
+            ) {
+                id
+                text
+                code
+            }
+        }
+    `, {authorId: user.id, text: question.text, code: question.code}, user.token, (error: any) => {
+        console.log(error);
+    });
+    return data.createQuestion;
+  });
+  return savedQuestions;
 }
 
 export async function deleteTestUsers(...users: User[]): Promise<object> {

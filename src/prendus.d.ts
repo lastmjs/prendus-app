@@ -49,6 +49,14 @@ export interface LTIUser {
   readonly user: User;
 }
 
+export interface Institution {
+    readonly id: string,
+    readonly name: string,
+    readonly abbreviation: string,
+    readonly country: string,
+    readonly state: string,
+    readonly city: string
+}
 export interface Question {
   readonly id: string;
   readonly createdAt: Date;

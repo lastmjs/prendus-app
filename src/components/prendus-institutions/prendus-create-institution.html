@@ -1,0 +1,29 @@
+<!-- <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+<dom-module id="prendus-create-institution">
+    <template>
+        <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+        <style include="prendus-styles">
+          .buttons{
+            float: right;
+            margin-bottom: 15px;
+          }
+        </style>
+        <h2>Add Institution</h2>
+        <paper-input id="institutionName" name="institutionName" label="Name of School or Business" maxlength="50" required auto-validate error-message="Please enter a name for your Institution." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
+        <paper-input id="institutionAbbreviation" name="institutionAbbreviation" label="Abbreviation" maxlength="5" autoFocus on-keydown="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
+        <paper-input id="institutionCountry" name="country" label="Country" maxlength="50" required auto-validate error-message="Please enter the country." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
+        <paper-input id="institutionState" name="state" label="State" maxlength="50" required auto-validate error-message="Please enter a state." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
+        <paper-input id="institutionCity" name="city" label="City" maxlength="50" required auto-validate error-message="Please enter a city." autoFocus on-keyup="enableCreateInstitutionAndSubmitOnEnter"></paper-input>
+        <div class="buttons">
+          <button class="prendus-button prendus-button--minor" dialog-dismiss on-click="fireCancelDialog">Cancel</button>
+          <button class="prendus-button prendus-button--recommended" disabled="[[createInstitutionButtonDisabled]]" on-click="createInstitution">Submit</button>
+        </div>
+    </template>
+
+    <script type="module" src="prendus-create-institution.ts"></script>
+</dom-module> -->

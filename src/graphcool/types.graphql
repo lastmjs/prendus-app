@@ -28,6 +28,7 @@ type User @model {
   questionRatings: [QuestionRating!]! @relation(name: "RaterOnQuestionRating")
   userAnalytics: [PrendusAnalytics!]! @relation(name: "UserOnPrendusAnalytics")
   purchases: [Purchase!]! @relation(name: "UserPurchases")
+  institution: [Institution!]! @relation(name: "UsersInstitution")
   createAssignmentEditorChosen: Boolean! @defaultValue(value: true)
 }
 
@@ -280,7 +281,18 @@ type LTISession @model {
     updatedAt: DateTime!
     serializedOutcomeService: Json!
 }
-
+type Institution @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    name: String!
+    abbreviation: String
+    country: String!
+    state: String!
+    city: String!
+    users: [User!]! @relation(name: "UsersInstitution")
+    approved: PrendusApproved! @defaultValue(value: TBD)
+  }
 type License @model {
     id: ID! @isUnique
     createdAt: DateTime!

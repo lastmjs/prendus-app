@@ -1,0 +1,112 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-tooltip. Remove it when possible -->
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-autocomplete/paper-autocomplete-suggestions.html">
+<link rel="import" href="../prendus-search/prendus-search-institutions.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+<link rel="import" href="../prendus-institutions/prendus-create-institution.html">
+
+
+<dom-module id="prendus-course-create">
+    <template>
+        <redux-store id="reduxStoreElement" on-statechange="stateChange" action="[[action]]"></redux-store>
+        <style include="prendus-styles">
+        #create-course-card{
+          min-width: 300px;
+          width: 50vw;
+          padding: 2%;
+          margin: auto 0;
+          /*clean this up when we have time*/
+          left: 15%;
+          --paper-card-header-text: {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            };
+        }
+        .giveMeSomeSpace{
+          margin-top: 5vh;
+        }
+        .add-item{
+          display: block;
+          margin-top: 15px;
+        }
+        .add-item-text{
+          color: blue;
+          cursor: pointer;
+        }
+        #create-institution-modal{
+          width: 50vw;
+        }
+        </style>
+        <dom-if if="[[loaded]]">
+            <template>
+              <paper-card id="create-course-card">
+                <h1>Create Course</h1>
+                <form on-keydown="createCourseOnEnter">
+                  <prendus-search-institutions></prendus-search-institutions>
+                  <paper-input id="courseTitle" name="title" label="Course Title" required></paper-input>
+                  <paper-input id="department" name="department" label="Department" maxlength="50" on-keydown="findDisciplines" required auto-validate error-message="Please enter a department." autoFocus on-keydown="submitOnEnter"></paper-input>
+                  <span class="add-item">Don't see the right department? <span class="add-item-text" on-click="openCreateDepartmentModal">Add Department</span>
+                  <paper-input id="courseNumber" name="courseNumber" label="Course Number" maxlength="50" required auto-validate error-message="Please enter a course number." autoFocus on-keydown="submitOnEnter"></paper-input>
+                  <paper-input id="subject" name="subject" label="Subject" maxlength="50" required auto-validate error-message="Please enter a subject." autoFocus on-keydown="submitOnEnter"></paper-input>
+                  <span class="add-item">Don't see the right subject? <span class="add-item-text" on-click="openCreateSubjectModal">Add Subject</span>
+
+                </form>
+              <div>
+                <button class="giveMeSomeSpace prendus-button prendus-button--recommended" disabled="[[!signupButtonEnabled]]" on-click="createCourse">Create Course</button>
+              </div>
+              </paper-card>
+              <paper-dialog id="create-institution-modal" modal opened="[[createInstitutionModalOpen]]">
+                <!-- Wrapped in a div solely for stylistic issues -->
+                <div>
+                  <prendus-create-institution on-institution-created="setInstitution" on-cancel-dialog="closeCreateInstitutionModal"></prendus-create-institution>
+                </div>
+              </paper-dialog>
+              <paper-dialog id="create-discipline" with-backdrop>
+                  <div class="content">
+                    <h2 id ="dialog-header">Create New Discipline</h2>
+                    <paper-input id="discipline-title" id="disciplineTitle" label="Discipline" autofocus on-keydown="createDisciplineOnEnter"></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--minor" on-click="cancelDisciplineDialog">Cancel</button>
+                    <button id="save-new-discipline" class="prendus-button prendus-button--recommended" on-click="createDiscipline">Save</button>
+                  </div>
+              </paper-dialog>
+              <paper-dialog id="create-subject" with-backdrop>
+                  <div class="content">
+                    <h2 id="dialog-header">Create New Subject</h2>
+                    <paper-input id="subject-title" id="subjectTitle" label="Subject" autofocus on-keydown="createSubjectOnEnter"></paper-input>
+                  </div>
+                  <div class="buttons">
+                    <button class="prendus-button prendus-button--minor" on-click="cancelSubjectDialog">Cancel</button>
+                    <button id="save-new-subject" class="prendus-button prendus-button--recommended" on-click="createSubject">Save</button>
+                  </div>
+              </paper-dialog>
+            </template>
+        </dom-if>
+
+        <dom-if if="[[!loaded]]">
+            <template>
+                Loading...
+            </template>
+        </dom-if>
+
+    </template>
+
+    <script type="module" src="prendus-course-create.ts"></script>
+</dom-module>

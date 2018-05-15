@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcryptjs": "^2.4.3",
     "graphcool-lib": "0.0.3",
     "ims-lti": "^3.0.2",
     "jsonwebtoken": "^8.1.0",

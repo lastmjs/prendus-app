@@ -11,6 +11,8 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     userToken: string | null;
     user: User | null;
     newCourseTitle: string | null;
+    client: any;
+    index: any;
 
     static get is() { return 'prendus-courses'; }
 
@@ -69,6 +71,29 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
             value: data[courseKey]
         };
     }
+    findDisciplines(){
+      this.client = algoliasearch("A8Q4DSJYC8", "beae44a49319e914ae864dc85bc6f957");
+      this.index = this.client.initIndex('Discipline');
+      const departmentPartialName: string = this.shadowRoot.querySelector('#department').value;
+      const that = this;
+      this.index.search(
+        {
+          query: departmentPartialName,
+          attributesToRetrieve: ['title', 'id'],
+          hitsPerPage: 3,
+        },
+        function searchDone(err: Error, content: any) {
+          if (err) {
+            console.error(err);
+            return err;
+          }
+          const departmentNames = content.hits.map(hit => hit.title);
+          // that.institutions = institutionNames;
+          console.log('departmentNames', departmentNames)
+          return departmentNames;
+        }
+      );
+    }
     async openDeleteModal(e: any): void {
       e.stopPropagation();
 			e.preventDefault();
@@ -96,6 +121,9 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
     }
     async createCourse(){
       const title = this.shadowRoot.querySelector('#titleInput').value;
+      const disciplineId = this.shadowRoot.querySelector('#department').value;
+      const subjectId = this.shadowRoot.querySelector('#subject').value;
+      const courseNumber = this.shadowRoot.querySelector('#courseNumber').value;
       if(title){
         const data = await GQLRequest(`
             mutation create($title: String!, $id: ID!) {
@@ -107,7 +135,7 @@ class PrendusCourses extends Polymer.Element implements ContainerElement {
                   title
                 }
             }
-        `, {title, id: this.user.id}, this.userToken, (error: any) => {
+        `, {title, disciplineId, subjectId, courseNumber, id: this.user.id}, this.userToken, (error: any) => {
           this.action = setNotification(error.message, NotificationType.ERROR)
         });
         this.shadowRoot.querySelector('#add-course-modal').value = null;

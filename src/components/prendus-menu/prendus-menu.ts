@@ -1,0 +1,55 @@
+import {GQLRequest} from '../../node_modules/prendus-shared/services/graphql-service';
+import {createUUID, fireLocalAction, navigate} from '../../node_modules/prendus-shared/services/utilities-service';
+import {EMAIL_REGEX, NotificationType} from '../../services/constants-service';
+import {SetPropertyAction, DefaultAction} from '../../typings/actions';
+import {setNotification, checkForUserToken, getAndSetUser, removeUser, removeUserToken} from '../../redux/actions';
+import {User} from '../../typings/user';
+
+class PrendusMenu extends Polymer.Element {
+    action: SetPropertyAction | DefaultAction;
+    user: User;
+    userToken: string;
+    componentId: string;
+    menuOpen: boolean;
+
+    static get is() { return 'prendus-menu'; }
+
+    constructor() {
+      super();
+      this.componentId = createUUID();
+    }
+
+    async connectedCallback() {
+      super.connectedCallback();
+    }
+
+    logout() {
+      if (this.userToken){
+        this.action = removeUser();
+        this.action = removeUserToken();
+        navigate(`/login`)
+      }
+    }
+    changeMenuOpen(e){
+      (e.detail.value === false) ? this.action = {type: 'SET_PROPERTY', key: 'menuOpen', value: false} : this.action = {type: 'SET_PROPERTY', key: 'menuOpen', value: true};
+    }
+    openUserInfoDialog(){
+      this.shadowRoot.querySelector('#user-info').opened === true ? this.shadowRoot.querySelector('#user-info').close() :  this.shadowRoot.querySelector('#user-info').open()
+    }
+    closeUserInfoDialog(e){
+      this.shadowRoot.querySelector('#user-info').close();
+    }
+    isInstructor(user: User){
+      if(this.user){
+        return this.user.role != "STUDENT" ? true : false;
+      }
+
+    }
+    stateChange(e: CustomEvent) {
+        const state: State = e.detail.state;
+        this.user = state.user;
+        this.userToken = state.userToken;
+    }
+}
+
+window.customElements.define(PrendusMenu.is, PrendusMenu);

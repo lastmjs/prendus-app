@@ -1,0 +1,79 @@
+<!-- <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+<link rel="import" href="../prendus-notification/prendus-notification.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../node_modules/prendus-question-elements/prendus-view-question.html">
+<link rel="import" href="../prendus-ui/prendus-no-content-card.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../prendus-ui/prendus-styles.html">
+
+
+<dom-module id="prendus-user-quizzes">
+    <template>
+      <style include="prendus-styles">
+        paper-fab{
+          --paper-fab-background: var(--prendus-primary-color);
+          position: fixed;
+          bottom: 30px;
+          right: 300px;
+        }
+        .quiz-card{
+          min-width: 300px;
+          width: 30%;
+          max-width: 30%;
+          margin-left: 2vw;
+          margin-bottom: 2vh;
+        }
+        .title{
+          display: flex;
+          justify-content: center;
+          margin-bottom: 5vh;
+        }
+      </style>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+
+      <dom-if if="[[loaded]]">
+          <template>
+            <dom-if if="[[!quizzes.length]]">
+              <template>
+                <prendus-no-content-card parent-component="Quiz" plural="Quizzes" primary-redirect-url="quiz/create" secondary-redirect-url="quiz/search" display-icon="editor:format-list-bulleted"></prendus-no-content-card>
+              </template>
+            </dom-if>
+            <dom-if if="[[quizzes.length]]">
+              <template>
+                <h1 class="title">My Quizzes</h1>
+              </template>
+            </dom-if>
+            <dom-repeat items="[[quizzes]]">
+              <template>
+                <paper-card class="quiz-card" heading="[[item.title]]">
+                  <div class="card-actions">
+                    <a href="quiz/[[item.id]]/view"><paper-icon-button id="view-quiz" class="prendus-icon-button" icon="view-list"></paper-icon-button></a>
+                    <paper-tooltip for="view-quiz" offset="0" animation-delay="300">Take Quiz</paper-tooltip>
+                    <a href="quiz/[[item.id]]/edit"><iron-icon id="edit-quiz" class="prendus-icon-button" icon="create"></iron-icon></a>
+                    <paper-tooltip for="edit-quiz" offset="0" animation-delay="300">Edit Quiz</paper-tooltip>
+                    <paper-icon-button id="[[item.id]]" class="prendus-icon-button" icon="delete" on-click="deleteQuiz"></paper-icon-button>
+                    <paper-tooltip for="[[item.id]]" offset="0" animation-delay="300">Remove Quiz</paper-tooltip>
+                  </div>
+                </paper-card>
+              </template>
+            </dom-repeat>
+            <a href="/quiz/create"><paper-fab icon="add"></paper-fab></a>
+          </template>
+      </dom-if>
+
+      <dom-if if="[[!loaded]]">
+          <template>
+              Loading...
+          </template>
+      </dom-if>
+    </template>
+
+    <script type="module" src="prendus-user-quizzes.ts"></script>
+</dom-module> -->

@@ -1,0 +1,130 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
+
+<dom-module id="prendus-menu">
+  <template>
+    <style include="prendus-styles">
+      app-drawer{
+        top: 64px;
+        /*Need this to be 0*/
+        bottom: 0;
+      }
+      a:hover, a:visited, a:link, a:active{
+          text-decoration: none;
+      }
+      #menu{
+        /*This is because the app-drawer has padding of 120px. Annoying. Open to other ways to get rid of the padding*/
+        margin-top: -184px;
+      }
+      .menu-items  paper-item{
+        cursor: pointer;
+        text-transform: uppercase;
+        font-style: normal;
+        font-variant-ligatures: normal;
+        font-variant-caps: normal;
+        font-variant-numeric: normal;
+        font-weight: 500;
+        font-stretch: normal;
+        font-size: 18px;
+        line-height: normal;
+        font-family: Roboto, sans-serif;
+        color: gray;
+        width: 100%;
+      }
+      .menu-items  paper-item:hover{
+        color: var(--prendus-primary-color);
+      }
+      #legal-links{
+        position: absolute;
+        bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+      }
+      #account-info{
+        cursor: pointer;
+        text-transform: uppercase;
+        font-style: normal;
+        font-variant-ligatures: normal;
+        font-variant-caps: normal;
+        font-variant-numeric: normal;
+        font-weight: 500;
+        font-stretch: normal;
+        font-size: 18px;
+        line-height: normal;
+        font-family: Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        color: white;
+      }
+      #truncated-email{
+        width: 165px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #account-item{
+        padding: 0;
+      }
+      .legal-link{
+        margin-left: 1vw;
+      }
+    </style>
+
+    <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+    <app-drawer-layout>
+      <app-drawer id="menu" slot="drawer" align="right" opened="[[menuOpen]]" on-opened-changed="changeMenuOpen">
+        <app-header id="prendus-navbar" fixed>
+          <app-toolbar>
+            <paper-menu-button vertical-align="bottom" horizontal-align="left" id='account-info'>
+              <paper-item id="account-item" slot="dropdown-trigger" on-click="openUserInfoDialog"><iron-icon icon="account-circle"></iron-icon>&nbsp; <span id="truncated-email">[[user.email]]</span></paper-item>
+            </paper-menu-button>
+          <app-toolbar>
+        </app-header>
+        <paper-listbox class="menu-items">
+          <a href="/user/[[user.id]]/questions"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
+          <hr>
+          <!-- <a href="/user/[[user.id]]/quizzes"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
+          <hr>
+          <dom-if if="[[isInstructor(user)]]">
+            <template>
+              <a href="/user/[[user.id]]/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
+              <hr>
+            </template>
+          </dom-if> -->
+        </paper-listbox>
+        <div id="legal-links">
+          <!-- &copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span><br> -->
+          <a class="legal-link" target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
+          <a class="legal-link" target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
+          <!-- <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms</a>&nbsp;&nbsp;&nbsp;
+          <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>&nbsp;&nbsp;&nbsp; -->
+          <a class="legal-link" href="/open-source">Open Source</a>
+        </div>
+      </app-drawer>
+    </app-drawer-layout>
+    <paper-dialog id="user-info" vertical-align="top" horizontal-align="right" on-open-changed="modalChangeLog">
+      <paper-listbox class="menu-items">
+        Signed in as [[user.email]]
+        <a href="/account"><paper-item on-click="closeUserInfoDialog"><iron-icon icon="account-circle"></iron-icon>&nbsp; My Profile</paper-item></a>
+        <hr>
+        <a><paper-item on-click="logout">Log Out</paper-item></a>
+      </paper-listbox>
+    </paper-dialog>
+  </template>
+
+  <script type="module" src="prendus-menu.ts"></script>
+</dom-module>

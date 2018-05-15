@@ -5,6 +5,12 @@
       OR:[{
         role: ADMIN
       }, {
+        ownedQuestions_some:{
+          author: {
+            id: $user_id
+          }
+        }
+      },{
         ownedCourses_some: {
           assignments_some: {
             questions_some: {
