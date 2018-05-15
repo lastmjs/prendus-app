@@ -79,6 +79,9 @@
       #account-item{
         padding: 0;
       }
+      .legal-link{
+        margin-left: 1vw;
+      }
     </style>
 
     <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
@@ -94,20 +97,22 @@
         <paper-listbox class="menu-items">
           <a href="/user/[[user.id]]/questions"><paper-item><iron-icon icon="speaker-notes"></iron-icon>&nbsp; My Questions</paper-item></a>
           <hr>
-          <a href="/user/[[user.id]]/quizzes"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
+          <!-- <a href="/user/[[user.id]]/quizzes"><paper-item><iron-icon icon="editor:format-list-numbered"></iron-icon>&nbsp; My Quizzes</paper-item></a>
           <hr>
           <dom-if if="[[isInstructor(user)]]">
             <template>
               <a href="/user/[[user.id]]/courses"><paper-item><iron-icon icon="social:school"></iron-icon>&nbsp; My Courses</paper-item></a>
               <hr>
             </template>
-          </dom-if>
+          </dom-if> -->
         </paper-listbox>
         <div id="legal-links">
-          <!-- &copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span><br> -->&nbsp;&nbsp;&nbsp;
-          <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms</a>&nbsp;&nbsp;&nbsp;
-          <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>&nbsp;&nbsp;&nbsp;
-          <a href="/open-source">Licenses</a>
+          <!-- &copy; [[getYear()]]&nbsp;<span class="long-text">Prendus LLC</span><br> -->
+          <a class="legal-link" target="_blank" href="https://github.com/Prendus/content/blob/master/terms-of-use.md">Terms of Use</a>
+          <a class="legal-link" target="_blank" href="https://github.com/Prendus/content/blob/master/privacy-policy.md">Privacy Policy</a>
+          <!-- <a target="_blank" href="https://github.com/Prendus/blob/master/terms-of-use.md">Terms</a>&nbsp;&nbsp;&nbsp;
+          <a target="_blank" href="https://github.com/Prendus/blob/master/privacy-policy.md">Privacy Policy</a>&nbsp;&nbsp;&nbsp; -->
+          <a class="legal-link" href="/open-source">Open Source</a>
         </div>
       </app-drawer>
     </app-drawer-layout>

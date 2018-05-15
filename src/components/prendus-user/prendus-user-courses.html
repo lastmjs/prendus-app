@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
@@ -6,7 +6,6 @@
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<!-- The neon-animation import is a polyfill, even for Chrome. It's necessary to support paper-tooltip. Remove it when possible -->
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -53,9 +52,6 @@
                 <dom-repeat items="[[courses]]" class="courses-container">
                     <template>
                       <paper-card class="course-card" heading="[[item.title]]">
-                        <div class="card-content">
-                          <!-- What are we going to put here?  -->
-                        </div>
                         <div class="card-actions">
                           <a href="course/[[item.id]]/edit"><iron-icon id="edit-course" class="prendus-icon-button" icon="create"></iron-icon></a>
                           <paper-tooltip for="edit-course" offset="0" animation-delay="300">Edit Course</paper-tooltip>
@@ -102,4 +98,4 @@
     </template>
 
     <script type="module" src="prendus-user-courses.ts"></script>
-</dom-module>
+</dom-module> -->

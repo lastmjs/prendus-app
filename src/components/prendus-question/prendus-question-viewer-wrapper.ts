@@ -55,10 +55,10 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   async connectedCallback() {
     super.connectedCallback();
     this.action = fireLocalAction(this.componentId, 'loaded', false);
-    !this.add ? this.action = fireLocalAction(this.componentId, 'add', false) : this.add;
-    !this.edit ? this.action = fireLocalAction(this.componentId, 'edit', false) : this.edit;
-    !this.delete ? this.action = fireLocalAction(this.componentId, 'delete', false) : this.delete;
-    !this.noActions ? this.action = fireLocalAction(this.componentId, 'noActions', false) : this.noActions;
+    this.action = fireLocalAction(this.componentId, 'add', this.add);
+    this.action = fireLocalAction(this.componentId, 'edit', this.edit);
+    this.action = fireLocalAction(this.componentId, 'delete', this.delete);
+    this.action = fireLocalAction(this.componentId, 'noActions', this.noActions);
     this.action = fireLocalAction(this.componentId, 'loaded', true);
   }
   questionLoaded(e){
@@ -66,8 +66,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   }
   fireAddQuestion(e){
     const questionId = e.target.dataset.questionid;
-    this.dispatchEvent(new CustomEvent('added', {
-        bubbles: false,
+    this.dispatchEvent(new CustomEvent('question-added', {
         detail: {
           questionId,
         }
@@ -75,7 +74,7 @@ class PrendusQuestionViewerWrapper extends Polymer.Element {
   }
   fireRemoveQuestion(e){
     const questionId = e.target.dataset.questionid;
-    this.dispatchEvent(new CustomEvent('deleted', {
+    this.dispatchEvent(new CustomEvent('question-deleted', {
         bubbles: false,
         detail: {
           questionId,

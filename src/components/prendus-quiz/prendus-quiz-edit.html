@@ -1,11 +1,11 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!-- <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-notification/prendus-notification.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html"> -->
 <!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<!-- <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
@@ -72,9 +72,9 @@
           margin-left: 5vw;
         }
       </style>
-      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store>
+      <redux-store id="reduxStoreElement" action="[[action]]" on-statechange="stateChange"></redux-store> -->
       <!-- Eventually just wrap the quiz-edit component in this component that will except an empty state and has a save button  -->
-      <dom-if if="[[loaded]]">
+      <!-- <dom-if if="[[loaded]]">
           <template>
             <div class="quizTitle">
               <h1 hidden$="[[editTitle]]">[[quizTitle]]</h1>
@@ -83,9 +83,9 @@
                 <a href="/quiz/create" class="prendus-button"><iron-icon icon="add"></iron-icon>&nbsp; New Quiz</a>
               </div>
             </div>
-            <div class="quizTitle">
+            <div class="quizTitle"> -->
               <!-- Trying to get the quiz title to validate, but I have not been able to figure it out -->
-              <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]" autofocus on-change="validateTitle" pattern="^(?!\s*$).+" error-message="Please enter a title."></paper-input>
+              <!-- <paper-input id="quizInput" label="Quiz Title" value="[[quizTitle]]" hidden$="[[!editTitle]]" autofocus on-change="validateTitle" pattern="^(?!\s*$).+" error-message="Please enter a title."></paper-input>
               <div class="titleActions" hidden$="[[!editTitle]]">
                 <button class="prendus-button" on-click="saveQuizTitle" ><iron-icon class="saveTitle" icon="check"></iron-icon>&nbsp;Done</button>
                 <button class="prendus-button prendus-button--minor" on-click="stopEditingQuizTitle">Cancel</button>
@@ -96,9 +96,9 @@
                 <h2 class="questionHeader">My Questions</h2>
                 <dom-repeat items="[[userQuestions]]">
                   <template>
-                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-added="addToQuiz" add edit></prendus-question-viewer-wrapper>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-question-added="addToQuiz" add edit></prendus-question-viewer-wrapper> -->
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
-                  </template>
+                  <!-- </template>
                 </dom-repeat>
               </div>
               <div id="quizQuestions" class="questionColumn">
@@ -107,9 +107,9 @@
                 </paper-card>
                 <dom-repeat items="[[quizQuestions]]">
                   <template>
-                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-deleted="removeFromQuiz" edit delete></prendus-question-viewer-wrapper>
+                    <prendus-question-viewer-wrapper class="prendus-question" question="[[item]]" on-question-deleted="removeFromQuiz" edit delete></prendus-question-viewer-wrapper> -->
                     <!-- <prendus-view-question class="prendus-question" question="[[item]]" on-question-response="_handleResponse"></prendus-view-question> -->
-                  </template>
+                  <!-- </template>
                 </dom-repeat>
               </div>
             </div>
@@ -125,4 +125,4 @@
     </template>
 
     <script type="module" src="prendus-quiz-edit.ts"></script>
-</dom-module>
+</dom-module> -->

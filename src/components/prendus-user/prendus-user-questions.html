@@ -20,7 +20,7 @@
         paper-fab{
           --paper-fab-background: var(--prendus-primary-color);
           position: fixed;
-          bottom: 30px;
+          bottom: 5vh;
           right: calc(5vw + 256px);
         }
         #questions-block{
@@ -52,8 +52,6 @@
 
       <dom-if if="[[loaded]]">
           <template>
-            [[questions]]
-            [[questions.length]]
             <dom-if if="[[!questions.length]]">
               <template>
                 <prendus-no-content-card parent-component="Question" plural="Questions" primary-redirect-url="question/create" secondary-redirect-url="question/search" display-icon="question-answer"></prendus-no-content-card>
@@ -68,8 +66,9 @@
               <prendus-infinite-list id="questionsList" next="[[fetchQuestions]]" delete-items="[[deleteItem]]">
                 <template>
                   <!-- Style is inline because this component is embedded in the infinite list and the shadowDOM prevents access to setting the styles. -->
-                  <div class="question-item" style="padding-top:75px; padding-left:25px;">
-                    <prendus-question-viewer-wrapper id="question[[item.id]]" question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit delete></prendus-question-viewer-wrapper>
+                  <div class="question-item" style="padding-top:5vh; padding-left:2vw;">
+                    <!-- Took out delete for now. Add it back when functionality is there -->
+                    <prendus-question-viewer-wrapper id="question[[item.id]]" question="[[item]]" on-deleted="openConfirmDeleteQuestionModal" edit></prendus-question-viewer-wrapper>
                     <prendus-delete-confirmation-modal id="[[item.id]]" on-delete="deleteQuestion"></prendus-delete-confirmation-modal>
                   </div>
                   </template>

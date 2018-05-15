@@ -159,8 +159,9 @@ async function signinUser(email: string, password: string, userToken: string | n
             }
         }
     `, {email, password}, userToken, (error: any) => {
-      error.message = "No account found with that email and password combination"
-      throw error;
+      const newError = error;
+      newError.message = "No account found with that email and password combination"
+      throw newError;
     });
     return data;
 }

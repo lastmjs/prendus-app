@@ -21,8 +21,6 @@ class PrendusMenu extends Polymer.Element {
 
     async connectedCallback() {
       super.connectedCallback();
-      this.action = fireLocalAction(this.componentId, 'menuOpen', true)
-
     }
 
     logout() {
@@ -49,9 +47,6 @@ class PrendusMenu extends Polymer.Element {
     }
     stateChange(e: CustomEvent) {
         const state: State = e.detail.state;
-        const componentState = state.components[this.componentId] || {};
-        const keys = Object.keys(componentState);
-        this.menuOpen = state.menuOpen;
         this.user = state.user;
         this.userToken = state.userToken;
     }

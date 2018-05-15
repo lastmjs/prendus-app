@@ -88,20 +88,7 @@ class PrendusInfiniteList extends Polymer.Element {
     const deletedItems = await deleteItems(this.items);
     deletedItems.map((deletedItem: any)=>{
       this.splice('items', this.items.indexOf(deletedItem), 1);
-    })
-    const threshold = this.shadowRoot.querySelector('#threshold');
-    // this.action = fireLocalAction(this.componentId, 'items', newItems);
-    this.action = fireLocalAction(this.componentId, 'cursor', this.cursor - 1);
-    // const threshold = this.shadowRoot.querySelector('#threshold');
-    console.log('threshold', threshold)
-    // if (newItems.length < this.pageSize)
-    //   this.action = fireLocalAction(this.componentId, 'lowerThreshold', null);
-    // else
-    //   threshold.clearLower();
-    // const newItems = this.items.filter((item) => {
-    //
-    //   return item.id !== deletedItemId;
-    // })
+    });
   }
 
   async loadMore(e: CustomEvent) {

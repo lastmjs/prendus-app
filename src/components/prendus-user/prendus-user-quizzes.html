@@ -1,10 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!-- <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../node_modules/redux-store-element/redux-store.html">
 <link rel="import" href="../prendus-notification/prendus-notification.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<!-- <link rel="import" href="../../bower_components/iron-list/iron-list.html"> -->
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
@@ -51,13 +50,9 @@
                 <h1 class="title">My Quizzes</h1>
               </template>
             </dom-if>
-            <!-- Need to get an iron list working.  -->
             <dom-repeat items="[[quizzes]]">
               <template>
                 <paper-card class="quiz-card" heading="[[item.title]]">
-                  <div class="card-content">
-                    <!-- What are we going to put here?  -->
-                  </div>
                   <div class="card-actions">
                     <a href="quiz/[[item.id]]/view"><paper-icon-button id="view-quiz" class="prendus-icon-button" icon="view-list"></paper-icon-button></a>
                     <paper-tooltip for="view-quiz" offset="0" animation-delay="300">Take Quiz</paper-tooltip>
@@ -81,4 +76,4 @@
     </template>
 
     <script type="module" src="prendus-user-quizzes.ts"></script>
-</dom-module>
+</dom-module> -->

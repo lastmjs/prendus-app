@@ -1,5 +1,4 @@
-import {SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../prendus.d';
-import {User, Question, Assignment} from '../../prendus.d';
+import {User, Question, Assignment, SetPropertyAction, SetComponentPropertyAction, DefaultAction} from '../../prendus.d';
 import {createUUID, navigate, fireLocalAction, asyncForEach} from '../../node_modules/prendus-shared/services/utilities-service';
 import {shuffleArray} from '../../services/utilities-service';
 import {QuestionType, NotificationType, ContextType, VerbType, ObjectType} from '../../services/constants-service';
@@ -58,27 +57,26 @@ export class PrendusUserQuestions extends Polymer.Element {
 
   computeFetchQuestions(user: User, userToken: string): (i: number, n: number) => Promise<object> | void {
     //The load user function will check if the user is logged in. This ensures that the user is set before returning this function.
-    //computeFetchQuestions gets called when the user gets set, so this just prevents the function from getting returned when the userToken is setTimeout
+    //computeFetchQuestions gets called when the user gets set, so this just prevents the function from getting returned when the userToken is set
     if(user)
       return async (pageIndex: number, pageAmount: number) => getUserQuestions(
         user.id, userToken, pageIndex, pageAmount
       );
   };
 
-  async deleteQuestion(e: any){
-    try{
-      this.action = fireLocalAction(this.componentId, 'loaded', false);
-      const questionId = e.target.id;
+  // async deleteQuestion(e: any){
+  //   try{
+  //     this.action = fireLocalAction(this.componentId, 'loaded', false);
+  //     const questionId = e.target.id;
       // const deletedQuestionId = await deleteQuestion(questionId, this.userToken);
-      this.action = fireLocalAction(this.componentId, 'deleteItem', async (questions: Question[]) => deleteQuestionFromGraphQLAndDOM(questionId, this.userToken, questions));
-      //Just raise an event notifiying the infinite list of the deleted item
-      this.action = fireLocalAction(this.componentId, 'loaded', true);
-    }catch(error){
-      console.log('error', error)
-      this.action = setNotification(error.message, NotificationType.ERROR);
-      this.action = fireLocalAction(this.componentId, 'loaded', true)
-    }
-  }
+  //     this.action = fireLocalAction(this.componentId, 'deleteItem', async (questions: Question[]) => deleteQuestionFromGraphQLAndDOM(questionId, this.userToken, questions));
+  //     this.action = fireLocalAction(this.componentId, 'loaded', true);
+  //   }catch(error){
+  //     console.log('error', error)
+  //     this.action = setNotification(error.message, NotificationType.ERROR);
+  //     this.action = fireLocalAction(this.componentId, 'loaded', true)
+  //   }
+  // }
   stateChange(e: CustomEvent) {
     const state = e.detail.state;
     const componentState = state.components[this.componentId] || {};
@@ -116,6 +114,7 @@ async function getUserQuestions(userId: string, userToken: string, pageIndex: nu
     `, {userId, pageIndex, pageAmount}, userToken, (error: any) => {
       throw error;
     });
+    console.log('questions', data.allQuestions)
     return data.allQuestions;
 }
 
