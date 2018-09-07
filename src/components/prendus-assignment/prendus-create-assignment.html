@@ -14,16 +14,6 @@
     <style include="prendus-styles"></style>
     <redux-store id="store" action="[[action]]" on-statechange="stateChange"></redux-store>
 
-    <div style="display: flex; justify-content: center; margin-bottom: 50px;">
-        <div hidden$="[[user.createAssignmentEditorChosen]]">
-            <paper-button raised style="background-color: #2a9af2" on-click="createAssignmentEditorChosen">Try the new Question Editor for a cleaner and more flexible experience with multiple choice, multiple select, fill in the blank, and images</paper-button>
-        </div>
-
-        <div hidden$="[[!user.createAssignmentEditorChosen]]">
-            <paper-button raised on-click="createAssignmentEditorChosen">I don't want to use the question editor</paper-button>
-        </div>
-    </div>
-
     <prendus-assignment-shared
       id="shared"
       assignment-id="[[assignmentId]]"
@@ -37,9 +27,12 @@
         <!-- <div hidden$="[[isMultipleChoiceType(assignment.questionType)]]">
           <prendus-essay-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-essay-scaffold>
         </div> -->
+
+        <!--TODO get rid of the multiple choice scaffold choice completely-->
         <div hidden$="[[user.createAssignmentEditorChosen]]">
           <prendus-multiple-choice-scaffold question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-multiple-choice-scaffold>
         </div>
+        
         <div hidden$="[[!user.createAssignmentEditorChosen]]">
             <prendus-create-assignment-editor question="[[question]]" assignment="[[assignment]]" on-question-created="_handleQuestion"></prendus-create-assignment-editor>
         </div>
