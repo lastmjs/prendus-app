@@ -150,6 +150,7 @@ async function loadAssignment(assignmentId: string, userId: string, userToken: s
       questionType
       numReviewQuestions
       questions(filter: {
+        createdAt_gt: "2018-08-01"
         author: {
           id_not: $userId
         }
